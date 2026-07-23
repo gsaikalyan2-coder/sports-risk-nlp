@@ -1,0 +1,73 @@
+# Construct taxonomy — the academic backbone of the project.
+# Each construct maps to a validated sports-psychology instrument so labels are
+# reviewer-defensible. Label = presence (0/1) + intensity (0=none,1=mild,2=moderate,3=strong).
+# DO NOT add constructs outside this file without updating docs/annotation_guidelines.md.
+
+version: 1
+intensity_scale: [0, 1, 2, 3]   # 0 none, 1 mild, 2 moderate, 3 strong
+
+constructs:
+  cognitive_anxiety:
+    definition: >
+      Negative expectations and worry about performance (fear of failure,
+      rumination, self-doubt about the upcoming competition).
+    instrument_anchor: "CSAI-2 (Competitive State Anxiety Inventory-2), cognitive subscale"
+    positive_examples:
+      - "I keep thinking about all the ways this could go wrong."
+      - "I'm worried I'll let the team down tomorrow."
+    negative_examples:
+      - "I've prepared well and I know my race plan."
+    edge_cases: "General life worry unrelated to competition = 0."
+
+  somatic_anxiety:
+    definition: >
+      Perception of bodily arousal / physiological tension (racing heart,
+      butterflies, shakiness, tight muscles) tied to competition.
+    instrument_anchor: "CSAI-2, somatic subscale"
+    positive_examples:
+      - "My stomach is in knots and my hands won't stop shaking."
+    negative_examples:
+      - "I feel calm and physically ready."
+    edge_cases: "Injury/illness symptoms without anxiety framing = 0."
+
+  self_confidence:
+    definition: >
+      Belief in one's ability to perform well and meet the competitive demand.
+    instrument_anchor: "CSAI-2, self-confidence subscale"
+    positive_examples:
+      - "I know I can win this if I stick to my game."
+    negative_examples:
+      - "I don't think I'm good enough for this field."
+
+  motivation_orientation:
+    definition: >
+      Whether drive is approach-focused (pursuing success/mastery) or
+      avoidance-focused (avoiding failure/shame).
+    instrument_anchor: "Self-Determination Theory / Achievement-Goal Theory"
+    labels: [approach, avoidance, mixed, none]
+
+  perceived_stress:
+    definition: "Sense of pressure or demand exceeding perceived resources."
+    instrument_anchor: "Perceived Stress framing (sport context)"
+
+  attentional_focus:
+    definition: >
+      Direction/stability of attention — task-focused concentration vs.
+      distraction by irrelevant cues, outcome, or audience.
+    instrument_anchor: "Attentional control in sport"
+    labels: [focused, distracted, mixed, none]
+
+  burnout_signal:
+    definition: >
+      Emotional/physical exhaustion, reduced sense of accomplishment, or
+      sport devaluation.
+    instrument_anchor: "Athlete Burnout Questionnaire (ABQ)"
+
+  coping_style:
+    definition: "How the athlete manages pressure — task-focused vs. avoidance."
+    instrument_anchor: "Coping in sport literature"
+    labels: [task_focused, avoidance, mixed, none]
+
+# Risk fusion note: cognitive_anxiety, somatic_anxiety, perceived_stress, burnout_signal,
+# and avoidance-oriented motivation/coping raise risk; self_confidence and
+# focused attention lower it. Exact weights are calibrated in src/risk (Phase 15).

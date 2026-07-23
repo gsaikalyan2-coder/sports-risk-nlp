@@ -1,0 +1,27 @@
+# Global project settings.
+project_name: sports-risk-nlp
+seed: 42                       # fix everywhere for reproducibility
+
+paths:
+  raw: data/raw
+  interim: data/interim
+  silver: data/processed/silver
+  gold: data/gold
+  models: models
+  reports: reports
+  logs: logs
+
+model:
+  base: microsoft/deberta-v3-base   # swap to roberta-base if VRAM-limited
+  max_length: 256
+  problem_type: multi_label
+
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+  stratify: true
+
+evaluation:
+  primary_metric: macro_f1
+  report_calibration: true          # Expected Calibration Error (ECE)

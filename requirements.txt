@@ -1,0 +1,27 @@
+# Core
+python-dotenv>=1.0
+pyyaml>=6.0
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.4
+
+# NLP / modeling
+torch>=2.2
+transformers>=4.44
+datasets>=2.20
+accelerate>=0.33
+
+# Agents / LLM routing (OpenRouter is OpenAI-API compatible)
+crewai>=0.51
+openai>=1.40          # used as the OpenRouter client
+
+# Explainability & tracking
+shap>=0.46
+wandb>=0.17
+
+# Dashboard
+streamlit>=1.37
+
+# Dev / test
+pytest>=8.0
+ruff>=0.5

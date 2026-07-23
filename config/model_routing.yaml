@@ -1,0 +1,24 @@
+# Cost-aware LLM routing (OpenRouter). Route by task difficulty; escalate only on
+# low confidence. Model IDs are placeholders — set to your chosen OpenRouter models.
+# Keep a running spend log at logs/cost_ledger.csv.
+
+provider: openrouter          # confirmed 2026-07-23
+budget_usd_month: 20          # hard cap; stop/alert when exceeded
+prompt_caching: true
+batch_requests: true
+
+tiers:
+  cheap:                      # bulk labeling, cleaning, dedup, EDA summaries
+    model: "openrouter/<cheap-model-id>"
+    use_for: [preprocessing, weak_labeling, deduplication]
+  mid:                        # ambiguous labels, explanations, adjudication assist
+    model: "openrouter/<mid-model-id>"
+    use_for: [ambiguous_labels, explanations, qa_review]
+  premium:                    # novelty analysis, paper writing, hard adjudication
+    model: "openrouter/<premium-model-id>"
+    use_for: [literature_review, paper_writing, hard_adjudication]
+
+escalation:
+  # If a cheap-tier label confidence < threshold, re-run on the next tier up.
+  confidence_threshold: 0.65
+  max_tier: premium
