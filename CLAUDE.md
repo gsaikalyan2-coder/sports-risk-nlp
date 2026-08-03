@@ -1,0 +1,273 @@
+# .claude.md — Pre-Competition Psychological Risk Profiling of Athletes
+
+> Single source of truth for this project. Claude (and any AI agent) must read
+> this file before doing work. Everything below is a **proposal for a sophomore-level,
+> IEEE-publishable rewrite** — items marked **[NEEDS PERMISSION]** must be confirmed by
+> Saikalyan before they are locked in.
+
+---
+
+## 0. Project Identity
+
+| Field | Value |
+|---|---|
+| **Title** | Pre-Competition Psychological Risk Profiling of Athletes |
+| **Domain** | NLP × Sports Psychology (interpretable, construct-grounded ML) |
+| **Owner** | Saikalyan, Sophomore, SRMIST |
+| **Target venue** | IEEE conference (iTriply Explore) — full paper |
+| **Timeline** | 8 weeks. Code frozen ~Week 7; paper draft by 1st week of September 2026 |
+| **IDE** | VS Code (primary) |
+| **Repo strategy** | Full rewrite from scratch. Old files deleted after a one-time backup branch |
+| **Primary language** | Python 3.11 |
+
+---
+
+## 1. What Makes This Novel (not "just sentiment analysis")
+
+Basic sentiment analysis outputs positive/negative/neutral. **This project does not do that.**
+Instead it performs **construct-grounded, multi-dimensional psychological risk profiling**:
+we detect *validated sports-psychology constructs* in athlete text and combine them into an
+interpretable **pre-competition risk index**.
+
+**The core idea in one sentence:** Given text an athlete produces before a competition
+(interviews, press conferences, social posts, journals), predict a set of psychology constructs
+grounded in validated instruments, then fuse them into an explainable risk score that flags
+elevated pre-competition psychological risk.
+
+**The constructs** are drawn from established sports-psychology instruments so the labels are
+defensible in a paper (this is the academic-rigor anchor):
+
+- **Cognitive anxiety** and **somatic anxiety** and **self-confidence** — from the CSAI-2 tradition.
+- **Motivation orientation** (approach vs. avoidance) — self-determination / achievement-goal theory.
+- **Perceived stress / pressure**.
+- **Attentional focus vs. distraction**.
+- **Burnout / emotional exhaustion signals** — Athlete Burnout Questionnaire (ABQ) tradition.
+- **Coping style** (task-focused vs. avoidance).
+
+**Four things make it publishable:**
+1. **Construct grounding** — labels map to recognized psychometric constructs, not ad-hoc classes.
+2. **A new labeled corpus** — even a modest, well-documented dataset with inter-annotator
+   agreement is a contribution.
+3. **Interpretability** — text spans → constructs → risk, with attribution (attention/SHAP).
+4. **Agentic, cost-aware pipeline** — a reproducible multi-agent system is itself a methods contribution.
+
+**Explicit non-goals / ethics guardrails (must appear in the paper):**
+- This is **decision-support and research**, **not** clinical diagnosis of any real person.
+- No claims about a named athlete's mental health. Use public/consented/synthetic/anonymized text.
+- Report limitations, bias, and misuse risks. Frame as a screening/awareness tool for coaches/researchers.
+
+---
+
+## 2. System Architecture (NLP–Psychology Pipeline)
+
+```
+                    ┌─────────────────────────────────────────────────────┐
+                    │            CONSTRUCT TAXONOMY (Sec. 3)               │
+                    │  CSAI-2 / SDT / ABQ-grounded label schema + rubric   │
+                    └─────────────────────────────────────────────────────┘
+                                          │ governs
+                                          ▼
+ [1] Ingestion ──▶ [2] Preprocessing ──▶ [3] Weak/LLM Labeling ──▶ [4] Gold Verification
+   raw text          clean, normalize        cheap LLM proposes         humans confirm a
+   (interviews,      de-identify, segment     construct labels           stratified subset;
+   pressers,         into utterances          (cost-aware routing)       measure IAA (kappa)
+   social, journals)                                                          │
+                                                                              ▼
+ [7] Explainability ◀── [6] Risk Scoring ◀── [5] Construct Classifier ◀── labeled dataset
+   span attribution        fuse construct        multi-label transformer
+   attention / SHAP        probs → risk index    (fine-tuned) + baselines
+        │                       │
+        ▼                       ▼
+ [8] Evaluation & Ablations ──▶ [9] Dashboard / Visualization ──▶ [10] IEEE Paper
+   per-construct F1, calibration,   coach-facing profile view        reproducible artifact
+   human-agreement, error analysis
+```
+
+**Layer responsibilities**
+
+1. **Ingestion** — pull/import text into `data/raw/`. Records provenance + license per source.
+2. **Preprocessing** — cleaning, sentence/utterance segmentation, de-identification (strip PII),
+   language filtering. Output `data/interim/`.
+3. **Weak/LLM Labeling** — a cheap LLM proposes construct labels + rationale per utterance
+   (silver labels). Cost-aware routing (Sec. 5). Output `data/processed/silver/`.
+4. **Gold Verification** — humans (Saikalyan + ≥1 peer) verify a stratified sample; compute
+   inter-annotator agreement (Cohen's/Fleiss' kappa). Output `data/gold/`.
+5. **Construct Classifier** — multi-label transformer fine-tuned on gold+silver, benchmarked
+   against classical baselines (TF-IDF+LogReg/SVM) and a lexicon baseline.
+6. **Risk Scoring** — deterministic + learned fusion of construct probabilities into a single
+   0–1 risk index with per-construct contributions. Calibrated (Platt/temperature scaling).
+7. **Explainability** — SHAP and/or attention rollout to attribute risk to text spans/constructs.
+8. **Evaluation** — per-construct P/R/F1, macro/micro F1, calibration (ECE), human agreement,
+   ablations (baseline vs transformer, with/without silver data, with/without risk fusion).
+9. **Dashboard** — a simple Streamlit/HTML view: paste text → construct bars + risk gauge + highlighted spans.
+10. **Paper** — LaTeX IEEE two-column, reproducible artifact (Docker + seeds + model card).
+
+---
+
+## 3. Construct Taxonomy (the academic backbone)
+
+Maintained as `config/taxonomy.yaml` and documented in `docs/annotation_guidelines.md`.
+Each construct has: definition, sports-psych citation anchor, positive/negative examples,
+edge cases, and label type (present/absent + intensity 0–3). This rubric is what makes the
+labels reproducible and reviewer-defensible. **Do not invent constructs outside this file.**
+
+---
+
+## 4. Specialized AI Agents (AI-First Engineering)
+
+Work is decomposed across specialized agents so several can run **in parallel**. Each agent has
+a narrow contract: inputs, outputs, and a "definition of done." Orchestration follows a Kanban
+work-item model (see `PROJECT_PLAN.md`), with **merge gates** — nothing lands without passing
+its acceptance check.
+
+| Agent | Responsibility | Reads | Writes | Model tier |
+|---|---|---|---|---|
+| **Literature Agent** | Related-work sweep, novelty positioning, citation harvesting | web/arXiv | `docs/related_work.md`, `paper/refs.bib` | premium (reasoning) |
+| **Taxonomy/Psych Agent** | Ground constructs in instruments, write annotation rubric | papers, `taxonomy.yaml` | `docs/annotation_guidelines.md` | premium |
+| **Harvester Agent** | Ingest text, record provenance/license, de-identify | sources | `data/raw/`, `data/interim/` | cheap |
+| **Labeling Agent** | Propose construct labels + rationale (silver) | `data/interim/` | `data/processed/silver/` | cheap→mid (routed) |
+| **Annotation-QA Agent** | Flag low-confidence/conflicting labels for human review | silver | review queue | cheap |
+| **Modeling Agent** | Train/tune baselines + transformer, log runs | gold+silver | `models/`, run logs | local GPU / mid |
+| **Evaluation Agent** | Metrics, calibration, ablations, error analysis | `models/`, gold | `reports/`, figures | cheap |
+| **Explainability Agent** | SHAP/attention attribution, example cards | `models/` | `reports/explain/` | mid |
+| **Security/Ethics Agent** | Secret/dep scan, PII audit, ethics & limitations draft | repo, data | `docs/security.md`, `docs/ethics.md` | mid |
+| **Paper Agent** | Assemble IEEE draft from artifacts | everything | `paper/` | premium |
+
+**Rules for all agents**
+- Every agent writes a short run log to `logs/` (what it did, cost, artifacts produced).
+- Agents never overwrite `data/gold/` — that is human-owned.
+- Any agent touching real athlete data must run the de-identification step first.
+- Prefer the smallest model that passes the acceptance check (Sec. 5).
+
+---
+
+## 5. Cost-Aware LLM Strategy **[NEEDS PERMISSION]**
+
+Bulk work (labeling thousands of utterances, preprocessing) must not use premium models.
+Route by task difficulty:
+
+- **Cheap tier** (bulk labeling, cleaning, dedup): a small/cheap model.
+- **Mid tier** (ambiguous labels, explanations): a mid model.
+- **Premium tier** (novelty analysis, paper writing, hard adjudication): a strong reasoning model.
+
+**Controls:** prompt caching for repeated system/rubric prompts; batch requests; a hard
+monthly budget with a running cost log (`logs/cost_ledger.csv`); automatic downgrade when a
+cheap model's confidence is high, escalation only on low confidence.
+
+**Provider options to confirm (Q2):** OpenRouter (one key, many models, easy routing) vs.
+direct provider APIs vs. local/free models (Hugging Face + Ollama) to spend ₹0 on inference.
+
+---
+
+## 6. Tool Recommendations **[ALL NEED PERMISSION]**
+
+| Concern | Recommended default | Alternatives | Ask |
+|---|---|---|---|
+| Language / env | Python 3.11 + `venv` + `pip` | conda, uv | default ok? |
+| Multi-agent orchestration | **CrewAI** (gentler for a sophomore) | AutoGen, LangGraph | **Q1** |
+| Containerization | Docker + docker-compose | Podman | default ok? |
+| LLM access / cost | **OpenRouter** + caching | direct APIs, local HF/Ollama | **Q2** |
+| Transformer training | Hugging Face `transformers` + `datasets` | Flair, spaCy | default ok? |
+| Base model | DeBERTa-v3-base / RoBERTa-base | domain BERT, DistilBERT (lighter) | default ok? |
+| Classical baselines | scikit-learn (TF-IDF + LogReg/SVM) | — | default ok? |
+| Explainability | SHAP + attention rollout | LIME, Captum | default ok? |
+| Experiment tracking | Weights & Biases (free tier) | MLflow, CSV logs | default ok? |
+| Dashboard | Streamlit | Gradio, Flask | default ok? |
+| Data acquisition | **[NEEDS PERMISSION]** | scrape / public datasets / synthetic | **Q3** |
+| AutoML benchmark (optional) | DataRobot | scikit-learn only | optional |
+| Paper | LaTeX (IEEE template) + Overleaf | Word | default ok? |
+| Vector store (only if RAG added) | Chroma / FAISS | — | later |
+
+---
+
+## 7. File Structure (rewrite target)
+
+```
+sports-risk-nlp/
+├── .claude.md                  # this file
+├── README.md
+├── PROJECT_PLAN.md             # 25-phase blueprint
+├── pyproject.toml / requirements.txt
+├── .env.example                # keys as placeholders; real .env is gitignored
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml          # agent services + dashboard
+├── config/
+│   ├── taxonomy.yaml           # construct schema (Sec. 3)
+│   ├── model_routing.yaml      # cost-aware tiers (Sec. 5)
+│   └── settings.yaml
+├── data/
+│   ├── raw/                    # untouched, with provenance.json per source
+│   ├── interim/                # cleaned, de-identified
+│   ├── processed/silver/       # LLM/weak labels
+│   ├── gold/                   # human-verified (human-owned, never auto-written)
+│   └── external/
+├── src/
+│   ├── ingestion/
+│   ├── preprocessing/          # includes deidentify.py
+│   ├── taxonomy/
+│   ├── labeling/               # cost-aware LLM labeling
+│   ├── models/                 # baselines + transformer
+│   ├── risk/                   # construct → risk fusion + calibration
+│   ├── explainability/
+│   ├── evaluation/
+│   └── agents/                 # CrewAI/AutoGen agent + crew definitions
+├── notebooks/                  # EDA, error analysis (exploration only)
+├── dashboard/                  # Streamlit app
+├── reports/                    # metrics, figures, explanations
+├── paper/                      # IEEE LaTeX, refs.bib, figures
+├── tests/                      # pytest
+├── scripts/                    # one-off runners
+├── logs/                       # agent run logs + cost_ledger.csv
+└── docs/                       # annotation_guidelines, related_work, ethics, security
+```
+
+---
+
+## 8. How Claude Should Respond On This Project (tailoring rules)
+
+1. **Teach while doing.** Saikalyan is a sophomore. Explain *why* before *how*; define jargon
+   the first time it appears; prefer one clear path over many options.
+2. **Ask before locking tools.** Any framework/library/model/data decision that isn't already
+   confirmed in this file must be confirmed via a question before it's treated as final.
+3. **Small, verifiable steps.** Produce runnable increments with a way to check they worked
+   (a test, a printout, a screenshot). End non-trivial work with a verification step.
+4. **Academic rigor is the priority.** Every modeling choice should be defensible in a paper.
+   When in doubt, prefer the option that is easier to justify to a reviewer.
+5. **Ethics is not optional.** Never infer mental-health status of a real named person; always
+   route real data through de-identification; keep the limitations/ethics framing current.
+6. **Cost discipline.** Default to the cheapest model that passes the acceptance check; log cost.
+7. **Reproducibility.** Fixed seeds, pinned versions, Dockerized runs, a model card per model.
+8. **Be concise and direct in chat** (Saikalyan's stated preference); put depth in files/docs.
+9. **Never commit secrets.** Keys live only in `.env` (gitignored); `.env.example` holds placeholders.
+10. **Update this file** when a decision is confirmed, so it stays the single source of truth.
+
+---
+
+## 9. Definition of "Publication-Ready"
+
+- A documented dataset with reported inter-annotator agreement.
+- Transformer beats classical + lexicon baselines on macro-F1, with ablations.
+- Calibrated, interpretable risk index with worked examples.
+- Reproducible artifact (Docker + seeds + model card + released code).
+- Complete IEEE draft: abstract, intro, related work, method, dataset, experiments, results,
+  ablation, ethics & limitations, conclusion, references.
+
+---
+
+## 10. Confirmed Decisions (locked 2026-07-23)
+
+- **Q1 — Multi-agent framework: CrewAI.** ✅ Confirmed. Role-based, sophomore-friendly.
+- **Q2 — LLM access: OpenRouter** with cost-tier routing + caching + budget ledger. ✅ Confirmed.
+- **Q3 — Data: existing public/licensed datasets first.** ✅ Confirmed. Fallback if coverage is
+  thin: hybrid synthetic-for-training + small real gold set (revisit at Phase 7).
+- **Optional** DataRobot AutoML benchmark — only if a DataRobot account is available (Phase 16).
+- **Expansions selected (stretch, park until core is done):** Temporal risk trajectory,
+  Multimodal audio/prosody, Team-level aggregation, Outcome-linkage validation.
+  → **Scope guidance:** core pipeline (Phases 1–25) ships first. Of the four, **Outcome-linkage
+  validation** is the highest-value add if outcome data exists; the other three are documented as
+  **"Future Work"** in the paper unless time in Week 8 allows. Do not start any expansion before Phase 19.
+
+Still using defaults from §6 (Python 3.11, Docker, HF transformers, DeBERTa/RoBERTa, scikit-learn,
+SHAP, W&B, Streamlit, LaTeX). Flag if you want to change any.
+```
