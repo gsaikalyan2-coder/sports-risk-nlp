@@ -156,16 +156,21 @@ A script loaded the YAML and checked every gate condition mechanically:
 
 ### Blockers and unresolved issues
 
-- **Stale git lock files — needs owner action.** The sandbox could not delete
-  `.git/HEAD.lock`, `.git/index.lock`, and `.git/objects/maintenance.lock`. Git still
-  operates, but **please delete these three files on Windows** before further git work.
-- **`pre-commit` is not installed in the sandbox**, so hooks could not be run against the
-  changed files. All three changed files are documentation/config with no secrets. **Run
-  `pre-commit run --all-files` on the owner machine** to confirm.
-- **A misconfigured plugin hook fires on every file write** — the `pixeltable` plugin points
-  at `hooks/validate_antipatterns.py`, which does not exist. It is noise and blocked nothing,
-  but it should be removed or repaired.
-- **Phase 2 verification still unconfirmed** (`.\scripts\verify_env.ps1`).
+> **`docs/open_issues.md` is the single source of truth for open items.** It is deliberately
+> not duplicated here. As of 2026-08-08 it carries **OPEN-001** (Docker daemon down — deferred
+> by owner, **hard gate on Phase 6**), **OPEN-002** (broken plugin hook), **OPEN-003** (no
+> off-machine backup), **OPEN-004** (expert-rater recruitment not started), **OPEN-005**
+> (ethics exemption not yet in writing — blocks submission), **OPEN-006** (contact route is a
+> personal address — blocks release). Read it before planning any phase.
+
+- **Stale git lock files — RESOLVED 2026-08-08.** `.git/HEAD.lock`, `.git/index.lock`, and
+  `.git/objects/maintenance.lock` were deleted on the owner machine; commits work again.
+- **`pre-commit` — RESOLVED.** Could not run in the sandbox, but `verify_env.ps1` check 9 ran
+  the full hook set on Windows: trailing whitespace, end-of-files, check-yaml, merge-conflict,
+  large-files, detect-private-key, ruff, ruff-format, detect-secrets — all **Passed**. Check 10
+  confirms `.env` is untracked.
+- **Phase 2 verification — 8/10 pass.** Only Docker checks 7 and 8 fail; see OPEN-001. The
+  Python environment is verified and safe to rely on.
 - **Open for Phase 12:** the construct set is locked but not frozen. `burnout_signal` and
   `attentional_focus` are the most likely candidates to show weak inter-annotator agreement.
 - **Not started, but should be:** `PROJECT_PLAN.md` risk #4 says expert-rater recruitment for

@@ -111,8 +111,62 @@ That fallback materially weakens the contribution, so it should be a last resort
 
 ---
 
+## OPEN-005 — Ethics-review exemption not yet in writing
+
+**Status:** OPEN — favourable determination, documentary record missing
+**Owned by:** Phase 5 (ethics & data governance)
+**Becomes blocking at:** **paper submission** (1st week of September 2026). Does **not** block
+Phase 7 ingestion.
+
+The owner reports that SRMIST determined this project **exempt** from institutional ethics
+review, as secondary analysis of public/licensed/consented/synthetic text with no primary
+human-subjects collection. Recorded in `docs/ethics.md` §3.4 on 2026-08-08. On the strength of
+that, A3 and A4 collection are unblocked.
+
+What is missing is the *documentary* form of the determination — an email, a letter, or a
+committee reference number naming the determining body and the date.
+
+**Why this stays open even though the answer was favourable.** An exemption is a claim about
+process, and reviewers and ethics editors ask for its provenance. "The author states the work was
+exempt" is materially weaker than "exempt per SRMIST, determination dated X, reference Y". The gap
+is only closable before submission, and it is cheapest to close now while the conversation is
+fresh — one email — rather than in September against a deadline.
+
+**Resolution:** obtain the written determination; save as `docs/ethics_review_exemption.*`, or if
+it carries personal contact details, record only the reference number in `docs/ethics.md` §3.4 and
+keep the document out of the repo. Cite it in the paper's Ethics section.
+
+---
+
+## OPEN-006 — Withdrawal/incident contact route is a personal address
+
+**Status:** OPEN — interim route live, institutional route required
+**Owned by:** Phase 5 (ethics & data governance)
+**Becomes blocking at:** **any public release** — corpus, code, or paper (~Phase 24/25).
+Does **not** block Phase 7 ingestion.
+
+`docs/ethics.md` §7.1 nominates `gsaikalyan2@gmail.com` (prefix `[SPORTS-RISK-NLP]`, 7-day
+acknowledgement) as the route for withdrawal, correction, and incident reports. That is adequate
+for a project with nothing released yet.
+
+It is not adequate on a published artefact, for two reasons. **Accountability:** the project's only
+accountability mechanism should be traceable to the institution that determined it exempt, not to
+one individual's private webmail. **Continuity:** an A3 donor may withdraw consent two years after
+publication, and the route has to still work — past the owner's graduation.
+
+**Resolution:** before release, update §7.1 to an **SRMIST institutional address** as primary plus
+a **named supervisor or lab contact** as secondary, then propagate to `README.md`,
+`docs/model_card.md`, and the A3 consent form.
+
+*Note:* no institutional address or supervisor name has been invented as a placeholder. A
+plausible-looking address that does not resolve would produce a withdrawal route that silently
+fails, which is worse than an honest interim one.
+
+---
+
 ## Change log
 
 | Date | Change |
 |---|---|
 | 2026-08-08 | Register created at end of Phase 4. OPEN-001 through OPEN-004 logged. |
+| 2026-08-08 | Phase 5 owner decisions resolved. OPEN-005 (exemption not in writing) and OPEN-006 (personal contact address) logged as the two residuals. Neither blocks Phase 7. |

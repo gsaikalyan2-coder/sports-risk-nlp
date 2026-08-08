@@ -31,6 +31,7 @@ permitted:
       - attribution_preserved
       - provenance_json_complete
     redistribution: "only if the source licence permits; otherwise derived artefacts only"
+    status: permitted
     notes: "Confirmed primary strategy. Exhaust this before considering A3 or A4."
 
   A2_synthetic:
@@ -43,6 +44,7 @@ permitted:
       - generation_prompts_version_controlled
       - generator_model_and_date_recorded
     redistribution: permitted
+    status: permitted
     notes: >
       Must never be presented as real athlete speech, in the corpus, the paper,
       or the dashboard. Confirmed fallback for training volume, paired with a
@@ -57,9 +59,15 @@ permitted:
       - consent_states_construct_labelling_purpose
       - withdrawal_right_explained_and_honoured
       - donor_is_adult
-      - institutional_review_resolved      # see docs/ethics.md §3.4 — BLOCKING
+      - institutional_review_resolved      # SATISFIED 2026-08-08 — exempt, see docs/ethics.md §3.4
+      - contact_route_present_in_consent_form   # see docs/ethics.md §7.1
     redistribution: "only as the consent form permits"
-    notes: "Blocked until the institutional-review question is resolved by the owner."
+    status: permitted
+    notes: >
+      UNBLOCKED 2026-08-08. Institutional review determined EXEMPT (docs/ethics.md §3.4);
+      documentary record still to be obtained (OPEN-005) but collection may proceed.
+      The consent form must carry the §7.1 contact route and the withdrawal terms as
+      written — including that models already trained are not retrained retroactively.
 
   A4_official_press_material:
     primary: false
@@ -72,13 +80,18 @@ permitted:
       - deidentified_despite_being_public
       - no_individual_level_published_output
       - no_named_athlete_claims
-      - institutional_review_resolved      # see docs/ethics.md §3.4 — BLOCKING
+      - institutional_review_resolved      # SATISFIED 2026-08-08 — exempt, see docs/ethics.md §3.4
+      - excluded_if_attribution_would_harm_speaker   # §3.3 condition 4, applied at annotation time
     redistribution: "derived artefacts only; never verbatim source text"
+    status: permitted
     notes: >
-      Ethically the hardest permission in this file. Permitted only under the
-      strict conditions in docs/ethics.md §3.3. Pending explicit owner
-      confirmation; conservative fallback is A1 + A2 + A3 only.
-    status: pending_owner_confirmation
+      CONFIRMED PERMITTED by owner decision 2026-08-08 (docs/ethics.md §3.3). The
+      conservative A1+A2+A3 fallback was NOT taken. Still the ethically hardest
+      permission in this file: all six `requires` above are mandatory, not advisory.
+      Note especially that a distinctive verbatim quote is itself an identifier and is
+      findable by search — so `no_individual_level_published_output` means paper,
+      dashboard, and figure examples must be synthetic or paraphrased beyond
+      re-identification, even after de-identification.
 
 # ---------------------------------------------------------------------------
 # PROHIBITED — non-negotiable. Not overridable by any agent or any phase.
@@ -156,7 +169,11 @@ enforcement:
   on_unlisted_source: refuse_and_log
   on_missing_required_provenance_field: refuse_and_log
   on_prohibited_match: refuse_and_log
-  on_category_pending_owner_confirmation: refuse_and_log   # blocks A4 until confirmed
+  on_category_pending_owner_confirmation: refuse_and_log
+  # ^ As of 2026-08-08 no category is `pending_owner_confirmation` — A3 and A4 are both
+  #   `permitted`. Keep this rule anyway: it is the fail-closed default for any category
+  #   added later, and removing it would silently permit an unratified source.
+  on_category_status_not_permitted: refuse_and_log
   log_destination: logs/ingestion_refusals.log
   note: >
     Fail closed. An ingestion run that refuses everything is a correct run if the

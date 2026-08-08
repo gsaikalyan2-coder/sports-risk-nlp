@@ -129,15 +129,47 @@ If a reviewer, an ethics board, or the owner judges A4 too permissive, the proje
 **A1 + A2 + A3 only**. That reduces ecological validity and would be reported as a limitation —
 it does not break the project.
 
-### 3.4 Institutional review
+**Owner decision, 2026-08-08: A4 is CONFIRMED and permitted**, under all four mandatory conditions
+above. The conservative A1+A2+A3 fallback is **not** taken. Conditions 1–4 are therefore binding
+requirements on Phase 7 ingestion and on every published artefact, not advisory notes:
 
-This project should be checked against SRMIST's requirements for human-subjects and secondary-data
-research **before** any A3 or A4 collection begins. If institutional review is required, obtain it;
-if the work is exempt as secondary analysis of public/licensed data, **record the exemption
-determination in writing** and cite it in the paper. An unrecorded assumption of exemption is a
-reviewer challenge waiting to happen.
+- Phase 7 (`src/ingestion/`) must de-identify A4 text despite the speaker being publicly known.
+- Phase 9 (dashboard) and the paper must use **synthetic or heavily paraphrased** examples only.
+  A real, quotable press-conference utterance must never appear in any output, even
+  de-identified — a distinctive quote is itself an identifier, findable by search.
+- The exclusion test in condition 4 ("would this embarrass or harm the speaker if attributed")
+  is applied at annotation time, not at publication time, and an excluded passage is dropped
+  from the corpus rather than merely withheld from the paper.
 
-**Owner action required — this is not something the agents can resolve.**
+Because A4 is the permission most likely to be questioned at review, §3.3 as a whole is written
+to be cited in the paper. Do not weaken conditions 1–4 without revisiting this decision with the
+owner and amending this section.
+
+### 3.4 Institutional review — DETERMINED EXEMPT (documentary record pending)
+
+**Determination:** the owner reports, following consultation at SRMIST, that this project is
+**exempt** from institutional ethics review as secondary analysis of public, licensed, consented,
+or synthetic text, with no primary human-subjects data collection and no clinical intervention.
+
+**Recorded:** 2026-08-08, on the owner's report.
+**Effect:** the block on A3 and A4 collection is **lifted**. Phase 7 ingestion may proceed across
+all permitted categories.
+
+**Still outstanding — one item, and it is not optional.** This determination is currently recorded
+on the owner's verbal report. The paper needs the *documentary* form: an email, a letter, or a
+committee reference number from whoever made the determination, naming the determining body and
+the date.
+
+Why this is worth chasing even though the answer is favourable: an exemption is a claim about
+process, and IEEE reviewers and ethics editors ask for its provenance. "The author states the work
+was exempt" is materially weaker than "exempt per SRMIST, determination dated X, reference Y", and
+the gap is only fixable *before* submission. Obtaining it now, while the conversation is fresh,
+costs one email. Reconstructing it in the first week of September, against a submission deadline,
+costs considerably more.
+
+**When obtained:** save it to `docs/ethics_review_exemption.*` (do not commit it if it contains
+personal contact details — record the reference number here instead) and cite it in the paper's
+Ethics section. Tracked as **OPEN-005** in `docs/open_issues.md`.
 
 ---
 
@@ -223,8 +255,38 @@ Named honestly, because the paper is stronger for naming them than for being cau
 - **Incident (suspected re-identification or leak):** stop processing, quarantine the affected
   records, notify the owner, record it in `docs/security.md`, and do not publish the affected
   subset. A near-miss is logged the same as a hit.
-- **Contact route** must appear in the released README and model card, or none of the above is
-  reachable in practice.
+### 7.1 Contact route — NOMINATED
+
+**Primary contact for withdrawal, correction, and incident reports:**
+
+> **Saikalyan — `gsaikalyan2@gmail.com`**
+> Subject line prefix: `[SPORTS-RISK-NLP]`
+> Acknowledgement target: **7 days**. Withdrawal actioned before the next data release.
+
+This address **must** appear verbatim in the released `README.md`, in `docs/model_card.md`, and in
+the A3 consent form, or none of the mechanisms in §7 is reachable in practice and the withdrawal
+right is decorative.
+
+**Standing requirement — replace before any public release.** A personal webmail address is
+acceptable for a project that has not yet released anything; it is **not** acceptable on a
+published IEEE artefact, for two reasons that both bite at review time:
+
+1. **Institutional accountability.** A withdrawal route should outlive the author's personal
+   inbox and be traceable to the institution that determined the work exempt (§3.4). A Gmail
+   address ties the project's only accountability mechanism to one individual's private account.
+2. **Continuity.** A donor may withdraw consent two years after publication. The route has to
+   still work.
+
+Therefore, **before the corpus, code, or paper is released**, this section must be updated to:
+
+- an **SRMIST institutional email address** for the owner, as primary; and
+- a **named supervisor or lab contact** as secondary, so the route survives the owner's
+  graduation.
+
+Neither is recorded here yet, and neither has been invented — inventing a plausible-looking
+institutional address would produce a route that silently fails, which is worse than an honest
+interim one. Tracked as **OPEN-006** in `docs/open_issues.md`; it is a release blocker, not a
+Phase 7 blocker, so it does not hold up ingestion.
 
 ---
 
@@ -277,14 +339,17 @@ Before any public release of code, data, or model:
 
 ---
 
-## 11. Open items requiring owner decision
+## 11. Owner decisions — all three resolved 2026-08-08
 
-1. **Institutional review (§3.4)** — determine whether SRMIST requires review, or record the
-   exemption in writing. **Blocking for A3 and A4 collection.**
-2. **Confirm category A4** (press-conference text). Permitted here under strict conditions;
-   if the owner prefers the conservative position, drop to A1 + A2 + A3 and record the
-   reduced ecological validity as a limitation.
-3. **Nominate a contact route** (§7) for withdrawal and incident reports before release.
+| # | Item | Decision | Residual action |
+|---|---|---|---|
+| 1 | Institutional review (§3.4) | **EXEMPT** — secondary analysis of public/licensed/consented/synthetic text; no primary human-subjects collection. A3 and A4 collection **unblocked**. | Obtain the determination **in writing** (reference number or email) and cite it in the paper. **OPEN-005** — before submission. |
+| 2 | Category A4, press-conference text (§3.3) | **CONFIRMED permitted** under all four mandatory conditions. Conservative A1+A2+A3 fallback **not** taken. | None. Conditions 1–4 are now binding on Phases 7, 9, and the paper. |
+| 3 | Contact route (§7.1) | **NOMINATED** — `gsaikalyan2@gmail.com`, prefix `[SPORTS-RISK-NLP]`, 7-day acknowledgement. | Replace with an SRMIST institutional address + named supervisor **before any public release**. **OPEN-006** — release blocker, not a Phase 7 blocker. |
+
+**Nothing in this section now blocks Phase 7 ingestion.** The two residual items are a
+pre-submission item and a pre-release item respectively, both tracked in
+`docs/open_issues.md`.
 
 ---
 
@@ -293,3 +358,4 @@ Before any public release of code, data, or model:
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-08-08 | Initial policy. Phase 5. Allow-list A1–A4 defined with prohibitions; de-identification spec written for Phase 8; non-diagnosis, limitations, and prohibited-use statements drafted paper-ready. |
+| 1.1 | 2026-08-08 | All three §11 owner decisions resolved. §3.4 institutional review determined **exempt** (documentary record pending, OPEN-005). §3.3 category **A4 confirmed** permitted with conditions 1–4 made binding. §7.1 contact route **nominated** (interim personal address; institutional replacement required before release, OPEN-006). A3/A4 collection unblocked for Phase 7. |
