@@ -1,0 +1,163 @@
+# Data-source allow-list — machine-readable companion to docs/ethics.md §3.
+#
+# Phase 7 ingestion MUST validate every source against this file before any text
+# enters data/raw/. The default for an unlisted source is DENY. This file is
+# policy expressed as config so that the policy can be enforced by code rather
+# than remembered by a human.
+#
+# If this file and docs/ethics.md ever disagree, docs/ethics.md is authoritative
+# and this file must be corrected.
+#
+# Status: v1.0, Phase 5, 2026-08-08.
+
+version: 1
+policy_document: docs/ethics.md
+default_action: deny        # unlisted source => refuse ingestion, no exceptions
+
+# ---------------------------------------------------------------------------
+# PERMITTED CATEGORIES
+# `primary: true` marks the confirmed default strategy (CLAUDE.md §10, Q3).
+# ---------------------------------------------------------------------------
+permitted:
+
+  A1_public_research_dataset:
+    primary: true
+    description: >
+      Existing public research datasets carrying an explicit licence that permits
+      research use.
+    requires:
+      - explicit_licence_recorded_verbatim
+      - licence_permits_research_use
+      - attribution_preserved
+      - provenance_json_complete
+    redistribution: "only if the source licence permits; otherwise derived artefacts only"
+    notes: "Confirmed primary strategy. Exhaust this before considering A3 or A4."
+
+  A2_synthetic:
+    primary: true
+    description: >
+      Text generated for this project to provide training volume without using
+      real people's words.
+    requires:
+      - record_field_synthetic_true
+      - generation_prompts_version_controlled
+      - generator_model_and_date_recorded
+    redistribution: permitted
+    notes: >
+      Must never be presented as real athlete speech, in the corpus, the paper,
+      or the dashboard. Confirmed fallback for training volume, paired with a
+      small real gold set. Revisit at Phase 7.
+
+  A3_consented_donation:
+    primary: false
+    description: >
+      Text voluntarily donated for this research under written informed consent.
+    requires:
+      - written_informed_consent_naming_this_project
+      - consent_states_construct_labelling_purpose
+      - withdrawal_right_explained_and_honoured
+      - donor_is_adult
+      - institutional_review_resolved      # see docs/ethics.md §3.4 — BLOCKING
+    redistribution: "only as the consent form permits"
+    notes: "Blocked until the institutional-review question is resolved by the owner."
+
+  A4_official_press_material:
+    primary: false
+    description: >
+      Officially published press-conference and pre/post-match interview
+      transcripts — public, professional-capacity speech.
+    requires:
+      - officially_published_by_org_or_outlet
+      - subject_is_adult
+      - deidentified_despite_being_public
+      - no_individual_level_published_output
+      - no_named_athlete_claims
+      - institutional_review_resolved      # see docs/ethics.md §3.4 — BLOCKING
+    redistribution: "derived artefacts only; never verbatim source text"
+    notes: >
+      Ethically the hardest permission in this file. Permitted only under the
+      strict conditions in docs/ethics.md §3.3. Pending explicit owner
+      confirmation; conservative fallback is A1 + A2 + A3 only.
+    status: pending_owner_confirmation
+
+# ---------------------------------------------------------------------------
+# PROHIBITED — non-negotiable. Not overridable by any agent or any phase.
+# ---------------------------------------------------------------------------
+prohibited:
+
+  - id: P1_social_media_scraping
+    rule: "Scraping personal social-media accounts."
+    reason: >
+      Public is not the same as consented. Personal posts are not
+      professional-capacity speech and their authors do not anticipate
+      psychological profiling.
+
+  - id: P2_minors
+    rule: "Any text from an identifiable person under 18."
+    reason: >
+      Youth athletes are a vulnerable population. Profiling them requires
+      ethics-board review and guardian consent this project does not hold.
+
+  - id: P3_private_communications
+    rule: "Direct messages, team chats, medical notes, counselling records, and
+           private journals not donated under A3."
+    reason: "No consent; the latter two are special-category health data."
+
+  - id: P4_licence_or_tos_violation
+    rule: "Any source whose licence forbids research use, or whose terms of
+           service forbid the collection method used."
+    reason: "Legal exposure and an avoidable reviewer challenge."
+
+  - id: P5_authenticated_or_paywalled_scraping
+    rule: "Text obtained by scraping behind authentication or a paywall."
+    reason: "Circumvents access control."
+
+  - id: P6_health_content
+    rule: "Text whose subject matter is an athlete's health, injury, or treatment."
+    reason: >
+      Special-category data, and outside the pre-competition
+      psychological-language scope of this project.
+
+  - id: P7_unverifiable_provenance
+    rule: "Any source that cannot produce a complete provenance.json."
+    reason: "Unverifiable provenance is unpublishable."
+
+# ---------------------------------------------------------------------------
+# Required provenance fields — Phase 7 writes one provenance.json per source.
+# Ingestion fails closed if any required field is missing or null.
+# ---------------------------------------------------------------------------
+provenance_required_fields:
+  - source_id
+  - source_name
+  - allowlist_category            # must be one of the `permitted` keys
+  - url_or_citation
+  - collection_date
+  - licence_or_consent_basis      # recorded verbatim, not summarised
+  - permitted_uses
+  - redistribution_permitted      # boolean
+  - synthetic                     # boolean
+  - subject_is_adult              # boolean
+  - language
+  - deidentified                  # boolean; set true only after Phase 8
+  - notes
+
+# Optional, time-aware/fusion-ready fields (PROJECT_PLAN.md Phase 7). Nullable.
+provenance_optional_fields:
+  - time_to_competition           # e.g. days before; replaces exact dates
+  - sport
+  - competition_level
+  - region
+  - source_type                   # interview | presser | social | journal | synthetic
+
+# ---------------------------------------------------------------------------
+# Enforcement contract for src/ingestion/ (Phase 7)
+# ---------------------------------------------------------------------------
+enforcement:
+  on_unlisted_source: refuse_and_log
+  on_missing_required_provenance_field: refuse_and_log
+  on_prohibited_match: refuse_and_log
+  on_category_pending_owner_confirmation: refuse_and_log   # blocks A4 until confirmed
+  log_destination: logs/ingestion_refusals.log
+  note: >
+    Fail closed. An ingestion run that refuses everything is a correct run if the
+    sources were non-compliant. Never add a bypass flag to this checking path.
