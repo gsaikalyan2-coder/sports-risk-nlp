@@ -5,8 +5,18 @@
 
 **Confirmed stack (2026-07-23):** CrewAI (agents) · OpenRouter (cost-tier LLM routing) ·
 public/licensed datasets first (hybrid synthetic fallback) · DeBERTa/RoBERTa · Docker · Streamlit · LaTeX.
-**Expansions selected:** Temporal trajectory, Multimodal audio, Team aggregation, Outcome linkage —
-all parked until after Phase 19; only Outcome-linkage attempted in-window if data allows, rest = "Future Work".
+
+**Evidence-backed novelty (updated 2026-08 from the Phase 3 review — see `docs/related_work.md`):**
+Three-part contribution — (1) construct-grounded athlete-text corpus bridging validated constructs to
+text; (2) **two-level, expert-validated interpretability** (span→construct + construct→risk), the
+headline differentiator that fills the Interpretability-Validation gap; (3) time-aware, fusion-ready
+design. Taxonomy expanded with **resilience** and **appraisal orientation (challenge/threat)** plus an
+**interpretation-direction** modifier on anxiety.
+
+**Expansions status (revised):** *Temporal* is now partly in-scope as **lightweight time-aware
+sampling** (Phase 7) with full temporal modeling still Future Work; *Multimodal* is **architecture-ready**
+(risk layer accepts optional light context, Phase 15) but not built; *Outcome linkage* is the one full
+stretch attempted in-window if data allows; *Team aggregation* stays Future Work.
 
 **How to read this:** phases are sequential *by dependency*, but many run **in parallel**
 (shown in the "Parallel agents" column). Each phase has an objective, tasks, the agents
@@ -37,21 +47,24 @@ Sec = Security/Ethics · Pap = Paper.
 - **Deliverable:** `pip install -r requirements.txt` works; `docker compose build` succeeds.
 - **Gate:** A hello-world script runs both locally and in the container.
 
-### Phase 3 — Literature review & novelty positioning *(parallelized)*
-- **Objective:** Prove the idea is novel and find the gap.
-- **Tasks:** Split the search across **3–4 parallel Literature-Agent runs** (anxiety/CSAI-2,
-  burnout/ABQ, NLP-on-athlete-text, explainable text classification). Harvest citations to `refs.bib`.
-- **Parallel agents:** Lit ×3–4.
-- **Deliverable:** `docs/related_work.md` + a one-paragraph novelty statement + `paper/refs.bib`.
-- **Gate:** ≥15 relevant references; a clear, written gap the project fills.
+### Phase 3 — Literature review & novelty positioning *(SUBSTANTIALLY COMPLETE — owner-led, 2026-08)*
+- **Objective:** Prove the idea is novel and find the gap. ✅ Done via owner's evidence review.
+- **Done:** 14 sources synthesized into `docs/related_work.md`; two validated gaps identified
+  (construct↔text bridge; unvalidated sports-XAI explanations); three-part contribution written.
+- **Remaining:** resolve each Consensus link to a primary DOI and populate `paper/refs.bib`
+  (do in Phase 23/24); optionally add a few more transformer/multi-label NLP method citations.
+- **Deliverable:** `docs/related_work.md` (drafted) → `paper/refs.bib` (pending).
+- **Gate:** ✅ Clear written gap + ≥14 references. Remaining gate item: `refs.bib` with primary sources.
 
 ### Phase 4 — Construct taxonomy design
 - **Objective:** Lock the label schema grounded in psychometrics.
-- **Tasks:** Psy Agent drafts `config/taxonomy.yaml` (constructs, definitions, intensity scale,
-  citations) and `docs/annotation_guidelines.md` (examples, edge cases).
+- **Tasks:** Psy Agent maintains `config/taxonomy.yaml` — now includes **resilience**,
+  **appraisal orientation (challenge/threat)**, and an **interpretation-direction** modifier
+  (facilitative/debilitative) added from the Phase 3 evidence — and writes
+  `docs/annotation_guidelines.md` (examples, edge cases) for every construct including the new ones.
 - **Parallel agents:** Psy (uses Phase 3 output).
 - **Deliverable:** Taxonomy + annotation rubric.
-- **Gate:** Every construct has a definition, a citation anchor, and ≥2 examples.
+- **Gate:** Every construct has a definition, a citation anchor, and ≥2 examples. Final set frozen at Phase 12.
 
 ### Phase 5 — Ethics, data governance & risk plan
 - **Objective:** Set the guardrails before touching data.
@@ -73,13 +86,17 @@ Sec = Security/Ethics · Pap = Paper.
 - **Deliverable:** A runnable "smoke-test crew" that passes a trivial task end to end.
 - **Gate:** One orchestrated multi-agent run completes and logs cost to `logs/cost_ledger.csv`.
 
-### Phase 7 — Data ingestion pipeline
-- **Objective:** Get raw text in with provenance.
+### Phase 7 — Data ingestion pipeline *(now time-aware)*
+- **Objective:** Get raw text in with provenance **and lightweight temporal/context metadata**.
 - **Tasks:** Har Agent implements `src/ingestion/`; each source writes `provenance.json`
-  (source, date, license). Respect the Phase 5 allow-list.
+  (source, date, license). Respect the Phase 5 allow-list. **New (from evidence review):** where
+  available, capture **timing relative to the competition** (e.g., days-before) and any **light
+  context** (sport, level, training-load/physiological hints) as optional metadata fields — even if
+  sparse. This makes the corpus temporal- and fusion-ready without committing to those models now.
 - **Parallel agents:** Har (can fan out per source).
-- **Deliverable:** `data/raw/` populated with provenance.
-- **Gate:** Every raw record traceable to a licensed/consented/synthetic source.
+- **Deliverable:** `data/raw/` populated with provenance + optional `time_to_competition` / context fields.
+- **Gate:** Every raw record traceable to a licensed/consented/synthetic source; temporal/context
+  fields present where the source allows (nullable otherwise).
 
 ### Phase 8 — Preprocessing & de-identification
 - **Objective:** Clean, segment, and strip PII.
@@ -144,13 +161,18 @@ Sec = Security/Ethics · Pap = Paper.
 - **Deliverable:** Trained classifier + run logs + `docs/model_card.md`.
 - **Gate:** Transformer > best baseline on macro-F1 on the held-out set.
 
-### Phase 15 — Risk scoring layer
+### Phase 15 — Risk scoring layer *(fusion-ready)*
 - **Objective:** Turn constructs into an interpretable risk index.
 - **Tasks:** `src/risk/` — fuse construct probabilities into 0–1 risk with per-construct
-  contributions; calibrate (temperature/Platt); document the scoring rationale.
+  contributions; calibrate (temperature/Platt); document the scoring rationale. Reflect the expanded
+  taxonomy: resilience & challenge-appraisal **lower** risk, threat-appraisal & debilitative
+  interpretation **raise** it. **Design the interface to optionally accept light non-text context
+  features** (timing, training-load) so multimodal fusion is a drop-in later — but keep **text-only
+  as the primary, reported model**.
 - **Parallel agents:** Mod, Psy (weights sanity-check).
-- **Deliverable:** Calibrated risk scorer + `reports/calibration.md`.
-- **Gate:** Calibration error (ECE) reported; risk decomposition is human-readable.
+- **Deliverable:** Calibrated risk scorer (text-only) + `reports/calibration.md`.
+- **Gate:** Calibration error (ECE) reported; risk decomposition is human-readable; interface accepts
+  optional context features without breaking the text-only path.
 
 ### Phase 16 — (Optional) DataRobot / AutoML benchmark
 - **Objective:** External sanity check on the tabular construct→risk step.
@@ -164,13 +186,23 @@ Sec = Security/Ethics · Pap = Paper.
 
 ## WEEK 5 — Explainability & Evaluation
 
-### Phase 17 — Explainability module
-- **Objective:** Attribute risk to text.
-- **Tasks:** Exp Agent implements SHAP and/or attention rollout; generate example "profile cards"
-  (text → highlighted spans → constructs → risk).
-- **Parallel agents:** Exp.
-- **Deliverable:** `reports/explain/` with worked examples.
-- **Gate:** ≥5 qualitative examples where attributions are sensible.
+### Phase 17 — Explainability module **+ expert validation (headline contribution)**
+- **Objective:** Attribute risk to text AND show the explanations are meaningful to practitioners —
+  the gap the evidence review flagged as most open (sports XAI is rarely practitioner-validated).
+- **Tasks:**
+  1. Exp Agent implements SHAP and/or attention rollout; generate "profile cards"
+     (text → highlighted spans → constructs → risk).
+  2. **Expert-validation study (small but real):** recruit 1–3 raters (a coach and/or sport-psychology
+     student/practitioner); give them ~15–20 profile cards; collect a simple rating of whether each
+     span→construct explanation is sensible/agree-disagree + free-text notes. Report agreement (e.g.
+     % agreement or a simple kappa) in `reports/explain/expert_validation.md`.
+- **Prep/decide (start EARLY — recruiting takes time):** identify the rater(s) now; prepare a 1-page
+  rating form; keep it de-identified and low-burden.
+- **Parallel agents:** Exp (cards) + human (runs the rating study).
+- **Deliverable:** `reports/explain/` worked examples **+ `expert_validation.md`** with rater results.
+- **Gate:** ≥5 sensible qualitative examples **and** ≥1 external rater's agreement scores reported.
+  (If no rater can be found in time, downgrade to a documented self-audit + name it a limitation —
+  but try hard to get at least one expert.)
 
 ### Phase 18 — Evaluation harness & ablations *(parallelized)*
 - **Objective:** The numbers that go in the paper.
@@ -268,10 +300,16 @@ Sec = Security/Ethics · Pap = Paper.
 | 7 | 23–25 | IEEE draft → reviewed → submission-ready |
 | 8 | buffer | Slack for slippage + final proofing |
 
-## Risk Register (top 3)
+## Risk Register (top 5)
 
 1. **Data scarcity/licensing** (highest risk) — mitigate via synthetic augmentation + a small
    high-quality gold set; decided in Q3 / Phase 6–7.
 2. **Weak labels too noisy** — mitigate with confidence thresholds, human gold anchor, Phase 12 refinement.
 3. **Scope creep** — mitigate by parking stretch goals (see expansion list) until core is done.
+4. **Expert-rater access** (new — Phase 17) — the expert-validation contribution needs ≥1 coach or
+   sport-psych practitioner. **Start recruiting in Week 1–2**, not Week 5. Fallback: documented
+   self-audit named as a limitation.
+5. **Annotation burden from expanded taxonomy** — resilience + appraisal + interpretation modifier
+   raise labeling load; mitigate by freezing the final set at Phase 12 after an agreement check, and
+   dropping any construct with poor inter-annotator agreement.
 ```

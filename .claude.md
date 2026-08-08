@@ -37,19 +37,35 @@ elevated pre-competition psychological risk.
 **The constructs** are drawn from established sports-psychology instruments so the labels are
 defensible in a paper (this is the academic-rigor anchor):
 
-- **Cognitive anxiety** and **somatic anxiety** and **self-confidence** — from the CSAI-2 tradition.
+- **Cognitive anxiety** and **somatic anxiety** and **self-confidence** — from the CSAI-2 tradition,
+  with an optional **interpretation direction** (facilitative vs. debilitative).
 - **Motivation orientation** (approach vs. avoidance) — self-determination / achievement-goal theory.
 - **Perceived stress / pressure**.
 - **Attentional focus vs. distraction**.
 - **Burnout / emotional exhaustion signals** — Athlete Burnout Questionnaire (ABQ) tradition.
 - **Coping style** (task-focused vs. avoidance).
+- **Resilience** — capacity to recover under pressure (mediator; Li2025).
+- **Appraisal orientation** — challenge vs. threat framing of the competition (Tóth2025).
 
-**Four things make it publishable:**
-1. **Construct grounding** — labels map to recognized psychometric constructs, not ad-hoc classes.
-2. **A new labeled corpus** — even a modest, well-documented dataset with inter-annotator
-   agreement is a contribution.
-3. **Interpretability** — text spans → constructs → risk, with attribution (attention/SHAP).
-4. **Agentic, cost-aware pipeline** — a reproducible multi-agent system is itself a methods contribution.
+  *(Added 2026-08 from the evidence review — see `docs/related_work.md`. Final set frozen at Phase 12.)*
+
+**Evidence-backed novelty (validated by the Phase 3 review — see `docs/related_work.md`).**
+The literature confirms two open gaps this project targets: (a) no work bridges *validated
+constructs* to athlete *text* with span-level, construct-specific labels — text studies stop at
+sentiment / broad mental-health; (b) sports XAI explanations are almost never validated with
+coaches or practitioners.
+
+**The three-part contribution:**
+1. **Construct-grounded athlete-text corpus** — span→construct labels bridging the survey↔text gap
+   (with inter-annotator agreement reported). This is the core dataset contribution.
+2. **Two-level, expert-validated interpretability** — span→construct evidence + construct→risk
+   weighting, with a small validation study asking coaches/sport-psych practitioners whether the
+   explanations are sensible. *This directly fills the biggest gap and is the headline differentiator.*
+3. **Time-aware, fusion-ready design** — pre-competition sampling records timing + light context so
+   the corpus supports temporal/multimodal extensions; full temporal + multimodal modeling is Future Work.
+
+Supporting these: an **agentic, cost-aware pipeline** (reproducible multi-agent system) as a methods
+contribution, and **first-class ethics** (risk labels can stigmatize; research/decision-support only).
 
 **Explicit non-goals / ethics guardrails (must appear in the paper):**
 - This is **decision-support and research**, **not** clinical diagnosis of any real person.

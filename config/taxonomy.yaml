@@ -65,9 +65,44 @@ constructs:
 
   coping_style:
     definition: "How the athlete manages pressure — task-focused vs. avoidance."
-    instrument_anchor: "Coping in sport literature"
+    instrument_anchor: "Coping in sport literature (Madigan2020: avoidance coping -> rising burnout)"
     labels: [task_focused, avoidance, mixed, none]
 
+  # --- Added 2026-08 from the evidence review (see docs/related_work.md) ---
+
+  resilience:
+    definition: >
+      Capacity to maintain or recover psychological functioning under competitive
+      pressure (bounce-back, steadiness, confidence in handling setbacks).
+    instrument_anchor: "Psychological resilience in sport (Li2025 — resilience mediates pressure->anxiety)"
+    positive_examples:
+      - "Whatever happens out there, I know I can reset and keep going."
+    negative_examples:
+      - "If I make one mistake early I know I'll fall apart."
+    risk_direction: lowers   # higher resilience lowers risk
+
+  appraisal_orientation:
+    definition: >
+      Whether the athlete frames the upcoming competition as a CHALLENGE (opportunity,
+      resources sufficient) or a THREAT (danger, resources insufficient).
+    instrument_anchor: "Challenge/threat & cognitive appraisal (Tóth2025)"
+    labels: [challenge, threat, mixed, none]
+    risk_direction: "threat raises risk; challenge lowers it"
+
+# Directional modifier (not a standalone construct):
+# For cognitive_anxiety and somatic_anxiety, optionally record INTERPRETATION direction —
+# facilitative (arousal seen as helpful) vs. debilitative (arousal seen as harmful),
+# per the CSAI-2 directional tradition and Tóth2025. Two athletes with the same anxiety
+# intensity can differ sharply in risk based on this direction.
+interpretation_modifier:
+  applies_to: [cognitive_anxiety, somatic_anxiety]
+  labels: [facilitative, debilitative, unclear]
+  note: "debilitative interpretation raises risk even at equal intensity"
+
+# FINAL CONSTRUCT SET IS FROZEN AT PHASE 12 after checking annotation burden and
+# inter-annotator agreement. Do not add more constructs without that check.
+
 # Risk fusion note: cognitive_anxiety, somatic_anxiety, perceived_stress, burnout_signal,
-# and avoidance-oriented motivation/coping raise risk; self_confidence and
-# focused attention lower it. Exact weights are calibrated in src/risk (Phase 15).
+# threat appraisal, debilitative interpretation, and avoidance-oriented motivation/coping
+# raise risk; self_confidence, resilience, challenge appraisal, and focused attention lower it.
+# Exact weights are calibrated in src/risk (Phase 15).
