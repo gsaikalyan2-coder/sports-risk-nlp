@@ -122,7 +122,7 @@ Configured in `.pre-commit-config.yaml`:
 **Prove the secret hook works** (do this once — it is a Phase 2 gate):
 
 ```powershell
-"OPENROUTER_API_KEY=sk-or-v1-0123456789abcdef0123456789abcdef" | Out-File fake_secret.py
+"OPENROUTER_API_KEY=sk-or-v1-0123456789abcdef0123456789abcdef" | Out-File fake_secret.py  # pragma: allowlist secret
 git add fake_secret.py
 git commit -m "test: should be blocked"     # EXPECT: detect-secrets FAILS the commit
 git reset HEAD fake_secret.py

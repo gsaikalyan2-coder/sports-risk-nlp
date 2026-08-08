@@ -31,9 +31,10 @@ EXPECTED_DIRS = [
 
 
 def test_python_version_is_311():
-    assert sys.version_info[:2] == (3, 11), (
-        f"project targets Python 3.11, running {sys.version_info[:2]}"
-    )
+    assert sys.version_info[:2] == (
+        3,
+        11,
+    ), f"project targets Python 3.11, running {sys.version_info[:2]}"
 
 
 @pytest.mark.parametrize("name", CONFIG_FILES)
