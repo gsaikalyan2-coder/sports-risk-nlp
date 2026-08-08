@@ -9,6 +9,17 @@ requires-python = ">=3.11"
 
 [tool.ruff]
 line-length = 100
+target-version = "py311"
+exclude = ["notebooks", ".venv", "data", "paper"]
+
+[tool.ruff.lint]
+# E/W = pycodestyle, F = pyflakes, I = import sorting, UP = pyupgrade, B = bugbear.
+select = ["E", "W", "F", "I", "UP", "B"]
+ignore = [
+  "E501",   # line length is enforced by the formatter, not the linter
+  "EXE002", # file-permission noise on Windows/WSL mounts
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-q"

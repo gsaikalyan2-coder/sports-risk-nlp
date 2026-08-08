@@ -1,3 +1,7 @@
+# Human-edited dependency manifest (minimum versions).
+# Exact resolved versions live in requirements.lock.txt (see docs/setup.md sec. 7).
+# CPU-only torch: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
 # Core
 python-dotenv>=1.0
 pyyaml>=6.0
@@ -25,3 +29,5 @@ streamlit>=1.37
 # Dev / test
 pytest>=8.0
 ruff>=0.5
+pre-commit>=3.7
+detect-secrets>=1.5
