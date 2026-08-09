@@ -19,6 +19,20 @@ data/external/*
 models/*
 !models/.gitkeep
 
+# ...but DO commit provenance.json (Phase 7).
+# It is the traceability record and it never contains source text -- only
+# licence basis, category, counts, and metadata. Committing it means a fresh
+# clone can show what was ingested and under what basis without running
+# anything, which is what the Phase 7 gate is actually about. The corpus itself
+# stays out: data/raw/synth_precomp_v1/records.jsonl is regenerated
+# deterministically by `python scripts/run_ingestion.py --seed 42`, so the seed
+# is the reproducibility guarantee and the blob would just be history weight.
+# Re-include the directories first -- git does not descend into an excluded dir --
+# then re-exclude their contents, then carve out provenance.json.
+!data/raw/*/
+data/raw/*/*
+!data/raw/*/provenance.json
+
 # Archived previous version
 _legacy/
 

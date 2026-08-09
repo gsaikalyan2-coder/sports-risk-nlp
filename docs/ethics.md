@@ -1,7 +1,7 @@
 # Ethics & Data Governance Policy
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes
-**Version:** 1.0 — Phase 5, 2026-08-08
+**Version:** 1.1 — Phase 5, 2026-08-08 (header corrected at Phase 7; the 1.1 changelog entry was present but the header still read 1.0)
 **Status:** Binding on all phases and all agents. No data may be collected, processed, labelled, or released except under this policy.
 **Companion file:** `config/data_sources_allowlist.yaml` (machine-readable allow-list; enforced by `src/ingestion/` from Phase 7)
 

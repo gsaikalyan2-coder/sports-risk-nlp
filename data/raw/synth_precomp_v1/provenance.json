@@ -1,0 +1,85 @@
+{
+  "source_id": "synth_precomp_v1",
+  "source_name": "Synthetic pre-competition athlete utterances (template grammar v1.0)",
+  "allowlist_category": "A2_synthetic",
+  "url_or_citation": "Generated for this project by src/ingestion/synthetic.py (construct-template-grammar@1.0, seed=42). Not derived from any external corpus.",
+  "collection_date": "2026-08-09",
+  "licence_or_consent_basis": "Project-generated synthetic text. No third-party licence applies and no human subject is involved: no real person's words are reproduced, paraphrased, or used as a generation input. Released under the repository licence alongside the code that produces it.",
+  "permitted_uses": "Research use, training, evaluation, redistribution, and publication of verbatim examples. Because no real athlete is involved, this is the only category in the corpus from which examples may be quoted verbatim in the paper or dashboard (docs/ethics.md sec.3.3 condition 2).",
+  "redistribution_permitted": true,
+  "synthetic": true,
+  "subject_is_adult": true,
+  "language": "en",
+  "deidentified": false,
+  "notes": "A2 fallback confirmed by the owner on 2026-08-09 after the Phase 7 survey found no public pre-competition athlete corpus. Scaffold corpus: bounded lexical diversity, no personal names, generation_spec is metadata not labels.",
+  "time_to_competition": null,
+  "sport": null,
+  "competition_level": null,
+  "region": null,
+  "source_type": "synthetic",
+  "record_count": 1200,
+  "generator": {
+    "name": "construct-template-grammar",
+    "version": "1.0",
+    "kind": "template-grammar",
+    "seed": 42,
+    "generated_on": "2026-08-09",
+    "prompts_location": "src/ingestion/synthetic.py (version-controlled template bank)",
+    "notes": "Deterministic seeded template grammar, no language model and no network call. Chosen over an LLM for byte-level reproducibility and because OPEN-008 leaves no OPENROUTER_API_KEY to verify an LLM path against. Lexical diversity is bounded by the template bank; see docs/data_sources.md.",
+    "extra": {
+      "constructs_covered": [
+        "cognitive_anxiety",
+        "somatic_anxiety",
+        "self_confidence",
+        "perceived_stress",
+        "burnout_signal",
+        "resilience",
+        "motivation_orientation",
+        "attentional_focus",
+        "coping_style",
+        "appraisal_orientation"
+      ],
+      "strata": {
+        "sports": [
+          "athletics",
+          "swimming",
+          "tennis",
+          "football",
+          "basketball",
+          "cricket",
+          "badminton",
+          "boxing",
+          "rowing",
+          "gymnastics"
+        ],
+        "competition_levels": [
+          "club",
+          "regional",
+          "national",
+          "international",
+          "elite"
+        ],
+        "regions": [
+          "south_asia",
+          "europe",
+          "north_america",
+          "oceania",
+          "africa"
+        ],
+        "time_to_competition_days": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          7,
+          10,
+          14,
+          21,
+          30
+        ]
+      }
+    }
+  },
+  "schema_version": 1
+}

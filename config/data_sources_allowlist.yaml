@@ -8,9 +8,11 @@
 # If this file and docs/ethics.md ever disagree, docs/ethics.md is authoritative
 # and this file must be corrected.
 #
-# Status: v1.0, Phase 5, 2026-08-08.
+# Status: v1.1, Phase 5, 2026-08-08 (owner decisions resolved; see docs/ethics.md sec.11).
+#         Version header corrected at Phase 7 -- the 1.1 changelog entry existed
+#         but the header still read 1.0, so file and changelog disagreed.
 
-version: 1
+version: 2   # bumped at Phase 7: enforced in code by src/ingestion/allowlist.py
 policy_document: docs/ethics.md
 default_action: deny        # unlisted source => refuse ingestion, no exceptions
 

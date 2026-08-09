@@ -37,7 +37,7 @@ interpretability; (3) a time-aware, fusion-ready design.
 | 3 — Related work & novelty | Complete | `b104b8d` |
 | 4 — Construct taxonomy | Complete | `d238721` |
 | 5 — Ethics, data governance & risk plan | Complete | `a28b7ba` |
-| **6 — Confirm decisions & wire agent framework** | **Complete (this session)** | **UNCOMMITTED — see blockers** |
+| **6 — Confirm decisions & wire agent framework** | **Complete** | **`b28873f`** (+ `ccba023` follow-up) |
 | 7 — Data ingestion pipeline | **NEXT** | — |
 
 **Carried-forward caveats:**
@@ -304,5 +304,18 @@ into the existing framework); `src/agents/roster.py` (`HARVESTER`).
 
 ## Commit status
 
-**Working tree: DIRTY. Nothing committed this session** — blocked on `.git/index.lock`.
-9 files modified, 16 new. See the blocker section above for the exact recovery commands.
+**RESOLVED 2026-08-09. Working tree clean.**
+
+| Commit | Contents |
+|---|---|
+| `b28873f` | The Phase 2 fix + Phase 6 work — 26 files, +3,600 / −72 |
+| `ccba023` | Follow-up: `.pre-commit-config.yaml` auto-fix (1 line) |
+
+The stale `.git/index.lock` that blocked the commit was cleared on the owner machine.
+Pre-commit ran clean on the way in: trailing whitespace, end-of-files, check-yaml,
+merge-conflict, large-files, detect-private-key, ruff, ruff-format and detect-secrets all
+passed.
+
+*Cosmetic:* both commits carry the same message. Harmless. If you want it tidy,
+`git rebase -i HEAD~2` and squash, or `git commit --amend` the second one's message —
+but only while nothing is pushed, and there is still no remote (OPEN-003).

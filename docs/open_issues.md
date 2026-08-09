@@ -264,6 +264,212 @@ regeneration would have been the blunter, riskier fix.
 
 ---
 
+## OPEN-011 — The corpus contains no real athlete text
+
+**Status:** OPEN — new 2026-08-09, Phase 7
+**Owned by:** Phase 7 (data strategy), realised in Phases 8–11
+**Becomes blocking at:** **Phase 11** (gold standard). Does not block Phases 8–10.
+
+The Phase 7 survey established that **no public corpus of pre-competition athlete text
+exists** — every athlete-speech corpus located is post-match, which is the wrong side of
+the event for an anticipatory taxonomy. Full reasoning and the rejected-candidate table:
+`docs/data_sources.md` §1 and §4.
+
+The owner chose **synthetic-first** on 2026-08-09 and declined, for now, the three routes
+to real text (Cornell author permission, iMiGUE licence agreement, A3 consented donation).
+So `data/raw/` is 100% synthetic.
+
+**Why this is the most consequential open item in the register.** Contribution #1 in
+`CLAUDE.md` §1 is "a construct-grounded athlete-text corpus … bridging the survey↔text
+gap". A corpus containing no athlete text does not bridge that gap. Phase 11's gold set and
+the inter-annotator agreement built on it are what make the contribution real, and both
+currently have nothing real to annotate.
+
+A reviewer will ask this question first. The honest answers available are, in descending
+strength:
+
+1. A small real gold set exists, drawn from a licensed source, and IAA is reported on it.
+2. No real text was obtainable within the window; the contribution is reframed as a
+   *method and schema* contribution with a synthetic proof-of-concept, and the absence is
+   named as the principal limitation.
+
+Option 2 is publishable but materially weaker, and it is the default if nothing changes.
+
+**Resolution — any one of these closes it, and all three are the owner's to action:**
+
+- **Cornell** — email Liye Fu / Cristian Danescu-Niculescu-Mizil / Lillian Lee asking for
+  written permission to use the transcript dataset for research. One line back converts an
+  unlicensed download into a recordable A1 basis. Post-match, so useful as contrastive
+  data rather than as the core corpus.
+- **iMiGUE-Speech** — contact Haoyu Chen (University of Oulu) to sign the licence
+  agreement. Cleanest licence position of any candidate; base iMiGUE is identity-free.
+- **A3 consented donation** — the only route that yields genuinely *pre-competition* text.
+  A handful of adult athletes at SRMIST donating pre-event journal entries under written
+  consent. Highest scientific value, longest lead time, and it pairs naturally with the
+  **OPEN-004** expert-rater recruitment that is already overdue.
+
+The A3 route is unblocked: `docs/ethics.md` §3.4 records the exemption determination and
+`config/data_sources_allowlist.yaml` marks A3 `permitted`. Nothing but the consent form and
+the asking stands in the way.
+
+---
+
+## OPEN-012 — Synthetic corpus vocabulary is too small to train a generalising model
+
+**Status: SUBSTANTIALLY MITIGATED 2026-08-09, same day it was raised.** Downgraded from
+blocking to monitored. Two things were done, and the second matters more than the first.
+
+**1. Vocabulary raised (generator v1.1).** A construct-preserving lexical-variation layer
+now runs after template rendering: near-synonym substitution plus discourse framing.
+
+| Metric | v1.0 | v1.1 |
+|---|---|---|
+| Vocabulary (types) | 444 | **638** |
+| Distinct texts | 81.3% | **96.9%** |
+| MATTR-50 | — | **0.819** |
+
+Raw TTR barely moved (0.0146 → 0.0159) and that is a property of the metric, not the
+corpus: TTR's denominator grows without bound while its numerator saturates. **MATTR-50 and
+vocabulary size are the honest figures** and both improved materially. `docs/data_sources.md`
+§2.1 states this rather than quoting the flattering number.
+
+**2. The real fix: template-disjoint evaluation.** Raising vocabulary reduces memorisation;
+it does not prove the absence of it. `src/evaluation/splits.py` now partitions *templates*
+before records, so a model is never tested on a phrasing it trained on.
+`scripts/run_benchmark_audit.py` measures the effect:
+
+| System | Random split | Template-disjoint | Drop |
+|---|---|---|---|
+| Memorisation probe (1-NN) | 0.732 | **0.198** | **+0.534** |
+| Lexicon (leakage-immune) | 0.729 | 0.757 | −0.028 |
+
+Templates on both sides: 85 → **0**. Verbatim test texts seen in train: 3.8% → **0.0%**.
+8-gram overlap: 60.3% → 11.8%.
+
+A pure memoriser loses **0.53 macro-F1** when templates are held out; a system that cannot
+memorise is unchanged. That gap *is* OPEN-012, now quantified rather than feared — and
+because a transformer memorises far more readily than 1-NN, 0.53 is a **lower bound** on the
+inflation Phase 14 would otherwise have reported.
+
+**What remains open, and why this is not closed.** The mitigation makes the metric honest;
+it does not make the corpus real. A 638-word synthetic vocabulary still will not produce a
+model that transfers to actual athlete speech — that requires **OPEN-011**. Two standing
+obligations:
+
+- Re-run `scripts/run_benchmark_audit.py` **after** the transformer exists. The probe's 0.53
+  is a floor, and the transformer's own drop is the number the paper should report.
+- Never quote a `random_split` number as a result. The function's docstring says it is a
+  foil; `docs/data_sources.md` §2.2 lists the five binding consequences for Phases 13/14/18.
+
+**Optional further work, no longer urgent:** an LLM paraphrase pass once **OPEN-008** is
+closed would widen lexis further. `GeneratorStamp` already distinguishes generators so the
+two passes cannot be confused.
+
+---
+
+## OPEN-012-HISTORICAL — original statement (retained for the record)
+
+**Status:** superseded by the mitigation above; the reasoning still holds.
+**Owned by:** Phase 7 (generator), realised at Phase 10
+**Owned by:** Phase 7 (generator), realised at Phase 10
+**Becomes blocking at:** **Phase 14** (transformer fine-tuning), and at any point a
+held-out number is quoted as evidence of generalisation.
+
+`synth_precomp_v1` measures **444 word types across 30,367 tokens**, type–token ratio
+**0.0146**, with 976 distinct texts out of 1,200. That is the expected consequence of a
+template grammar and it was chosen deliberately for reproducibility (`docs/data_sources.md`
+§2.1), but it has a specific downstream failure mode worth stating before it happens.
+
+A DeBERTa/RoBERTa classifier fine-tuned on this corpus will reach a very high held-out
+macro-F1 by memorising template surface forms. That number would be **meaningless** as
+evidence about athlete language, and quoting it in the paper without qualification would be
+the single most damaging thing this project could do to its own credibility.
+
+**Resolution options, in preference order:**
+
+1. **LLM paraphrase pass** over the existing records once **OPEN-008** is closed —
+   preserves the construct/intensity structure while widening lexis. Cheap on the
+   cheap tier; `GeneratorStamp` already distinguishes generators so the two passes never
+   get confused. This is the recommended Phase 8/10 follow-on.
+2. **Expand the template bank** in `src/ingestion/synthetic.py` — free and deterministic,
+   but effort scales linearly and the ceiling is still low.
+3. **Accept it and report it** — state the TTR, and report held-out numbers on the *real*
+   gold set only, never on synthetic held-out data.
+
+Option 3 is mandatory regardless of whether 1 or 2 is done.
+
+---
+
+## OPEN-013 — De-identification cannot be validated against a corpus with no identifiers
+
+**Status: FIXTURE DELIVERED 2026-08-09.** The measurement instrument now exists; the
+measurement itself is Phase 8's job.
+
+`tests/fixtures/deid_cases.jsonl` — **34 cases** with expected placeholder output, covering
+every category in the `docs/ethics.md` §5.1 removal table: person names (including
+nicknames, lowercase, hyphenated, and honorific forms), handles, contacts, URLs, teams and
+sponsors, locations, events, exact dates, quasi-identifier combinations, and health detail
+(removed entirely, not placeholdered). Spans easy/medium/hard difficulty bands.
+
+**Eight of the 34 are negatives** — text that must come back *unchanged*. This is the half
+that is usually forgotten. A de-identifier that redacts everything scores perfect recall and
+destroys the corpus, and `docs/ethics.md` §5.2 requires typed placeholders precisely because
+blanking "destroys the linguistic structure the model needs". The negatives include "**Mark**
+my words" (common given name used as a verb), "The **Final** is on **Sunday** and my
+**Coach**" (capitalised common nouns with no proper name), "47 seconds" (a performance
+figure, contrasted against jersey number 47 in the positive set), and "**Two days out**"
+(relative timing, which is contribution #3 and must survive).
+
+Every name in the fixture is invented. 12 tests enforce the fixture's own integrity —
+unique IDs, required fields, positives that change, negatives that do not, health cases that
+delete rather than placeholder, timing preserved, and that none of it has leaked into
+`data/raw/`.
+
+**Still Phase 8's obligation, and the gate should be written this way:**
+
+1. Report **recall, precision, and exact-match**, not recall alone.
+2. Report **per difficulty band**. An aggregate hides that easy passes and hard fails.
+3. Treat the fixture measurement as the real gate. "Spot-check shows no identifiers remain"
+   against the synthetic corpus is true and worthless — that corpus never had any.
+4. Do not tune until it overfits 34 cases. It is a smoke test with teeth, not a benchmark,
+   and `docs/ethics.md` §5.3 already names residual re-identification risk as a limitation.
+5. Re-measure against real text when **OPEN-011** resolves, and report both numbers.
+
+---
+
+## OPEN-013-HISTORICAL — original statement (retained for the record)
+
+**Status:** superseded by the fixture above.
+**Owned by:** Phase 8 (preprocessing & de-identification)
+**Owned by:** Phase 8 (preprocessing & de-identification)
+**Becomes blocking at:** **Phase 8's own gate** ("spot-check sample shows no direct
+identifiers remain").
+
+`src/ingestion/synthetic.py` deliberately emits **no personal names**, real or invented —
+inventing names risks colliding with real people, and the corpus needs no identifiers. A
+test enforces this.
+
+The consequence is that Phase 8's `deidentify.py` will be run against text containing
+essentially nothing to remove, and will trivially pass its own gate while telling us
+**nothing about its recall**. `docs/ethics.md` §5.3 already names automated
+de-identification as imperfect and highest-risk for A4 press text — precisely the text this
+corpus does not contain.
+
+**Why it matters beyond tidiness.** "Spot-check shows no identifiers remain" is a claim the
+paper will make. Made against a corpus that never had identifiers, it is true and
+worthless.
+
+**Resolution:**
+
+- Build a small **held-out de-identification test fixture** in Phase 8: a few dozen
+  synthetic utterances deliberately seeded with names, handles, teams, venues, and event
+  names, with the expected placeholder output recorded. That gives `deidentify.py` a real
+  recall measurement without needing real athlete data, and it is cheap.
+- Keep it in `tests/fixtures/`, **not** in `data/raw/` — it is a test artefact, not corpus.
+- When real text arrives (**OPEN-011**), re-measure against it and report both numbers.
+
+---
+
 ## OPEN-002 — Misconfigured plugin hook fires on every file write
 
 **Status:** OPEN — cosmetic
@@ -367,3 +573,5 @@ fails, which is worse than an honest interim one.
 | 2026-08-08 | Phase 5 owner decisions resolved. OPEN-005 (exemption not in writing) and OPEN-006 (personal contact address) logged as the two residuals. Neither blocks Phase 7. |
 | 2026-08-09 | Phase 6. OPEN-001 updated: a second defect (CUDA torch in the image) found and fixed; container definitions split and hardened. OPEN-007 (CrewAI backend unexecuted), OPEN-008 (no OpenRouter key), OPEN-009 (model/price drift) logged. |
 | 2026-08-09 | **OPEN-001 RESOLVED** — Docker Desktop started; verify_env checks 1–9 pass including container build and container hello-world. First successful build of the `Dockerfile`. OPEN-010 (detect-secrets false positive) raised and resolved the same day. |
+| 2026-08-09 | Phase 7 follow-up. OPEN-012 **substantially mitigated** (generator v1.1 lexical variation: vocab 444->638, distinct texts 81%->97%; plus template-disjoint splitting in `src/evaluation/`, memorisation probe drops 0.732->0.198). OPEN-013 **fixture delivered** (34 cases, 8 negatives). Allow-list and ethics.md version headers corrected to 1.1. |
+| 2026-08-09 | Phase 7. Source survey found **no public pre-competition athlete corpus**; owner chose synthetic-first. OPEN-011 (no real athlete text), OPEN-012 (synthetic vocabulary too small), OPEN-013 (de-identification unvalidatable against an identifier-free corpus) logged. OPEN-011 supersedes risk #1 in `PROJECT_PLAN.md` as the project's live highest risk. |

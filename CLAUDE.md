@@ -275,9 +275,23 @@ sports-risk-nlp/
 
 - **Q1 — Multi-agent framework: CrewAI.** ✅ Confirmed. Role-based, sophomore-friendly.
 - **Q2 — LLM access: OpenRouter** with cost-tier routing + caching + budget ledger. ✅ Confirmed.
-- **Q3 — Data: existing public/licensed datasets first.** ✅ Confirmed. Fallback if coverage is
-  thin: hybrid synthetic-for-training + small real gold set (revisit at Phase 7).
+- **Q3 — Data: existing public/licensed datasets first.** ✅ Confirmed 2026-07-23. Fallback if
+  coverage is thin: hybrid synthetic-for-training + small real gold set (revisit at Phase 7).
+  → **REVISITED AND RESOLVED at Phase 7, 2026-08-09. The fallback was taken.** The survey
+  found **no public corpus of pre-competition athlete text** — every athlete-speech corpus
+  located is post-match, which is the wrong side of the event for an anticipatory taxonomy
+  (`appraisal_orientation`, anticipatory `cognitive_anxiety`). Four candidates were surveyed
+  and all four rejected: Cornell tennis transcripts (no licence stated), iMiGUE-Speech
+  (gated behind an unsigned agreement), ASAP Sports direct (terms unverifiable), YouTube
+  captions (API requires channel-owner OAuth). Full table in `docs/data_sources.md` §4.
+  **Owner decision: synthetic-first (A2), pre-competition framing retained, full taxonomy
+  retained.** Real-text acquisition routes declined for now — tracked as **OPEN-011**, which
+  is the project's live highest risk because contribution #1 needs real athlete text.
 - **Optional** DataRobot AutoML benchmark — only if a DataRobot account is available (Phase 16).
+  → **Reconfirmed at Phase 7, 2026-08-09.** No DataRobot account, SDK, endpoint, or token
+  exists. Ingestion stays local and offline. Uploading athlete text to a third-party cloud
+  is a `docs/ethics.md` governance decision, not a tooling one, and it would break the
+  "a reviewer reproduces the artifact with no account" property established in Phase 6.
 - **Expansions selected (stretch, park until core is done):** Temporal risk trajectory,
   Multimodal audio/prosody, Team-level aggregation, Outcome-linkage validation.
   → **Scope guidance:** core pipeline (Phases 1–25) ships first. Of the four, **Outcome-linkage
