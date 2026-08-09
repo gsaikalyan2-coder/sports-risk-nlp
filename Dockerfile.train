@@ -1,0 +1,23 @@
+# Training image: the light base plus the heavy ML stack.
+# Not needed until Phase 13 (transformer fine-tuning). Build it only when you
+# actually need to train, so Phase 6-12 work is not gated on a multi-GB pull.
+#
+# Build:  docker compose --profile train build train
+# Run:    docker compose --profile train run --rm train python scripts/hello.py
+#
+# torch comes from the PyTorch CPU wheel index. The default PyPI wheel for Linux
+# is the CUDA build, which drags in several GB of nvidia-* runtime libraries that
+# a CPU-only container will never load. If you later train on a CUDA GPU, remove
+# the --extra-index-url line and let pip resolve the default wheel.
+
+FROM sports-risk-nlp-base:latest
+
+USER root
+
+COPY requirements-ml.txt .
+RUN pip install -r requirements-ml.txt \
+        --extra-index-url https://download.pytorch.org/whl/cpu
+
+USER appuser
+
+CMD ["python", "scripts/hello.py"]

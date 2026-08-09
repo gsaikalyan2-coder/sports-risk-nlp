@@ -1,0 +1,29 @@
+# Heavy ML dependency layer (Phase 13 onward: transformer fine-tuning,
+# explainability, experiment tracking).
+#
+# INSTALL NOTE — torch must come from the PyTorch CPU wheel index, not PyPI.
+# The default PyPI wheel for Linux is the CUDA build and drags in several GB of
+# nvidia-* runtime libraries this project never uses (no GPU in the container).
+# The owner's Windows venv already runs torch 2.13.0+cpu, which is correct.
+#
+# Host (Windows / Linux, CPU-only):
+#     pip install -r requirements-ml.txt --extra-index-url https://download.pytorch.org/whl/cpu
+#
+# Container: Dockerfile.train already passes the CPU index.
+# If you later train on a CUDA GPU, drop the --extra-index-url and let pip
+# resolve the default (CUDA) wheel instead.
+
+-r requirements-base.txt
+
+torch>=2.2
+
+# transformers 5.x is a breaking major over 4.x (tokenizer and Trainer API
+# changes). src/models/ from Phase 13 targets 5.x; the bound stops a silent
+# downgrade to 4.x resolving underneath it.
+transformers>=5.0,<6.0
+datasets>=5.0
+accelerate>=1.0
+
+# Explainability & tracking
+shap>=0.46
+wandb>=0.17

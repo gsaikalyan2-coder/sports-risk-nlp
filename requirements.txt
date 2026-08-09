@@ -1,33 +1,19 @@
-# Human-edited dependency manifest (minimum versions).
+# Full local development environment = base + ML layers.
+#
+# Layered on purpose (Phase 2 fix, 2026-08-09):
+#   requirements-base.txt  light: agents, OpenRouter, sklearn, dashboard, dev tools
+#   requirements-ml.txt    heavy: torch, transformers, datasets, shap, wandb
+#
+# The Docker images mirror this split — see docs/docker.md. Phase 6 agent work
+# only needs the base layer; the ML layer is not required until Phase 13.
+#
+# Local install (CPU-only torch, recommended on a laptop):
+#     pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+#
+# Base layer only (much faster, sufficient through Phase 12):
+#     pip install -r requirements-base.txt
+#
 # Exact resolved versions live in requirements.lock.txt (see docs/setup.md sec. 7).
-# CPU-only torch: pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-# Core
-python-dotenv>=1.0
-pyyaml>=6.0
-pandas>=2.2
-numpy>=1.26
-scikit-learn>=1.4
-
-# NLP / modeling
-torch>=2.2
-transformers>=4.44
-datasets>=2.20
-accelerate>=0.33
-
-# Agents / LLM routing (OpenRouter is OpenAI-API compatible)
-crewai>=0.51
-openai>=1.40          # used as the OpenRouter client
-
-# Explainability & tracking
-shap>=0.46
-wandb>=0.17
-
-# Dashboard
-streamlit>=1.37
-
-# Dev / test
-pytest>=8.0
-ruff>=0.5
-pre-commit>=3.7
-detect-secrets>=1.5
+-r requirements-base.txt
+-r requirements-ml.txt

@@ -1,19 +1,82 @@
+# Service definitions for sports-risk-nlp.
+#
+# Two images, not one (Phase 2 fix, 2026-08-09):
+#   sports-risk-nlp-base   light  — app, agents, dashboard    (Dockerfile)
+#   sports-risk-nlp-train  heavy  — + torch/transformers      (Dockerfile.train)
+#
+# app / agents / dashboard all declare the SAME build block and the SAME image
+# name. Compose deduplicates by image name, so this builds once and is reused —
+# it does not build three times, and none of the services will try to pull from
+# a registry.
+#
+# The train service sits behind the `train` profile so `docker compose build`
+# does NOT pull the multi-GB ML stack during ordinary Phase 6-12 work.
+# See docs/docker.md for commands.
+
 services:
+  # ---- light image -------------------------------------------------------
   app:
-    build: .
-    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sports-risk-nlp-base:latest
+    env_file:
+      # required:false so a fresh clone with no .env still starts. Without this,
+      # compose aborts before the container is ever created.
+      - path: .env
+        required: false
     volumes:
       - .:/app
     working_dir: /app
     command: bash
     tty: true
 
+  agents:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sports-risk-nlp-base:latest
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - .:/app
+    working_dir: /app
+    # Offline by default: no API key needed, no spend. Use the `agents-live`
+    # invocation in docs/docker.md to call OpenRouter for real.
+    command: python scripts/run_crew.py --offline
+
   dashboard:
-    build: .
-    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sports-risk-nlp-base:latest
+    env_file:
+      - path: .env
+        required: false
     volumes:
       - .:/app
     working_dir: /app
     command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"
+
+  # ---- heavy image (Phase 13+; behind a profile) --------------------------
+  #
+  # PREREQUISITE: Dockerfile.train starts `FROM sports-risk-nlp-base:latest`, so
+  # the light image must already exist. Always run `docker compose build app`
+  # before `docker compose --profile train build train`.
+  train:
+    profiles: ["train"]
+    build:
+      context: .
+      dockerfile: Dockerfile.train
+    image: sports-risk-nlp-train:latest
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash
+    tty: true

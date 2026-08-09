@@ -1,0 +1,38 @@
+# Base (light) dependency layer.
+#
+# Everything needed to run the agent orchestration, the config/taxonomy layer,
+# the classical baselines, the dashboard shell, and the dev toolchain.
+# Deliberately EXCLUDES torch/transformers — see requirements-ml.txt.
+#
+# Rationale (Phase 2 fix, 2026-08-09): installing torch from the default PyPI
+# index on Linux pulls the CUDA build (~2.5 GB of wheels plus nvidia-* CUDA
+# runtime libraries), producing a ~6 GB image and a 30-60 minute build. The
+# agent layer needs none of that, so it lives in its own image.
+#
+# Floors below are the versions actually installed and working in the owner's
+# Windows 3.11 venv as of 2026-08-09. Upper bounds appear only where a known
+# breaking major boundary exists. Exact tested versions: requirements.lock.txt.
+
+# Core
+python-dotenv>=1.0
+pyyaml>=6.0
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.4
+
+# Agents / LLM routing (OpenRouter is OpenAI-API compatible)
+#
+# CrewAI 1.x is a breaking redesign of the 0.x API (crewai.LLM, crewai_core
+# split, new Flow primitives). The <2.0 bound is deliberate: code in src/agents/
+# is written against 1.x and would not run on 0.5x.
+crewai>=1.15,<2.0
+openai>=2.0,<3.0      # used as the OpenRouter client; 2.x broke 1.x call sites
+
+# Dashboard
+streamlit>=1.37
+
+# Dev / test
+pytest>=8.0
+ruff>=0.5
+pre-commit>=3.7
+detect-secrets>=1.5

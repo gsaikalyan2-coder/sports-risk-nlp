@@ -1,24 +1,140 @@
-# Cost-aware LLM routing (OpenRouter). Route by task difficulty; escalate only on
-# low confidence. Model IDs are placeholders — set to your chosen OpenRouter models.
-# Keep a running spend log at logs/cost_ledger.csv.
+# Cost-aware LLM routing (OpenRouter).
+#
+# Phase 6, locked 2026-08-09. Confirmed decisions from CLAUDE.md sec.10:
+#   Q1 framework  = CrewAI          (installed: crewai 1.15.x)
+#   Q2 LLM access = OpenRouter      (OpenAI-API compatible; openai>=2.0 client)
+#   Q3 data       = public/licensed datasets first
+#
+# Principle (CLAUDE.md sec.8 rule 6): default to the cheapest model that passes
+# the acceptance check; escalate only on low confidence; log every call.
 
-provider: openrouter          # confirmed 2026-07-23
-budget_usd_month: 20          # hard cap; stop/alert when exceeded
-prompt_caching: true
+version: 2
+provider: openrouter
+
+# ---------------------------------------------------------------------------
+# Execution mode
+# ---------------------------------------------------------------------------
+# offline : no network, no spend. A deterministic stub LLM answers from a fixed
+#           seed. This is the DEFAULT so that tests, CI, and container smoke
+#           runs can never bill the owner's account.
+# live    : real OpenRouter calls. Requires OPENROUTER_API_KEY in .env.
+#
+# Override at runtime with `--live` / `--offline` on scripts/run_crew.py.
+mode: offline
+
+api:
+  base_url: "https://openrouter.ai/api/v1"
+  # This is the NAME of an environment variable, not a key. The real value
+  # lives only in .env, which is gitignored and excluded from Docker images.
+  # detect-secrets' "Secret Keyword" rule fires on the api_key prefix plus a
+  # quoted string and cannot tell a variable name from a credential, so this is
+  # an explicit false positive rather than a silenced real finding.
+  api_key_env: "OPENROUTER_API_KEY"   # pragma: allowlist secret
+  timeout_seconds: 120
+  max_retries: 3
+
+# ---------------------------------------------------------------------------
+# Budget controls
+# ---------------------------------------------------------------------------
+budget:
+  monthly_cap_usd: 20.0        # hard cap
+  warn_at_fraction: 0.75       # print a warning past 75% of the cap
+  ledger_path: "logs/cost_ledger.csv"
+  # If a call would push the running month's spend past the cap, refuse it and
+  # raise rather than silently truncating the run. A surprise bill is worse than
+  # a failed job.
+  enforce: true
+
+prompt_caching: true           # reuse the cached rubric/system prompt across calls
 batch_requests: true
 
+# ---------------------------------------------------------------------------
+# Tiers
+# ---------------------------------------------------------------------------
+# PROVENANCE OF THESE NUMBERS
+# Model IDs and prices were read from the live OpenRouter model endpoint
+# (https://openrouter.ai/api/v1/models) on 2026-08-09. Prices are USD per 1M
+# tokens and are used ONLY to estimate spend for the ledger -- they are not
+# billing truth, and OpenRouter changes both catalogue and pricing without
+# notice. Re-run `python scripts/refresh_pricing.py --check` before trusting the
+# ledger for a budget decision.
+#
+# A stale model ID is a silent failure mode: the API returns 404 and the whole
+# labeling run dies mid-batch. If a run fails on an unknown model, re-check here
+# first.
 tiers:
-  cheap:                      # bulk labeling, cleaning, dedup, EDA summaries
-    model: "openrouter/<cheap-model-id>"
-    use_for: [preprocessing, weak_labeling, deduplication]
-  mid:                        # ambiguous labels, explanations, adjudication assist
-    model: "openrouter/<mid-model-id>"
-    use_for: [ambiguous_labels, explanations, qa_review]
-  premium:                    # novelty analysis, paper writing, hard adjudication
-    model: "openrouter/<premium-model-id>"
-    use_for: [literature_review, paper_writing, hard_adjudication]
+  cheap:
+    model: "openai/gpt-5.6-luna"
+    price_per_1m_input_usd: 0.10
+    price_per_1m_output_usd: 0.60
+    context_length: 1050000
+    max_tokens: 1024
+    temperature: 0.0           # labeling must be reproducible
+    use_for: [preprocessing, weak_labeling, deduplication, eda_summary]
 
+  mid:
+    model: "openai/gpt-5.6-terra"
+    price_per_1m_input_usd: 1.00
+    price_per_1m_output_usd: 6.00
+    context_length: 1050000
+    max_tokens: 2048
+    temperature: 0.0
+    use_for: [ambiguous_labels, explanations, qa_review]
+
+  premium:
+    model: "anthropic/claude-sonnet-5"
+    price_per_1m_input_usd: 2.00
+    price_per_1m_output_usd: 10.00
+    context_length: 1000000
+    max_tokens: 4096
+    temperature: 0.2
+    use_for: [literature_review, paper_writing, hard_adjudication, novelty_analysis]
+
+# Batch variants cost roughly half and are the right choice for Phase 10 bulk
+# weak labeling, where nothing is interactive and latency does not matter.
+# They are NOT suitable for escalation, which happens inline during a run.
+#   openai/gpt-5.6-luna:batch        0.10 / 0.60
+#   anthropic/claude-sonnet-5:batch  1.00 / 5.00
+batch_alternatives:
+  cheap: "openai/gpt-5.6-luna:batch"
+  premium: "anthropic/claude-sonnet-5:batch"
+
+# ---------------------------------------------------------------------------
+# Budget sanity check (why the cheap tier matters)
+# ---------------------------------------------------------------------------
+# Phase 10 labels on the order of 10,000 utterances. Assume ~400 input tokens
+# (rubric is cached; only the utterance varies) and ~120 output tokens each:
+#   input  10,000 x 400 = 4.0M tokens  @ $0.10/1M = $0.40
+#   output 10,000 x 120 = 1.2M tokens  @ $0.60/1M = $0.72
+#   -> about $1.12 for a full labeling pass on the cheap tier.
+# The same pass on the premium tier would be ~$20 -- the entire monthly cap for
+# one run. This is the whole argument for tiered routing, in one calculation.
+
+# ---------------------------------------------------------------------------
+# Escalation
+# ---------------------------------------------------------------------------
 escalation:
-  # If a cheap-tier label confidence < threshold, re-run on the next tier up.
+  # A cheap-tier label whose self-reported confidence falls below the threshold
+  # is re-run one tier up. Phase 10 calibrates this against the gold set --
+  # 0.65 is a starting value, not an evidence-backed one, and the ablation in
+  # Phase 18 should report sensitivity to it.
   confidence_threshold: 0.65
   max_tier: premium
+  max_escalations_per_record: 1
+
+# ---------------------------------------------------------------------------
+# Agent -> default tier
+# ---------------------------------------------------------------------------
+# Mirrors the table in CLAUDE.md sec.4. An agent may escalate above its default
+# but never silently: every escalation is written to the ledger with a reason.
+agent_defaults:
+  literature: premium
+  taxonomy_psych: premium
+  harvester: cheap
+  labeling: cheap
+  annotation_qa: cheap
+  modeling: local            # runs on the local machine; no API spend
+  evaluation: cheap
+  explainability: mid
+  security_ethics: mid
+  paper: premium
