@@ -61,9 +61,35 @@ from typing import Any
 from .allowlist import SourceDescriptor
 from .provenance import GeneratorStamp
 from .records import RawRecord
+from .substitution_verdicts import is_defective
 
 GENERATOR_NAME = "construct-template-grammar"
-GENERATOR_VERSION = "1.0"
+
+#: Version history, because the corpus is a dataset contribution and a reviewer
+#: has to be able to tell which generator produced which numbers.
+#:
+#:   1.0  Phase 7. Template grammar only.
+#:   1.1  Phase 7 follow-up. Lexical-variation layer (OPEN-012 mitigation).
+#:        **The constant was never bumped**, so every artefact from that run is
+#:        stamped `@1.0` while the docs call it v1.1. Recorded here rather than
+#:        silently corrected: `data/raw/.../provenance.json` in commit 6f9561a
+#:        says 1.0 and means 1.1.
+#:   1.2  Phase 9. `("part", "portion", "corner", "piece")` removed (OPEN-015).
+#:   1.3  Phase 9 follow-up. `_vary` is now GUARDED (OPEN-016): a substitution
+#:        that would produce a ruled-defective token sequence is reverted. Zero
+#:        synonym groups were deleted; realised vocabulary 643 -> 625 at n=4,000,
+#:        against 594 had the implicated members been deleted instead, so
+#:        OPEN-012's mitigation still stands. Default corpus size raised from
+#:        1,200 to 4,000 records (OPEN-017): 4,000 is the measured minimum at
+#:        which a 400-item gold set meets the 40-positive floor for all ten
+#:        constructs.
+#:
+#: A version bump changes the corpus. It also changes the RNG stream, because
+#: `_vary` consumes randomness per matched token -- so removing one group moves
+#: every downstream draw, not just the sentences that group touched. That is why
+#: OPEN-015's fix required re-running the Phase 7, Phase 8 and benchmark gates
+#: together instead of patching 21 records.
+GENERATOR_VERSION = "1.3"
 
 # ---------------------------------------------------------------------------
 # Strata. Deliberately coarse: docs/ethics.md sec.5.2 warns that a precise
@@ -449,7 +475,19 @@ SYNONYM_GROUPS: tuple[tuple[str, ...], ...] = (
     ("point", "purpose", "reason"),
     ("job", "chore", "duty", "obligation"),
     ("difference", "impact", "dent", "change"),
-    ("part", "portion", "corner", "piece"),
+    # ("part", "portion", "corner", "piece") was removed at Phase 9 (OPEN-015).
+    # Every occurrence of "part" in the template bank sits inside the idiom
+    # "part of me", and the idiom does not survive substitution: the group
+    # generated "corner of me" (9 records), "portion of me" (10) and
+    # "piece of me" (14) at seed 42 -- verified at Phase 9 by reconstructing the
+    # v1.1 generator from `git show HEAD:` and regenerating. An earlier draft of
+    # this comment said 11 for "corner of me"; the true count is 9, matching
+    # docs/open_issues.md and phase8_handover.md, and the other two are correct.
+    # All four members share a part of speech
+    # AND an argument structure, which is the constraint this bank was reviewed
+    # against -- so the review could not have caught it. **Idiom membership is
+    # a third constraint**, and `src/ingestion/synonym_audit.py` now checks it
+    # mechanically rather than by reading. Do not reinstate this group.
     ("moment", "instant", "second"),
     ("everything", "the whole lot", "all of it"),
 )
@@ -489,12 +527,36 @@ DISCOURSE_SUFFIXES: tuple[str, ...] = (
 
 
 def _vary(sentence: str, rng: random.Random, rate: float = 0.55) -> str:
-    """Swap words for construct-preserving near-synonyms, deterministically."""
+    """Swap words for construct-preserving near-synonyms, deterministically.
+
+    **Guarded since v1.3 (OPEN-016).** Every candidate substitution is applied,
+    the result is checked against `substitution_verdicts.is_defective`, and the
+    substitution is reverted if it would produce a token sequence a human ruled
+    broken or degraded.
+
+    Why guard rather than shrink the bank. `think -> figure` is broken in *"all
+    I figure about"* and unremarkable in *"I figure I'm ready"*. The defect is a
+    property of the **frame**, not of the word, and a context-blind bank can only
+    accept or reject the word. Measured at n=4,000, seed 42: deleting the 34
+    implicated members costs 49 realised types (643 -> 594); the guard costs 18
+    (643 -> 625) and removes nothing from the bank, so a future template using
+    one of those words in a good frame gets it back for free. Both reach zero
+    defects. Full table in `substitution_verdicts.py`.
+
+    **The RNG draw happens before the check, and is not retried.** A rejected
+    substitution consumes its random numbers exactly as an accepted one does, so
+    the stream depends only on which tokens are substitutable, not on which
+    substitutions survived. Retrying until something passed would make the
+    stream depend on the verdict table, and every future edit to that table
+    would silently reshuffle the whole corpus.
+    """
     # Phrase-level first, so multi-word synonyms survive tokenisation.
     for group in SYNONYM_GROUPS:
         for variant in group:
             if " " in variant and variant in sentence and rng.random() < rate:
-                sentence = sentence.replace(variant, rng.choice(group), 1)
+                candidate = sentence.replace(variant, rng.choice(group), 1)
+                if not is_defective(candidate):
+                    sentence = candidate
 
     out: list[str] = []
     for token in sentence.split(" "):
@@ -506,7 +568,16 @@ def _vary(sentence: str, rng: random.Random, rate: float = 0.55) -> str:
             replacement = rng.choice(group)
             if head[:1].isupper():
                 replacement = replacement[0].upper() + replacement[1:]
-            out.append(replacement + tail)
+            # Check against the sentence as it will actually read: the already
+            # decided prefix, this candidate, and the untouched remainder. A
+            # check against the candidate token alone would miss every
+            # multi-token signature, which is most of them.
+            decided = out + [replacement + tail]
+            remainder = sentence.split(" ")[len(decided) :]
+            if is_defective(" ".join(decided + remainder)):
+                out.append(token)
+            else:
+                out.append(replacement + tail)
         else:
             out.append(token)
     return " ".join(out)
@@ -794,7 +865,9 @@ def synthetic_descriptor(
     """
     return SourceDescriptor(
         source_id=source_id,
-        source_name="Synthetic pre-competition athlete utterances (template grammar v1.0)",
+        source_name=(
+            f"Synthetic pre-competition athlete utterances (template grammar v{GENERATOR_VERSION})"
+        ),
         allowlist_category="A2_synthetic",
         url_or_citation=(
             "Generated for this project by src/ingestion/synthetic.py "

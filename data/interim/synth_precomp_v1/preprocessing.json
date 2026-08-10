@@ -1,0 +1,30 @@
+{
+  "phase": 8,
+  "source_id": "synth_precomp_v1",
+  "written_on": "2026-08-10",
+  "utterance_count": 13651,
+  "deidentified": true,
+  "policy": "docs/ethics.md sec.5.1",
+  "raw_records": 4000,
+  "utterances_written": 13651,
+  "dropped": {
+    "empty_after_normalisation": 0,
+    "no_utterances": 0,
+    "non_english": 0,
+    "empty_after_deidentification": 0
+  },
+  "dropped_total": 0,
+  "records_normalised": 0,
+  "deid_replacements": {},
+  "deid_replacements_total": 0,
+  "health_clauses_removed": 0,
+  "utterances_with_residual_flags": 0,
+  "offset_violations": 0,
+  "steps": [
+    "normalize",
+    "segment",
+    "language_filter",
+    "deidentify"
+  ],
+  "note": "char_start/char_end index the NORMALISED parent text in data/raw/, not the de-identified utterance text stored here."
+}

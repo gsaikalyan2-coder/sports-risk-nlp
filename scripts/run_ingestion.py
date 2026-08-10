@@ -38,7 +38,12 @@ from src.ingestion import (  # noqa: E402
     type_token_ratio,
 )
 
-DEFAULT_COUNT = 1200
+#: Raised from 1,200 at Phase 9 (OPEN-017). 4,000 is the *measured* minimum at
+#: which the Phase 11 gold set reaches 400 items with 40+ positives for all ten
+#: constructs; the sweep behind it is in `reports/eda.md` §7.4. Not a round
+#: number picked for comfort -- 2,400 leaves one construct short and 1,200 leaves
+#: seven.
+DEFAULT_COUNT = 4000
 DEFAULT_SEED = 42
 SOURCE_ID = "synth_precomp_v1"
 
