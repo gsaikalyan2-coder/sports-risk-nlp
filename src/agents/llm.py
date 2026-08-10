@@ -164,7 +164,17 @@ class OfflineLLM(_BaseLLM):
     ) -> LLMResponse:
         tier_cfg = self._tier(tier)
         rng = self._rng(system + user)
-        text = self._synthesise(kind, rng)
+        # The "silver" shape is dispatched here rather than inside
+        # `_synthesise` because it is the only shape that needs the user prompt,
+        # and widening `_synthesise(kind, rng)` to take it broke four existing
+        # tests in `tests/test_agents.py` that subclass OfflineLLM and override
+        # that method with the two-argument signature. Those tests were right:
+        # `_synthesise(kind, rng)` is the established contract for "make me an
+        # answer of this shape out of thin air", and a shape that needs the
+        # prompt is a different job. Splitting it keeps both honest.
+        text = (
+            self._synthesise_silver(user, rng) if kind == "silver" else self._synthesise(kind, rng)
+        )
 
         input_tokens = estimate_tokens(system) + estimate_tokens(user)
         output_tokens = estimate_tokens(text)
@@ -197,6 +207,9 @@ class OfflineLLM(_BaseLLM):
 
         Dispatches on the caller's declared `kind`, never on prompt text --
         see the note in roster.TaskSpec for the bug that motivated this.
+
+        The Phase 10 "silver" shape is handled by `_synthesise_silver` instead,
+        because it is the one shape that has to read the prompt.
         """
         if kind == "label":
             pool = self.constructs or ("cognitive_anxiety",)
@@ -228,6 +241,90 @@ class OfflineLLM(_BaseLLM):
         return (
             "OFFLINE STUB RESPONSE. This text is generated locally with a fixed seed "
             "and contains no model output. Run with --live to call OpenRouter."
+        )
+
+    #: Delimiter the Phase 10 user prompt fences the target utterance with.
+    #: Duplicated here rather than imported from `src.labeling.prompt`, because
+    #: the agent layer must not depend on a pipeline stage that depends on it.
+    _TARGET_RE = re.compile(r"<<<(.*?)>>>", re.DOTALL)
+
+    def _synthesise_silver(self, user: str, rng: random.Random) -> str:
+        """A well-formed silver-label response for the Phase 10 schema.
+
+        Reads the user prompt, but only to recover the target utterance from its
+        explicit `<<<...>>>` delimiter. That is not the intent-sniffing the
+        TaskSpec note warns against -- the caller declared the shape, and this
+        reads a delimited field rather than guessing meaning from a substring.
+        It has to: a silver label must cite spans that are literal substrings of
+        the utterance, and a stub that invented spans would fail the parser's
+        substring check on every call and prove nothing downstream.
+
+        The content is meaningless -- that is the point of a stub -- but the
+        *shape* is exercised end to end: real construct keys, in-range
+        intensities, a confidence that straddles the escalation threshold, and
+        spans that really are substrings of the target utterance so the parser's
+        substring check is genuinely tested rather than trivially satisfied.
+
+        It abstains about a third of the time. An offline run in which nothing
+        ever abstains would leave the abstention path -- the one Phase 9 warns
+        is mandatory -- unexercised until the first live call.
+        """
+        match = self._TARGET_RE.search(user)
+        target = (match.group(1) if match else user).strip()
+
+        if not target:
+            return json.dumps(
+                {
+                    "abstain": True,
+                    "rationale": "Offline stub: no target utterance found in the prompt.",
+                    "confidence": 0.5,
+                    "interpretation_modifier": None,
+                    "low_resilience_explicit": False,
+                    "labels": [],
+                },
+                indent=2,
+            )
+
+        confidence = round(rng.uniform(0.45, 0.95), 2)
+        if rng.random() < 0.33 or not self.constructs:
+            return json.dumps(
+                {
+                    "abstain": True,
+                    "rationale": "Offline stub abstention; no construct language asserted.",
+                    "confidence": confidence,
+                    "interpretation_modifier": None,
+                    "low_resilience_explicit": False,
+                    "labels": [],
+                },
+                indent=2,
+            )
+
+        # A real substring: the first few words of the utterance. Crude, and
+        # deliberately so -- a cleverer span picker would be untested code
+        # standing between the parser and its own check.
+        words = target.split()
+        span = " ".join(words[: max(2, min(6, len(words)))])
+        construct = self.constructs[rng.randrange(len(self.constructs))]
+        intensity = rng.randrange(1, 4)
+
+        return json.dumps(
+            {
+                "abstain": False,
+                "rationale": ("Deterministic offline response; shape is real, judgement is not."),
+                "confidence": confidence,
+                "interpretation_modifier": None,
+                "low_resilience_explicit": False,
+                "labels": [
+                    {
+                        "construct": construct,
+                        "value": "present",
+                        "intensity": intensity,
+                        "evidence_spans": [span],
+                        "confidence": confidence,
+                    }
+                ],
+            },
+            indent=2,
         )
 
 
