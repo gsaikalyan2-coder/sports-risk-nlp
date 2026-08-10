@@ -913,7 +913,31 @@ session. Remove or repair the plugin's hook configuration.
 
 ## OPEN-003 — No off-machine backup of the repository
 
-**Status:** OPEN — accepted risk
+**Status: CLOSED 2026-08-10 (Phase 9).** Pushed to a **private** GitHub remote,
+`gsaikalyan2-coder/sports-risk-nlp`, 273 objects. `main` now tracks `origin/main`.
+
+**Verified before the push:** `.env` is untracked and gitignored, so no `OPENROUTER_API_KEY`
+was published. The `detect-private-key` and `detect-secrets` pre-commit hooks both passed on
+the commit that carried the corpus.
+
+**Standing obligation, not a one-off.** A remote that stops receiving pushes is not a backup.
+Push at the end of every phase, as part of the gate. `PROJECT_PLAN.md` §"Status board" now
+carries the commit for each completed phase, which is only meaningful if the commits are
+actually reachable off this machine.
+
+**Two things to keep in mind now that the repo is remote:**
+
+1. **It is private, and it should stay private until submission.** The corpus is synthetic and
+   nothing in it is sensitive, but `docs/ethics.md` §3.3 governs what may be published, and an
+   unfinished paper's artefacts are not covered by it.
+2. **When it does go public, re-check `docs/ethics.md` §3.3 first**, not after. Only the A2
+   synthetic source is quotable verbatim; if an A3 consented donation ever lands in
+   `data/raw/`, the `.gitignore` rules that keep corpora out of git become a privacy control
+   rather than a housekeeping convenience.
+
+**Original entry follows.**
+
+**Was:** OPEN — accepted risk
 **Owned by:** Phase 1
 
 Per the documented Phase 1 deviation, the previous codebase was permanently deleted at the
@@ -1048,3 +1072,4 @@ and both feed the same weakness.
 `scripts/run_eda.py` will flag unruled signatures and the build will fail until each is ruled
 in `substitution_verdicts.VERDICTS`. That is the ratchet working, not an obstacle — but budget
 for it, and do not merge template work without re-running the sweep.
+| 2026-08-10 | **OPEN-003 CLOSED** — repository pushed to a private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`), 273 objects, `main` tracking `origin/main`. First off-machine backup since Phase 1. `.env` confirmed untracked before the push. Pushing is now part of every phase gate, not a one-off. |

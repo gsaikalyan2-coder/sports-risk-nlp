@@ -26,7 +26,7 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 
 | Phase | Status | Evidence |
 |---|---|---|
-| 1 Scaffold | ✅ | `fb87925` · deviation: no `legacy-backup` branch (OPEN-003) |
+| 1 Scaffold | ✅ | `fb87925` · deviation: no `legacy-backup` branch; **OPEN-003 closed 2026-08-10**, private GitHub remote |
 | 2 Env & tooling | ✅ | `07d77ab`, `b28873f` · Docker builds, 11 env checks pass |
 | 3 Related work | ✅ | `b104b8d` · `docs/related_work.md`, 14 refs resolved to primaries |
 | 4 Taxonomy | ✅ | `d238721` · 10 constructs locked; **frozen at Phase 12** |
@@ -46,6 +46,10 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 | 2 | **OPEN-004 — no expert raters recruited.** Longest lead time of anything left; Phase 17 is the headline contribution. Was due Week 1–2. | open, **3 phases overdue** |
 | 3 | **OPEN-020 — template bank too small.** 7–12 templates/construct leaves 2–4 phrasings in the eval set; a kappa on 3 phrasings is a kappa about 3 phrasings. | open, Phase 9b |
 | 4 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
+
+**Closed since the last revision:** OPEN-003 (no off-machine backup) — repository pushed to a
+private GitHub remote on 2026-08-10. **Push at the end of every phase; a remote that stops
+receiving pushes is not a backup.**
 
 **Risks 1 and 2 are the same conversation** — one SRMIST coach or sport-psychology
 practitioner could both broker pre-competition text under A3 consent *and* serve as the

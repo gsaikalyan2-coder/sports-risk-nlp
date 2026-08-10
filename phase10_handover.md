@@ -50,8 +50,9 @@ of truth for open items.
 **Carried-forward caveats:**
 
 - **Phase 1 deviation:** no `legacy-backup` branch; the previous codebase was permanently
-  deleted at the owner's instruction. Only `main` exists, no remote, no off-machine backup
-  (**OPEN-003**).
+  deleted at the owner's instruction. **OPEN-003 is now closed** — the repo was pushed to a
+  private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`) on 2026-08-10, the first
+  off-machine backup this project has had. Push at the end of every phase from now on.
 - **Phase 3:** the BibTeX key `Toth2025` is historical. László Tóth was the **handling
   editor**, not an author. Correct authors: Nogueira, Morais, Mansell & Gomes.
 - **Sandbox caveat:** the agent sandbox runs Python 3.10; the project pins 3.11.
@@ -683,7 +684,7 @@ decision logged per call, and a cost ledger entry — plus the Annotation-QA rev
 | OPEN-013 | ~~De-identification unvalidatable~~ — **CLOSED at Phase 8.** | closed |
 | OPEN-005 | Ethics exemption not in writing. | Submission |
 | OPEN-006 | Withdrawal contact is a personal address. | Public release |
-| OPEN-003 | No off-machine backup. Everything exists in one place on one machine. | Standing risk |
+| OPEN-003 | ~~No off-machine backup~~ — **CLOSED 2026-08-10**, private GitHub remote. Keep pushing per phase. | closed |
 | OPEN-009 | Model/price drift. | Any large batch |
 | OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. Confirmed still firing throughout Phase 9. | — |
 
