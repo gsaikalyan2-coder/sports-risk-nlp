@@ -1,0 +1,17 @@
+{
+  "phase": 10,
+  "source_id": "synth_precomp_v1",
+  "written_on": "2026-08-10",
+  "label_count": 9302,
+  "content": "machine-proposed silver labels",
+  "ground_truth": false,
+  "policy": "docs/labeling.md",
+  "run_id": "20260810T140018Z",
+  "mode": "offline",
+  "prompt_version": "silver-v1",
+  "context_used": true,
+  "distinct_prompts": 9260,
+  "escalations": 3633,
+  "cost_usd": 0.0,
+  "failures": 0
+}

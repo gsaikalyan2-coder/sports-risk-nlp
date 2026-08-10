@@ -61,6 +61,18 @@ data/interim/*/*
 data/processed/gold_candidates/*
 !data/processed/gold_candidates/sampling_plan.json
 
+# Phase 10 silver labels. 9,302 rows, ~10 MB, and fully regenerable offline from
+# data/interim/ with `python scripts/run_labeling.py` -- the same reasoning that
+# keeps data/raw/ and data/interim/ out of the repo. The manifest and provenance
+# ARE kept: they are the claims about what was produced, and a claim that cannot
+# be diffed is a claim nobody checks. Same un-ignore dance as gold_candidates.
+!data/processed/silver/
+data/processed/silver/*/silver.jsonl
+
+# Annotation-QA queue: regenerated with the labels, and 1.7 MB of it.
+logs/review_queue.jsonl
+logs/labeling_*.json
+
 # Archived previous version
 _legacy/
 

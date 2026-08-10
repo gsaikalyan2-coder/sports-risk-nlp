@@ -1,0 +1,154 @@
+{
+  "run": {
+    "run_id": "20260810T140018Z",
+    "phase": 10,
+    "mode": "offline",
+    "prompt_version": "silver-v1",
+    "use_context": true,
+    "started_on": "2026-08-10T14:00:18+00:00",
+    "finished_on": "2026-08-10T14:00:29+00:00",
+    "utterances": 9302,
+    "distinct_prompts": 9260,
+    "copied_by_dedup": 42,
+    "dedup_saving_fraction": 0.0045,
+    "calls_made": 12893,
+    "escalations": 3633,
+    "escalation_rate": 0.3923,
+    "labels_written": 9302,
+    "failures": 0,
+    "abstentions": 3102,
+    "abstention_rate": 0.3335,
+    "construct_counts": {
+      "burnout_signal": 1087,
+      "cognitive_anxiety": 1036,
+      "perceived_stress": 1053,
+      "resilience": 1012,
+      "self_confidence": 983,
+      "somatic_anxiety": 1029
+    },
+    "input_tokens": 52496677,
+    "output_tokens": 1106561,
+    "cost_usd": 0.0
+  },
+  "projection": {
+    "projected_usd": 17.4625,
+    "cheap_only_usd": 4.9893,
+    "escalation_usd": 12.4732,
+    "calls": 9260.0,
+    "system_prompt_tokens": 3946.0,
+    "mean_user_tokens": 122.0,
+    "mean_billable_input_tokens": 4068.0,
+    "assumed_output_tokens": 220.0,
+    "assumed_escalation_fraction": 0.25,
+    "assumed_cache_discount": 1.0
+  },
+  "queue": {
+    "BURNOUT_ASSERTED": 1087,
+    "ESCALATED_AND_UNCERTAIN": 3652,
+    "SPAN_IS_WHOLE_UTTERANCE": 205,
+    "_rows": 4944,
+    "_distinct_utterances": 4427
+  },
+  "ancestry": [
+    {
+      "construct": "cognitive_anxiety",
+      "high_overlap_n": 33,
+      "low_overlap_n": 9269,
+      "high_overlap_assert_rate": 0.0303,
+      "low_overlap_assert_rate": 0.1117,
+      "assert_rate_gap": -0.0814,
+      "high_overlap_mean_confidence": 0.67,
+      "low_overlap_mean_confidence": 0.6991
+    },
+    {
+      "construct": "somatic_anxiety",
+      "high_overlap_n": 57,
+      "low_overlap_n": 9245,
+      "high_overlap_assert_rate": 0.1228,
+      "low_overlap_assert_rate": 0.1105,
+      "assert_rate_gap": 0.0123,
+      "high_overlap_mean_confidence": 0.68,
+      "low_overlap_mean_confidence": 0.698
+    },
+    {
+      "construct": "self_confidence",
+      "high_overlap_n": 75,
+      "low_overlap_n": 9227,
+      "high_overlap_assert_rate": 0.0933,
+      "low_overlap_assert_rate": 0.1058,
+      "assert_rate_gap": -0.0124,
+      "high_overlap_mean_confidence": 0.7271,
+      "low_overlap_mean_confidence": 0.6897
+    },
+    {
+      "construct": "motivation_orientation",
+      "high_overlap_n": 92,
+      "low_overlap_n": 9210,
+      "high_overlap_assert_rate": 0.0,
+      "low_overlap_assert_rate": 0.0,
+      "assert_rate_gap": 0.0,
+      "high_overlap_mean_confidence": 0.0,
+      "low_overlap_mean_confidence": 0.0
+    },
+    {
+      "construct": "perceived_stress",
+      "high_overlap_n": 98,
+      "low_overlap_n": 9204,
+      "high_overlap_assert_rate": 0.0612,
+      "low_overlap_assert_rate": 0.1138,
+      "assert_rate_gap": -0.0525,
+      "high_overlap_mean_confidence": 0.71,
+      "low_overlap_mean_confidence": 0.7044
+    },
+    {
+      "construct": "attentional_focus",
+      "high_overlap_n": 76,
+      "low_overlap_n": 9226,
+      "high_overlap_assert_rate": 0.0,
+      "low_overlap_assert_rate": 0.0,
+      "assert_rate_gap": 0.0,
+      "high_overlap_mean_confidence": 0.0,
+      "low_overlap_mean_confidence": 0.0
+    },
+    {
+      "construct": "burnout_signal",
+      "high_overlap_n": 77,
+      "low_overlap_n": 9225,
+      "high_overlap_assert_rate": 0.0909,
+      "low_overlap_assert_rate": 0.1171,
+      "assert_rate_gap": -0.0262,
+      "high_overlap_mean_confidence": 0.7271,
+      "low_overlap_mean_confidence": 0.7022
+    },
+    {
+      "construct": "coping_style",
+      "high_overlap_n": 144,
+      "low_overlap_n": 9158,
+      "high_overlap_assert_rate": 0.0,
+      "low_overlap_assert_rate": 0.0,
+      "assert_rate_gap": 0.0,
+      "high_overlap_mean_confidence": 0.0,
+      "low_overlap_mean_confidence": 0.0
+    },
+    {
+      "construct": "resilience",
+      "high_overlap_n": 97,
+      "low_overlap_n": 9205,
+      "high_overlap_assert_rate": 0.0515,
+      "low_overlap_assert_rate": 0.1094,
+      "assert_rate_gap": -0.0579,
+      "high_overlap_mean_confidence": 0.648,
+      "low_overlap_mean_confidence": 0.6976
+    },
+    {
+      "construct": "appraisal_orientation",
+      "high_overlap_n": 148,
+      "low_overlap_n": 9154,
+      "high_overlap_assert_rate": 0.0,
+      "low_overlap_assert_rate": 0.0,
+      "assert_rate_gap": 0.0,
+      "high_overlap_mean_confidence": 0.0,
+      "low_overlap_mean_confidence": 0.0
+    }
+  ]
+}
