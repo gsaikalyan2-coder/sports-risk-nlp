@@ -18,6 +18,41 @@ sampling** (Phase 7) with full temporal modeling still Future Work; *Multimodal*
 (risk layer accepts optional light context, Phase 15) but not built; *Outcome linkage* is the one full
 stretch attempted in-window if data allows; *Team aggregation* stays Future Work.
 
+---
+
+## STATUS BOARD (updated 2026-08-10, end of Phase 9)
+
+**Week 3 of 8.** Phases 1–9 complete and gated. Next: Phase 9b, then Phase 10.
+
+| Phase | Status | Evidence |
+|---|---|---|
+| 1 Scaffold | ✅ | `fb87925` · deviation: no `legacy-backup` branch (OPEN-003) |
+| 2 Env & tooling | ✅ | `07d77ab`, `b28873f` · Docker builds, 11 env checks pass |
+| 3 Related work | ✅ | `b104b8d` · `docs/related_work.md`, 14 refs resolved to primaries |
+| 4 Taxonomy | ✅ | `d238721` · 10 constructs locked; **frozen at Phase 12** |
+| 5 Ethics & governance | ✅ | `a28b7ba` · `docs/ethics.md`, allow-list v1.1 |
+| 6 Agent framework | ✅ | `b28873f` · offline crew run + cost ledger |
+| 7 Ingestion | ✅ | `6f9561a` · **4,000** records, fail-closed allow-list, time-aware metadata |
+| 8 Preprocessing & de-ID | ✅ | **13,651** utterances · fixture 34/34 exact, leak rate 0% |
+| 9 EDA & quality profiling | ✅ | `reports/eda.md` · gold sampling plan, 400 items, 0/10 below floor |
+| **9b Corpus hardening** | **NEXT** | OPEN-020 + OPEN-018 · ~1 day, unblocks a defensible kappa |
+| 10 Weak labelling | blocked on `OPENROUTER_API_KEY` (OPEN-008) | — |
+
+**Live risks, in order.** These supersede the generic risk list at the foot of this file.
+
+| # | Risk | Status |
+|---|---|---|
+| 1 | **OPEN-011 — no real athlete text.** Contribution #1 claims an *athlete-text* corpus; the corpus is 100% synthetic. Only unmitigated high-impact item. | open, owner-actionable |
+| 2 | **OPEN-004 — no expert raters recruited.** Longest lead time of anything left; Phase 17 is the headline contribution. Was due Week 1–2. | open, **3 phases overdue** |
+| 3 | **OPEN-020 — template bank too small.** 7–12 templates/construct leaves 2–4 phrasings in the eval set; a kappa on 3 phrasings is a kappa about 3 phrasings. | open, Phase 9b |
+| 4 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
+
+**Risks 1 and 2 are the same conversation** — one SRMIST coach or sport-psychology
+practitioner could both broker pre-competition text under A3 consent *and* serve as the
+Phase 17 rater. It has been deferred across Phases 7, 8 and 9.
+
+---
+
 **How to read this:** phases are sequential *by dependency*, but many run **in parallel**
 (shown in the "Parallel agents" column). Each phase has an objective, tasks, the agents
 involved, a concrete deliverable, and a **gate** (the acceptance check that must pass before
@@ -86,7 +121,12 @@ Sec = Security/Ethics · Pap = Paper.
 - **Deliverable:** A runnable "smoke-test crew" that passes a trivial task end to end.
 - **Gate:** One orchestrated multi-agent run completes and logs cost to `logs/cost_ledger.csv`.
 
-### Phase 7 — Data ingestion pipeline *(now time-aware)*
+### Phase 7 — Data ingestion pipeline *(now time-aware)* — ✅ COMPLETE
+- **Outcome:** No public pre-competition athlete corpus exists (survey in `docs/data_sources.md`
+  §4 — four candidates, all rejected). Owner chose **synthetic-first (A2)**. Generator is a seeded
+  template grammar, now at **v1.3**, default **4,000 records** at seed 42, byte-reproducible with
+  no API key. Fail-closed allow-list; structural provenance; time-aware metadata at 100% coverage
+  on all five required fields. **Consequence: OPEN-011 is the project's highest live risk.**
 - **Objective:** Get raw text in with provenance **and lightweight temporal/context metadata**.
 - **Tasks:** Har Agent implements `src/ingestion/`; each source writes `provenance.json`
   (source, date, license). Respect the Phase 5 allow-list. **New (from evidence review):** where
@@ -98,7 +138,12 @@ Sec = Security/Ethics · Pap = Paper.
 - **Gate:** Every raw record traceable to a licensed/consented/synthetic source; temporal/context
   fields present where the source allows (nullable otherwise).
 
-### Phase 8 — Preprocessing & de-identification
+### Phase 8 — Preprocessing & de-identification — ✅ COMPLETE
+- **Outcome:** 4,000 records → **13,651 utterances**, 0 dropped. De-identification measured against
+  a 34-case fixture: precision 100%, recall 100%, exact 34/34, **leak rate 0%**, negatives 8/8,
+  plus a held-out 10/10 probe reported but deliberately not gated. **Read that as an upper bound**
+  — the A2 generator plants no identifiers, so the fixture measures the failure modes we thought to
+  write down. Re-measure against real text when OPEN-011 resolves.
 - **Objective:** Clean, segment, and strip PII.
 - **Tasks:** `src/preprocessing/` — normalization, utterance segmentation, language filter,
   `deidentify.py` (remove names/handles/locations). Output `data/interim/`.
@@ -106,33 +151,105 @@ Sec = Security/Ethics · Pap = Paper.
 - **Deliverable:** Clean, de-identified utterance corpus.
 - **Gate:** Spot-check sample shows no direct identifiers remain.
 
-### Phase 9 — Exploratory data analysis & quality profiling
+### Phase 9 — Exploratory data analysis & quality profiling — ✅ COMPLETE
 - **Objective:** Understand the corpus before labeling.
-- **Tasks:** Notebook EDA — length distributions, vocabulary, class-of-interest prevalence,
-  duplicates, junk. Decide sampling strategy for gold set.
-- **Parallel agents:** Eval (profiling).
-- **Deliverable:** `reports/eda.md` + figures.
-- **Gate:** Documented data-quality issues and a stratified sampling plan.
+- **Delivered:** `src/evaluation/{profile,sampling,figures}.py` (pure Python, no new deps),
+  `scripts/run_eda.py` (the gate), `reports/eda.md` + 9 SVG figures, `notebooks/01_eda.ipynb` as a
+  thin viewer over tested functions, and `data/processed/gold_candidates/sampling_plan.json`.
+- **The gold-set sampling plan is the real deliverable.** The obvious plan — draw from the test
+  side of `template_disjoint_split` — leaves `appraisal_orientation` with **zero** items, because
+  that function shuffles all 85 templates as one pool. Templates are now partitioned **per
+  construct** (35% holdout, floor of one), records assigned only if *every* template is held out,
+  duplicates and sub-annotatable items filtered, then drawn construct-quota-first and
+  context-balanced. 400 `gold_eval` + 100 `gold_dev`, 100% double-annotated, `generation_spec`
+  stripped from every candidate.
+- **Four defects found, three fixed in-phase:** OPEN-016 (15.8% of records carried an
+  ungrammatical substitution → **0%** via a generation-time guard), OPEN-017 (gold pool too small
+  → corpus raised to 4,000, **0/10** constructs below floor), OPEN-019 (`generation_spec` is
+  replicated per utterance — documentation), and OPEN-018 (**87.4%** utterance duplication,
+  mitigated in the sampling plan, root cause open).
+- **Gate:** ✅ Documented data-quality issues and a stratified sampling plan.
+
+### Phase 9b — Corpus hardening *(NEW, inserted 2026-08-10)*
+- **Why this exists.** Phase 9 measured two things that cannot be fixed downstream and that both
+  attack contribution #1 at its weakest point. Doing them now costs ~1 day and one
+  regenerate-and-re-gate cycle. Doing them after Phase 10 means paying for silver labels twice.
+- **Objective:** Make the corpus able to support a kappa a reviewer will believe.
+- **Tasks:**
+  1. **OPEN-020 — expand the template bank to ~15 realisations per construct** (from 7–12). This
+     is the one that matters. At the current size a 35% holdout leaves 2–4 phrasings per construct
+     in the evaluation set, so the kappa describes those phrasings rather than the construct. It
+     also raises the fraction of utterances that actually realise a construct (currently 0.62),
+     which corpus size provably cannot: swept at 1.2k/4k/6k/8k records, the fraction stays at
+     0.59–0.62 because it is a per-*record* property.
+  2. **OPEN-018 option (a) — apply `_vary` to `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES`.**
+     They are currently emitted verbatim, and Phase 8 segments each into its own utterance, so
+     `"It is what it is."` appears hundreds of times. 87.4% of utterances are exact duplicates.
+  3. Re-run the synonym sweep. **New templates create new substitution frames**, so the build will
+     fail until each flagged signature is ruled in `substitution_verdicts.VERDICTS`. That is the
+     ratchet working — budget for it.
+  4. Regenerate at seed 42; re-run all four gates; update `reports/eda.md`, `docs/data_sources.md`
+     and the fixed-corpus assertions in `tests/test_profile.py` **in the same change**.
+- **Parallel agents:** Psy (writes realisations against the rubric), Eval (re-runs the profile).
+- **Deliverable:** v1.4 corpus + refreshed EDA report.
+- **Gate:** ≥14 templates per construct; utterance duplicate rate materially below 87.4%;
+  cue-corrected construct coverage ≥40 for at least 8 of 10 constructs; all four gates pass;
+  synonym sweep reports zero unruled signatures and zero realised defects.
+- **Explicitly NOT in scope:** anything requiring an API key, and any change to the taxonomy
+  (frozen until Phase 12).
 
 ---
 
 ## WEEK 3 — Labeling & Gold Standard
 
 ### Phase 10 — Cost-aware LLM weak labeling *(parallelized)*
+- **Blocked on:** `OPENROUTER_API_KEY` (**OPEN-008**). Do not ship an unexecuted path — that is
+  the OPEN-007 mistake. Either get the key, or gate the provider behind a mock with the real
+  integration test hidden behind an env flag. **`pytest` must never be able to spend money.**
+- **Do Phase 9b first.** Both of its remedies regenerate the corpus, and silver labels computed
+  against a corpus about to be replaced are tokens spent twice.
 - **Objective:** Produce silver labels cheaply.
 - **Tasks:** Lab Agent labels utterances against the taxonomy with rationale + confidence,
   using cheap-tier models, prompt caching, and batching; escalate low-confidence to mid tier.
+- **Four things Phase 9 measured that change how this is built:**
+  1. **Deduplicate before the API call.** 87.4% of utterances are exact duplicates; there are
+     3,131 distinct strings, not 13,651. Label the distinct set and fan results back out — that is
+     roughly a **77% saving** on the phase's entire budget, and it costs one `dict`.
+  2. **Abstention must be a first-class answer.** ~38% of utterances carry no construct at all. A
+     labeller that never returns "none" is broken, not thorough.
+  3. **Pass the parent record as context.** Median utterance is 9 tokens — too short to judge
+     `appraisal_orientation` alone. `parent_record_id` is on every interim record for this.
+  4. **Placeholders must survive the prompt intact** and the model must be told what `[ATHLETE]`
+     and `[EVENT_WINDOW]` mean rather than left to guess.
+- **The circularity trap.** This phase produces something that *is* a label, stored next to
+  records carrying `generation_spec`, which is not one. Never evaluate silver against
+  `generation_spec` — that measures whether an LLM can recover this project's own template
+  choices. Silver is evaluated against the Phase 11 human gold set and nothing else.
 - **Parallel agents:** Lab ×N shards.
 - **Deliverable:** `data/processed/silver/` + per-shard cost logs.
-- **Gate:** Full corpus silver-labeled under budget; confidence recorded per label.
+- **Gate:** Full corpus silver-labeled under budget; confidence recorded per label; every call has
+  a routing decision and a `logs/cost_ledger.csv` entry.
 
 ### Phase 11 — Gold standard human verification
 - **Objective:** A trustworthy evaluation set.
-- **Tasks:** Draw a stratified sample; Saikalyan + ≥1 peer annotate independently using the
-  rubric; QA Agent surfaces conflicts; adjudicate; compute inter-annotator agreement (kappa).
+- **The sample is already drawn.** `data/processed/gold_candidates/` holds `gold_eval.jsonl`
+  (400 items) and `gold_dev.jsonl` (100), with `sampling_plan.json` recording the template
+  partition and every parameter. Regenerate with `python scripts/run_eda.py`. **Do not redraw by
+  hand** — the plan is what makes the evaluation set leakage-safe, and it is asserted by tests.
+- **Order of operations, and it is load-bearing:** annotators calibrate on `gold_dev` **first**,
+  argue over the rubric, revise `docs/annotation_guidelines.md`, and only then start `gold_eval`.
+  `gold_dev` is drawn from *training-side* templates precisely so that burning it on rubric
+  arguments costs zero evaluation power. An item read during an argument about the rubric is no
+  longer an independent measurement.
+- **Tasks:** Saikalyan + ≥1 peer annotate **every** `gold_eval` item independently using the
+  rubric (100% double annotation, so kappa is computable *per construct*); QA Agent surfaces
+  conflicts; adjudicate; compute inter-annotator agreement.
 - **Parallel agents:** QA (assist only — humans own gold).
 - **Deliverable:** `data/gold/` + `reports/iaa.md`.
-- **Gate:** Kappa reported; a target subset (e.g. a few hundred utterances) gold-labeled.
+- **Gate:** Per-construct Cohen's kappa reported **with a bootstrap interval, never a bare point
+  estimate** — at 40 items the interval is roughly ±0.20 wide, enough to separate "substantial"
+  from "fair" and not enough to separate 0.70 from 0.75. 400 utterances gold-labelled.
+- **`data/gold/` is human-owned.** No agent writes there; the store guards refuse the root.
 
 ### Phase 12 — Label validation & taxonomy refinement
 - **Objective:** Fix schema problems the data exposed.

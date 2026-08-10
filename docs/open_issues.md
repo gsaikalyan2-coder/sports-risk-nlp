@@ -402,8 +402,437 @@ Option 3 is mandatory regardless of whether 1 or 2 is done.
 
 ## OPEN-013 — De-identification cannot be validated against a corpus with no identifiers
 
-**Status: FIXTURE DELIVERED 2026-08-09.** The measurement instrument now exists; the
-measurement itself is Phase 8's job.
+**Status: CLOSED 2026-08-09 (Phase 8).** The fixture was delivered at Phase 7 and the
+measurement has now been made. All five obligations listed at the bottom of this entry were
+met, and the numbers are in `docs/preprocessing.md` §3.
+
+| Metric | Value |
+|---|---|
+| Precision | **100.0%** |
+| Recall | **100.0%** |
+| Exact match | **100.0%** (34/34) |
+| Leak rate (the privacy number) | **0.0%** |
+| Negatives preserved | **8/8** |
+
+Reported per difficulty band (easy, medium, hard all 100% exact) and per category. A
+**held-out 10-case generalisation probe**, never consulted while writing the rules, scores
+10/10 exact — reported and deliberately **not** gated, because a probe that gates becomes a
+second fixture the next person tunes against.
+
+**One fixture case was corrected, and it should be recorded rather than glossed.** `name_01`
+originally expected the bare role noun *"the coach"* to be replaced with `[COACH]`. That
+contradicted `negative_04` in the same file — *"'my Coach' is a role, not an identity"* — and
+contradicted `docs/ethics.md` §5.1, which lists person **names** for replacement, not role
+nouns. The two cases could not both be satisfied, and `name_01` was the one that disagreed
+with the policy. It was amended to expect `[ATHLETE] said the coach was happy with the
+session.`; the implementation was **not** changed to chase it. The correction is recorded in
+the case's own `notes` field so the file explains itself.
+
+**A 100% score on 34 cases is not a strong claim, and the paper must not present it as one.**
+Every case was written by this project; none of it is real athlete text (OPEN-011). The
+number means the cascade handles the failure modes we thought to write down — not that it
+handles the ones we did not. Re-measure when OPEN-011 resolves and report both numbers, with
+the fixture score labelled as an **upper bound**. The seven stated limitations in
+`docs/preprocessing.md` §5 are the honest counterweight to this number.
+
+---
+
+## OPEN-015 — Generator v1.1 lexical variation produced an ungrammatical substitution
+
+**Status: CLOSED 2026-08-10 (Phase 9).** Option (a) was taken with the owner's approval. The
+`("part", "portion", "corner", "piece")` group was deleted, generator bumped to **v1.2**, the
+corpus regenerated at seed 42, and the Phase 7, Phase 8 and benchmark gates all re-run and
+re-reported together. Occurrences of `corner of me`, `portion of me` and `piece of me` in the
+regenerated corpus: **0, 0, 0**.
+
+Regenerating moved the RNG stream, so every downstream count changed — 4,110 → **4,141**
+utterances; memorisation probe 0.732/0.198 → **0.738/0.146**. Full before/after table in
+`reports/eda.md` §0.
+
+**One number in this entry was wrong and is corrected rather than deleted.** The
+`src/ingestion/synthetic.py` comment written when the group was removed said `corner of me`
+occurred in **11** records. The true v1.1 count is **9**, as this entry and
+`phase8_handover.md` both said. Verified by reconstructing generator v1.1 from
+`git show 6f9561a:src/ingestion/synthetic.py` and regenerating at seed 42; the other two
+counts in that comment (10 and 14) are correct. The comment was fixed.
+
+**The wider sweep was done, and it found that OPEN-015 was not an isolated defect. See
+OPEN-016.**
+
+**Original entry follows.**
+
+**Owned by:** Phase 7 (synthetic generator), found at Phase 8
+**Becomes blocking at:** never on its own — but it is a **corpus quality** defect, so it
+belongs to **Phase 9** (EDA & quality profiling), which is the phase that exists to find
+exactly this.
+
+**How it was found:** by reading `reports/deid_audit_sample.md`, the manual audit sample Phase
+8 generates. The very second entry read:
+
+> *"To be fair, corner of me wants to attack it and part of me just wants to survive it."*
+
+`corner of me` is not English. Generator v1.1's near-synonym substitution layer replaced
+*part* with *corner* — a valid synonym in isolation ("a corner of the room"), invalid in the
+idiom *part of me*.
+
+**Prevalence: 9 of 1,200 records (0.8%).**
+
+`phase8_handover.md` §B6b records that a first pass of the substitution layer produced
+"fixating *about* the result", "I must *to* not mess this up", and "Sessions *has* been", and
+that those groups were deleted with the reasoning recorded inline. This one survived the same
+review, because the constraint applied was shared part-of-speech **and** argument structure —
+and *part* → *corner* satisfies both. Idiom membership is a third constraint that was not
+checked and cannot be checked from POS alone.
+
+**Why it matters more than 0.8% suggests.** The corpus is the dataset contribution. A
+reviewer who reads nine ungrammatical records will discount the whole generator, and the
+paper claims the template grammar produces *plausible* pre-competition language. It also
+pollutes the vocabulary statistics that OPEN-012 was mitigated against — some of the
+444→638 vocabulary gain is noise of this kind, and nobody has measured how much.
+
+**Resolution, owner's choice:**
+
+- **(a)** Delete the `part`/`corner` group from the synonym bank, regenerate at seed 42, and
+  re-run the Phase 7, Phase 8, and benchmark gates. Cheap; changes every downstream count
+  (1,200 records / 4,110 utterances / the audit numbers) so all three must be re-reported
+  together. *Recommended, and best done at the start of Phase 9 before EDA numbers are
+  published.*
+- **(b)** Leave it and disclose the rate in `docs/data_sources.md` as a known generator
+  limitation.
+
+**It was not fixed during Phase 8.** Regenerating the corpus mid-phase would have invalidated
+the de-identification and pipeline numbers reported in the same session, and the corpus is a
+Phase 7 artefact under owner decision, not a preprocessing detail.
+
+**Wider action for Phase 9:** this was one substitution found by reading roughly twenty
+records. A systematic sweep of the whole synonym bank against the corpus is EDA work, and
+"junk" is already on the Phase 9 task list in `PROJECT_PLAN.md`.
+
+---
+
+## OPEN-016 — 15.8% of records still carry a broken or degraded synonym substitution
+
+**Status: CLOSED 2026-08-10 (Phase 9).** Resolved by **option (c)**, the generation-time
+guard, on the owner's instruction. Generator bumped to **v1.3**.
+
+`_vary` now applies each candidate substitution, checks the result against the ruled-defective
+signatures in the new `src/ingestion/substitution_verdicts.py`, and reverts it if it would
+produce one. **Zero synonym groups were deleted.** Current corpus: **0 of 4,000 records
+(0.0%)** carry a defect, down from 190 of 1,200 (15.8%).
+
+**Both remedies were measured before choosing, at n=4,000 and seed 42:**
+
+| | Synonym bank | Realised vocabulary | Defective records |
+|---|---|---|---|
+| v1.2, unguarded | 64 groups | 643 types | 630 (15.75%) |
+| Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |
+| **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |
+
+Deleting costs 49 realised types; the guard costs 18. The guard is **not free** — a word whose
+only frames in the bank were defective now never appears — but it keeps 31 more types than
+deletion and removes nothing from the bank, so a future template using one of those words in a
+good frame gets it back automatically. Deletion would not. This is why the vocabulary line in
+`docs/data_sources.md` reads 636 → 625 rather than 636 → 594.
+
+**The RNG stream deliberately does not depend on the verdict table.** A rejected substitution
+consumes its random draw exactly as an accepted one does; there is no retry. Retrying until
+something passed would make the corpus a function of the verdict table, and every future edit
+to that table would silently reshuffle the whole corpus.
+
+**The honest limit, which the paper must state.** The guard is only as good as its hand-ruled
+table and cannot catch a defect class nobody has thought of. What it does is make the failure
+mode **non-recurring**: the sweep is exhaustive over single substitutions, a test fails the
+build on an unruled signature, and a second test asserts the corpus contains no ruled-defective
+frame. A new defect class still needs a human to notice it once. It no longer needs a human to
+notice it over and over.
+
+**One structural detail worth recording**, because it was caught by a test rather than by
+review. The three OPEN-015 signatures (`corner of me`, `piece of me`, `portion of me`) were
+first added straight into `VERDICTS`, which broke `test_no_orphan_verdicts` — that test asserts
+every verdict corresponds to a frame the audit can still produce, and the deleted group can
+produce none of them. The invariant is correct. The two tables answer different questions, so
+the guard entries moved to a separate `RETIRED_DEFECTS` tuple. The test was not weakened.
+
+**Original entry follows.**
+
+**Was:** OPEN — needs an owner decision; it is a trade-off, not a bug fix
+**Owned by:** Phase 7 (synthetic generator), found at Phase 9
+**Becomes blocking at:** **Phase 11.** An annotator asked to judge
+*"my insides is in knots"* is being asked to judge text no athlete would produce, and the
+kappa that results describes the generator's defects as much as the rubric's clarity.
+
+**How it was found — and this part is the reusable finding.** OPEN-015 was found by a human
+reading about twenty records. That is luck, and luck does not scale to 65 synonym groups.
+`src/ingestion/synonym_audit.py` replaces it with an **exhaustive** enumeration of every
+single-token substitution the generator can make — 221 filled template variants, **727
+substitution events** — screened by six mechanical probes: idiom membership, indefinite
+article agreement, number agreement, particle/argument structure, inflected form, and arity
+(one word swapped for a phrase or the reverse). Every flagged signature carries a recorded
+human verdict, and a test fails the build if any signature is unreviewed, so editing the
+synonym bank or the template bank cannot silently introduce a new defect class.
+
+**The finding.**
+
+| Measure | Value |
+|---|---|
+| Substitution events enumerated (exhaustive over single substitutions) | 727 |
+| Distinct signatures flagged | 127 |
+| Ruled `broken` / `degraded` / `acceptable` | 53 / 6 / 68 |
+| Distinct defective signatures **realised** in the v1.2 corpus | 55 |
+| **Records containing ≥1 defect** | **190 / 1,200 (15.8%)** |
+| Utterances containing ≥1 defect | 207 / 4,141 (5.0%) |
+
+Removing the `part` group (OPEN-015) fixed 0.8% of records and left the other 15%. Examples,
+all at seed 42 in the current v1.2 corpus:
+
+> *"I can feel my heart pick up a bit when I **figure about** the first ball."*
+> *"my **insides is** in knots and my fingers won't stop shaking"*
+> *"we've got **a approach** for the first bell"*
+> *"I'm **on edge I'll** let everyone down in this race"*
+> *"I keep turning over what happens if I get the first half **badly**"*
+
+**Why the original review could not have caught these.** The v1.1 bank was reviewed against
+shared part-of-speech **and** shared argument structure. `think → figure` satisfies both and
+still breaks, because *think about* is attested and *figure about* is not; that is a lexical
+fact about English, not a property derivable from either constraint. Idiom membership is a
+third constraint, arity a fourth, and article/number agreement a fifth and sixth. The general
+lesson for the paper: **a generation-quality review that enumerates constraint classes will
+always miss the class nobody thought of; enumerating the search space mechanically is a
+guarantee.**
+
+**Why it is not fixed in Phase 9.** The remedy is to delete or repair roughly fifteen more
+synonym groups. That shrinks the vocabulary OPEN-012's mitigation rests on — the same 636
+types that justify calling OPEN-012 "substantially mitigated" — and it regenerates the corpus
+a second time, invalidating every number in `reports/eda.md`, `docs/preprocessing.md` and
+`docs/data_sources.md`. **Corpus grammaticality versus lexical diversity is an owner
+trade-off**, and it is the same reasoning under which Phase 8 declined to fix OPEN-015.
+
+**Resolution, owner's choice:**
+
+- **(a) Repair, don't delete.** Replace the offending groups with narrower ones that keep the
+  type count — e.g. `("think", "reckon")` instead of `("think", "reckon", "figure",
+  "suppose")` — and re-run the sweep until the defective-signature count is zero. Costs the
+  most vocabulary at the margin but keeps the diversity claim honest. *Recommended.*
+- **(b) Delete the offending groups outright.** Fastest; costs ~15 groups of vocabulary and
+  weakens OPEN-012's mitigation.
+- **(c) Make `_vary` context-aware** — refuse a substitution whose result matches a flagged
+  signature. Reuses `synonym_audit.VERDICTS` as a live filter rather than an audit, so
+  defects cannot be generated at all. Most robust, most work, and it makes the generator
+  depend on a hand-curated verdict table.
+- **(d) Disclose and leave.** Report 15.8% in the paper as a known generator limitation.
+  Defensible only if the gold set is drawn to avoid defective records, which it currently is
+  not.
+
+**Do (a) or (c) together with OPEN-017's regeneration**, not separately. Both require a
+regenerate-and-re-gate cycle, and doing them in one pass costs one re-report instead of two.
+
+---
+
+## OPEN-017 — The gold pool is too small for a per-construct kappa
+
+**Status: CLOSED 2026-08-10 (Phase 9) against its stated criterion; the residual is now
+OPEN-020.** Resolved by **option (a)**: `DEFAULT_COUNT` in `scripts/run_ingestion.py` raised
+from 1,200 to **4,000**, corpus regenerated at seed 42, all four gates re-run.
+
+| | Before (n=1,200) | **After (n=4,000)** |
+|---|---|---|
+| Utterances | 4,141 | **13,651** |
+| Eligible gold pool | 235 | **559** |
+| `gold_eval` drawn / target 400 | 235 | **400** |
+| Constructs below the 40-positive floor | **7 / 10** | **0 / 10** |
+| Thinnest construct (`resilience`) | 27 | **46** |
+
+**But the correction this entry warned about did not go away, and it is now the binding
+constraint.** The lexicon proxy still finds **153 of 400 (38.2%)** drawn items carrying no
+construct cue, because that fraction is a property of *records* — a record is ~3.4 utterances
+of which ~2 realise a construct — and multiplying records does not change the ratio. Corrected
+at 0.62×, **7 of 10 constructs fall back below 40.**
+
+Swept, correcting each draw by its own measured cue fraction:
+
+| Records | Pool | Target | Drawn | Cue fraction | Corrected min | Below 40 |
+|---|---|---|---|---|---|---|
+| 1,200 | 235 | 400 | 235 | 0.59 | 10.0 | 10 / 10 |
+| **4,000 (current)** | **559** | **400** | **400** | **0.62** | **28.4** | **7 / 10** |
+| 4,000 | 559 | 559 | 559 | 0.61 | 32.3 | 3 / 10 |
+| 6,000 | 694 | 500 | 500 | 0.61 | 34.2 | 4 / 10 |
+| 8,000 | 838 | 400 | 400 | 0.59 | 28.2 | 7 / 10 |
+| 8,000 | 838 | 600 | 600 | 0.59 | 37.8 | 2 / 10 |
+
+Corrected coverage tracks **gold-set size**, not corpus size, and even 600 double-annotated
+items (~10 hours per annotator) leaves two constructs short. **More records cannot fix this;
+more templates can.** Continued as **OPEN-020**.
+
+`TARGET_GOLD_EVAL` was left at 400 rather than raised to the full 559-item pool. That would
+take the shortfall from 7 constructs to 3 at the cost of ~40% more annotation, which is the
+owner's time budget, not a code decision. It is a one-constant change in
+`src/evaluation/sampling.py` if wanted.
+
+**Original entry follows.**
+
+**Was:** OPEN — needs an owner decision on corpus size
+**Owned by:** Phase 9, blocks Phase 11
+**Becomes blocking at:** **Phase 11**, immediately and unavoidably.
+
+**The measurement.** `src/evaluation/sampling.py` draws the gold set from a
+construct-stratified held-out template partition (see `reports/eda.md` §7 for why the obvious
+plan fails). At the current corpus size it yields:
+
+| | Target | Drawn |
+|---|---|---|
+| `gold_eval` | 400 utterances | **235** |
+| `gold_dev` | 100 utterances | 100 |
+| Constructs meeting the 40-positive floor | 10 / 10 | **3 / 10** |
+
+Short by: `appraisal_orientation`, `burnout_signal`, `coping_style`, `motivation_orientation`,
+`perceived_stress`, `resilience`, `self_confidence`.
+
+The binding constraint is **not** annotator time and **not** corpus size in utterances. Only
+235 of 4,141 utterances survive the template partition and the deduplication: 3,649 are
+excluded for straddling the partition or carrying no template, 251 as duplicates, 6 as junk.
+
+**How much of an upper bound, estimated.** Running the Phase 7 lexicon baseline over the
+drawn sample as a proxy detector, **97 of 235 `gold_eval` items (41.3%) contain no construct
+cue of any kind** — the first drawn item is *"Kit arrived yesterday, so that's one thing
+sorted."*, a logistics sentence selected because its *parent record* plants a construct. The
+lexicon is crude and this is an estimate, not a measurement. But if it is even roughly right,
+the per-construct counts should be read at about **0.6×** the table above, under which **no
+construct meets the floor** — which strengthens this issue rather than changing its direction.
+Those items are not waste (a gold set with no negatives cannot measure false positives), but
+they are negatives and the coverage table counts them as positives.
+
+**Those counts are an upper bound, not an estimate.** Phase 8 copies `generation_spec` from
+the raw record onto every utterance cut from it, verbatim — verified, and asserted by a test.
+A record averaging 3.45 utterances and planting 2 constructs therefore reports both constructs
+on all 3.45 of them, including the neutral logistics sentence and the discourse suffix that
+realise neither. The *true* count of gold utterances expressing each construct is lower than
+the table above and will not be known until annotation. See OPEN-019.
+
+**Measured remedy.** Corpus size was swept with the generator, seed, partition and draw held
+fixed:
+
+| Generated records | Utterances | Eligible gold pool | Drawn | Constructs below floor |
+|---|---|---|---|---|
+| 1,200 (current) | 4,141 | 235 | 235 | **7 of 10** |
+| 2,400 | 8,214 | 408 | 400 | 1 of 10 |
+| **4,000** | 13,651 | 599 | 400 | **0 of 10** |
+| 8,000 | 27,367 | 933 | 400 | 0 of 10 |
+
+**4,000 generated records is the minimum at which a 400-item gold set meets the floor for all
+ten constructs**, and it is a lower bound for the reason above.
+
+Note the sub-linear growth: 6.7× the corpus buys 4× the eligible pool, because deduplication
+bites harder as the template grammar's ceiling of distinct utterances is approached. **More
+records raise positives per template; only a larger template bank raises phrasing diversity,
+and phrasing diversity is what a construct kappa generalises over.** With 7–12 templates per
+construct, a 35% holdout leaves 2–4 phrasings per construct in the evaluation set. A kappa
+computed on 3 phrasings is a kappa about those 3 phrasings.
+
+**Resolution, owner's choice:**
+
+- **(a) Regenerate at `--count 4000`.** One command, offline, deterministic, free. Changes
+  every published number, so it must be bundled with a full re-gate and a re-report.
+  *Recommended, and bundle it with OPEN-016.*
+- **(b) Regenerate at 4,000 **and** expand the template bank to ~15 templates per construct.**
+  The only option that raises phrasing diversity as well as count. Roughly a day of writing
+  templates, and it is the one that most strengthens contribution #1.
+- **(c) Accept the shortfall.** Report per-construct kappa with wide bootstrap intervals and
+  say plainly that seven constructs are under-powered. Honest, and weak.
+- **(d) Reduce the floor below 40.** Not recommended: the floor is already a working
+  approximation, not a power calculation, and lowering it to fit the data is fitting the
+  method to the result.
+
+**Whichever is chosen, `reports/eda.md` and `tests/test_profile.py`'s three fixed-corpus
+assertions become stale on regeneration — deliberately. Those tests exist to fail loudly so
+the report cannot silently drift from the corpus.**
+
+---
+
+## OPEN-018 — 73.6% of utterances are exact duplicates of another utterance
+
+**Status:** OPEN — **mitigated in the sampling plan**, root cause not fixed, and it **got
+worse** at n=4,000 exactly as this entry predicted: **87.4%** (was 73.6%), 13,651 utterances
+to 3,131 distinct texts. Record-level duplication is 7.2%. Multiplying records multiplies
+repeats, because the template grammar has a ceiling of distinct utterances and the discourse
+suffixes are not varied at all. Option (a) below is now the recommended one, bundled with
+OPEN-020's template work.
+**Owned by:** Phase 7 (generator) / Phase 8 (segmenter), found at Phase 9
+**Becomes blocking at:** never on its own; it would have silently corrupted Phase 11's kappa
+if the sampling plan had not been written to avoid it.
+
+**The measurement.** At utterance level: 4,141 utterances, **1,528 distinct texts**, 3,046
+utterances sharing text with another, exact duplicate rate **0.736 [0.723, 0.750]**. At
+record level the same corpus is **5.0%** duplicated. So this is an artefact of segmentation,
+not of generation, and it is invisible in every statistic Phase 7 published.
+
+**Mechanism.** `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES` are appended as whole sentences
+and are rendered **without** the near-synonym variation layer — `generate_records` applies
+`_vary` to construct realisations only. Phase 8 then segments each into its own standalone
+utterance. A bank of ~8 suffixes across 1,200 records produces the same string hundreds of
+times: `"It is what it is."` 268 times, `"Anyway, that's the reality."` 266, `"That's the
+honest version."` 265.
+
+**Why it matters.** Two annotators agreeing on `"It is what it is."` 268 times is **one**
+agreement counted 268 times. A gold set sampled without collapsing duplicates would report a
+kappa inflated by repetition, and the inflation would be invisible in the kappa itself. It
+also means the *effective* per-utterance corpus for any model is 1,528 strings, not 4,141 —
+which changes what a training-set size of "4,141 utterances" means in the paper.
+
+**Mitigation already in place.** `eligible_utterances` collapses exact and near-duplicates
+(Jaccard ≥ 0.9) before drawing, and `test_the_gold_sample_contains_no_duplicate_text` asserts
+the drawn sample is duplicate-free. That protects the kappa. It does not fix the corpus.
+
+**Resolution, owner's choice:**
+
+- **(a) Apply `_vary` to the discourse suffixes and neutral sentences too.** Cheap, and it
+  raises real diversity. Interacts with OPEN-016 — more varied text is more substitution
+  surface — so run the sweep afterwards.
+- **(b) Attach discourse suffixes to the preceding sentence instead of letting the segmenter
+  split them out.** Changes segmentation, which changes offsets, which contribution #2
+  depends on. More invasive than it looks.
+- **(c) Leave it and report both figures.** Quote "1,528 distinct utterances" alongside
+  "4,141 utterances" everywhere. Requires no code change and no regeneration, and it is what
+  `reports/eda.md` and `docs/data_sources.md` now do.
+
+---
+
+## OPEN-019 — `generation_spec` is replicated onto every utterance of a record
+
+**Status:** OPEN — documentation and schema clarity, no data loss
+**Owned by:** Phase 8, found at Phase 9
+**Becomes blocking at:** never directly, but it is the most likely source of a wrong number
+in the paper.
+
+Phase 8 copies the parent record's `generation_spec` onto every utterance cut from it,
+byte-identical (verified;
+`tests/test_profile.py::test_generation_spec_is_identical_across_a_records_utterances`
+asserts it). The consequence: a record averaging 3.45 utterances and planting 2 constructs
+reports both constructs on all 3.45 utterances, including the neutral logistics sentence and
+the discourse suffix that realise neither.
+
+So **any per-utterance count derived from `generation_spec` is a per-record count multiplied
+by ~3.45**, not a per-utterance quantity. It is not wrong to carry the field forward —
+provenance requires it — but it is very easy to read as an utterance-level annotation,
+because an interim record looks far more like training data than a raw one does.
+
+`src/evaluation/profile.py::GeneratorMetadataProfile` documents this and every downstream
+calculation uses `planted_construct_records`. OPEN-017's construct counts are an **upper
+bound** for exactly this reason.
+
+**Resolution:** no code change proposed. Two documentation actions:
+
+1. State the replication in `docs/preprocessing.md` next to the schema, where a reader meets
+   the field, not only in an evaluation module. *(Done at Phase 9.)*
+2. If the generator is ever changed to record *which utterance* realises which construct, that
+   is a genuine schema improvement — but it must be introduced as new metadata, not by
+   narrowing `generation_spec`, or it starts looking exactly like the label it must never be.
+
+---
+
+## OPEN-013-SUPERSEDED — fixture delivery note (retained for the record)
+
+**Status:** superseded by the closure above; retained because the design reasoning still
+stands.
 
 `tests/fixtures/deid_cases.jsonl` — **34 cases** with expected placeholder output, covering
 every category in the `docs/ethics.md` §5.1 removal table: person names (including
@@ -575,3 +1004,47 @@ fails, which is worse than an honest interim one.
 | 2026-08-09 | **OPEN-001 RESOLVED** — Docker Desktop started; verify_env checks 1–9 pass including container build and container hello-world. First successful build of the `Dockerfile`. OPEN-010 (detect-secrets false positive) raised and resolved the same day. |
 | 2026-08-09 | Phase 7 follow-up. OPEN-012 **substantially mitigated** (generator v1.1 lexical variation: vocab 444->638, distinct texts 81%->97%; plus template-disjoint splitting in `src/evaluation/`, memorisation probe drops 0.732->0.198). OPEN-013 **fixture delivered** (34 cases, 8 negatives). Allow-list and ethics.md version headers corrected to 1.1. |
 | 2026-08-09 | Phase 7. Source survey found **no public pre-competition athlete corpus**; owner chose synthetic-first. OPEN-011 (no real athlete text), OPEN-012 (synthetic vocabulary too small), OPEN-013 (de-identification unvalidatable against an identifier-free corpus) logged. OPEN-011 supersedes risk #1 in `PROJECT_PLAN.md` as the project's live highest risk. |
+| 2026-08-09 | **Phase 8. OPEN-013 CLOSED** — de-identifier measured against the fixture: precision 100%, recall 100%, exact 100% (34/34), leak rate 0%, negatives 8/8, reported per difficulty band; held-out 10-case probe 10/10. Fixture case `name_01` corrected: it had required a bare role noun to be redacted, contradicting `negative_04` and `docs/ethics.md` §5.1; the implementation was not changed to chase it. Language-filter defect found and fixed by running the pipeline: unequal stopword profiles dropped 2 English records as Portuguese (`docs/preprocessing.md` §4.1). **OPEN-015 raised** — generator v1.1 substitution produced "corner of me" in 9/1,200 records; owned by Phase 9. |
+| 2026-08-10 | **Phase 9 follow-up. OPEN-016 and OPEN-017 CLOSED.** OPEN-016 by generation-time guard (generator **v1.3**, `substitution_verdicts.py`): defective records **190/1,200 → 0/4,000**, zero synonym groups deleted, realised vocabulary 643 → 625 against 594 had the 34 implicated members been deleted instead. OPEN-017 by raising `DEFAULT_COUNT` 1,200 → **4,000**: gold_eval **235 → 400** items, constructs below the 40-positive floor **7/10 → 0/10**. All four gates re-run and PASSED; 251 tests. **OPEN-020 raised** — corrected for the 0.62 cue fraction, 7/10 constructs still fall short, and the sweep shows no corpus size fixes it; the remedy is ~15 templates per construct. **OPEN-018 worsened as predicted**: utterance duplication 73.6% → **87.4%**. |
+| 2026-08-10 | **Phase 9. OPEN-015 CLOSED** — `("part","portion","corner","piece")` deleted, generator bumped to v1.2, corpus regenerated at seed 42, Phase 7 / Phase 8 / benchmark gates all re-run and PASSED. 4,110 → **4,141** utterances; memorisation probe 0.732/0.198 → 0.738/0.146. Four issues raised: **OPEN-016** (exhaustive synonym sweep — 727 substitution events, 127 flagged signatures, **15.8% of records still carry a broken/degraded substitution**; OPEN-015 was not isolated), **OPEN-017** (gold pool too small — 235 of a 400 target, 7/10 constructs below the 40-positive floor; 4,000 generated records measured as the minimum), **OPEN-018** (**73.6% utterance-level exact duplication**, a segmentation artefact invisible at record level; mitigated in the sampling plan), **OPEN-019** (`generation_spec` replicated onto every utterance). Three published numbers corrected: v1.1 vocabulary 638→**635**, distinct texts 1,163→**1,161**, `"corner of me"` 11→**9** in a code comment. Deliverables: `reports/eda.md`, 9 SVG figures, `notebooks/01_eda.ipynb`, `data/processed/gold_candidates/sampling_plan.json`. |
+
+---
+
+## OPEN-020 — The template bank is too small for a defensible per-construct kappa
+
+**Status:** OPEN — the residual of OPEN-017, and the last corpus-side blocker on
+contribution #1
+**Owned by:** Phase 7 (generator), raised at Phase 9
+**Becomes blocking at:** **Phase 11.**
+
+**Two separate consequences of the same cause: 85 templates, 7–12 per construct.**
+
+**1. Coverage.** A record realises ~2 constructs across ~3.4 utterances, so ~38% of any gold
+sample carries no construct at all. Corrected for that, 7 of 10 constructs sit below the
+40-positive floor even at 4,000 records — and the sweep in OPEN-017 shows no corpus size fixes
+it, because the cue fraction is a per-record property. More construct realisations per record
+raises it directly.
+
+**2. Phrasing diversity, which matters more.** With 7–12 templates per construct, a 35%
+holdout leaves **2–4 phrasings** in the evaluation set. A kappa computed on 3 phrasings is a
+kappa about those 3 phrasings, not about the construct. Two annotators agreeing on *"I keep
+turning over what happens if I get the first half wrong"* tells you they read the same
+sentence the same way; it does not tell you the rubric distinguishes `cognitive_anxiety` from
+`perceived_stress` in language they have not seen. **This is the weakest point in
+contribution #1 and a reviewer will find it.**
+
+**Target: ~15 templates per construct**, roughly doubling the bank. That takes the holdout to
+5 phrasings per construct and raises the cue fraction, addressing both consequences at once.
+
+**Cost:** roughly a day of writing realisations against `docs/annotation_guidelines.md` and
+`config/taxonomy.yaml`. It is the single highest-value corpus action left, and unlike
+OPEN-011 it is entirely within the owner's control.
+
+**Do it together with OPEN-018's option (a)** — applying `_vary` to the discourse suffixes and
+neutral sentences. Both are template-bank edits, both need one regenerate-and-re-gate cycle,
+and both feed the same weakness.
+
+**Sequencing note.** New templates create new substitution frames, so
+`scripts/run_eda.py` will flag unruled signatures and the build will fail until each is ruled
+in `substitution_verdicts.VERDICTS`. That is the ratchet working, not an obstacle — but budget
+for it, and do not merge template work without re-running the sweep.

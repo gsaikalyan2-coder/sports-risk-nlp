@@ -193,6 +193,15 @@ Ethics section. Tracked as **OPEN-005** in `docs/open_issues.md`.
 review. No exceptions, no "it's already public" carve-out. This is the specification that
 `src/preprocessing/deidentify.py` implements in Phase 8.
 
+> **Implementation status (Phase 8, 2026-08-09).** Implemented as written; the spec below was
+> not redesigned. Measured against `tests/fixtures/deid_cases.jsonl`: precision 100%, recall
+> 100%, exact match 100% (34/34), **leak rate 0%**, negatives preserved 8/8, reported per
+> difficulty band. Full numbers, the pass ordering, and the seven stated limitations are in
+> **`docs/preprocessing.md`**. **A clean sweep of 34 self-authored cases is a weak claim and
+> must not be presented as a strong one**: every case was written by this project, none of it
+> is real athlete text (OPEN-011), and the score is an **upper bound** on real-text
+> performance. §5.3 below stands unchanged and is the honest counterweight.
+
 ### 5.1 What is removed or replaced
 
 | Category | Action |

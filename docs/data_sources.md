@@ -39,10 +39,10 @@ retained, full taxonomy retained.** Recorded in `CLAUDE.md` §10.
 | Field | Value |
 |---|---|
 | Allow-list category | **A2_synthetic** |
-| Records | **1,200** |
+| Records | **4,000** |
 | Licence | Project-generated. No third-party licence applies; no human subject involved |
 | Redistribution | **Permitted** — the only source in the corpus quotable verbatim in the paper |
-| Generator | `construct-template-grammar@1.0`, seed `42` |
+| Generator | `construct-template-grammar@1.3`, seed `42` |
 | Language | English |
 | De-identified | `false` — Phase 8 sets this flag, not Phase 7 |
 | Path | `data/raw/synth_precomp_v1/` (`provenance.json` + `records.jsonl`) |
@@ -52,7 +52,7 @@ retained, full taxonomy retained.** Recorded in `CLAUDE.md` §10.
 time-to-competition. Rebuild it with:
 
 ```bash
-python scripts/run_ingestion.py --count 1200 --seed 42
+python scripts/run_ingestion.py            # defaults: --count 4000 --seed 42
 ```
 
 **Why a template grammar rather than an LLM.** Three reasons, all recorded in
@@ -66,18 +66,50 @@ python scripts/run_ingestion.py --count 1200 --seed 42
 3. **Visible limitations.** A template grammar cannot pass itself off as naturalistic
    speech. The constraint is in the artefact rather than hidden behind fluent prose.
 
-#### Corpus statistics (measured, generator v1.1, seed 42, n=1200)
+#### Corpus statistics (measured, generator v1.3, seed 42, n=4000)
 
-| Metric | v1.0 | **v1.1 (current)** |
-|---|---|---|
-| Records | 1,200 | 1,200 |
-| Distinct texts | 976 (81.3%) | **1,163 (96.9%)** |
-| Tokens | 30,367 | 40,169 |
-| **Vocabulary (types)** | 444 | **638** |
-| **MATTR-50** | — | **0.819** |
-| Raw type–token ratio | 0.0146 | 0.0159 |
-| Words per record | mean 25.3 | mean 33.5 |
-| Records with no construct planted | 106 (8.8%) | 106 (8.8%) |
+| Metric | v1.0 (n=1.2k) | v1.1 (n=1.2k) | v1.2 (n=1.2k) | **v1.3 (n=4k, current)** |
+|---|---|---|---|---|
+| Records | 1,200 | 1,200 | 1,200 | **4,000** |
+| Distinct texts | 976 (81.3%) | 1,161 (96.8%) | 1,158 (96.5%) | **3,797 (94.9%)** |
+| Tokens | 30,367 | 40,251 | 40,634 | **134,787** |
+| **Vocabulary (types)** | 444 | 635 | 636 | **625** |
+| **MATTR-50** | — | 0.818 | 0.820 | **0.819** |
+| Raw type–token ratio | 0.0146 | 0.0158 | 0.0157 | **0.0046** |
+| Words per record | mean 25.3 | mean 33.5 | mean 33.9 | **mean 33.7** |
+| Records with no construct planted | 106 (8.8%) | 92 (7.7%) | 85 (7.1%) | **300 (7.5%)** |
+| **Records with a broken/degraded substitution** | — | not measured | 190 (15.8%) | **0 (0.0%)** |
+
+> **Read the raw-TTR column as a warning, not a result.** It falls from 0.0157 to
+> 0.0046 between v1.2 and v1.3 while MATTR-50 does not move at all (0.820 →
+> 0.819) and the vocabulary barely changes. Nothing about the text got less
+> diverse; the corpus got 3.3× longer and TTR's denominator grew with it. This is
+> the length confound in one row, and it is why **MATTR-50 and `vocabulary_size`
+> are the two figures this project quotes.**
+
+> **v1.3 vocabulary is 11 types lower than v1.2, and that is the guard working.**
+> OPEN-016 added a generation-time check that reverts a substitution which would
+> produce a ruled-defective frame, so a word whose only frames in the bank were
+> defective now never appears. The alternative — deleting the 34 implicated
+> synonym-group members — was measured at **594** types. The guard keeps 31 more
+> and removes nothing from the bank. Full table in
+> `src/ingestion/substitution_verdicts.py`.
+
+> **Three v1.1 figures were corrected at Phase 9.** The v1.1 column previously
+> read 638 types, 1,163 distinct texts, 40,169 tokens and 106 construct-free
+> records. Regenerating from the committed v1.1 generator
+> (`git show 6f9561a:src/ingestion/synthetic.py`) at seed 42 gives **635**,
+> **1,161**, **40,251** and **92**. The discrepancy is small and changes no
+> conclusion, but the artefact claim in `CLAUDE.md` §9 is that a reviewer can
+> reproduce these numbers exactly, so a figure that does not reproduce is a defect
+> regardless of its size.
+
+> **These are per-RECORD statistics** over `data/raw/`. The per-*utterance*
+> profile of `data/interim/` is in `reports/eda.md`, and the two are not
+> comparable — Phase 8 turned 4,000 records into 13,651 utterances, which changes
+> every denominator. In particular the per-utterance corpus is **87.4% exact
+> duplicates** (OPEN-018), a fact entirely invisible at record level, where the
+> duplicate rate is 7.2%.
 
 **Do not quote raw TTR as the diversity headline.** It is length-confounded: its
 denominator grows without bound while its numerator saturates, so v1.1 raised the
@@ -99,23 +131,57 @@ argument structure. A first pass without that restriction generated
 *has* been at the usual times". Those groups were removed rather than
 special-cased; the reasoning is recorded inline in `SYNONYM_GROUPS`.
 
+**What v1.2 changed.** `("part", "portion", "corner", "piece")` deleted: every
+occurrence of *part* in the bank sits inside the idiom *part of me*, and the
+idiom does not survive substitution (OPEN-015). All four members share a part of
+speech **and** an argument structure, so the review rule above could not have
+caught it — **idiom membership is a third constraint**.
+
+**What v1.3 changed, and it is the important one.** The v1.2 fix prompted an
+exhaustive sweep (`src/ingestion/synonym_audit.py`): all 727 single-token
+substitutions the generator can make, screened by six probes. It found that
+OPEN-015 had **not** been isolated — **15.8% of v1.2 records** still contained a
+substitution a human ruled broken or degraded, across 55 realised signatures
+("*figure about*", "*insides is*", "*a approach*", "*on edge I'll*").
+
+The remedy was **not** to shrink the bank. `_vary` now consults the ruled
+verdicts at generation time and reverts any substitution that would produce a
+defective frame (OPEN-016, option (c)). `think → figure` is broken in *"all I
+figure about"* and fine in *"I figure I'm ready"*: the defect belongs to the
+**frame**, not the word, and a context-blind bank can only accept or reject the
+word. Measured both ways at n=4,000 — deleting the 34 implicated members costs
+49 realised types, the guard costs 18, and both reach zero defects.
+
+The standing guarantee is a build-time ratchet, not a one-off measurement: the
+sweep is exhaustive over single substitutions, a test fails if any flagged
+signature lacks a human verdict, and a second test asserts the corpus contains no
+ruled-defective frame at all. **A new defect class still needs a human to notice
+it once; it no longer needs a human to notice it repeatedly.**
+
 #### Construct prevalence
 
-| Construct | n | Prevalence |
-|---|---|---|
-| `coping_style` | 254 | 21.2% |
-| `cognitive_anxiety` | 250 | 20.8% |
-| `appraisal_orientation` | 227 | 18.9% |
-| `self_confidence` | 215 | 17.9% |
-| `somatic_anxiety` | 199 | 16.6% |
-| `perceived_stress` | 190 | 15.8% |
-| `resilience` | 175 | 14.6% |
-| `attentional_focus` | 173 | 14.4% |
-| `burnout_signal` | 170 | 14.2% |
-| `motivation_orientation` | 144 | 12.0% |
+> **GENERATOR METADATA, NOT LABELS.** This is what the generator *planted*, i.e.
+> a description of the template bank. It is not corpus prevalence, it is not
+> athlete language, and using it as evaluation ground truth would measure whether
+> a model can recover this file's own template choices. Evaluation rests on the
+> Phase 11 human gold set. Counts are **per record** (n=4,000); see OPEN-019 for
+> why the per-utterance version of this table would be meaningless.
 
-Constructs per record: 0 → 106, 1 → 412, 2 → 461, 3 → 221. The interpretation modifier is
-present on 124 records (58 debilitative, 66 facilitative).
+| Construct | Records | Prevalence |
+|---|---|---|
+| `cognitive_anxiety` | 934 | 23.4% |
+| `coping_style` | 895 | 22.4% |
+| `self_confidence` | 745 | 18.6% |
+| `somatic_anxiety` | 689 | 17.2% |
+| `appraisal_orientation` | 687 | 17.2% |
+| `perceived_stress` | 671 | 16.8% |
+| `attentional_focus` | 587 | 14.7% |
+| `resilience` | 566 | 14.2% |
+| `burnout_signal` | 540 | 13.5% |
+| `motivation_orientation` | 431 | 10.8% |
+
+Constructs per record: 0 → 300, 1 → 1,377, 2 → 1,601, 3 → 722. The interpretation
+modifier is present on 385 records (209 debilitative, 176 facilitative).
 
 #### Temporal and context coverage
 
