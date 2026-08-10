@@ -17,6 +17,14 @@ from __future__ import annotations
 import random
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import TypeVar
+
+#: Element type for the single-sample bootstrap. Phase 9 found this missing:
+#: `bootstrap_statistic` was annotated `Sequence[T]` with no `T` in scope, which
+#: `from __future__ import annotations` makes invisible at runtime -- the code
+#: worked, and only ruff's F821 caught it. An annotation nobody can resolve is a
+#: comment that looks like a type.
+T = TypeVar("T")
 
 #: One prediction: the set of construct labels assigned to a record.
 LabelSet = frozenset[str]
@@ -117,6 +125,77 @@ class Interval:
     @property
     def width(self) -> float:
         return self.high - self.low
+
+
+def _percentile_interval(
+    scores: list[float], point: float, level: float, n_resamples: int
+) -> Interval:
+    """Percentile bootstrap interval from an unsorted list of resample scores.
+
+    Factored out so `bootstrap_ci` and `bootstrap_statistic` cannot drift apart
+    in how they take percentiles -- two implementations of the same interval is
+    two numbers that will one day disagree in a paper.
+    """
+    scores.sort()
+    tail = (1.0 - level) / 2.0
+    low = scores[max(0, int(tail * n_resamples))]
+    high = scores[min(n_resamples - 1, int((1.0 - tail) * n_resamples))]
+    return Interval(point, low, high, level)
+
+
+def bootstrap_statistic(
+    values: Sequence[T],
+    statistic: Callable[[Sequence[T]], float],
+    *,
+    n_resamples: int = 1000,
+    level: float = 0.95,
+    seed: int = 42,
+) -> Interval:
+    """Percentile bootstrap CI for a statistic of a **single** sample.
+
+    `bootstrap_ci` above resamples aligned (truth, prediction) pairs, which is
+    the right shape for a model score and the wrong shape for a corpus
+    statistic: "mean utterance length" and "duplicate rate" have no predictions
+    to pair with. Rather than pass a sequence twice and ignore one copy -- which
+    works, and which would quietly turn a typo into a silent wrong answer -- the
+    single-sample case gets its own entry point sharing the same machinery, the
+    same default seed, and the same percentile rule.
+
+    Same caveat as `bootstrap_ci`, and it bites harder here: this quantifies
+    sampling variability **within this corpus**. For `synth_precomp_v1` the
+    corpus is a template grammar, so the interval describes variability across
+    draws from that grammar. It says nothing whatever about athlete language.
+    """
+    n = len(values)
+    if n == 0:
+        return Interval(0.0, 0.0, 0.0, level)
+    rng = random.Random(seed)
+    point = statistic(values)
+    scores = [statistic([values[rng.randrange(n)] for _ in range(n)]) for _ in range(n_resamples)]
+    return _percentile_interval(scores, point, level, n_resamples)
+
+
+def proportion_ci(
+    flags: Sequence[bool],
+    *,
+    n_resamples: int = 1000,
+    level: float = 0.95,
+    seed: int = 42,
+) -> Interval:
+    """Bootstrap CI for a rate, given one boolean per item.
+
+    A convenience over `bootstrap_statistic`, present because almost every
+    headline number in the Phase 9 profile is a rate -- duplicate rate, defect
+    rate, coverage -- and writing the lambda at each call site is where an
+    off-by-one denominator gets introduced.
+    """
+    return bootstrap_statistic(
+        [1.0 if f else 0.0 for f in flags],
+        lambda xs: sum(xs) / len(xs),
+        n_resamples=n_resamples,
+        level=level,
+        seed=seed,
+    )
 
 
 def bootstrap_ci(

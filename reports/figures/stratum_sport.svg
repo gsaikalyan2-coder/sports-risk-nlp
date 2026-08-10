@@ -1,0 +1,34 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='720' height='350' viewBox='0 0 720 350' role='img'>
+<rect width='720' height='350' fill='white'/>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by sport (n=13651)</text>
+<text x='182' y='56' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>athletics</text>
+<rect x='190' y='40' width='408.74' height='22' fill='#1f3a5f'/>
+<text x='604.74' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1386</text>
+<text x='182' y='84' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>badminton</text>
+<rect x='190' y='68' width='440.00' height='22' fill='#1f3a5f'/>
+<text x='636.00' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1492</text>
+<text x='182' y='112' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>basketball</text>
+<rect x='190' y='96' width='403.73' height='22' fill='#1f3a5f'/>
+<text x='599.73' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1369</text>
+<text x='182' y='140' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>boxing</text>
+<rect x='190' y='124' width='407.56' height='22' fill='#1f3a5f'/>
+<text x='603.56' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1382</text>
+<text x='182' y='168' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>cricket</text>
+<rect x='190' y='152' width='382.20' height='22' fill='#1f3a5f'/>
+<text x='578.20' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1296</text>
+<text x='182' y='196' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>football</text>
+<rect x='190' y='180' width='422.31' height='22' fill='#1f3a5f'/>
+<text x='618.31' y='196' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1432</text>
+<text x='182' y='224' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>gymnastics</text>
+<rect x='190' y='208' width='377.48' height='22' fill='#1f3a5f'/>
+<text x='573.48' y='224' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1280</text>
+<text x='182' y='252' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>rowing</text>
+<rect x='190' y='236' width='422.01' height='22' fill='#1f3a5f'/>
+<text x='618.01' y='252' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1431</text>
+<text x='182' y='280' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>swimming</text>
+<rect x='190' y='264' width='368.93' height='22' fill='#1f3a5f'/>
+<text x='564.93' y='280' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1251</text>
+<text x='182' y='308' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>tennis</text>
+<rect x='190' y='292' width='392.82' height='22' fill='#1f3a5f'/>
+<text x='588.82' y='308' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1332</text>
+</svg>

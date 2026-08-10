@@ -1,0 +1,38 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='720' height='380' viewBox='0 0 720 380' role='img'>
+<rect width='720' height='380' fill='white'/>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Corpus vs gold_eval construct coverage</text>
+<text x='182' y='59' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>appraisal_orientation</text>
+<rect x='190' y='40.00' width='323.64' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='51.00' width='33.45' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='89' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>attentional_focus</text>
+<rect x='190' y='70.00' width='276.53' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='81.00' width='28.27' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='119' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>burnout_signal</text>
+<rect x='190' y='100.00' width='254.39' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='111.00' width='22.61' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='149' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>cognitive_anxiety</text>
+<rect x='190' y='130.00' width='440.00' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='141.00' width='43.34' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='179' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>coping_style</text>
+<rect x='190' y='160.00' width='421.63' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='171.00' width='28.74' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='209' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>motivation_orientation</text>
+<rect x='190' y='190.00' width='203.04' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='201.00' width='23.55' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='239' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>perceived_stress</text>
+<rect x='190' y='220.00' width='316.10' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='231.00' width='25.44' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='269' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>resilience</text>
+<rect x='190' y='250.00' width='266.64' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='261.00' width='21.67' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='299' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>self_confidence</text>
+<rect x='190' y='280.00' width='350.96' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='291.00' width='29.21' height='9.00' fill='#9bb0c7'/>
+<text x='182' y='329' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>somatic_anxiety</text>
+<rect x='190' y='310.00' width='324.58' height='9.00' fill='#1f3a5f'/>
+<rect x='190' y='321.00' width='32.98' height='9.00' fill='#9bb0c7'/>
+<rect x='190' y='356' width='12' height='12' fill='#1f3a5f'/>
+<text x='208' y='366' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>corpus records planting construct</text>
+<rect x='340' y='356' width='12' height='12' fill='#9bb0c7'/>
+<text x='358' y='366' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>gold_eval items</text>
+</svg>

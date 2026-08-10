@@ -33,6 +33,34 @@ models/*
 data/raw/*/*
 !data/raw/*/provenance.json
 
+# Same rule one layer down (Phase 8). `data/interim/` holds de-identified
+# utterances, which are still corpus and still regenerable -- `python
+# scripts/run_preprocessing.py` rebuilds them deterministically from data/raw/.
+# What is committed is the evidence *about* that run: the derived provenance
+# (which is where `deidentified: true` is recorded) and `preprocessing.json`
+# (counts in, counts out, drop reasons, placeholder tallies). A fresh clone can
+# then show what Phase 8 did without running anything, which is what the gate
+# is actually about.
+!data/interim/*/
+data/interim/*/*
+!data/interim/*/provenance.json
+!data/interim/*/preprocessing.json
+
+# Phase 9 gold-set candidates.
+#
+# The DRAWN CANDIDATE TEXT is derived data -- `scripts/run_eda.py` reproduces it
+# byte-for-byte from data/interim/ at seed 42 -- so it is gitignored like every
+# other regenerable corpus artefact. The PLAN is not: `sampling_plan.json`
+# carries the template partition and the parameters the paper's methods section
+# is written from, and it must be reviewable in a diff. If the plan changes
+# without anyone noticing, the evaluation set silently changes with it.
+# Note the un-ignore dance: line 15 ignores `data/processed/*` wholesale, and
+# git will not descend into an ignored DIRECTORY, so the directory itself has to
+# be re-included before a file inside it can be.
+!data/processed/gold_candidates/
+data/processed/gold_candidates/*
+!data/processed/gold_candidates/sampling_plan.json
+
 # Archived previous version
 _legacy/
 

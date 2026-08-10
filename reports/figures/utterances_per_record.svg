@@ -1,0 +1,23 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='720' height='320' viewBox='0 0 720 320' role='img'>
+<rect width='720' height='320' fill='white'/>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances per raw record, n=4000 records</text>
+<line x1='60' y1='264' x2='700' y2='264' stroke='#222222' stroke-width='1'/>
+<line x1='60' y1='40' x2='60' y2='264' stroke='#222222' stroke-width='1'/>
+<text x='52' y='50' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>934</text>
+<text x='52' y='264' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>0</text>
+<text x='380' y='310' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>utterances per record</text>
+<rect x='60.00' y='159.91' width='69.11' height='104.09' fill='#1f3a5f'/>
+<text x='60.00' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>1</text>
+<rect x='131.11' y='40.00' width='69.11' height='224.00' fill='#1f3a5f'/>
+<rect x='202.22' y='50.07' width='69.11' height='213.93' fill='#1f3a5f'/>
+<text x='202.22' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>3</text>
+<rect x='273.33' y='88.69' width='69.11' height='175.31' fill='#1f3a5f'/>
+<rect x='344.44' y='135.69' width='69.11' height='128.31' fill='#1f3a5f'/>
+<text x='344.44' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>5</text>
+<rect x='415.56' y='192.05' width='69.11' height='71.95' fill='#1f3a5f'/>
+<rect x='486.67' y='232.34' width='69.11' height='31.66' fill='#1f3a5f'/>
+<text x='486.67' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>7</text>
+<rect x='557.78' y='257.04' width='69.11' height='6.96' fill='#1f3a5f'/>
+<rect x='628.89' y='260.88' width='69.11' height='3.12' fill='#1f3a5f'/>
+<text x='628.89' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>9</text>
+</svg>
