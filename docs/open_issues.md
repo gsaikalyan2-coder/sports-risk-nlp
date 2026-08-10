@@ -172,7 +172,30 @@ and it probably does — prefer `--engine simple` for bulk labeling.
 
 ## OPEN-008 — No OpenRouter API key present
 
-**Status:** OPEN — new 2026-08-09
+**Status: PARTIALLY RESOLVED 2026-08-10 — the key exists; no live call has been made.**
+
+The owner added `OPENROUTER_API_KEY` to `.env` during Phase 10. Verified only as *set and
+non-empty*; the value was never read, printed, or written anywhere. `git check-ignore -v
+.env` reports a match on `.gitignore:2`.
+
+**This does NOT close the issue, and the distinction matters.** The Phase 10 pipeline was
+built and gated entirely offline. **Not one live OpenRouter call has been made by this
+project.** `phase8_handover.md` records OPEN-007 as precisely the mistake of shipping a
+code path that has never been executed, and an unexecuted live labelling path is that same
+mistake with a different module name. It closes when a live pilot runs and its cost appears
+in `logs/cost_ledger.csv`.
+
+**Two things must happen before that pilot, in order:**
+
+1. `python scripts/refresh_pricing.py --check` — must pass. `scripts/run_labeling.py`
+   refuses `--live` without `--pricing-checked` for this reason (OPEN-009).
+2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` — a bounded pilot
+   that measures the real cache-read rate, the real escalation rate, and the real output
+   length, all three of which the projection currently assumes.
+
+**The $1.12 sizing below is wrong.** See OPEN-023.
+
+### Original entry (2026-08-09)
 **Owned by:** Phase 6
 **Becomes blocking at:** **Phase 10** (bulk weak labeling). Does not block Phase 6–9.
 
@@ -1204,3 +1227,101 @@ output relabelled *"Label-leakage-immune"* with an inline note, and §5b added t
    labelled, so it does not share this ancestry — but the *silver* labels from Phase 10 will be
    produced by an LLM given the taxonomy, including its `positive_examples`. That is the same
    shared-ancestry shape one level up, and it deserves to be checked rather than assumed away.
+
+---
+
+## OPEN-022 — Template era is not recorded, so the OPEN-021 probe cannot be run properly
+
+**Status:** OPEN — new 2026-08-10
+**Owned by:** Phase 7 (generator) / Phase 10 (found here)
+**Becomes blocking at:** Phase 18 (the paper's limitations section)
+
+Phase 9b exposed the lexicon baseline's shared ancestry with one comparison: templates
+written at Phase 7 (lexicon fires on 73%) against templates written at Phase 9b (22%).
+That comparison is the sharpest instrument this project has for detecting shared ancestry,
+and **it can no longer be run.**
+
+`template_id` is `construct:label:index`, and every index is 0–4 across all 150 templates,
+because Phase 9b restructured the bank to five realisations per (construct, label) rather
+than appending to it. Nothing in the corpus records when a template was written.
+
+So `src/labeling/ancestry.py` falls back to lexical overlap with `taxonomy.yaml`'s
+`positive_examples` — a proxy for ancestry, and a coarse one. It is the available
+substitute, not the preferred instrument.
+
+**Remedy (cheap, and it should be done before the corpus is regenerated again):** add an
+`era` or `written_at_phase` field to each template and carry it into `generation_spec`
+alongside `template_id`. That is generation *provenance*, not a label, and OPEN-019's
+warning about deriving per-utterance counts from `generation_spec` applies to it unchanged.
+
+**Cost of not doing it:** the paper's independence claim for the silver labeller rests on
+a weaker probe than the one used for the lexicon, and the difference has to be admitted.
+
+---
+
+## OPEN-023 — The config's Phase 10 cost estimate is low by an order of magnitude
+
+**Status:** OPEN — new 2026-08-10 (documented; the config comment is NOT yet corrected)
+**Owned by:** Phase 6 (`config/model_routing.yaml`)
+**Becomes blocking at:** the first live labelling run, i.e. immediately
+
+`config/model_routing.yaml` carries a worked budget estimate concluding **"about $1.12 for
+a full labeling pass on the cheap tier"**, resting on "~400 input tokens (rubric is cached;
+only the utterance varies)".
+
+The assembled rubric prompt is **3,946 estimated tokens**, not 400 — ten construct
+definitions, forty examples, ten edge-case notes, the intensity anchors and the five
+discriminating questions. The estimate was written at Phase 6, before the prompt existed,
+so Phase 10 is the first opportunity anyone has had to check it.
+
+Measured with `python scripts/run_labeling.py --project-only`:
+
+| | USD |
+|---|---|
+| cheap tier, 9,260 distinct prompts | 4.99 |
+| + escalations at an assumed 25% on mid | 12.47 |
+| **projected total, no cache credit** | **17.46** |
+| enforced monthly cap | 20.00 |
+
+**87% of the cap for one pass.** That is an owner decision, not an implementation detail,
+which is why `scripts/run_labeling.py` prints the projection before it will spend anything
+and why the projection gives prompt caching zero credit by default.
+
+**Three unknowns sit inside that 17.46, all of them declared parameters rather than
+measured facts:** the provider's cache-read multiplier, the real escalation rate, and the
+real output length. A `--live --limit 50` pilot measures all three. If the cached prefix
+bills at 0.25x, the figure falls to roughly $5.
+
+**Do not raise `monthly_cap_usd` to make a run finish.** The ledger's hard stop is the
+control that makes a surprise bill impossible; a half-written silver dataset with a
+confident manifest is the failure it exists to prevent.
+
+**Not yet actioned:** the misleading comment block still sits in `config/model_routing.yaml`.
+It should be corrected in place, with the old figure kept and marked wrong rather than
+deleted — the same treatment Phase 9 gave the three incorrect `data_sources.md` figures.
+
+---
+
+## OPEN-024 — The cost ledger was O(n^2) and had never been run at scale
+
+**Status: RESOLVED 2026-08-10, in the same session that found it.**
+**Owned by:** Phase 6
+
+`CostLedger.record()` called `_ensure_header()` (mkdir + exists + stat) and
+`spend_this_month()` (a full re-read and re-parse of the CSV) on **every** append. With the
+Phase 6 smoke crew's handful of calls this was invisible. At Phase 10's 12,893 calls it was
+roughly 43 million row parses plus 39,000 filesystem syscalls, and the first full labelling
+run did not finish.
+
+Measured with cProfile: `_ensure_header` accounted for **11.2 of 11.9 seconds** on a
+600-prompt run — 95% of wall time spent re-asking whether a file it had just written to
+still existed.
+
+**Fixed:** the month total is cached and maintained incrementally under the same lock as
+the append (`refresh()` drops it); the header check runs once per instance. Behaviour is
+unchanged and `tests/test_labeling.py` asserts the cached total equals a fresh read.
+
+**The general lesson, worth carrying:** every gate before Phase 10 exercised the agent layer
+at a scale of ones and tens. A component that is correct at n=5 and quadratic at n=10,000
+passes every test written at n=5. Phase 13's training loop is the next place this shape
+could appear.
