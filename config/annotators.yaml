@@ -1,0 +1,54 @@
+# The Phase 11 annotator roster -- the people who may write into `data/gold/`.
+#
+# WHY THIS FILE EXISTS
+#
+# Inter-annotator agreement is a property of a PAIR of people over the same
+# items. That only holds if "annotator A" means the same person on every item
+# and in every batch. A free-text annotator field lets one typo create a third
+# annotator with nine items and a meaningless kappa, and nothing would fail.
+#
+# `src/annotation/store.py` refuses to write a gold label whose `annotator_id`
+# is not listed here. Adding yourself is a deliberate act.
+#
+# PSEUDONYMOUS BY DESIGN
+#
+# Ids are role-based pseudonyms, not names or email addresses. `docs/ethics.md`
+# governs the athletes in the corpus, but the annotators are human subjects of
+# the agreement study too, and the paper reports per-annotator statistics. A
+# published kappa table that names two students is a disclosure nobody agreed
+# to. Keep the mapping from id to person out of the repository.
+#
+# CLAUDE.md sec.4: no agent writes data/gold/. There is no entry here for a
+# model, and `GoldLabel` has no author kind that would permit one.
+
+version: 1
+
+annotators:
+  - annotator_id: A1
+    role: project owner; primary annotator
+    is_owner: true
+
+  # -------------------------------------------------------------------------
+  # A2 IS NOT YET A REAL PERSON. THIS IS THE PHASE 11 BLOCKER.
+  #
+  # Kappa with one annotator is undefined, so contribution #1 -- "a
+  # construct-grounded corpus with reported inter-annotator agreement" -- does
+  # not exist until this entry names someone who has actually agreed to do it.
+  #
+  # 400 items, double annotated, is the commitment. Estimate the burden from
+  # the gold_dev calibration pass before asking, so the ask is honest.
+  #
+  # The highest-value candidate is an SRMIST coach or sport-psychology
+  # practitioner, because the same person could also broker pre-competition
+  # athlete text under an A3 consent basis (OPEN-011) and serve as the Phase 17
+  # expert rater (OPEN-004). Those three open items have one solution between
+  # them and it has been deferred across five phases.
+  #
+  # Uncomment and edit once the person has said yes. Do not invent an A2 to
+  # make the pipeline run: `scripts/run_annotation.py --agreement` will report
+  # a single-annotator batch as UNMEASURABLE rather than computing a number,
+  # and that refusal is the point.
+  # -------------------------------------------------------------------------
+  # - annotator_id: A2
+  #   role: peer annotator
+  #   is_owner: false
