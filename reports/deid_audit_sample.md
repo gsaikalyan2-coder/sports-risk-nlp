@@ -1,0 +1,252 @@
+# Phase 8 — de-identification manual audit sample
+
+Stratified by sport × time-to-competition band. Records carrying residual-risk
+flags are drawn first: the automated cascade already handled the rest, so a
+sample that ignores the pipeline's own uncertainty wastes the reader's attention.
+
+**How to use this.** Read each passage and mark anything that could identify a
+person. Log failures here — `docs/ethics.md` §5.2 requires failures to be logged,
+and an audit with no written outcome is an audit nobody can check.
+
+## synth_precomp_v1
+
+- **synth_precomp_v1-000044#u0** _(stratum: athletics|0-1d)_
+  - text: Training has been at the usual times this block.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000044#u1** _(stratum: athletics|0-1d)_
+  - text: The way I see it, part of me wants to attack it and part of me just wants to survive it.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000031#u0** _(stratum: athletics|2-7d)_
+  - text: We had the team meeting this morning as normal.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000031#u1** _(stratum: athletics|2-7d)_
+  - text: I keep turning over what happens if I get the first half wrong.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000008#u0** _(stratum: athletics|8d+)_
+  - text: We had the team meeting this morning as normal.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000043#u0** _(stratum: athletics|8d+)_
+  - text: I've been reading a fair bit on the trip over.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000026#u0** _(stratum: badminton|0-1d)_
+  - text: It's a sizeable one, and that's the point — that's why I train.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000026#u1** _(stratum: badminton|0-1d)_
+  - text: That's the honest version.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000022#u0** _(stratum: badminton|2-7d)_
+  - text: I can't afford another performance like the last one.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000022#u1** _(stratum: badminton|2-7d)_
+  - text: That's the honest version.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000002#u0** _(stratum: badminton|8d+)_
+  - text: If I'm truthful, my stomach is in knots and my fingers won't stop shaking.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000002#u1** _(stratum: badminton|8d+)_
+  - text: Truth be told, I'm tired in a way that a rest day doesn't seem to fix.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000004#u0** _(stratum: basketball|0-1d)_
+  - text: Prep has been at the usual times this block.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000004#u1** _(stratum: basketball|0-1d)_
+  - text: Look, I can't stop thinking about the scoreline instead of the process.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000057#u0** _(stratum: basketball|2-7d)_
+  - text: If I'm truthful, I want to push it from the tip-off and see where that takes me.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000060#u0** _(stratum: basketball|2-7d)_
+  - text: Kit arrived yesterday, so that's one thing sorted.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000151#u0** _(stratum: basketball|8d+)_
+  - text: Between us, I keep checking what everyone else is doing instead of my own game.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000151#u1** _(stratum: basketball|8d+)_
+  - text: Make of that what you will.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000007#u0** _(stratum: boxing|0-1d)_
+  - text: Truth be told, I know what I'm capable of when it matters.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000007#u1** _(stratum: boxing|0-1d)_
+  - text: Make of that what you will.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000061#u0** _(stratum: boxing|2-7d)_
+  - text: I'm mostly dialled in, though I do keep glancing at the line-up.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000061#u1** _(stratum: boxing|2-7d)_
+  - text: That's just where I am.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000019#u0** _(stratum: boxing|8d+)_
+  - text: I've been reading a fair bit on the trip over.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000019#u1** _(stratum: boxing|8d+)_
+  - text: Honestly, I'm tired in a way that a rest day doesn't seem to fix.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000064#u0** _(stratum: cricket|0-1d)_
+  - text: Truth be told, this match is an opening and I've got what it takes to meet it.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000064#u1** _(stratum: cricket|0-1d)_
+  - text: That's just where I am.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000095#u0** _(stratum: cricket|2-7d)_
+  - text: Honestly, the timetable has been more than I can comfortably manage.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000095#u1** _(stratum: cricket|2-7d)_
+  - text: It is what it is.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000052#u0** _(stratum: cricket|8d+)_
+  - text: Truth be told, whatever happens out there, I know I can reset and keep going.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000052#u1** _(stratum: cricket|8d+)_
+  - text: It is what it is.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000005#u0** _(stratum: football|0-1d)_
+  - text: Truth be told, I have absolutely no doubt about what I'm going to do at the kick-off.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000005#u1** _(stratum: football|0-1d)_
+  - text: Truth be told, this is too big a step up and I know it.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000001#u0** _(stratum: football|2-7d)_
+  - text: The way I see it, I've been through far worse and I'm still here — that's what I hold on to.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000016#u0** _(stratum: football|2-7d)_
+  - text: The way I see it, slept a little lighter than usual last night.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000024#u0** _(stratum: football|8d+)_
+  - text: The staff named the draw earlier in the week.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000024#u1** _(stratum: football|8d+)_
+  - text: I can't afford another performance like the last one.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000049#u0** _(stratum: gymnastics|0-1d)_
+  - text: I've been reading a fair bit on the trip over.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000049#u1** _(stratum: gymnastics|0-1d)_
+  - text: Right now, it feels like it's all completely out of my hands.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000054#u0** _(stratum: gymnastics|2-7d)_
+  - text: The staff named the draw earlier in the week.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000054#u1** _(stratum: gymnastics|2-7d)_
+  - text: Right now, I can't stop thinking about the scoreline instead of the process.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000009#u0** _(stratum: gymnastics|8d+)_
+  - text: My hands were shaking when I was packing my kit.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000009#u1** _(stratum: gymnastics|8d+)_
+  - text: That's the honest version.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000006#u0** _(stratum: rowing|0-1d)_
+  - text: To be fair, I just try not to think about it at all until I'm at the start.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000006#u1** _(stratum: rowing|0-1d)_
+  - text: That's just where I am.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000012#u0** _(stratum: rowing|2-7d)_
+  - text: Right now, there are a few butterflies, nothing I'm not used to.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000012#u1** _(stratum: rowing|2-7d)_
+  - text: Make of that what you will.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000013#u0** _(stratum: rowing|8d+)_
+  - text: Truth be told, there is nothing that can happen in this race that I can't come back from.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000013#u1** _(stratum: rowing|8d+)_
+  - text: I've been through it with my coach, but I'm still avoiding the footage.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000000#u0** _(stratum: swimming|0-1d)_
+  - text: The staff named the line-up earlier in the week.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000000#u1** _(stratum: swimming|0-1d)_
+  - text: I'd rather not talk about the event at all this week.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000010#u0** _(stratum: swimming|2-7d)_
+  - text: I've been reading a fair bit on the trip over.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000010#u1** _(stratum: swimming|2-7d)_
+  - text: I know I win this if I stick to my own contest.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000196#u0** _(stratum: swimming|8d+)_
+  - text: I've been reading a fair bit on the trip over.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000196#u1** _(stratum: swimming|8d+)_
+  - text: The way I see it, I'm finding it hard to care about this event the way I should.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000050#u0** _(stratum: tennis|0-1d)_
+  - text: We fly out on Thursday and the match is on Saturday afternoon.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000050#u1** _(stratum: tennis|0-1d)_
+  - text: The way I see it, the timetable has been more than I can comfortably manage.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000003#u0** _(stratum: tennis|2-7d)_
+  - text: Kit arrived yesterday, so that's one thing sorted.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000003#u1** _(stratum: tennis|2-7d)_
+  - text: If I'm truthful, I just try not to think about it at all until I'm at the first serve.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000045#u0** _(stratum: tennis|8d+)_
+  - text: Truth be told, I'm keeping it to the things I can actually control.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
+- **synth_precomp_v1-000045#u1** _(stratum: tennis|8d+)_
+  - text: That's the honest version.
+  - automated flags: none
+  - auditor verdict: _(unreviewed)_
