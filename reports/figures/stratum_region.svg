@@ -1,19 +1,19 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='720' height='210' viewBox='0 0 720 210' role='img'>
 <rect width='720' height='210' fill='white'/>
-<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by region (n=13651)</text>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by region (n=9302)</text>
 <text x='182' y='56' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>africa</text>
-<rect x='190' y='40' width='440.00' height='22' fill='#1f3a5f'/>
-<text x='636.00' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2836</text>
+<rect x='190' y='40' width='420.73' height='22' fill='#1f3a5f'/>
+<text x='616.73' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1812</text>
 <text x='182' y='84' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>europe</text>
-<rect x='190' y='68' width='420.76' height='22' fill='#1f3a5f'/>
-<text x='616.76' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2712</text>
+<rect x='190' y='68' width='437.91' height='22' fill='#1f3a5f'/>
+<text x='633.91' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1886</text>
 <text x='182' y='112' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>north_america</text>
-<rect x='190' y='96' width='418.74' height='22' fill='#1f3a5f'/>
-<text x='614.74' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2699</text>
+<rect x='190' y='96' width='432.34' height='22' fill='#1f3a5f'/>
+<text x='628.34' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1862</text>
 <text x='182' y='140' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>oceania</text>
-<rect x='190' y='124' width='401.99' height='22' fill='#1f3a5f'/>
-<text x='597.99' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2591</text>
+<rect x='190' y='124' width='428.85' height='22' fill='#1f3a5f'/>
+<text x='624.85' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1847</text>
 <text x='182' y='168' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>south_asia</text>
-<rect x='190' y='152' width='436.43' height='22' fill='#1f3a5f'/>
-<text x='632.43' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2813</text>
+<rect x='190' y='152' width='440.00' height='22' fill='#1f3a5f'/>
+<text x='636.00' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1895</text>
 </svg>

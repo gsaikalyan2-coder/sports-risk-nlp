@@ -750,12 +750,34 @@ the report cannot silently drift from the corpus.**
 
 ## OPEN-018 — 73.6% of utterances are exact duplicates of another utterance
 
-**Status:** OPEN — **mitigated in the sampling plan**, root cause not fixed, and it **got
-worse** at n=4,000 exactly as this entry predicted: **87.4%** (was 73.6%), 13,651 utterances
-to 3,131 distinct texts. Record-level duplication is 7.2%. Multiplying records multiplies
-repeats, because the template grammar has a ceiling of distinct utterances and the discourse
-suffixes are not varied at all. Option (a) below is now the recommended one, bundled with
-OPEN-020's template work.
+**Status: CLOSED 2026-08-10 (Phase 9b).** Utterance duplication **87.4% → 37.6%**; 9,302
+utterances over 6,444 distinct texts, against 13,651 over 3,131. Record-level duplication is
+3.9%.
+
+**The fix was not the one this entry recommended, and the failed first attempt is the useful
+part.** Option (a) — apply `_vary` to the suffixes and expand the bank from 8 entries to 17 —
+was implemented first. It *spread* the repeats without reducing them: every construct sentence
+still drew a suffix, Phase 8 still segmented each suffix into its own standalone utterance, and
+38.6% of all utterances still sat in twenty strings. **Bank size was never the lever.
+Sentence-hood was.**
+
+A discourse suffix is now a **clause** joined with an em dash, and `_frame` strips the parent's
+full stop before attaching, so `"I'm nervous. That's where my head is at."` becomes `"I'm
+nervous — that's where my head is at."` The segmenter has nothing to split, and the repeated
+text stops being a whole utterance.
+
+**Two consequences, both wanted.** Utterance count fell from 13,651 to 9,302 on a corpus that
+did not shrink. And **median utterance length rose from 9 tokens to 17**, which independently
+answers the concern Phase 9 raised in `reports/eda.md` §1 — that a 9-token median is too short
+for an annotator to judge `appraisal_orientation` from. Asserted by
+`tests/test_profile.py::test_utterances_are_long_enough_to_annotate`.
+
+`_vary` also now reaches the discourse frame, the interpretation modifier and the
+construct-free records; all three previously bypassed it.
+
+**Original entry follows.**
+
+**Was:** OPEN — mitigated in the sampling plan, root cause not fixed
 **Owned by:** Phase 7 (generator) / Phase 8 (segmenter), found at Phase 9
 **Becomes blocking at:** never on its own; it would have silently corrupted Phase 11's kappa
 if the sampling plan had not been written to avoid it.
@@ -1029,6 +1051,7 @@ fails, which is worse than an honest interim one.
 | 2026-08-09 | Phase 7 follow-up. OPEN-012 **substantially mitigated** (generator v1.1 lexical variation: vocab 444->638, distinct texts 81%->97%; plus template-disjoint splitting in `src/evaluation/`, memorisation probe drops 0.732->0.198). OPEN-013 **fixture delivered** (34 cases, 8 negatives). Allow-list and ethics.md version headers corrected to 1.1. |
 | 2026-08-09 | Phase 7. Source survey found **no public pre-competition athlete corpus**; owner chose synthetic-first. OPEN-011 (no real athlete text), OPEN-012 (synthetic vocabulary too small), OPEN-013 (de-identification unvalidatable against an identifier-free corpus) logged. OPEN-011 supersedes risk #1 in `PROJECT_PLAN.md` as the project's live highest risk. |
 | 2026-08-09 | **Phase 8. OPEN-013 CLOSED** — de-identifier measured against the fixture: precision 100%, recall 100%, exact 100% (34/34), leak rate 0%, negatives 8/8, reported per difficulty band; held-out 10-case probe 10/10. Fixture case `name_01` corrected: it had required a bare role noun to be redacted, contradicting `negative_04` and `docs/ethics.md` §5.1; the implementation was not changed to chase it. Language-filter defect found and fixed by running the pipeline: unequal stopword profiles dropped 2 English records as Portuguese (`docs/preprocessing.md` §4.1). **OPEN-015 raised** — generator v1.1 substitution produced "corner of me" in 9/1,200 records; owned by Phase 9. |
+| 2026-08-10 | **Phase 9b. OPEN-018 and OPEN-020 CLOSED.** OPEN-020: template bank 7-12 -> **15 realisations per construct** (150 templates, 5 phrasings held out per construct against 2-4); realised vocabulary **625 -> 860** (+38%). OPEN-018: discourse suffixes became **clauses** rather than sentences after the obvious fix (a bigger suffix bank) was implemented and measured to do nothing — utterance duplication **87.4% -> 37.6%**, utterance count 13,651 -> 9,302, median utterance length 9 -> **17 tokens**. The ratchet flagged **28 new unruled substitution frames** and blocked the build until each was judged. All four gates re-run and PASSED; 253 tests. **OPEN-021 raised** — the lexicon baseline is NOT independent of the corpus (shared ancestry via `taxonomy.yaml` positive_examples): it fires on 73% of pre-9b templates and 22% of 9b templates, macro-F1 **0.780 -> 0.461**, and Phase 9's cue-fraction correction is **withdrawn**. |
 | 2026-08-10 | **Phase 9 follow-up. OPEN-016 and OPEN-017 CLOSED.** OPEN-016 by generation-time guard (generator **v1.3**, `substitution_verdicts.py`): defective records **190/1,200 → 0/4,000**, zero synonym groups deleted, realised vocabulary 643 → 625 against 594 had the 34 implicated members been deleted instead. OPEN-017 by raising `DEFAULT_COUNT` 1,200 → **4,000**: gold_eval **235 → 400** items, constructs below the 40-positive floor **7/10 → 0/10**. All four gates re-run and PASSED; 251 tests. **OPEN-020 raised** — corrected for the 0.62 cue fraction, 7/10 constructs still fall short, and the sweep shows no corpus size fixes it; the remedy is ~15 templates per construct. **OPEN-018 worsened as predicted**: utterance duplication 73.6% → **87.4%**. |
 | 2026-08-10 | **Phase 9. OPEN-015 CLOSED** — `("part","portion","corner","piece")` deleted, generator bumped to v1.2, corpus regenerated at seed 42, Phase 7 / Phase 8 / benchmark gates all re-run and PASSED. 4,110 → **4,141** utterances; memorisation probe 0.732/0.198 → 0.738/0.146. Four issues raised: **OPEN-016** (exhaustive synonym sweep — 727 substitution events, 127 flagged signatures, **15.8% of records still carry a broken/degraded substitution**; OPEN-015 was not isolated), **OPEN-017** (gold pool too small — 235 of a 400 target, 7/10 constructs below the 40-positive floor; 4,000 generated records measured as the minimum), **OPEN-018** (**73.6% utterance-level exact duplication**, a segmentation artefact invisible at record level; mitigated in the sampling plan), **OPEN-019** (`generation_spec` replicated onto every utterance). Three published numbers corrected: v1.1 vocabulary 638→**635**, distinct texts 1,163→**1,161**, `"corner of me"` 11→**9** in a code comment. Deliverables: `reports/eda.md`, 9 SVG figures, `notebooks/01_eda.ipynb`, `data/processed/gold_candidates/sampling_plan.json`. |
 
@@ -1036,7 +1059,45 @@ fails, which is worse than an honest interim one.
 
 ## OPEN-020 — The template bank is too small for a defensible per-construct kappa
 
-**Status:** OPEN — the residual of OPEN-017, and the last corpus-side blocker on
+**Status: CLOSED 2026-08-10 (Phase 9b).** The bank went from 7–12 realisations per construct
+to a uniform **15** — five per intensity level for the six graded constructs, five per label
+for the four categorical ones. 150 templates against 85.
+
+| | Before | **After** |
+|---|---|---|
+| Templates per construct | 7–12 | **15** |
+| Phrasings on the held-out side (35% holdout) | 2–4 | **5** |
+| Realised vocabulary (raw records, n=4,000) | 625 | **860** |
+| Distinct record texts | 94.9% | **97.2%** |
+| `gold_eval` / constructs below the 40-positive floor | 400 / 0 | 400 / **0** |
+
+**Five phrasings is not generous and the paper should say so** — but it is the difference
+between a kappa a reviewer interrogates and one they dismiss. Held by
+`tests/test_profile.py::test_every_construct_has_fifteen_templates`, which fails if the bank
+falls back below 14.
+
+**The new templates were written against `taxonomy.yaml`'s definitions and edge cases, and
+deliberately NOT against its `positive_examples`.** That choice was made to avoid reproducing
+the same phrasings twice — and it is what exposed **OPEN-021**, because the lexicon baseline's
+cues came from those same examples. A methodological decision made for one reason turned out
+to be the instrument that falsified an unrelated claim.
+
+**The ratchet earned its keep.** Doubling the bank created **28 substitution frames nobody had
+ruled on**, and the build refused to pass until each was judged: 19 `broken` (*"a entry list"*,
+*"spectators keeps"*, *"I keep myself crowded with"*), 5 `degraded`, 4 acceptable. None was
+found by reading. The sweep enumerated them, a test failed, a human ruled. That is the
+difference between a control and a good intention.
+
+**One template of mine was defective and a Phase 7 test caught it**, which is worth recording
+because it is the guard working in the direction that matters: *"after Tuesday's session"*
+tripped `test_generated_text_contains_no_personal_names`, whose heuristic flags mid-sentence
+capitalised tokens outside a known-safe list. The template was reworded. **The allow-list was
+not extended** — adding possessive weekday forms to a name guard is the kind of accretion that
+eventually lets a real name through.
+
+**Original entry follows.**
+
+**Was:** OPEN — the residual of OPEN-017, and the last corpus-side blocker on
 contribution #1
 **Owned by:** Phase 7 (generator), raised at Phase 9
 **Becomes blocking at:** **Phase 11.**
@@ -1073,3 +1134,73 @@ and both feed the same weakness.
 in `substitution_verdicts.VERDICTS`. That is the ratchet working, not an obstacle — but budget
 for it, and do not merge template work without re-running the sweep.
 | 2026-08-10 | **OPEN-003 CLOSED** — repository pushed to a private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`), 273 objects, `main` tracking `origin/main`. First off-machine backup since Phase 1. `.env` confirmed untracked before the push. Pushing is now part of every phase gate, not a one-off. |
+
+---
+
+## OPEN-021 — The lexicon baseline is not independent of the corpus
+
+**Status:** OPEN — a **reporting and framing** obligation, not a bug to fix
+**Owned by:** Phase 7 (evaluation harness), found at Phase 9b
+**Becomes blocking at:** **Phase 18** (results and ablations) — and it must be in the paper.
+
+**The claim that was wrong.** `src/evaluation/baselines.py` documented `LexiconBaseline` as
+*"immune to the template leakage that inflates the others"*, and `CONSTRUCT_CUES` carried the
+note *"Hand-written on purpose: a lexicon induced from the training labels would inherit the
+template bank and stop being an independent baseline."* `scripts/run_benchmark_audit.py`
+printed its drop as the *"Leakage-immune"* control against which the memorisation probe's drop
+was judged.
+
+Avoiding induction from labels prevents **direct** inheritance. It does not prevent **shared
+ancestry**. Both the cue list and `src/ingestion/synthetic.py`'s template bank were written
+from `config/taxonomy.yaml`'s `positive_examples`, and several Phase 7 templates reproduce them
+close to verbatim — *"I'm just drained. I don't even care how this one goes anymore."* is
+simultaneously a taxonomy example and a generator template. The cues and the corpus are
+cousins, and the baseline scores partly by matching its own relative.
+
+**How it became measurable.** Phase 9b's templates were written to the same construct
+*definitions* but deliberately not to the same example *phrasings*. That produced two template
+sets differing in exactly one respect:
+
+| Template set | Lexicon fires on |
+|---|---|
+| Written at Phase 7 | **73%** (66/90) |
+| Written at Phase 9b | **22%** (13/60) |
+
+Nothing about the constructs changed between them.
+
+**Consequences.**
+
+| | v1.3 | **v1.4** |
+|---|---|---|
+| Lexicon macro-F1, random split | 0.762 | 0.570 |
+| Lexicon macro-F1, template-disjoint | 0.780 | **0.461** |
+| Memorisation probe, template-disjoint | 0.184 | 0.200 |
+
+The corpus did not get harder in any meaningful sense. The baseline lost an advantage it should
+never have been credited with. **0.461 is the honest floor, and every lexicon number published
+before v1.4 carries an upward bias.**
+
+**A second consequence, already actioned: Phase 9's "cue fraction" correction is withdrawn.**
+Phase 9 used this lexicon as a proxy detector to estimate what share of gold candidates carry
+construct language, reported 0.62, and concluded 7 of 10 constructs were under-powered once
+corrected. That number measured overlap with the cue list. The tell is that the same proxy
+reports a *worse* figure on a corpus with twice the construct phrasings — which is not a
+statement about constructs at all. `reports/eda.md` §7.4 no longer quotes a corrected floor;
+OPEN-017's residual can only be settled by annotation at Phase 11.
+
+**What has been done:** the docstrings in `baselines.py` corrected at source, the benchmark's
+output relabelled *"Label-leakage-immune"* with an inline note, and §5b added to
+`reports/eda.md`.
+
+**What remains, and it is a paper obligation rather than a code task:**
+
+1. **Report the 0.780 → 0.461 drop as a result, not an embarrassment.** A keyword baseline
+   whose score depends this heavily on phrasing overlap with its own source is a finding about
+   *lexicon baselines in general* on template-seeded corpora. It is reusable by anyone building
+   one, which is exactly the kind of secondary contribution this paper can afford to make.
+2. **Never reuse `LexiconBaseline` as a construct detector.** It is a baseline. Phase 9 used it
+   as an instrument and got a number that measured the instrument.
+3. **Re-examine the same question for the transformer at Phase 14.** The gold set is human
+   labelled, so it does not share this ancestry — but the *silver* labels from Phase 10 will be
+   produced by an LLM given the taxonomy, including its `positive_examples`. That is the same
+   shared-ancestry shape one level up, and it deserves to be checked rather than assumed away.

@@ -42,7 +42,7 @@ retained, full taxonomy retained.** Recorded in `CLAUDE.md` §10.
 | Records | **4,000** |
 | Licence | Project-generated. No third-party licence applies; no human subject involved |
 | Redistribution | **Permitted** — the only source in the corpus quotable verbatim in the paper |
-| Generator | `construct-template-grammar@1.3`, seed `42` |
+| Generator | `construct-template-grammar@1.4`, seed `42` |
 | Language | English |
 | De-identified | `false` — Phase 8 sets this flag, not Phase 7 |
 | Path | `data/raw/synth_precomp_v1/` (`provenance.json` + `records.jsonl`) |
@@ -66,50 +66,57 @@ python scripts/run_ingestion.py            # defaults: --count 4000 --seed 42
 3. **Visible limitations.** A template grammar cannot pass itself off as naturalistic
    speech. The constraint is in the artefact rather than hidden behind fluent prose.
 
-#### Corpus statistics (measured, generator v1.3, seed 42, n=4000)
+#### Corpus statistics (measured, generator v1.4, seed 42, n=4000)
 
-| Metric | v1.0 (n=1.2k) | v1.1 (n=1.2k) | v1.2 (n=1.2k) | **v1.3 (n=4k, current)** |
-|---|---|---|---|---|
-| Records | 1,200 | 1,200 | 1,200 | **4,000** |
-| Distinct texts | 976 (81.3%) | 1,161 (96.8%) | 1,158 (96.5%) | **3,797 (94.9%)** |
-| Tokens | 30,367 | 40,251 | 40,634 | **134,787** |
-| **Vocabulary (types)** | 444 | 635 | 636 | **625** |
-| **MATTR-50** | — | 0.818 | 0.820 | **0.819** |
-| Raw type–token ratio | 0.0146 | 0.0158 | 0.0157 | **0.0046** |
-| Words per record | mean 25.3 | mean 33.5 | mean 33.9 | **mean 33.7** |
-| Records with no construct planted | 106 (8.8%) | 92 (7.7%) | 85 (7.1%) | **300 (7.5%)** |
-| **Records with a broken/degraded substitution** | — | not measured | 190 (15.8%) | **0 (0.0%)** |
+| Metric | v1.0 (1.2k) | v1.1 (1.2k) | v1.2 (1.2k) | v1.3 (4k) | **v1.4 (4k, current)** |
+|---|---|---|---|---|---|
+| Records | 1,200 | 1,200 | 1,200 | 4,000 | **4,000** |
+| Templates per construct | 7–12 | 7–12 | 7–12 | 7–12 | **15** |
+| Distinct texts | 976 (81.3%) | 1,161 (96.8%) | 1,158 (96.5%) | 3,797 (94.9%) | **3,888 (97.2%)** |
+| Tokens | 30,367 | 40,251 | 40,634 | 134,787 | **151,333** |
+| **Vocabulary (types)** | 444 | 635 | 636 | 625 | **860** |
+| **MATTR-50** | — | 0.818 | 0.820 | 0.819 | **0.819** |
+| Raw type–token ratio | 0.0146 | 0.0158 | 0.0157 | 0.0046 | 0.0057 |
+| Words per record | 25.3 | 33.5 | 33.9 | 33.7 | **37.8** |
+| Records with no construct planted | 106 (8.8%) | 92 (7.7%) | 85 (7.1%) | 300 (7.5%) | **345 (8.6%)** |
+| **Records with a broken substitution** | — | not measured | 190 (15.8%) | 0 | **0** |
 
-> **Read the raw-TTR column as a warning, not a result.** It falls from 0.0157 to
-> 0.0046 between v1.2 and v1.3 while MATTR-50 does not move at all (0.820 →
-> 0.819) and the vocabulary barely changes. Nothing about the text got less
-> diverse; the corpus got 3.3× longer and TTR's denominator grew with it. This is
-> the length confound in one row, and it is why **MATTR-50 and `vocabulary_size`
-> are the two figures this project quotes.**
+> **Vocabulary is the headline: 625 → 860 types (+38%) at v1.4**, from doubling the
+> template bank (OPEN-020). MATTR-50 barely moves, and that is the correct
+> behaviour rather than a disappointment — MATTR measures richness *within a
+> 50-token window*, and the new templates are as varied inside a sentence as the
+> old ones were. What grew is the number of distinct *sentences*, which is what
+> `vocabulary_size` and the distinct-text rate capture. The two measures answer
+> different questions and both are reported for that reason.
 
-> **v1.3 vocabulary is 11 types lower than v1.2, and that is the guard working.**
-> OPEN-016 added a generation-time check that reverts a substitution which would
-> produce a ruled-defective frame, so a word whose only frames in the bank were
-> defective now never appears. The alternative — deleting the 34 implicated
-> synonym-group members — was measured at **594** types. The guard keeps 31 more
-> and removes nothing from the bank. Full table in
-> `src/ingestion/substitution_verdicts.py`.
+> **Read the raw-TTR row as a warning, not a result.** It falls from 0.0157 to
+> 0.0046 between v1.2 and v1.3 while MATTR-50 does not move at all and the
+> vocabulary barely changes. Nothing about the text got less diverse; the corpus
+> got 3.3× longer and TTR's denominator grew with it. This is the length confound
+> in one row, and it is why **MATTR-50 and `vocabulary_size` are the two figures
+> this project quotes.**
+
+> **v1.3 lost 11 types against v1.2, and that was the OPEN-016 guard working.**
+> A generation-time check reverts a substitution that would produce a
+> ruled-defective frame, so a word whose only frames in the bank were defective
+> stopped appearing. The alternative — deleting the 34 implicated synonym-group
+> members — was measured at **594** types. The guard kept 31 more and removed
+> nothing from the bank, which is why the v1.4 template expansion could recover
+> the vocabulary so sharply: the words were still there waiting for good frames.
 
 > **Three v1.1 figures were corrected at Phase 9.** The v1.1 column previously
 > read 638 types, 1,163 distinct texts, 40,169 tokens and 106 construct-free
 > records. Regenerating from the committed v1.1 generator
 > (`git show 6f9561a:src/ingestion/synthetic.py`) at seed 42 gives **635**,
 > **1,161**, **40,251** and **92**. The discrepancy is small and changes no
-> conclusion, but the artefact claim in `CLAUDE.md` §9 is that a reviewer can
-> reproduce these numbers exactly, so a figure that does not reproduce is a defect
-> regardless of its size.
+> conclusion, but `CLAUDE.md` §9 claims a reviewer can reproduce these numbers
+> exactly, so a figure that does not reproduce is a defect regardless of size.
 
 > **These are per-RECORD statistics** over `data/raw/`. The per-*utterance*
 > profile of `data/interim/` is in `reports/eda.md`, and the two are not
-> comparable — Phase 8 turned 4,000 records into 13,651 utterances, which changes
-> every denominator. In particular the per-utterance corpus is **87.4% exact
-> duplicates** (OPEN-018), a fact entirely invisible at record level, where the
-> duplicate rate is 7.2%.
+> comparable — Phase 8 turns 4,000 records into 9,302 utterances, which changes
+> every denominator. Utterance-level exact duplication is **37.6%** (was 87.4% at
+> v1.3; OPEN-018), against 3.9% at record level.
 
 **Do not quote raw TTR as the diversity headline.** It is length-confounded: its
 denominator grows without bound while its numerator saturates, so v1.1 raised the
@@ -137,7 +144,7 @@ idiom does not survive substitution (OPEN-015). All four members share a part of
 speech **and** an argument structure, so the review rule above could not have
 caught it — **idiom membership is a third constraint**.
 
-**What v1.3 changed, and it is the important one.** The v1.2 fix prompted an
+**What v1.3 changed.** The v1.2 fix prompted an
 exhaustive sweep (`src/ingestion/synonym_audit.py`): all 727 single-token
 substitutions the generator can make, screened by six probes. It found that
 OPEN-015 had **not** been isolated — **15.8% of v1.2 records** still contained a
@@ -158,6 +165,47 @@ signature lacks a human verdict, and a second test asserts the corpus contains n
 ruled-defective frame at all. **A new defect class still needs a human to notice
 it once; it no longer needs a human to notice it repeatedly.**
 
+**What v1.4 changed — the template bank, and the discourse layer.**
+
+*Templates (OPEN-020).* The bank went from 7–12 realisations per construct to a
+uniform **15**: five per intensity level for the six graded constructs, five per
+label for the four categorical ones. Written against `config/taxonomy.yaml`'s
+definitions and edge cases, and deliberately **not** against its
+`positive_examples` — which turned out to matter more than expected, because it
+is what exposed OPEN-021 (see below).
+
+Why 15 and not more: a 35% per-construct holdout over 15 templates puts **five
+distinct phrasings** on the evaluation side, against two to four before. A kappa
+computed on three phrasings is a kappa about those three phrasings. Five is not
+generous and the paper should say so, but it is the difference between a number a
+reviewer interrogates and one they dismiss.
+
+*Discourse suffixes (OPEN-018).* A suffix is now a **clause** joined with an em
+dash rather than a following sentence, and `_frame` strips the parent's full stop
+before attaching. The first attempt — expanding the suffix bank from 8 entries to
+17 — is worth recording because it looked right and was not: it spread the
+repeats without reducing them, because every construct sentence still drew a
+suffix and Phase 8 still segmented each into its own utterance. Bank size was
+never the lever; **sentence-hood was**. Utterance duplication fell 87.4% → 37.6%,
+and median utterance length rose from 9 tokens to 17, which independently fixes
+the "too short for an annotator to judge" problem Phase 9 flagged.
+
+`_vary` also now reaches the discourse frame, the interpretation modifier and the
+construct-free records. All three previously bypassed it, which is why a
+construct-free record used to be byte-identical to every other record drawing the
+same neutral sentence.
+
+**A Phase 7 claim was falsified along the way (OPEN-021).** `LexiconBaseline` was
+documented as independent of the corpus because its cues were hand-written from
+`taxonomy.yaml` rather than induced from labels. Avoiding induction prevents
+*direct* inheritance; it does not prevent **shared ancestry**, and the Phase 7
+templates were written from those same `positive_examples`. The v1.4 templates
+were not, which made the entanglement measurable: the cue list fires on **73%**
+of pre-9b templates and **22%** of 9b templates, and the lexicon's
+template-disjoint macro-F1 fell **0.780 → 0.461**. The corpus did not get harder;
+the baseline lost an advantage it should not have had. **0.461 is the honest
+floor**, and every lexicon number published before v1.4 carries an upward bias.
+
 #### Construct prevalence
 
 > **GENERATOR METADATA, NOT LABELS.** This is what the generator *planted*, i.e.
@@ -169,19 +217,18 @@ it once; it no longer needs a human to notice it repeatedly.**
 
 | Construct | Records | Prevalence |
 |---|---|---|
-| `cognitive_anxiety` | 934 | 23.4% |
-| `coping_style` | 895 | 22.4% |
-| `self_confidence` | 745 | 18.6% |
-| `somatic_anxiety` | 689 | 17.2% |
-| `appraisal_orientation` | 687 | 17.2% |
-| `perceived_stress` | 671 | 16.8% |
-| `attentional_focus` | 587 | 14.7% |
-| `resilience` | 566 | 14.2% |
-| `burnout_signal` | 540 | 13.5% |
-| `motivation_orientation` | 431 | 10.8% |
+| `cognitive_anxiety` | 886 | 22.2% |
+| `coping_style` | 838 | 21.0% |
+| `self_confidence` | 757 | 18.9% |
+| `appraisal_orientation` | 745 | 18.6% |
+| `somatic_anxiety` | 666 | 16.7% |
+| `perceived_stress` | 629 | 15.7% |
+| `attentional_focus` | 566 | 14.2% |
+| `burnout_signal` | 557 | 13.9% |
+| `resilience` | 544 | 13.6% |
+| `motivation_orientation` | 448 | 11.2% |
 
-Constructs per record: 0 → 300, 1 → 1,377, 2 → 1,601, 3 → 722. The interpretation
-modifier is present on 385 records (209 debilitative, 176 facilitative).
+Constructs per record: 0 → 345, 1 → 1,401, 2 → 1,527, 3 → 727.
 
 #### Temporal and context coverage
 

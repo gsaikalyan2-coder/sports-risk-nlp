@@ -181,7 +181,13 @@ def main(argv: list[str] | None = None) -> int:
         lex_drop = rnd["lexicon"] - dis["lexicon"]
         print()
         print(f"  Memorisation-sensitive drop (probe) : {probe_drop:+.3f}")
-        print(f"  Leakage-immune drop (lexicon)       : {lex_drop:+.3f}")
+        print(f"  Label-leakage-immune drop (lexicon) : {lex_drop:+.3f}")
+        print(
+            "    NOTE (OPEN-021): the lexicon is immune to LABEL leakage, not\n"
+            "    independent of the corpus -- its cues and the template bank were\n"
+            "    both written from taxonomy.yaml positive_examples. Read its score\n"
+            "    as a floor with a known upward bias."
+        )
         print()
         if probe_drop > 0.02:
             print("  CONFIRMED: a random split materially overstates performance here.")
@@ -189,7 +195,9 @@ def main(argv: list[str] | None = None) -> int:
                 "  A pure memoriser loses "
                 f"{probe_drop:.3f} macro-F1 once templates are held out, while the"
             )
-            print("  leakage-immune lexicon barely moves. The gap is memorisation, not skill.")
+            print(
+                "  label-leakage-immune lexicon moves far less. The gap is memorisation, not skill."
+            )
             print()
             print("  ACTION: Phases 13, 14 and 18 MUST use template_disjoint_split().")
             print("  Report BOTH numbers in the paper -- the gap is itself a finding.")

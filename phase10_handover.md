@@ -44,8 +44,8 @@ of truth for open items.
 | 7 — Data ingestion pipeline | Complete | `6f9561a` |
 | 8 — Preprocessing & de-identification | Complete | see Phase 9 commits |
 | **9 — EDA & quality profiling** | **Complete** | see Part B9 |
-| **9b — Corpus hardening** | **NEXT** (~1 day, no API key needed) | — |
-| 10 — Weak / LLM labelling | blocked on OPEN-008 | — |
+| **9b — Corpus hardening** | **Complete** | see Part B12 |
+| **10 — Weak / LLM labelling** | **NEXT** — blocked on OPEN-008 | — |
 
 **Carried-forward caveats:**
 
@@ -58,7 +58,7 @@ of truth for open items.
 - **Sandbox caveat:** the agent sandbox runs Python 3.10; the project pins 3.11.
   `datetime.UTC` (3.11+) is used in `src/agents/ledger.py` and `src/ingestion/allowlist.py`.
   Tests were run here with a `sitecustomize` shim backfilling that alias (not committed).
-  **Re-run `pytest` on the 3.11 machine to confirm natively** — expect **251/251**.
+  **Re-run `pytest` on the 3.11 machine to confirm natively** — expect **253/253**.
 - **OPEN-002** (broken pixeltable plugin hook) fired on every file write throughout Phase 9.
   Still cosmetic, still unfixed.
 
@@ -556,59 +556,116 @@ sessions. Environment quirk, not a repo problem, but it costs time every session
 
 ---
 
-## PART C — Phase 9b Brief (do this before Phase 10)
+### B12. Phase 9b — corpus hardening (OPEN-018, OPEN-020), and a Phase 7 claim falsified
 
-**Phase 9b is new**, inserted into `PROJECT_PLAN.md` at the end of Phase 9. It needs **no API
-key**, costs roughly a day, and is the last corpus-side work standing between this project and
-a kappa a reviewer will believe.
+**Generator v1.4.** Two changes, one measured consequence each, plus one unplanned finding
+that matters more than either.
 
-**Objective:** make the corpus able to support a defensible per-construct kappa.
+**OPEN-020 — template bank 7–12 → 15 realisations per construct.** 150 templates against 85:
+five per intensity level for the six graded constructs, five per label for the four
+categorical ones, written against `taxonomy.yaml`'s definitions and edge cases.
 
-**Owning agent:** Taxonomy/Psych Agent (writes realisations), Evaluation Agent (re-profiles).
+| | Before | After |
+|---|---|---|
+| Templates per construct | 7–12 | **15** |
+| Phrasings held out for evaluation (35%) | 2–4 | **5** |
+| Realised vocabulary (raw records) | 625 | **860** (+38%) |
+| Distinct record texts | 94.9% | **97.2%** |
 
-### The two tasks
+**OPEN-018 — and the first fix did nothing, which is the part worth keeping.** The entry
+recommended applying `_vary` to the discourse suffixes and expanding the bank. I did that
+first: 8 entries → 17. Duplication barely moved. Every construct sentence still drew a suffix,
+Phase 8 still segmented each suffix into its own standalone utterance, and 38.6% of all
+utterances still sat in twenty strings. **Bank size was never the lever; sentence-hood was.**
 
-**1. OPEN-020 — expand the template bank to ~15 realisations per construct** (from 7–12). This
-is the one that matters, for two independent reasons:
+A suffix is now a **clause** joined with an em dash, with the parent's full stop stripped:
+`"I'm nervous. That's where my head is at."` → `"I'm nervous — that's where my head is at."`
 
-- **Phrasing diversity.** A 35% holdout currently leaves **2–4 phrasings per construct** in the
-  evaluation set. A kappa computed on 3 phrasings is a kappa about those 3 phrasings, not about
-  the construct. Two annotators agreeing on *"I keep turning over what happens if I get the
-  first half wrong"* tells you they read the same sentence the same way. It does not tell you
-  the rubric separates `cognitive_anxiety` from `perceived_stress` in language they have not
-  seen. **This is the weakest point in contribution #1 and a reviewer will find it.**
-- **Coverage.** More construct realisations per record raises the 0.62 cue fraction directly,
-  which is the only thing that will clear the corrected floor.
+| | v1.3 | v1.4 |
+|---|---|---|
+| Utterance exact-duplicate rate | 87.4% | **37.6%** |
+| Utterances | 13,651 | **9,302** (corpus did not shrink) |
+| Distinct utterance texts | 3,131 | **6,444** |
+| **Median utterance length** | 9 tokens | **17 tokens** |
 
-Write them against `docs/annotation_guidelines.md` and `config/taxonomy.yaml`. **The taxonomy
-is frozen until Phase 12** — new realisations of existing constructs only, no new constructs
-and no changed definitions.
+The length result was not the goal and is arguably worth more than the duplication one: Phase 9
+flagged a 9-token median as too short for an annotator to judge `appraisal_orientation` from.
+Asserted now by `test_utterances_are_long_enough_to_annotate`.
 
-**2. OPEN-018 option (a) — apply `_vary` to `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES`.**
-They are emitted verbatim today, and Phase 8 segments each into its own utterance, so
-`"It is what it is."` appears hundreds of times and 87.4% of utterances are exact duplicates.
+**The ratchet blocked the build 28 times.** New templates create new substitution frames, and
+`test_every_flagged_signature_has_a_verdict` failed until each was ruled: 19 `broken`
+(*"a entry list"*, *"spectators keeps"*, *"I keep myself crowded with"*), 5 `degraded`, 4 fine.
+**None was found by reading.** The sweep enumerated them, a test failed, a human ruled.
 
-### Sequencing, and one thing that will surprise you
+**Two tests caught real defects, and neither was weakened.**
 
-New templates create new substitution frames. `scripts/run_eda.py` will therefore flag
-signatures nobody has ruled on, and **the build will fail until each is ruled** in
-`substitution_verdicts.VERDICTS`. That is the ratchet working as designed, not an obstacle —
-but budget for it, and do not merge template work without re-running the sweep.
+1. A template I wrote — *"after Tuesday's session"* — tripped the Phase 7 guard
+   `test_generated_text_contains_no_personal_names`. I reworded the template. I did **not**
+   add possessive weekday forms to the name allow-list; that accretion is how a real name
+   eventually gets through.
+2. `test_the_holdout_fraction_moves_the_pool_size` failed because both holdout fractions now
+   saturate the 400-item target, so drawn sizes are equal. The assertion moved from `.size` to
+   `eligibility.eligible` — which is literally the pool size the test name has always claimed
+   to measure. The old assertion had stopped testing anything.
 
-Then: regenerate at seed 42, re-run all four gates, and update `reports/eda.md`,
-`docs/data_sources.md` and the fixed-corpus assertions in `tests/test_profile.py` **in the same
-change**. Expect those three assertions to fail first — that is the alarm that the report has
-gone stale, and it is the second time they will have earned their keep.
+### B12b. OPEN-021 — the lexicon baseline is not independent of the corpus
 
-### Gate
+**This was not on the Phase 9b task list. It is the most consequential thing in this session.**
 
-≥14 templates per construct · utterance duplicate rate materially below 87.4% · cue-corrected
-construct coverage ≥40 for at least 8 of 10 constructs · all four gates pass · synonym sweep
-reports zero unruled signatures and zero realised defects.
+`baselines.py` documented `LexiconBaseline` as *"immune to the template leakage that inflates
+the others"*, because its cues were hand-written from `taxonomy.yaml` rather than induced from
+labels. That prevents **direct** inheritance. It does not prevent **shared ancestry** — the
+Phase 7 template bank was written from the same `positive_examples`, and several templates
+reproduce them near-verbatim.
+
+The Phase 9b templates were written to the same construct *definitions* but deliberately not to
+the same example *phrasings*, which made the entanglement measurable:
+
+| Template set | Lexicon fires on |
+|---|---|
+| Written at Phase 7 | **73%** (66/90) |
+| Written at Phase 9b | **22%** (13/60) |
+
+| | v1.3 | v1.4 |
+|---|---|---|
+| Lexicon macro-F1, template-disjoint | 0.780 | **0.461** |
+| Memorisation probe, template-disjoint | 0.184 | 0.200 |
+
+**The corpus did not get harder. The baseline lost an advantage it should never have had.**
+0.461 is the honest floor, and every lexicon number published before v1.4 carries an upward
+bias.
+
+**Phase 9's "cue fraction" correction is withdrawn.** Phase 9 used this lexicon as a proxy
+detector to estimate what share of gold candidates carry construct language, got 0.62, and
+concluded 7 of 10 constructs were under-powered once corrected. That number measured overlap
+with the cue list. The tell: the same proxy reports a *worse* figure on a corpus with twice the
+construct phrasings. `reports/eda.md` §7.4 no longer quotes a corrected floor.
+
+Corrected at source: `baselines.py` docstrings, the benchmark's *"Label-leakage-immune"*
+relabelling with an inline note, and a new §5b in `reports/eda.md`.
+
+**Carry into Phase 14:** the same shared-ancestry shape will exist one level up. Phase 10's
+silver labels will be produced by an LLM given the taxonomy, `positive_examples` included.
+Check it rather than assume it away.
+
+### B12c. Gates after Phase 9b
+
+| Gate | Result |
+|---|---|
+| Phase 7 | **PASSED** — 4,000 records, generator v1.4 |
+| Phase 8 | **PASSED** — 9,302 utterances, 0 dropped, fixture 34/34 exact, leak 0% |
+| Benchmark | **PASSED** — probe 0.721 → **0.200** disjoint (drop +0.520); lexicon 0.570 → 0.461 |
+| Phase 9 | **PASSED** — 0 defective records, 0 unruled signatures, gold_eval 400, 0/10 below floor |
+| `ruff check` / `format` | clean, 55 files |
+| `pytest` | **252/253** (the failure is the 3.11 check under the sandbox's 3.10) |
+| Determinism | `run_eda.py` twice → byte-identical report, figures, candidates |
+
+Also fixed: `run_eda.py` now rstrips each line of the generated report, so the pre-commit
+trailing-whitespace hook stops rewriting `reports/eda.md` on every regeneration.
 
 ---
 
-## PART C2 — Phase 10 Brief (after 9b)
+## PART C — Phase 10 Brief
 
 **Objective:** weak / LLM labelling — a cheap model proposes construct labels plus a rationale
 per utterance (silver labels), under cost-aware routing.
@@ -627,14 +684,18 @@ the Annotation-QA Agent flagging low-confidence and conflicting labels.
 
 ### Four things Phase 9 measured that change how this is built
 
-1. **Deduplicate before the API call.** 87.4% of utterances are exact duplicates — 3,131
-   distinct strings, not 13,651. Label the distinct set and fan results back out. That is a
-   **~77% saving on the phase's entire budget** and it costs one `dict`. (After 9b the ratio
-   improves, so re-measure rather than reusing this number.)
-2. **Abstention must be a first-class answer.** ~38% of utterances carry no construct at all. A
-   labeller that never returns "none" is broken, not thorough.
-3. **Pass the parent record as context.** Median utterance is 9 tokens — too short to judge
-   `appraisal_orientation` alone. `parent_record_id` is on every interim record for this.
+1. **Deduplicate before the API call.** 37.6% of utterances are exact duplicates — 6,444
+   distinct strings, not 9,302. Label the distinct set and fan results back out. That is a
+   **saving on the phase's entire budget** and it costs one `dict`. **Re-measured after 9b:
+   9,302 utterances over 6,444 distinct texts, so the saving is now ~31%, not the ~77% Phase 9
+   quoted. Still worth taking, and a good example of why a number from a superseded corpus
+   version has to be recomputed rather than carried forward.**
+2. **Abstention must be a first-class answer.** Construct-free records are 8.6% of the corpus
+   by construction, and many utterances inside construct-bearing records realise nothing. A
+   labeller that never returns "none" is broken, not thorough. **Do not use the lexicon to
+   estimate how many — see OPEN-021.**
+3. **Pass the parent record as context.** Median utterance is now 17 tokens (was 9), which is
+   workable but still short for `appraisal_orientation`. `parent_record_id` is on every interim record for this.
 4. **Placeholders must survive the prompt intact.** Tell the model what `[ATHLETE]` and
    `[EVENT_WINDOW]` mean rather than leaving it to guess.
 
@@ -672,9 +733,10 @@ decision logged per call, and a cost ledger entry — plus the Annotation-QA rev
 |---|---|---|
 | **OPEN-011** | **No real athlete text in the corpus.** Contribution #1 needs some. Still the only unmitigated high-impact item. | **Phase 11** |
 | **OPEN-004** | **Expert-rater recruitment not started.** Week 1–2 per the risk register; it is now Week 3. Headline contribution, longest lead time, least control. | **Phase 17** |
-| **OPEN-020** | **New.** Template bank too small: 2–4 phrasings per construct in the eval set, and a 0.62 cue fraction that no corpus size fixes. The weakest point in contribution #1. | **Phase 9b (next)** |
-| **OPEN-008** | No `OPENROUTER_API_KEY` in `.env`. **Now genuinely blocking.** | **Phase 10** |
-| OPEN-018 | **Worsened as predicted:** 87.4% utterance duplication (was 73.6%). Mitigated in the sampling plan; ~77% Phase 10 cost saving available; root cause is Phase 9b task 2. | Phase 9b |
+| **OPEN-008** | No `OPENROUTER_API_KEY` in `.env`. **Now the only thing blocking forward progress.** | **Phase 10 (next)** |
+| **OPEN-021** | **New.** The lexicon baseline is not independent of the corpus; macro-F1 0.780 → 0.461 once the templates stopped reusing `taxonomy.yaml` phrasings. A paper obligation, and a check to repeat for silver labels at Phase 14. | Phase 18 |
+| OPEN-020 | ~~Template bank too small~~ — **CLOSED at Phase 9b.** 15 templates/construct, 5 phrasings held out, vocab 625→860. | closed |
+| OPEN-018 | ~~87.4% duplication~~ — **CLOSED at Phase 9b.** 37.6%; suffixes are clauses, not sentences. | closed |
 | OPEN-017 | ~~Gold pool too small~~ — **CLOSED at Phase 9** against its stated criterion (235→400 items, 7/10→0/10 below floor). Residual is OPEN-020. | closed |
 | OPEN-016 | ~~15.8% broken substitutions~~ — **CLOSED at Phase 9** by a generation-time guard. 0/4,000 records. | closed |
 | OPEN-019 | **New.** `generation_spec` replicated per utterance. Documentation only. | monitored |

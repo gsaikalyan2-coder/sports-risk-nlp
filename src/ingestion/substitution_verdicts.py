@@ -256,6 +256,45 @@ VERDICTS: dict[str, str] = {
     "thing squared away": ACCEPTABLE,
     "tough to": ACCEPTABLE,
     "weary in": ACCEPTABLE,
+    # -----------------------------------------------------------------
+    # Ruled at Phase 9b (2026-08-10), against the frames created by the
+    # expanded template bank (OPEN-020). 28 new signatures, all surfaced by
+    # the ratchet rather than by reading -- which is the control working: the
+    # build refused to pass until a human had looked at each one.
+    # -----------------------------------------------------------------
+    # -- broken: number agreement --------------------------------------
+    "all of them is": BROKEN,  # "everyone is going to see it"
+    "spectators keeps": BROKEN,  # "the crowd keeps taking my attention"
+    "stands keeps": BROKEN,
+    # -- broken: indefinite article ------------------------------------
+    "a entry list": BROKEN,  # "a field this strong"
+    # -- broken: argument structure / arity ----------------------------
+    "candid back": BROKEN,  # "pulls me straight back out"
+    "crowded with": BROKEN,  # "I keep myself busy with"
+    "hectic with": BROKEN,
+    "honest back": BROKEN,
+    "none of it beyond": BROKEN,  # "nothing beyond it"
+    "none of it else": BROKEN,
+    "none of it left": BROKEN,  # "nothing left to give"
+    "not a thing beyond": BROKEN,
+    "not a thing else": BROKEN,
+    "not a thing serious": BROKEN,
+    "off the rails wrong": BROKEN,
+    "relentless with": BROKEN,
+    "squared away out": BROKEN,  # "accreditation was sorted out"
+    "squared away this": BROKEN,  # "I have handled this level before"
+    "truthful back": BROKEN,
+    # -- degraded: grammatical, sense or register moved ----------------
+    "badly off the rails": DEGRADED,  # doubles the adverbial
+    "breath control quicken": DEGRADED,  # breathing quickens; breath control is a skill
+    "none of it serious": DEGRADED,  # the head noun ("things") is plural
+    "not a thing left": DEGRADED,  # archaic register for an athlete interview
+    "went off the rails": DEGRADED,  # fine for a race, odd for a start line
+    # -- acceptable: the probe fired, a human read it, it is fine ------
+    "all of them over": ACCEPTABLE,  # "the physio checked all of them over"
+    "cope with it": ACCEPTABLE,
+    "deal with it": ACCEPTABLE,
+    "everybody over": ACCEPTABLE,
 }
 
 #: Defects from a bank the generator no longer has.

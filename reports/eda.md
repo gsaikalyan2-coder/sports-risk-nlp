@@ -1,6 +1,6 @@
 # Phase 9 — Exploratory Data Analysis & Quality Profiling
 
-Source: `synth_precomp_v1` · generator `construct-template-grammar@1.3`, seed 42, n=4,000 records
+Source: `synth_precomp_v1` · generator `construct-template-grammar@1.4`, seed 42, n=4,000 records
 
 > **This corpus is 100% synthetic (OPEN-011).** Every distribution below is a
 > distribution over a template grammar written by this project. None of it is
@@ -9,7 +9,7 @@ Source: `synth_precomp_v1` · generator `construct-template-grammar@1.3`, seed 4
 > built and measured before real text arrives; acquiring real pre-competition
 > athlete text remains the project's highest live risk.
 
-> **Unit warning.** Phase 8 turned 4,000 raw *records* into 13,651 *utterances*. Every number below is tagged with its
+> **Unit warning.** Phase 8 turned 4,000 raw *records* into 9,302 *utterances*. Every number below is tagged with its
 > unit. Per-record and per-utterance figures are not comparable, and Phase 7's
 > per-record statistics are not comparable with anything here.
 
@@ -19,59 +19,61 @@ under `pytest`, not in a notebook.
 
 ## 0. What changed, and every number it superseded
 
-Phase 9 closed three corpus defects in sequence. Each regeneration moves the
-RNG stream, so **every** downstream count changed each time — not only the
-sentences the fix touched. Superseded figures are listed rather than quietly
+Phase 9 and Phase 9b closed five corpus defects in sequence. Each regeneration
+moves the RNG stream, so **every** downstream count changed each time — not only
+the sentences the fix touched. Superseded figures are listed rather than quietly
 overwritten.
 
 | Step | Issue | Action | Generator |
 |---|---|---|---|
 | 1 | OPEN-015 | delete `(part, portion, corner, piece)` | v1.1 → **v1.2** |
 | 2 | OPEN-016 | **guard** `_vary` against ruled-defective frames | v1.2 → **v1.3** |
-| 3 | OPEN-017 | default corpus 1,200 → **4,000** records | v1.3, `--count 4000` |
+| 3 | OPEN-017 | default corpus 1,200 → **4,000** records | v1.3 |
+| 4 | OPEN-020 | template bank 7–12 → **15 realisations per construct** | v1.3 → **v1.4** |
+| 5 | OPEN-018 | discourse suffixes become **clauses**, not sentences | v1.4 |
 
-| Quantity | v1.1 | v1.2 (n=1,200) | **v1.3 (n=4,000)** |
-|---|---|---|---|
-| Records | 1,200 | 1,200 | **4,000** |
-| Utterances | 4,110 | 4,141 | **13,651** |
-| Records with a broken/degraded substitution | not measured | 190 (15.8%) | **0 (0.0%)** |
-| Realised vocabulary (raw records) | 635 | 636 | **625** |
-| Memorisation probe, random split | 0.732 | 0.738 | **0.797** |
-| Memorisation probe, template-disjoint | 0.198 | 0.146 | **0.184** |
-| `gold_eval` drawn / target 400 | — | 235 | **400** |
-| Constructs below the 40-positive floor | — | 7 / 10 | **0 / 10** |
-| Utterance exact-duplicate rate | not measured | 73.6% | **87.4%** |
+| Quantity | v1.1 | v1.2 (n=1.2k) | v1.3 (n=4k) | **v1.4 (n=4k)** |
+|---|---|---|---|---|
+| Records | 1,200 | 1,200 | 4,000 | **4,000** |
+| Utterances | 4,110 | 4,141 | 13,651 | **9,302** |
+| Templates per construct | 7–12 | 7–12 | 7–12 | **15** |
+| Records with a broken substitution | — | 190 (15.8%) | 0 | **0** |
+| Realised vocabulary (raw records) | 635 | 636 | 625 | **860** |
+| Utterance exact-duplicate rate | — | 73.6% | 87.4% | **37.6%** |
+| `gold_eval` drawn / target 400 | — | 235 | 400 | **400** |
+| Constructs below the 40-positive floor | — | 7 / 10 | 0 / 10 | **0 / 10** |
+| Lexicon macro-F1, template-disjoint | — | 0.706 | 0.780 | **0.461** |
 
-**Three published numbers were found to be wrong and corrected, not glossed:**
+**Read the last two rows together — this is the most important thing on the page.**
+Utterance count *fell* from 13,651 to 9,302 while the corpus grew, because the
+discourse suffixes stopped being separate sentences. And the lexicon baseline lost
+0.32 macro-F1 without the corpus becoming harder in any real sense. Both are
+explained below (§3 and §5b); neither is a regression.
+
+**Four published numbers were found to be wrong and corrected, not glossed:**
 
 1. `src/ingestion/synthetic.py` said `"corner of me"` occurred in **11** records.
-   The true v1.1 count is **9**, matching `docs/open_issues.md` and
-   `phase8_handover.md`. Verified by reconstructing the committed v1.1 generator
-   from `git show 6f9561a:` and regenerating at seed 42. The other two counts in
-   that comment (10, 14) are correct.
+   The true v1.1 count is **9**, verified by reconstructing the committed v1.1
+   generator from `git show 6f9561a:` and regenerating at seed 42.
 2. `docs/data_sources.md` reported v1.1 as **638** types / **1,163** distinct texts
    / **40,169** tokens / **106** construct-free records. The committed generator
    produces **635 / 1,161 / 40,251 / 92**. Small, and it changes no conclusion —
    but `CLAUDE.md` §9 claims a reviewer can reproduce these exactly, so a figure
    that does not reproduce is a defect regardless of size.
-3. A field named `templates_per_record` counted **constructs**. A record plants at
-   most one template per construct, so the two coincide on this corpus and would
-   have diverged silently the moment the generator changed. Renamed.
-
-**One number got worse and it is reported as such:** utterance-level exact
-duplication rose from 73.6% to **87.4%** with the larger corpus. Predicted in the
-v1.2 report and confirmed here — the template grammar has a ceiling of distinct
-utterances, so multiplying records multiplies repeats. See §3 and OPEN-018.
+3. A field named `templates_per_record` counted **constructs**. Renamed.
+4. **`src/evaluation/baselines.py` claimed the lexicon baseline is independent of
+   the corpus. It is not** — see §5b. That claim has been in the repo since Phase 7
+   and every lexicon number reported before v1.4 carries an upward bias.
 
 ## 1. Corpus shape
 
 | Quantity | Unit | n | Mean [95% CI] | SD | Min | p25 | Median | p75 | p90 | Max |
 |---|---|---|---|---|---|---|---|---|---|---|
-| chars per utterance | utterance | 13,651 | 49.79 [49.41, 50.17] | 22.43 | 10 | 27 | 50 | 69 | 79 | 108 |
-| tokens per utterance | utterance | 13,651 | 9.87 [9.80, 9.95] | 4.54 | 2 | 5 | 10 | 13 | 16 | 23 |
-| chars per record | record | 4,000 | 172.35 [169.88, 174.68] | 78.49 | 39 | 105 | 164 | 226 | 284 | 440 |
-| tokens per record | record | 4,000 | 33.70 [33.22, 34.16] | 15.33 | 8 | 21 | 32 | 44 | 55 | 84 |
-| utterances per record | record | 4,000 | 3.41 [3.36, 3.46] | 1.65 | 1 | 2 | 3 | 5 | 6 | 10 |
+| chars per utterance | utterance | 9,302 | 79.76 [79.22, 80.27] | 25.11 | 10 | 59 | 85 | 100 | 109 | 133 |
+| tokens per utterance | utterance | 9,302 | 15.72 [15.60, 15.82] | 5.17 | 2 | 11 | 17 | 20 | 22 | 28 |
+| chars per record | record | 4,000 | 186.80 [184.08, 189.33] | 86.38 | 40 | 108 | 180 | 250 | 310 | 450 |
+| tokens per record | record | 4,000 | 36.55 [36.01, 37.05] | 16.98 | 7 | 21 | 36 | 49 | 61 | 91 |
+| utterances per record | record | 4,000 | 2.33 [2.29, 2.36] | 1.10 | 1 | 1 | 2 | 3 | 4 | 6 |
 
 Token counts here use `profile.tokenise` (alphabetic words and placeholders),
 which is **not** the generator's whitespace tokeniser. `docs/data_sources.md`
@@ -89,7 +91,7 @@ grammar. They say nothing about athlete language.
 
 ![utterances per record](figures/utterances_per_record.svg)
 
-**Read the median utterance length carefully.** At 10 tokens the median utterance is one short
+**Read the median utterance length carefully.** At 17 tokens the median utterance is one short
 sentence. That is short for a construct judgement: `appraisal_orientation`
 (challenge vs threat framing) is a stance towards an event, and a nine-token
 sentence often does not carry enough of it for two annotators to agree. This is
@@ -101,12 +103,12 @@ annotation-interface design.
 
 | Measure | Including placeholders | Excluding placeholders |
 |---|---|---|
-| Tokens | 134,785 | 134,785 |
-| Types (vocabulary size) | 515 | 515 |
-| Raw TTR | 0.0038 | 0.0038 |
-| **MATTR** (window 50) | **0.8010** | **0.8010** |
-| Hapax legomena | 0 | 0 |
-| Hapax rate | 0.0000 | 0.0000 |
+| Tokens | 146,206 | 146,206 |
+| Types (vocabulary size) | 674 | 674 |
+| Raw TTR | 0.0046 | 0.0046 |
+| **MATTR** (window 50) | **0.8078** | **0.8078** |
+| Hapax legomena | 5 | 5 |
+| Hapax rate | 0.0074 | 0.0074 |
 
 **Placeholder tokens in the corpus: 0.** The two
 columns are identical, and that is the expected result — the A2 generator plants
@@ -117,7 +119,7 @@ number would not show it.
 
 **Why MATTR is the headline and raw TTR is not.** TTR is types÷tokens, and it
 falls mechanically as a text grows: a corpus eventually stops meeting new words
-but never stops accumulating tokens. So a TTR computed over 13,651 utterances is *not* comparable with the TTR Phase 7
+but never stops accumulating tokens. So a TTR computed over 9,302 utterances is *not* comparable with the TTR Phase 7
 reported over 4,000 records, even though the underlying text is
 the same — the number would fall with no change in lexical richness whatsoever,
 purely because the denominator grew. That is exactly the comparison a reader is
@@ -125,9 +127,9 @@ most likely to make. MATTR averages the TTR of every fixed-length window, so the
 length confound is gone by construction and the figure **is** comparable across
 corpora of different sizes (Covington & McFall, 2010). Quote MATTR.
 
-**MATTR = 0.801** is high in absolute terms, and it is not evidence
+**MATTR = 0.808** is high in absolute terms, and it is not evidence
 of a rich corpus. Within any 50-token window the text looks varied; across the
-whole corpus there are only 515 distinct word types and 0 hapax legomena. A natural
+whole corpus there are only 674 distinct word types and 5 hapax legomena. A natural
 English corpus of 40,000 tokens would show several thousand types and a hapax
 rate near 40–50%. **OPEN-012 is mitigated, not solved**, and MATTR should not be
 used in the paper as a claim that it is.
@@ -143,38 +145,38 @@ Most frequent types (including placeholders):
 
 | Rank | Type | Count |
 |---|---|---|
-| 1 | `the` | 8,352 |
-| 2 | `i` | 6,443 |
-| 3 | `it` | 4,033 |
-| 4 | `is` | 3,237 |
-| 5 | `that's` | 3,141 |
-| 6 | `this` | 2,904 |
-| 7 | `to` | 2,863 |
-| 8 | `of` | 2,551 |
-| 9 | `what` | 2,412 |
-| 10 | `i'm` | 2,301 |
-| 11 | `and` | 2,185 |
-| 12 | `a` | 2,056 |
-| 13 | `my` | 1,846 |
-| 14 | `i've` | 1,822 |
-| 15 | `been` | 1,504 |
+| 1 | `the` | 8,208 |
+| 2 | `i` | 6,720 |
+| 3 | `it` | 6,056 |
+| 4 | `this` | 3,597 |
+| 5 | `that's` | 3,512 |
+| 6 | `to` | 2,888 |
+| 7 | `is` | 2,786 |
+| 8 | `of` | 2,673 |
+| 9 | `and` | 2,374 |
+| 10 | `a` | 2,119 |
+| 11 | `my` | 2,107 |
+| 12 | `i'm` | 1,785 |
+| 13 | `on` | 1,683 |
+| 14 | `what` | 1,647 |
+| 15 | `me` | 1,595 |
 
 ## 3. Duplicates — the largest data-quality finding in this phase
 
 | Measure | Utterances | Records |
 |---|---|---|
-| n | 13,651 | 4,000 |
-| Distinct texts | 3,131 | 3,797 |
-| Distinct rate | 22.9% | 94.9% |
-| Items sharing text with another (exact) | 11,929 | 289 |
-| **Exact duplicate rate [95% CI]** | **0.874 [0.868, 0.880]** | 0.072 [0.064, 0.081] |
-| Near-duplicate items (Jaccard ≥ 0.9) | 12,312 | 400 |
-| Near-duplicate rate [95% CI] | 0.902 [0.897, 0.907] | 0.100 [0.091, 0.110] |
+| n | 9,302 | 4,000 |
+| Distinct texts | 6,444 | 3,888 |
+| Distinct rate | 69.3% | 97.2% |
+| Items sharing text with another (exact) | 3,500 | 155 |
+| **Exact duplicate rate [95% CI]** | **0.376 [0.366, 0.386]** | 0.039 [0.033, 0.045] |
+| Near-duplicate items (Jaccard ≥ 0.9) | 3,999 | 222 |
+| Near-duplicate rate [95% CI] | 0.430 [0.419, 0.440] | 0.056 [0.049, 0.063] |
 
-**87.4% of utterances share their exact text
+**37.6% of utterances share their exact text
 with at least one other utterance.** The effective per-utterance corpus is
-**3,131 distinct strings, not 13,651.** At record level the same
-corpus is 7.2% duplicated, so this is almost
+**6,444 distinct strings, not 9,302.** At record level the same
+corpus is 3.9% duplicated, so this is almost
 entirely an artefact of segmentation, not of generation.
 
 **Mechanism.** `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES` in the generator are
@@ -186,14 +188,14 @@ string hundreds of times:
 
 | Repeated utterance | Occurrences |
 |---|---|
-| `It is what it is.` | 879 |
-| `That's the honest version.` | 858 |
-| `Anyway, that's the reality.` | 851 |
-| `Make of that what you will.` | 792 |
-| `That's just where I am.` | 786 |
-| `I've been reading a fair bit on the trip over.` | 221 |
-| `Training has been at the usual times this block.` | 178 |
-| `Kit arrived yesterday, so that's one thing sorted.` | 156 |
+| `I've been reading a fair bit on the trip over.` | 114 |
+| `Results from the heats should be up by lunchtime.` | 109 |
+| `The venue is about forty minutes from where we are staying.` | 100 |
+| `The travel schedule was confirmed on Monday.` | 82 |
+| `Training has been at the usual times this block.` | 78 |
+| `Kit arrived yesterday, so that's one thing sorted.` | 71 |
+| `The physio checked everyone over after the session on Tuesday.` | 69 |
+| `Flat is worse.` | 65 |
 
 **Why this is a gold-set problem and not a cosmetic one.** Two annotators
 agreeing on `"It is what it is."` 268 times is *one* agreement counted 268
@@ -204,11 +206,11 @@ many items that costs.
 
 ## 4. Junk and degenerate utterances
 
-Flagged: **220 of 13,651** utterances (0.016 [0.014, 0.018]).
+Flagged: **82 of 9,302** utterances (0.009 [0.007, 0.011]).
 
 | Check | Utterances flagged | Example |
 |---|---|---|
-| `too_short` | 220 | `That's it.` |
+| `too_short` | 82 | `That's it.` |
 | `no_alphabetic_content` | 0 | — |
 | `placeholder_only` | 0 | — |
 | `unbalanced_brackets` | 0 | — |
@@ -230,37 +232,33 @@ actually needs.
 ## 5. Systematic synonym sweep — OPEN-015 was not an isolated defect
 
 OPEN-015 was found by a human reading about twenty records. `src/ingestion/synonym_audit.py` replaces that with an **exhaustive** enumeration
-of every single-token substitution the generator can make — 221 filled template variants, **727 substitution
+of every single-token substitution the generator can make — 358 filled template variants, **1039 substitution
 events** — screened by six mechanical probes (idiom membership, article agreement,
 number agreement, particle/argument structure, inflected form, and arity).
 
-- **127 distinct signatures flagged**, every one carrying a recorded
+- **157 distinct signatures flagged**, every one carrying a recorded
   human verdict (the build fails on an unreviewed signature).
-- **53 ruled `broken`**, 6 `degraded`, 68 `acceptable`.
+- **73 ruled `broken`**, 11 `degraded`, 73 `acceptable`.
 
 ### The finding, and the fix
 
-At v1.2 the sweep found that OPEN-015 had **not** been an isolated defect:
-**190 of 1,200 records (15.8%)** still contained at least one substitution a
-human ruled broken or degraded, across 55 distinct realised signatures.
-Deleting one synonym group had fixed 0.8% of records and left the other 15%.
-
-Examples from the v1.2 corpus, now all eliminated:
+At v1.2 the sweep found that OPEN-015 had **not** been isolated: **190 of 1,200
+records (15.8%)** still contained a substitution a human ruled broken or degraded,
+across 55 realised signatures. Deleting one synonym group had fixed 0.8% of records
+and left the other 15%. Examples, all now eliminated:
 
 - *"I can feel my heart pick up a bit when I **figure about** the first ball."*
 - *"my **insides is** in knots and my fingers won't stop shaking"* — number
 - *"we've got **a approach** for the first bell"* — article agreement
 - *"I'm **on edge I'll** let everyone down"* — no clausal complement
-- *"if I get the first half **badly**"* — the frame is *get X wrong*
 
 **Resolved at v1.3 by guarding the generator, not by shrinking it** (OPEN-016,
-option (c)). `_vary` now applies each candidate substitution, checks the result
-against the ruled-defective signatures, and reverts it if it would produce one.
-`think → figure` is broken in *"all I figure about"* and unremarkable in *"I
-figure I'm ready"* — the defect belongs to the **frame**, not the word, and a
-context-blind bank can only accept or reject the word.
+option (c)). `_vary` applies each candidate substitution, checks the result against
+the ruled-defective signatures, and reverts it if it would produce one. `think →
+figure` is broken in *"all I figure about"* and unremarkable in *"I figure I'm
+ready"* — the defect belongs to the **frame**, not the word.
 
-Both candidate remedies were measured at n=4,000, seed 42, rather than argued:
+Both candidate remedies were measured at n=4,000 rather than argued:
 
 | | Synonym bank | Realised vocabulary | Defective records |
 |---|---|---|---|
@@ -268,27 +266,64 @@ Both candidate remedies were measured at n=4,000, seed 42, rather than argued:
 | Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |
 | **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |
 
-Deleting costs 49 realised types; the guard costs 18. The guard is **not free** —
-a word whose only frames in the bank were defective now never appears — but it
-keeps 31 more types and removes nothing from the bank, so a future template using
-one of those words in a good frame gets it back automatically.
+**Current corpus: 0 of 4000 records and 0 of 9302 utterances carry a defect.**
 
-**Current corpus: 0 of 4000 records and 0 of 13651 utterances carry a defect.**
+### The ratchet earned its keep at Phase 9b
 
-**The honest limit.** The guard is only as good as its hand-ruled table, and it
-cannot catch a defect class nobody has thought of. What it does is make the
-failure mode **non-recurring**: the sweep enumerates exhaustively, the ratchet
-fails the build on an unruled signature, and the guard blocks anything ruled bad.
-A new defect class still needs a human to notice it once — it no longer needs a
-human to notice it over and over.
+Doubling the template bank created **28 substitution frames nobody had ruled on**,
+and the build refused to pass until each was judged: 19 `broken` (*"a entry list"*,
+*"spectators keeps"*, *"I keep myself crowded with"*), 5 `degraded`, 4 fine. Not
+one of them was found by reading — the sweep enumerated them, the test failed, and
+a human ruled. **That is the difference between a control and a good intention.**
+The sweep now covers 1039 substitution events over
+157 signatures, all reviewed.
 
-**Why the original review could not have caught these.** The v1.1 bank was
-reviewed against shared part-of-speech **and** shared argument structure. Both
-hold for `think → figure`, and *think about* is attested while *figure about* is
-not — a lexical fact about English derivable from neither constraint. The general
-lesson for the paper: **a generation-quality review that enumerates constraint
-classes will always miss the class nobody thought of; enumerating the search
-space mechanically is a guarantee.**
+**The honest limit.** The guard is only as good as its hand-ruled table and cannot
+catch a defect class nobody has thought of. What it does is make the failure mode
+**non-recurring**: a new class still needs a human to notice it once, but no longer
+needs a human to notice it repeatedly.
+
+## 5b. The lexicon baseline is not independent of the corpus (OPEN-021)
+
+**This is a correction to a Phase 7 claim, found by doing Phase 9b, and it is the
+most consequential finding in this report.**
+
+`src/evaluation/baselines.py` documented `LexiconBaseline` as *"immune to the
+template leakage that inflates the others"*, on the reasoning that its cues were
+hand-written from `taxonomy.yaml` rather than induced from labels. Avoiding
+induction prevents *direct* inheritance. It does not prevent **shared ancestry** —
+the template bank was written from the same `positive_examples`, several Phase 7
+templates reproduce them near-verbatim, and so cue list and corpus are cousins.
+
+Phase 9b measured it, because the Phase 9b templates were written to the same
+construct *definitions* but deliberately not to the same example *phrasings*:
+
+| Template set | Lexicon fires on |
+|---|---|
+| Written at Phase 7 (pre-9b) | **73%** (66/90) |
+| Written at Phase 9b | **22%** (13/60) |
+
+Nothing about the constructs changed between those sets. What changed is how much
+wording they share with the cue list.
+
+**Two consequences the paper must carry.**
+
+1. **The lexicon's template-disjoint macro-F1 fell 0.780 → 0.461.** The corpus did
+   not get harder; the baseline lost an advantage it should never have been
+   credited with. **0.461 is the more honest floor**, and every lexicon number
+   published before v1.4 carries an upward bias. Report the drop — a baseline whose
+   score depends this much on phrasing overlap with its own source is a finding
+   about lexicon baselines in general, not a defect peculiar to this project.
+2. **The Phase 9 'cue fraction' correction is withdrawn.** Phase 9 used this
+   lexicon to estimate what share of gold candidates carry construct language, and
+   reported 0.62. That number measured overlap with the cue list, not construct
+   presence. It is not reported as a corrected floor anywhere in this document
+   any more, and OPEN-017's residual can only be settled by annotation (Phase 11).
+
+For reference and clearly labelled as such: the lexicon currently fires on
+159 of 400 `gold_eval` items
+(39.8%). **Read that as
+lexicon coverage of the gold set, not as construct prevalence.**
 
 ## 6. Metadata coverage and strata
 
@@ -302,7 +337,7 @@ these fields being present, so they are measured rather than assumed.
 | `competition_level` | 1.000 [1.000, 1.000] |
 | `region` | 1.000 [1.000, 1.000] |
 | `source_type` | 1.000 [1.000, 1.000] |
-| `training_load_hint` | 0.619 [0.611, 0.626] |
+| `training_load_hint` | 0.626 [0.616, 0.635] |
 | `language` | 1.000 [1.000, 1.000] |
 
 `training_load_hint` is the only partially-covered field, by design — the
@@ -317,16 +352,16 @@ code change.
 
 | Value | Utterances | Share |
 |---|---|---|
-| `athletics` | 1,386 | 10.2% |
-| `badminton` | 1,492 | 10.9% |
-| `basketball` | 1,369 | 10.0% |
-| `boxing` | 1,382 | 10.1% |
-| `cricket` | 1,296 | 9.5% |
-| `football` | 1,432 | 10.5% |
-| `gymnastics` | 1,280 | 9.4% |
-| `rowing` | 1,431 | 10.5% |
-| `swimming` | 1,251 | 9.2% |
-| `tennis` | 1,332 | 9.8% |
+| `athletics` | 997 | 10.7% |
+| `badminton` | 989 | 10.6% |
+| `basketball` | 893 | 9.6% |
+| `boxing` | 929 | 10.0% |
+| `cricket` | 953 | 10.2% |
+| `football` | 934 | 10.0% |
+| `gymnastics` | 943 | 10.1% |
+| `rowing` | 943 | 10.1% |
+| `swimming` | 892 | 9.6% |
+| `tennis` | 829 | 8.9% |
 
 ![sport](figures/stratum_sport.svg)
 
@@ -334,11 +369,11 @@ code change.
 
 | Value | Utterances | Share |
 |---|---|---|
-| `club` | 2,885 | 21.1% |
-| `elite` | 2,784 | 20.4% |
-| `international` | 2,770 | 20.3% |
-| `national` | 2,607 | 19.1% |
-| `regional` | 2,605 | 19.1% |
+| `club` | 1,838 | 19.8% |
+| `elite` | 1,851 | 19.9% |
+| `international` | 1,873 | 20.1% |
+| `national` | 1,839 | 19.8% |
+| `regional` | 1,901 | 20.4% |
 
 ![competition_level](figures/stratum_competition_level.svg)
 
@@ -346,11 +381,11 @@ code change.
 
 | Value | Utterances | Share |
 |---|---|---|
-| `africa` | 2,836 | 20.8% |
-| `europe` | 2,712 | 19.9% |
-| `north_america` | 2,699 | 19.8% |
-| `oceania` | 2,591 | 19.0% |
-| `south_asia` | 2,813 | 20.6% |
+| `africa` | 1,812 | 19.5% |
+| `europe` | 1,886 | 20.3% |
+| `north_america` | 1,862 | 20.0% |
+| `oceania` | 1,847 | 19.9% |
+| `south_asia` | 1,895 | 20.4% |
 
 ![region](figures/stratum_region.svg)
 
@@ -358,11 +393,11 @@ code change.
 
 | Value | Utterances | Share |
 |---|---|---|
-| `build` | 1,845 | 13.5% |
-| `day_of` | 1,882 | 13.8% |
-| `eve` | 4,527 | 33.2% |
-| `final_week` | 3,467 | 25.4% |
-| `taper` | 1,930 | 14.1% |
+| `build` | 1,239 | 13.3% |
+| `day_of` | 1,208 | 13.0% |
+| `eve` | 3,152 | 33.9% |
+| `final_week` | 2,444 | 26.3% |
+| `taper` | 1,259 | 13.5% |
 
 ![time_band](figures/stratum_time_band.svg)
 
@@ -370,12 +405,12 @@ code change.
 
 | Value | Utterances | Share |
 |---|---|---|
-| `None` | 5,206 | 38.1% |
-| `back-to-back competitions` | 1,518 | 11.1% |
-| `heavy block just finished` | 1,760 | 12.9% |
-| `light week` | 1,707 | 12.5% |
-| `returning from a rest week` | 1,733 | 12.7% |
-| `tapering` | 1,727 | 12.7% |
+| `None` | 3,478 | 37.4% |
+| `back-to-back competitions` | 1,136 | 12.2% |
+| `heavy block just finished` | 1,175 | 12.6% |
+| `light week` | 1,146 | 12.3% |
+| `returning from a rest week` | 1,191 | 12.8% |
+| `tapering` | 1,176 | 12.6% |
 
 ![training_load_hint](figures/stratum_training_load_hint.svg)
 
@@ -414,16 +449,16 @@ disjointness holds; coverage of every construct is now guaranteed by constructio
 
 | Construct | Templates | Held out for gold |
 |---|---|---|
-| `appraisal_orientation` | 8 | 3 |
-| `attentional_focus` | 8 | 3 |
-| `burnout_signal` | 8 | 3 |
-| `cognitive_anxiety` | 12 | 4 |
-| `coping_style` | 8 | 3 |
-| `motivation_orientation` | 8 | 3 |
-| `perceived_stress` | 8 | 3 |
-| `resilience` | 7 | 2 |
-| `self_confidence` | 9 | 3 |
-| `somatic_anxiety` | 9 | 3 |
+| `appraisal_orientation` | 15 | 5 |
+| `attentional_focus` | 15 | 5 |
+| `burnout_signal` | 15 | 5 |
+| `cognitive_anxiety` | 15 | 5 |
+| `coping_style` | 15 | 5 |
+| `motivation_orientation` | 15 | 5 |
+| `perceived_stress` | 15 | 5 |
+| `resilience` | 15 | 5 |
+| `self_confidence` | 15 | 5 |
+| `somatic_anxiety` | 15 | 5 |
 
 Disjoint: **True**. Constructs with no holdout: **none**.
 
@@ -438,11 +473,11 @@ leakage Phase 7 quantified.
 
 | Exclusion | gold_eval pool | gold_dev pool |
 |---|---|---|
-| Considered | 13,651 | 13,651 |
-| Straddling / template-free | 11,939 | 7,496 |
-| Junk (`too_short`) | 12 | 128 |
-| Exact / near duplicate | 1,141 | 4,508 |
-| **Eligible** | **559** | **1,519** |
+| Considered | 9,302 | 9,302 |
+| Straddling / template-free | 8,032 | 5,303 |
+| Junk (`too_short`) | 19 | 37 |
+| Exact / near duplicate | 285 | 998 |
+| **Eligible** | **966** | **2,964** |
 
 **Step 4 — draw, construct quotas first then context balance.** Round-robin
 across constructs to the per-construct floor, then greedily fill the remainder
@@ -471,85 +506,66 @@ spending training-side items on calibration costs zero evaluation power.
 |---|---|---|
 | Target | 400 | 100 |
 | **Drawn** | **400** | **100** |
-| Distinct parent records | 313 | 100 |
+| Distinct parent records | 325 | 95 |
 | Leakage-safe | True | — |
 
 Construct coverage of the drawn sample. **GENERATOR METADATA, NOT LABELS.** Describes the template bank, not athlete language. Never use as evaluation ground truth.
 
 | Construct | gold_eval items | Floor (40) met? |
 |---|---|---|
-| `appraisal_orientation` | 71 | yes |
-| `attentional_focus` | 60 | yes |
-| `burnout_signal` | 48 | yes |
-| `cognitive_anxiety` | 92 | yes |
-| `coping_style` | 61 | yes |
-| `motivation_orientation` | 50 | yes |
-| `perceived_stress` | 54 | yes |
-| `resilience` | 46 | yes |
-| `self_confidence` | 62 | yes |
-| `somatic_anxiety` | 70 | yes |
+| `appraisal_orientation` | 57 | yes |
+| `attentional_focus` | 53 | yes |
+| `burnout_signal` | 50 | yes |
+| `cognitive_anxiety` | 74 | yes |
+| `coping_style` | 62 | yes |
+| `motivation_orientation` | 53 | yes |
+| `perceived_stress` | 52 | yes |
+| `resilience` | 51 | yes |
+| `self_confidence` | 75 | yes |
+| `somatic_anxiety` | 68 | yes |
 
 ![gold coverage](figures/gold_eval_construct_coverage.svg)
 
-### 7.4 Statistical power: what 4,000 records bought, and what it did not
+### 7.4 Statistical power: what is settled and what is not
 
-**The stated floor is met.** `gold_eval` draws its full target of 400 items and **all ten constructs clear 40 positives**. At
-n=1,200 it drew 235 and seven constructs fell short, so raising the corpus to
-4,000 (OPEN-017) did exactly what the sweep predicted it would.
+**The stated floor is met.** `gold_eval` draws its full target of 400 items and **all ten constructs clear 40 positives**. At n=1,200 it drew 235 and seven
+constructs fell short; raising the corpus to 4,000 (OPEN-017) fixed that, and
+doubling the template bank (OPEN-020) held it while roughly doubling the number of
+distinct phrasings behind each construct.
 
-**A correction the floor does not include, and it matters.** Phase 8 copies
-`generation_spec` from the parent record onto every utterance cut from it,
-verbatim (verified, and asserted by a test — OPEN-019). A record averaging 3.4
-utterances and planting 2 constructs reports both on all 3.4, including the
-neutral logistics sentence and the discourse suffix that realise neither. So the
-coverage table above is an **upper bound**, not an estimate.
+**What OPEN-020 actually bought, stated in the unit that matters.** A 35% holdout
+over 15 templates per construct leaves **5 phrasings** in the evaluation set,
+against **2–4** before. A kappa computed on 3 phrasings is a kappa about those 3
+phrasings; 5 is not generous, and the paper should say so, but it is the
+difference between a number a reviewer will interrogate and one they will dismiss.
 
-Running the Phase 7 lexicon baseline over the drawn sample as a proxy detector, **153 of 400 items (38.2%) contain no construct cue of any kind**.
-Those items are *not* waste — a gold set with no negatives cannot measure false
-positives, and ~40% negatives is a defensible ratio — but they are negatives, and
-the table counts them as positives for whatever their parent record planted.
+**One correction, withdrawn.** Phase 9 reported that ~38% of drawn items carried
+no construct cue, applied that as a 0.62× correction to the coverage table, and
+concluded that 7 of 10 constructs were still under-powered. **That correction is
+withdrawn** — it was computed with `LexiconBaseline`, which §5b shows is not a
+construct detector but a measure of overlap with its own cue list. The evidence:
+the same proxy now reports a *worse* figure on a corpus with twice the construct
+phrasings, which is not a statement about constructs at all.
 
-Corrected at 0.62×, **7 of 10 constructs**
-fall back below 40. That is a real shortfall and it is stated here rather than
-left for Phase 11 to discover.
+**So the honest position is: the raw floor is met, and the corrected floor is
+unknown until humans annotate.** Phase 11 is what settles it. The two things to
+carry into that phase:
 
-**Corpus size does not fix it.** Swept with generator, seed, partition and draw
-held fixed, correcting each draw by its own measured cue fraction:
+1. The coverage table below is still an **upper bound**, for the OPEN-019 reason —
+   `generation_spec` is replicated onto every utterance of a record, including the
+   ones realising no construct. That fact is independent of the lexicon and stands.
+2. If annotation shows a construct materially short of 40 positives, the fix is a **larger gold set**, not a
+   larger corpus. The eligible pool is 966 items,
+   so `TARGET_GOLD_EVAL` can rise from 400 without regenerating
+   anything — at the cost of proportionally more annotation time.
 
-| Records | Eligible pool | Gold target | Drawn | Cue fraction | Corrected min | Below 40 |
-|---|---|---|---|---|---|---|
-| 1,200 | 235 | 400 | 235 | 0.59 | 10.0 | 10 / 10 |
-| **4,000 (current)** | **559** | **400** | **400** | **0.62** | **28.4** | **7 / 10** |
-| 4,000 | 559 | 559 | 559 | 0.61 | 32.3 | 3 / 10 |
-| 6,000 | 694 | 500 | 500 | 0.61 | 34.2 | 4 / 10 |
-| 8,000 | 838 | 400 | 400 | 0.59 | 28.2 | 7 / 10 |
-| 8,000 | 838 | 600 | 600 | 0.59 | 37.8 | 2 / 10 |
-
-**Read the cue-fraction column.** It sits at 0.59–0.62 regardless of corpus size,
-because it is a property of *records*, not of the corpus: a record is ~3.4
-utterances of which ~2 realise a construct, and multiplying records does not
-change that ratio. Corrected coverage therefore tracks **gold-set size**, not
-corpus size — and 600 double-annotated items is roughly 10 hours per annotator.
-
-**So the real remedy is a larger template bank, not a larger corpus** — more
-construct realisations per record raises the cue fraction directly, and it is
-also the only thing that raises *phrasing* diversity, which is what a construct
-kappa generalises over. With 7–12 templates per construct a 35% holdout leaves
-2–4 phrasings in the evaluation set; a kappa computed on 3 phrasings is a kappa
-about those 3 phrasings. Raised as **OPEN-020**.
-
-**One tempting fix is rejected outright.** The draw could prefer utterances the
-lexicon detects, which would push the cue fraction towards 1.0 and clear the
-corrected floor immediately. It must not: selecting gold items by lexicon
-detectability builds the lexicon baseline's strengths into the evaluation set,
-so the lexicon would then beat the transformer on a test set chosen to suit it.
-That is not a gold set, it is a rigged one.
-
-**A one-constant alternative is available now.** Setting `TARGET_GOLD_EVAL` to
-559 (the whole eligible pool) at the current
-corpus size takes the shortfall from 7 constructs to 3, at the cost of ~40% more
-annotation. That is the owner's time budget, so it is left at 400 and recorded
-here rather than changed unilaterally.
+**One tempting fix stays rejected.** The draw could prefer utterances the lexicon
+detects, which would make the coverage table look better immediately. It must not:
+selecting gold items by lexicon detectability builds that baseline's strengths into
+the evaluation set, so the lexicon would then beat the transformer on a test set
+chosen to suit it. §5b makes this worse, not better — the lexicon is already
+entangled with the template bank, and selecting on it would entangle the gold set
+too. That is not a gold set, it is a rigged one.
 
 ## 8. Data-quality issues, ranked
 
@@ -558,10 +574,10 @@ here rather than changed unilaterally.
 | 1 | Corpus is 100% synthetic | 1,200/1,200 records | OPEN-011 | open, highest risk |
 | 2 | Residual ungrammatical substitutions | 0.0% of records | OPEN-016 | **new**, needs owner decision |
 | 3 | Gold pool too small for per-construct kappa | 7/10 below floor | OPEN-017 | **new**, needs owner decision |
-| 4 | Utterance-level exact duplication | 87.4% | OPEN-018 | **new**, mitigated in the sampling plan |
-| 5 | Vocabulary bounded by the template bank | 515 types, 0 hapax | OPEN-012 | monitored |
+| 4 | Utterance-level exact duplication | 37.6% | OPEN-018 | **new**, mitigated in the sampling plan |
+| 5 | Vocabulary bounded by the template bank | 674 types, 5 hapax | OPEN-012 | monitored |
 | 6 | `generation_spec` replicated per utterance | 3.45× inflation | OPEN-019 | **new**, documentation fix |
-| 7 | Sub-annotatable utterances | 220 (1.6%) | — | handled in sampling |
+| 7 | Sub-annotatable utterances | 82 (0.9%) | — | handled in sampling |
 
 ## 9. Reproducing this report
 

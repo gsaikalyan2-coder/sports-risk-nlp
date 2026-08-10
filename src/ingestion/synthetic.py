@@ -83,13 +83,20 @@ GENERATOR_NAME = "construct-template-grammar"
 #:        1,200 to 4,000 records (OPEN-017): 4,000 is the measured minimum at
 #:        which a 400-item gold set meets the 40-positive floor for all ten
 #:        constructs.
+#:   1.4  Phase 9b. Template bank doubled: **15 realisations per construct**
+#:        (was 7-12), five per intensity level and five per categorical label
+#:        (OPEN-020). Discourse suffixes 8 -> 17, neutral sentences 8 -> 16, and
+#:        `_vary` now reaches the discourse frame, the interpretation modifier
+#:        and the construct-free records -- all three previously bypassed it,
+#:        which is why 87.4% of v1.3 utterances were exact duplicates
+#:        (OPEN-018).
 #:
 #: A version bump changes the corpus. It also changes the RNG stream, because
 #: `_vary` consumes randomness per matched token -- so removing one group moves
 #: every downstream draw, not just the sentences that group touched. That is why
 #: OPEN-015's fix required re-running the Phase 7, Phase 8 and benchmark gates
 #: together instead of patching 21 records.
-GENERATOR_VERSION = "1.3"
+GENERATOR_VERSION = "1.4"
 
 # ---------------------------------------------------------------------------
 # Strata. Deliberately coarse: docs/ethics.md sec.5.2 warns that a precise
@@ -166,18 +173,21 @@ GRADED_REALISATIONS: dict[str, dict[int, tuple[str, ...]]] = {
             "I've caught myself thinking about the result once or twice.",
             "I suppose there's a bit of doubt in the back of my mind.",
             "Every so often I wonder whether I've done enough.",
+            "It crosses my mind now and then, but it passes quickly enough.",
         ),
         2: (
             "I keep turning over what happens if I get the first half wrong.",
             "I'm worried I'll let everyone down in this {EVENT}.",
             "I've been replaying last season's {EVENT} more than I should.",
             "The thought of coming up short has been sitting with me all week.",
+            "I've been running through the bad version of this in my head.",
         ),
         3: (
             "I cannot stop thinking about all the ways this could fall apart.",
             "Every time I close my eyes I see myself failing at the {START}.",
             "I've convinced myself it's going to go wrong and I can't shift it.",
             "It's all I think about now — losing, and what everyone will say.",
+            "I have already lost this in my head a hundred times this week.",
         ),
     },
     "somatic_anxiety": {
@@ -185,16 +195,22 @@ GRADED_REALISATIONS: dict[str, dict[int, tuple[str, ...]]] = {
             "There are a few butterflies, nothing I'm not used to.",
             "I can feel my heart pick up a bit when I think about the {START}.",
             "Slept a little lighter than usual last night.",
+            "There is a flutter in my chest when the {EVENT} comes up in conversation.",
+            "I noticed my breathing quicken while I was warming up yesterday.",
         ),
         2: (
             "My stomach has been unsettled since yesterday morning.",
             "My hands were shaking when I was packing my kit.",
             "I've barely slept properly for two nights and my chest feels tight.",
+            "My shoulders have been tight since the team meeting.",
+            "I woke at four and could not get back down again.",
         ),
         3: (
             "My stomach is in knots and my hands won't stop shaking.",
             "I couldn't sleep at all — heart going the whole night.",
             "I felt sick this morning and my legs have gone completely heavy.",
+            "My whole body feels wired and I cannot switch it off.",
+            "I was shaking so much this morning I could barely tie my laces.",
         ),
     },
     "self_confidence": {
@@ -202,63 +218,91 @@ GRADED_REALISATIONS: dict[str, dict[int, tuple[str, ...]]] = {
             "I think I can be competitive if things fall right.",
             "On a good day I belong in this field.",
             "I've done the work, so there's some belief there.",
+            "I would give myself a fair chance if I get things right.",
+            "There is enough there to make a decent account of it.",
         ),
         2: (
             "I back myself to execute the plan in this {EVENT}.",
             "I've beaten most of this field before and nothing has changed.",
             "I know what I'm capable of when it matters.",
+            "I trust my preparation for this {EVENT} completely.",
+            "I have handled this level before and I expect to handle it again.",
         ),
         3: (
             "I know I win this if I stick to my own {EVENT}.",
             "There is nobody here I'm afraid of. I've earned this.",
             "I have absolutely no doubt about what I'm going to do at the {START}.",
+            "I expect to win this and I have expected it for weeks.",
+            "I am the best prepared I have ever been going into a {EVENT}.",
         ),
     },
     "perceived_stress": {
         1: (
             "It's been a slightly busier week than I'd like.",
             "There's a bit more going on around this {EVENT} than usual.",
+            "There is a little more noise around me than I would choose.",
+            "The week has been fuller than I planned for.",
+            "A few small things have piled up, nothing serious.",
         ),
         2: (
             "There's just a lot on right now — exams, selection, and now this {EVENT}.",
             "Everyone seems to want something from me this week.",
             "The schedule has been more than I can comfortably manage.",
+            "Between travel and the {EVENT} I have not had a clear day in a fortnight.",
+            "There have been too many demands on me to prepare the way I wanted.",
         ),
         3: (
             "It feels like it's all completely out of my hands.",
             "I'm being pulled in every direction and I cannot keep up with any of it.",
             "There is far too much on me right now and no way to put any of it down.",
+            "Every day this week has been one more thing I could not say no to.",
+            "I am running on empty and the demands have not stopped coming.",
         ),
     },
     "burnout_signal": {
         1: (
             "I'm a bit flat this week, if I'm honest.",
             "The enthusiasm isn't quite what it was at the start of the season.",
+            "The spark is not quite there this block.",
+            "I am going through the motions a bit more than I would like.",
+            "It feels more like a duty than a choice this week.",
         ),
         2: (
             "I'm tired in a way that a rest day doesn't seem to fix.",
             "I'm finding it hard to care about this {EVENT} the way I should.",
             "Some mornings I struggle to see the point of the session.",
+            "I have stopped looking forward to the {EVENT} the way I once did.",
+            "The tiredness has been sitting on me for weeks, not days.",
         ),
         3: (
             "I'm just drained. I don't even care how this one goes anymore.",
             "I used to love this. Now it's a job I want to finish.",
             "Nothing I do seems to make the slightest difference these days.",
+            "I have nothing left to give this and I have known it a while.",
+            "Whether I compete or not stopped mattering to me some time ago.",
         ),
     },
     "resilience": {
         1: (
             "If something goes wrong I'd like to think I can steady myself.",
             "I've come back from worse than this before.",
+            "I would probably find a way back if the {START} went badly.",
+            "I have had rough patches before and got through them.",
+            "A setback would not be the end of it, I do not think.",
         ),
         2: (
             "Whatever happens out there, I know I can reset and keep going.",
             "I've been behind in a {EVENT} before and come back — that doesn't scare me.",
             "A bad start wouldn't finish me. I'd find my way into it.",
+            "If the plan goes I trust myself to build another one mid-{EVENT}.",
+            "I have lost the opening exchanges before and still finished strongly.",
         ),
         3: (
             "There is nothing that can happen in this {EVENT} that I can't come back from.",
             "I've been through far worse and I'm still here — that's what I hold on to.",
+            "Whatever this {EVENT} throws at me, I will find my way back into it.",
+            "I have recovered from far worse than anything that can happen this week.",
+            "No setback in this {EVENT} would stop me. I have proved that to myself.",
         ),
     },
 }
@@ -269,15 +313,22 @@ CATEGORICAL_REALISATIONS: dict[str, dict[str, tuple[str, ...]]] = {
             "I want to go out and take this {EVENT} on and see what I'm capable of.",
             "I'm here to find out how good I can actually be.",
             "I want to push it from the {START} and see where that takes me.",
+            "I want to see how far I can push this before it pushes back.",
+            "I am chasing something here, not protecting anything.",
         ),
         "avoidance": (
             "I just don't want to embarrass myself in front of that crowd.",
             "Mostly I need to not mess this one up again.",
             "I can't afford another performance like the last one.",
+            "I just need to get through this without anything going badly wrong.",
+            "As long as I do not repeat last month I will settle for that.",
         ),
         "mixed": (
             "I want the win, but mostly I need to not fall apart like last time.",
             "Part of me wants to attack it and part of me just wants to survive it.",
+            "I would love a big one, but honestly I would take not falling apart.",
+            "Half of me is chasing this and half of me is bracing for it.",
+            "I want to attack this and I also want it over with.",
         ),
     },
     "attentional_focus": {
@@ -285,15 +336,22 @@ CATEGORICAL_REALISATIONS: dict[str, dict[str, tuple[str, ...]]] = {
             "All I'm thinking about is my first two minutes — nothing past that.",
             "My whole {EVENT} is the plan and the {START}. That's it.",
             "I'm keeping it to the things I can actually control.",
+            "My attention is on the process and nothing beyond it.",
+            "I have narrowed it down to the first few exchanges and nothing else.",
         ),
         "distracted": (
             "I keep checking what everyone else is doing instead of my own {EVENT}.",
             "I've been on my phone reading about this all week instead of preparing.",
             "I can't stop thinking about the scoreline instead of the process.",
+            "I have spent more time on the timeline this week than on preparing.",
+            "My head has been everywhere except the {EVENT} itself.",
         ),
         "mixed": (
             "I know my plan, but the noise keeps pulling me out of it.",
             "I'm mostly locked in, though I do keep glancing at the draw.",
+            "I get into the plan and then something pulls me straight back out.",
+            "Mostly I am on task, but the crowd keeps taking my attention.",
+            "I hold my focus for a while and then lose it again.",
         ),
     },
     "coping_style": {
@@ -301,15 +359,22 @@ CATEGORICAL_REALISATIONS: dict[str, dict[str, tuple[str, ...]]] = {
             "When the nerves hit I go back to my breathing routine and my checklist.",
             "I've talked it through with my coach and we've got a plan for the {START}.",
             "I write down the three things I control and I read them back.",
+            "I run the same warm-up routine every time and it settles me.",
+            "I break it into small jobs and work through them one at a time.",
         ),
         "avoidance": (
             "I just try not to think about it at all until I'm at the {START}.",
             "I've been avoiding the video and anything to do with the draw.",
             "I'd rather not talk about the {EVENT} at all this week.",
+            "I keep myself busy with anything that is not the {EVENT}.",
+            "I have been switching the subject every time it comes up.",
         ),
         "mixed": (
             "I've been through it with my coach, but I'm still avoiding the footage.",
             "I do my routine, then I spend the rest of the day pretending it isn't happening.",
+            "I do my preparation properly and then hide from the rest of it.",
+            "I have worked the plan through, though I am still dodging the video.",
+            "Half of my week has been preparation and half of it avoidance.",
         ),
     },
     "appraisal_orientation": {
@@ -317,15 +382,22 @@ CATEGORICAL_REALISATIONS: dict[str, dict[str, tuple[str, ...]]] = {
             "This is exactly the kind of field I've been waiting to test myself against.",
             "This {EVENT} is an opportunity and I've got what it takes to meet it.",
             "It's a big one, and that's the point — that's why I train.",
+            "This is a demand I have the tools for and I want it.",
+            "A field this strong is the reason I have put the work in.",
         ),
         "threat": (
             "This field is way above me. I'm going to get exposed out there.",
             "I don't think I've got anywhere near enough for this {EVENT}.",
             "This is too big a step up and I know it.",
+            "I have not got what this {EVENT} is going to ask of me.",
+            "I am out of my depth here and everyone is going to see it.",
         ),
         "mixed": (
             "It's a huge opportunity, but I'm not sure I'm ready for it.",
             "Part of me thinks I can handle this and part of me knows I might not.",
+            "It is the chance I wanted and I am not certain I can meet it.",
+            "I can see the opportunity and I can also see myself falling short.",
+            "This could be the making of me or the undoing of me.",
         ),
     },
 }
@@ -336,10 +408,14 @@ INTERPRETATION_REALISATIONS: dict[str, tuple[str, ...]] = {
     "facilitative": (
         "The nerves are there, but that's how I know I'm switched on — I need them.",
         "I want to feel like this. Flat is worse.",
+        "That edge is useful to me. It means I care about this {EVENT}.",
+        "I would rather turn up nervous than turn up numb.",
     ),
     "debilitative": (
         "The nerves just wreck me. I lose the plot completely once they start.",
         "Once that feeling starts I know the {EVENT} is already slipping away.",
+        "When it takes hold I stop being able to do the simple things.",
+        "That feeling does not sharpen me, it takes the {EVENT} away from me.",
     ),
 }
 
@@ -356,6 +432,14 @@ NEUTRAL_SENTENCES: tuple[str, ...] = (
     "Kit arrived yesterday, so that's one thing sorted.",
     "It's a strong field this year by all accounts.",
     "We had the team meeting this morning as normal.",
+    "The travel schedule was confirmed on Monday.",
+    "There is a media session booked for the day before the {EVENT}.",
+    "Accreditation was sorted out at the hotel this morning.",
+    "The warm-up area opens two hours before the {START}.",
+    "We have been on the same food and sleep routine all week.",
+    "The physio checked everyone over after the session on Tuesday.",
+    "Results from the heats should be up by lunchtime.",
+    "The venue is about forty minutes from where we are staying.",
 )
 
 #: Co-occurrence affinities, taken from `taxonomy.yaml`'s own edge-case notes --
@@ -512,17 +596,49 @@ DISCOURSE_PREFIXES: tuple[str, ...] = (
     "The way I see it, ",
     "Right now, ",
     "Truth be told, ",
+    "In all honesty, ",
+    "Put it this way, ",
+    "If I'm being straight, ",
+    "At this stage, ",
+    "Sitting here now, ",
 )
 
+#: Discourse suffixes, as **clauses** rather than sentences (v1.4, OPEN-018).
+#:
+#: This is the fix that actually worked, and the first attempt is worth recording
+#: because it looked right and was not. Expanding the bank from 8 entries to 17
+#: spread the repeats but did not reduce them: every construct sentence still
+#: drew a suffix, Phase 8 still segmented each suffix into its own standalone
+#: utterance, and the corpus still put 38.6% of all utterances into twenty
+#: strings. Bank size was never the lever. **Sentence-hood was.**
+#:
+#: So a suffix is now a lowercase clause joined to its parent with an em dash,
+#: and `_frame` strips the parent's full stop before attaching. `"I'm nervous.
+#: That's where my head is at."` becomes `"I'm nervous — that's where my head is
+#: at."`: one utterance instead of two, and the segmenter has nothing to split.
+#:
+#: Two consequences, both wanted. Duplicate utterances fall because the repeated
+#: text is no longer a whole utterance. And median utterance length rises, which
+#: matters independently -- Phase 9 flagged a 9-token median as too short for an
+#: annotator to judge `appraisal_orientation` from.
 DISCOURSE_SUFFIXES: tuple[str, ...] = (
     "",
     "",
     "",
-    " That's just where I am.",
-    " Anyway, that's the reality.",
-    " Make of that what you will.",
-    " That's the honest version.",
-    " It is what it is.",
+    " — that's just where I am.",
+    " — anyway, that's the reality.",
+    " — make of that what you will.",
+    " — that's the honest version.",
+    " — it is what it is.",
+    " — that's about the size of it.",
+    " — take that how you like.",
+    " — that's where my head is at.",
+    " — not much more to say on it.",
+    " — that's the truth of it.",
+    " — for what it's worth.",
+    " — that's just how it feels.",
+    " — I'll leave it there.",
+    " — that's me being straight about it.",
 )
 
 
@@ -597,7 +713,15 @@ def _frame(sentence: str, rng: random.Random) -> str:
         if not (first == "I" or first.startswith("I'")):
             sentence = sentence[0].lower() + sentence[1:]
         sentence = prefix + sentence
-    return sentence + suffix
+    if suffix:
+        # Strip the parent's full stop so the suffix joins as a clause. Only a
+        # period: a template ending in "?" or "!" is carrying its own force and
+        # a trailing clause after it reads wrong, so those keep their sentence
+        # boundary and their suffix is dropped rather than mangled.
+        if sentence.endswith("."):
+            sentence = sentence[:-1] + suffix
+        return sentence
+    return sentence
 
 
 @dataclass(frozen=True)
@@ -744,7 +868,12 @@ def generate_records(
             # first construct's distribution is unaffected.
             if _contradicts(spec, planted):
                 sentence, spec = _realise(construct, rng, stratum.sport, cap_intensity=2)
-            sentences.append(_frame(_vary(sentence, rng), rng))
+            # _vary AFTER _frame, not before (changed at v1.4, OPEN-018).
+            # The old order varied the construct sentence and then bolted an
+            # untouched prefix and suffix onto it, so the suffixes -- the
+            # single largest source of duplicate utterances -- were the one
+            # part of the corpus the variation layer never saw.
+            sentences.append(_vary(_frame(sentence, rng), rng))
             planted.append(spec)
 
         # The interpretation modifier, constrained twice over.
@@ -783,14 +912,20 @@ def generate_records(
             else:
                 interpretation = rng.choice(("facilitative", "debilitative"))
             sentences.append(
-                _fill(rng.choice(INTERPRETATION_REALISATIONS[interpretation]), stratum.sport)
+                _vary(
+                    _fill(rng.choice(INTERPRETATION_REALISATIONS[interpretation]), stratum.sport),
+                    rng,
+                )
             )
 
         # Records with no construct planted still need to be utterances.
+        # Both of these used to bypass `_vary`, which is why a construct-free
+        # record was byte-identical to every other record drawing the same
+        # neutral sentence. v1.4 routes them through it like everything else.
         if not sentences:
-            sentences.append(_fill(rng.choice(NEUTRAL_SENTENCES), stratum.sport))
+            sentences.append(_vary(_fill(rng.choice(NEUTRAL_SENTENCES), stratum.sport), rng))
         if len(sentences) == 1 and not planted and rng.random() < 0.5:
-            sentences.append(_fill(rng.choice(NEUTRAL_SENTENCES), stratum.sport))
+            sentences.append(_vary(_fill(rng.choice(NEUTRAL_SENTENCES), stratum.sport), rng))
 
         records.append(
             RawRecord(

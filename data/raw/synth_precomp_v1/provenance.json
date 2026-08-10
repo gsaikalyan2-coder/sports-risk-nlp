@@ -1,8 +1,8 @@
 {
   "source_id": "synth_precomp_v1",
-  "source_name": "Synthetic pre-competition athlete utterances (template grammar v1.3)",
+  "source_name": "Synthetic pre-competition athlete utterances (template grammar v1.4)",
   "allowlist_category": "A2_synthetic",
-  "url_or_citation": "Generated for this project by src/ingestion/synthetic.py (construct-template-grammar@1.3, seed=42). Not derived from any external corpus.",
+  "url_or_citation": "Generated for this project by src/ingestion/synthetic.py (construct-template-grammar@1.4, seed=42). Not derived from any external corpus.",
   "collection_date": "2026-08-10",
   "licence_or_consent_basis": "Project-generated synthetic text. No third-party licence applies and no human subject is involved: no real person's words are reproduced, paraphrased, or used as a generation input. Released under the repository licence alongside the code that produces it.",
   "permitted_uses": "Research use, training, evaluation, redistribution, and publication of verbatim examples. Because no real athlete is involved, this is the only category in the corpus from which examples may be quoted verbatim in the paper or dashboard (docs/ethics.md sec.3.3 condition 2).",
@@ -20,7 +20,7 @@
   "record_count": 4000,
   "generator": {
     "name": "construct-template-grammar",
-    "version": "1.3",
+    "version": "1.4",
     "kind": "template-grammar",
     "seed": 42,
     "generated_on": "2026-08-10",

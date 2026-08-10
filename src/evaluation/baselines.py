@@ -104,6 +104,31 @@ class StratifiedRandomBaseline(Baseline):
 #: `definition` fields of `config/taxonomy.yaml`. Hand-written on purpose: a
 #: lexicon induced from the training labels would inherit the template bank and
 #: stop being an independent baseline.
+#:
+#: **That precaution was not sufficient, and Phase 9b measured how insufficient
+#: (OPEN-021).** Avoiding induction from labels prevents *direct* inheritance. It
+#: does not prevent **shared ancestry**: `src/ingestion/synthetic.py`'s template
+#: bank was also written from `taxonomy.yaml`'s `positive_examples`, and several
+#: Phase 7 templates reproduce them close to verbatim. So the cues and the
+#: corpus descend from one source, and the lexicon scores well partly because it
+#: is matching its own cousin.
+#:
+#: The number: this cue list fires on **73%** of the pre-Phase-9b templates and
+#: **22%** of the Phase 9b templates, which were written to the same construct
+#: definitions but deliberately not to the same example phrasings. Nothing about
+#: the constructs changed between those two sets. What changed is how much
+#: wording they share with this file.
+#:
+#: Consequences, both of which the paper has to carry:
+#:
+#: 1. The lexicon's macro-F1 fell 0.780 -> 0.461 on the template-disjoint split
+#:    between v1.3 and v1.4. That is not the corpus getting harder in any
+#:    meaningful sense; it is this baseline losing an advantage it should never
+#:    have been credited with. **0.461 is the more honest floor.**
+#: 2. Do not use `LexiconBaseline` as a detector of whether a span expresses a
+#:    construct. Phase 9 used it exactly that way, to estimate what fraction of
+#:    gold candidates carry construct language, and the estimate was really a
+#:    measure of overlap with this list.
 CONSTRUCT_CUES: dict[str, tuple[str, ...]] = {
     "cognitive_anxiety": (
         "worried",
@@ -251,7 +276,17 @@ class LexiconBaseline(Baseline):
     it is the honest measure of what the modelling actually bought.
 
     Deliberately unsupervised: `fit` ignores the labels entirely, so this
-    baseline is immune to the template leakage that inflates the others.
+    baseline is immune to the *label* leakage that inflates the others.
+
+    **It is not independent of the corpus, and Phase 9b proved it (OPEN-021).**
+    Ignoring labels prevents direct inheritance; it does not prevent shared
+    ancestry. Both this cue list and the template bank were written from
+    `taxonomy.yaml`'s `positive_examples`, so they are cousins, and the score
+    reflects that relationship as well as any real detection ability. See the
+    note on `CONSTRUCT_CUES` for the measurement.
+
+    Treat its score as a floor with a known upward bias, and never as a
+    construct detector for corpus-profiling purposes.
     """
 
     name: str = "lexicon"

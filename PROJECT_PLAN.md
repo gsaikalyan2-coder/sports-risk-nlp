@@ -22,7 +22,7 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 
 ## STATUS BOARD (updated 2026-08-10, end of Phase 9)
 
-**Week 3 of 8.** Phases 1–9 complete and gated. Next: Phase 9b, then Phase 10.
+**Week 3 of 8.** Phases 1–9b complete and gated. Next: **Phase 10** (blocked on an OpenRouter key).
 
 | Phase | Status | Evidence |
 |---|---|---|
@@ -32,11 +32,11 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 | 4 Taxonomy | ✅ | `d238721` · 10 constructs locked; **frozen at Phase 12** |
 | 5 Ethics & governance | ✅ | `a28b7ba` · `docs/ethics.md`, allow-list v1.1 |
 | 6 Agent framework | ✅ | `b28873f` · offline crew run + cost ledger |
-| 7 Ingestion | ✅ | `6f9561a` · **4,000** records, fail-closed allow-list, time-aware metadata |
-| 8 Preprocessing & de-ID | ✅ | **13,651** utterances · fixture 34/34 exact, leak rate 0% |
-| 9 EDA & quality profiling | ✅ | `reports/eda.md` · gold sampling plan, 400 items, 0/10 below floor |
-| **9b Corpus hardening** | **NEXT** | OPEN-020 + OPEN-018 · ~1 day, unblocks a defensible kappa |
-| 10 Weak labelling | blocked on `OPENROUTER_API_KEY` (OPEN-008) | — |
+| 7 Ingestion | ✅ | `6f9561a` · **4,000** records, generator **v1.4**, fail-closed allow-list |
+| 8 Preprocessing & de-ID | ✅ | **9,302** utterances · fixture 34/34 exact, leak rate 0% |
+| 9 EDA & quality profiling | ✅ | `reports/eda.md` · gold plan, 400 items, 0/10 below floor |
+| **9b Corpus hardening** | ✅ | **15 templates/construct**, vocab 625→**860**, duplication 87.4%→**37.6%** |
+| **10 Weak labelling** | **NEXT** — blocked on `OPENROUTER_API_KEY` (OPEN-008) | — |
 
 **Live risks, in order.** These supersede the generic risk list at the foot of this file.
 
@@ -44,11 +44,11 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 |---|---|---|
 | 1 | **OPEN-011 — no real athlete text.** Contribution #1 claims an *athlete-text* corpus; the corpus is 100% synthetic. Only unmitigated high-impact item. | open, owner-actionable |
 | 2 | **OPEN-004 — no expert raters recruited.** Longest lead time of anything left; Phase 17 is the headline contribution. Was due Week 1–2. | open, **3 phases overdue** |
-| 3 | **OPEN-020 — template bank too small.** 7–12 templates/construct leaves 2–4 phrasings in the eval set; a kappa on 3 phrasings is a kappa about 3 phrasings. | open, Phase 9b |
-| 4 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
+| 3 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
+| 4 | **OPEN-021 — the lexicon baseline is not independent of the corpus.** Shared ancestry with the template bank via `taxonomy.yaml` examples; macro-F1 0.780 → 0.461 once the bank stopped reusing those phrasings. A paper obligation, not a bug. | open, Phase 18 |
 
-**Closed since the last revision:** OPEN-003 (no off-machine backup) — repository pushed to a
-private GitHub remote on 2026-08-10. **Push at the end of every phase; a remote that stops
+**Closed since the last revision:** OPEN-003 (off-machine backup), OPEN-013, OPEN-015,
+OPEN-016, OPEN-017, OPEN-018, OPEN-020. **Push at the end of every phase; a remote that stops
 receiving pushes is not a backup.**
 
 **Risks 1 and 2 are the same conversation** — one SRMIST coach or sport-psychology
@@ -174,7 +174,30 @@ Sec = Security/Ethics · Pap = Paper.
   mitigated in the sampling plan, root cause open).
 - **Gate:** ✅ Documented data-quality issues and a stratified sampling plan.
 
-### Phase 9b — Corpus hardening *(NEW, inserted 2026-08-10)*
+### Phase 9b — Corpus hardening — ✅ COMPLETE *(inserted and executed 2026-08-10)*
+
+- **Delivered:** template bank 7–12 → **15 realisations per construct** (150 templates);
+  discourse suffixes converted from sentences to **clauses**; `_vary` extended to the discourse
+  frame, the interpretation modifier and construct-free records; generator **v1.4**.
+- **Measured:** realised vocabulary **625 → 860** (+38%) · distinct record texts 94.9% → 97.2%
+  · utterance duplication **87.4% → 37.6%** · utterance count 13,651 → 9,302 on a corpus that
+  did not shrink · **median utterance length 9 → 17 tokens**, which independently fixes the
+  "too short to annotate" problem Phase 9 flagged · defective substitutions still **0/4,000**.
+- **The obvious fix for OPEN-018 was implemented first and did nothing.** Expanding the suffix
+  bank from 8 entries to 17 spread the repeats without reducing them, because each suffix was
+  still its own sentence and Phase 8 still segmented it into its own utterance. **Bank size was
+  never the lever; sentence-hood was.** Worth carrying into the paper: the diagnosis that feels
+  obvious is the one to measure first.
+- **The ratchet blocked the build 28 times** — new templates create new substitution frames,
+  each needed a human verdict, 19 were `broken`. Not one was found by reading.
+- **A Phase 7 claim was falsified:** OPEN-021, the lexicon baseline is not independent of the
+  corpus. See the risk table above.
+- **Gate:** ✅ ≥14 templates per construct · duplication materially below 87.4% · all four
+  gates pass · sweep reports zero unruled signatures and zero realised defects.
+
+---
+
+### Phase 9b — original brief *(retained for the record)*
 - **Why this exists.** Phase 9 measured two things that cannot be fixed downstream and that both
   attack contribution #1 at its weakest point. Doing them now costs ~1 day and one
   regenerate-and-re-gate cycle. Doing them after Phase 10 means paying for silver labels twice.

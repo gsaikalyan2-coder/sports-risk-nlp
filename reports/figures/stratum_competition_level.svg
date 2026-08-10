@@ -1,19 +1,19 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='720' height='210' viewBox='0 0 720 210' role='img'>
 <rect width='720' height='210' fill='white'/>
-<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by competition_level (n=13651)</text>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by competition_level (n=9302)</text>
 <text x='182' y='56' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>club</text>
-<rect x='190' y='40' width='440.00' height='22' fill='#1f3a5f'/>
-<text x='636.00' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2885</text>
+<rect x='190' y='40' width='425.42' height='22' fill='#1f3a5f'/>
+<text x='621.42' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1838</text>
 <text x='182' y='84' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>elite</text>
-<rect x='190' y='68' width='424.60' height='22' fill='#1f3a5f'/>
-<text x='620.60' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2784</text>
+<rect x='190' y='68' width='428.43' height='22' fill='#1f3a5f'/>
+<text x='624.43' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1851</text>
 <text x='182' y='112' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>international</text>
-<rect x='190' y='96' width='422.46' height='22' fill='#1f3a5f'/>
-<text x='618.46' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2770</text>
+<rect x='190' y='96' width='433.52' height='22' fill='#1f3a5f'/>
+<text x='629.52' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1873</text>
 <text x='182' y='140' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>national</text>
-<rect x='190' y='124' width='397.60' height='22' fill='#1f3a5f'/>
-<text x='593.60' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2607</text>
+<rect x='190' y='124' width='425.65' height='22' fill='#1f3a5f'/>
+<text x='621.65' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1839</text>
 <text x='182' y='168' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>regional</text>
-<rect x='190' y='152' width='397.30' height='22' fill='#1f3a5f'/>
-<text x='593.30' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2605</text>
+<rect x='190' y='152' width='440.00' height='22' fill='#1f3a5f'/>
+<text x='636.00' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1901</text>
 </svg>

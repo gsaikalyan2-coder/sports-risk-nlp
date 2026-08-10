@@ -1,27 +1,27 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='720' height='320' viewBox='0 0 720 320' role='img'>
 <rect width='720' height='320' fill='white'/>
-<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterance length (word tokens), n=13651</text>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterance length (word tokens), n=9302</text>
 <line x1='60' y1='264' x2='700' y2='264' stroke='#222222' stroke-width='1'/>
 <line x1='60' y1='40' x2='60' y2='264' stroke='#222222' stroke-width='1'/>
-<text x='52' y='50' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>3513</text>
+<text x='52' y='50' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>1603</text>
 <text x='52' y='264' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>0</text>
 <text x='380' y='310' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>tokens per utterance</text>
-<rect x='60.00' y='249.97' width='51.33' height='14.03' fill='#1f3a5f'/>
+<rect x='60.00' y='251.70' width='51.33' height='12.30' fill='#1f3a5f'/>
 <text x='60.00' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>2</text>
-<rect x='113.33' y='40.00' width='51.33' height='224.00' fill='#1f3a5f'/>
-<rect x='166.67' y='190.54' width='51.33' height='73.46' fill='#1f3a5f'/>
+<rect x='113.33' y='230.88' width='51.33' height='33.12' fill='#1f3a5f'/>
+<rect x='166.67' y='197.48' width='51.33' height='66.52' fill='#1f3a5f'/>
 <text x='166.67' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>6</text>
-<rect x='220.00' y='231.16' width='51.33' height='32.84' fill='#1f3a5f'/>
-<rect x='273.33' y='130.73' width='51.33' height='133.27' fill='#1f3a5f'/>
-<text x='273.33' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>9</text>
-<rect x='326.67' y='150.18' width='51.33' height='113.82' fill='#1f3a5f'/>
-<rect x='380.00' y='150.82' width='51.33' height='113.18' fill='#1f3a5f'/>
-<text x='380.00' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>12</text>
-<rect x='433.33' y='208.21' width='51.33' height='55.79' fill='#1f3a5f'/>
-<rect x='486.67' y='193.03' width='51.33' height='70.97' fill='#1f3a5f'/>
-<text x='486.67' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>16</text>
-<rect x='540.00' y='233.58' width='51.33' height='30.42' fill='#1f3a5f'/>
-<rect x='593.33' y='255.71' width='51.33' height='8.29' fill='#1f3a5f'/>
-<text x='593.33' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>20</text>
-<rect x='646.67' y='263.62' width='51.33' height='0.38' fill='#1f3a5f'/>
+<rect x='220.00' y='96.59' width='51.33' height='167.41' fill='#1f3a5f'/>
+<rect x='273.33' y='137.68' width='51.33' height='126.32' fill='#1f3a5f'/>
+<text x='273.33' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>11</text>
+<rect x='326.67' y='168.84' width='51.33' height='95.16' fill='#1f3a5f'/>
+<rect x='380.00' y='40.00' width='51.33' height='224.00' fill='#1f3a5f'/>
+<text x='380.00' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>15</text>
+<rect x='433.33' y='58.59' width='51.33' height='205.41' fill='#1f3a5f'/>
+<rect x='486.67' y='62.64' width='51.33' height='201.36' fill='#1f3a5f'/>
+<text x='486.67' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>19</text>
+<rect x='540.00' y='138.66' width='51.33' height='125.34' fill='#1f3a5f'/>
+<rect x='593.33' y='228.09' width='51.33' height='35.91' fill='#1f3a5f'/>
+<text x='593.33' y='278' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='10' fill='#222222'>24</text>
+<rect x='646.67' y='257.01' width='51.33' height='6.99' fill='#1f3a5f'/>
 </svg>

@@ -1,19 +1,19 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='720' height='210' viewBox='0 0 720 210' role='img'>
 <rect width='720' height='210' fill='white'/>
-<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by time_band (n=13651)</text>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Utterances by time_band (n=9302)</text>
 <text x='182' y='56' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>build</text>
-<rect x='190' y='40' width='179.32' height='22' fill='#1f3a5f'/>
-<text x='375.32' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1845</text>
+<rect x='190' y='40' width='172.96' height='22' fill='#1f3a5f'/>
+<text x='368.96' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1239</text>
 <text x='182' y='84' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>day_of</text>
-<rect x='190' y='68' width='182.92' height='22' fill='#1f3a5f'/>
-<text x='378.92' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1882</text>
+<rect x='190' y='68' width='168.63' height='22' fill='#1f3a5f'/>
+<text x='364.63' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1208</text>
 <text x='182' y='112' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>eve</text>
 <rect x='190' y='96' width='440.00' height='22' fill='#1f3a5f'/>
-<text x='636.00' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>4527</text>
+<text x='636.00' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>3152</text>
 <text x='182' y='140' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>final_week</text>
-<rect x='190' y='124' width='336.97' height='22' fill='#1f3a5f'/>
-<text x='532.97' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>3467</text>
+<rect x='190' y='124' width='341.17' height='22' fill='#1f3a5f'/>
+<text x='537.17' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>2444</text>
 <text x='182' y='168' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>taper</text>
-<rect x='190' y='152' width='187.59' height='22' fill='#1f3a5f'/>
-<text x='383.59' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1930</text>
+<rect x='190' y='152' width='175.75' height='22' fill='#1f3a5f'/>
+<text x='371.75' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>1259</text>
 </svg>

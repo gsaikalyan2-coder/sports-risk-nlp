@@ -398,9 +398,23 @@ def test_a_different_seed_draws_a_different_sample(corpus):
 
 
 def test_the_holdout_fraction_moves_the_pool_size(corpus):
+    """A bigger template holdout must yield a bigger eligible pool.
+
+    Asserted on the **pool**, not on the drawn sample size. Until Phase 9b the
+    two coincided, because the pool was smaller than `TARGET_GOLD_EVAL` and the
+    draw returned everything it had. After the template bank doubled, both
+    fractions saturate the 400-item target and the drawn sizes are equal --
+    so the old assertion had stopped testing anything and would have passed
+    for the wrong reason had the pool shrunk.
+
+    `eligibility.eligible` is literally the pool size, which is what the test
+    name and docstring have always claimed to measure.
+    """
     small = build_plan(corpus, SOURCE, holdout_fraction=0.2)
     large = build_plan(corpus, SOURCE, holdout_fraction=0.5)
-    assert large.gold_eval.size > small.gold_eval.size
+    assert small.gold_eval.eligibility is not None
+    assert large.gold_eval.eligibility is not None
+    assert large.gold_eval.eligibility.eligible > small.gold_eval.eligibility.eligible
 
 
 def test_under_powered_constructs_are_reported_not_hidden(plan):
@@ -525,18 +539,41 @@ def test_figures_import_without_matplotlib():
 
 
 def test_reported_corpus_size(profile):
-    assert (profile.n_records, profile.n_utterances) == (4000, 13651)
+    assert (profile.n_records, profile.n_utterances) == (4000, 9302)
 
 
 def test_reported_duplicate_rate(profile):
-    assert profile.utterance_duplicates.distinct == 3131
-    assert profile.utterance_duplicates.exact_duplicate_items == 11929
+    assert profile.utterance_duplicates.distinct == 6444
+    assert profile.utterance_duplicates.exact_duplicate_items == 3500
 
 
 def test_reported_gold_sample_size(plan):
     assert plan.gold_eval.size == 400
     assert plan.gold_dev.size == 100
     assert plan.gold_eval.constructs_below_floor == []
+
+
+def test_every_construct_has_fifteen_templates(corpus):
+    """OPEN-020's gate, as a standing assertion rather than a one-off count.
+
+    Fifteen per construct is what puts five distinct phrasings on the held-out
+    side at a 35% holdout. Falling back to twelve would quietly take the
+    evaluation set to four, and the kappa would describe the phrasings again.
+    """
+    counts = {k: len(v) for k, v in templates_by_construct(corpus).items()}
+    assert len(counts) == 10, counts
+    assert all(n >= 14 for n in counts.values()), counts
+
+
+def test_utterances_are_long_enough_to_annotate(profile):
+    """OPEN-018's second, less obvious payoff.
+
+    Phase 9 flagged a 9-token median as too short to judge
+    `appraisal_orientation` from. Attaching the discourse suffixes as clauses
+    rather than sentences roughly doubled it. If a future change re-splits them,
+    this fails before an annotator ever sees the result.
+    """
+    assert profile.utterance_tokens.median >= 12
 
 
 def test_the_corpus_contains_no_ruled_defective_substitution(corpus):
