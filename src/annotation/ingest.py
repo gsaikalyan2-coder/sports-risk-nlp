@@ -43,6 +43,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .potato_output import PotatoPass, read_pass
 from .schema import MODIFIER_CONSTRUCTS, GoldConstruct, GoldLabel, GoldSchemaError
 
 #: The flags multiselect in `potato_project.py`. Matched by prefix rather than
@@ -95,8 +96,16 @@ def _intensity_from_label(raw: Any) -> int:
     return value
 
 
-def _collect_spans(raw_spans: Any) -> dict[str, list[str]]:
-    """Group highlighted surface strings by their span label."""
+def _collect_spans(raw_spans: Any, *, record_id: str = "<unknown>") -> dict[str, list[str]]:
+    """Group highlighted surface strings by their span label.
+
+    A labelled span with no recoverable surface text is **refused**, not
+    skipped. The earlier version skipped it, which meant that against Potato
+    2.7.1 -- whose spans carry offsets and no surface text at all (see
+    `potato_output.py`) -- every span vanished silently and the item was then
+    misread as unannotated. Losing evidence quietly is the one failure mode this
+    parser exists to prevent.
+    """
     grouped: dict[str, list[str]] = {}
     if not raw_spans:
         return grouped
@@ -107,8 +116,16 @@ def _collect_spans(raw_spans: Any) -> dict[str, list[str]]:
             continue
         label = str(span.get("annotation") or span.get("label") or "").strip()
         surface = str(span.get("span") or span.get("text") or "").strip()
-        if not label or not surface:
+        if not label:
             continue
+        if not surface:
+            raise IngestError(
+                record_id,
+                "SPAN_WITHOUT_SURFACE",
+                f"span labelled {label!r} carries no text. Potato records spans as "
+                "start/end offsets, so this output must be normalised through "
+                "src/annotation/potato_output.py before parsing",
+            )
         grouped.setdefault(label, []).append(surface)
     return grouped
 
@@ -130,7 +147,9 @@ def parse_annotation(
     if not isinstance(annotations, dict):
         raise IngestError(record_id, "BAD_SHAPE", "annotations is not an object")
 
-    spans = _collect_spans(payload.get("span_annotations") or annotations.get("evidence"))
+    spans = _collect_spans(
+        payload.get("span_annotations") or annotations.get("evidence"), record_id=record_id
+    )
 
     # Escalation: Potato's `bad_text_label` checkbox on the span scheme.
     escalated = bool(
@@ -278,6 +297,49 @@ def parse_annotation(
         )
     except GoldSchemaError as exc:
         raise IngestError(record_id, "SCHEMA_VIOLATION", str(exc)) from exc
+
+
+def ingest_passes(
+    passes: Sequence[PotatoPass],
+    *,
+    item_texts: dict[str, str],
+    annotator_id: str,
+    batch: str,
+    valid_constructs: dict[str, Any],
+) -> IngestReport:
+    """Ingest real Potato 2.7.1 output. **This is the production path.**
+
+    `ingest_potato` below reads an already-normalised JSONL and is kept for
+    hand-prepared input and for the tests that exercise the rubric rules
+    directly. Anything coming out of an actual Potato server arrives here,
+    because only `potato_output.read_pass` knows how to turn offset-only spans
+    back into evidence.
+    """
+    labels: list[GoldLabel] = []
+    errors: list[IngestError] = []
+
+    for potato_pass in passes:
+        payloads, problems = read_pass(potato_pass, item_texts=item_texts)
+        for record_id, message in problems:
+            reason = "UNKNOWN_ITEM" if "not in the batch" in message else "UNREADABLE_SPAN"
+            errors.append(IngestError(record_id or potato_pass.path.name, reason, message))
+
+        for payload in payloads:
+            try:
+                labels.append(
+                    parse_annotation(
+                        payload,
+                        item_text=item_texts[payload["id"]],
+                        annotator_id=annotator_id,
+                        batch=batch,
+                        valid_constructs=valid_constructs,
+                    )
+                )
+            except IngestError as exc:
+                errors.append(exc)
+
+    skipped = len(item_texts) - len({x.record_id for x in labels} | {e.record_id for e in errors})
+    return IngestReport(labels=labels, errors=errors, skipped_unannotated=max(skipped, 0))
 
 
 def ingest_potato(

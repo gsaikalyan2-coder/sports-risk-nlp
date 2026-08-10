@@ -47,7 +47,8 @@ from src.annotation import (  # noqa: E402
     compute_agreement,
     context_coverage,
     disagreements,
-    ingest_potato,
+    discover_passes,
+    ingest_passes,
     load_annotators,
     load_batch,
     write_project,
@@ -143,20 +144,29 @@ def cmd_ingest(args, taxonomy) -> int:
     item_texts = {item.record_id: item.text for item in items}
 
     output_dir = (args.project_root or DEFAULT_PROJECT_ROOT) / args.batch / "annotation_output"
-    paths = sorted(output_dir.rglob("*.jsonl"))
-    if args.annotator_dir:
-        paths = [p for p in paths if args.annotator in str(p)]
-    if not paths:
+    discovered = discover_passes(output_dir)
+    passes = [p for p in discovered if p.annotator_id == args.annotator]
+    if not passes and discovered:
         print(
-            f"ERROR: no annotation output under {output_dir}. Has {args.annotator} "
-            "finished a pass in Potato?",
+            f"ERROR: {output_dir} holds passes for {[p.annotator_id for p in discovered]}, "
+            f"but not for {args.annotator!r}. Potato names the directory after the id the "
+            "annotator logged in with, so this usually means they used a different one.",
             file=sys.stderr,
         )
         return 2
-    print(f"  reading {len(paths)} output file(s)")
+    if not passes:
+        print(
+            f"ERROR: no annotation output under {output_dir}. Has {args.annotator} "
+            "finished a pass in Potato? Expected "
+            f"{output_dir.name}/<annotator-id>/user_state.json",
+            file=sys.stderr,
+        )
+        return 2
+    for potato_pass in passes:
+        print(f"  reading {potato_pass.describe()}")
 
-    report = ingest_potato(
-        paths,
+    report = ingest_passes(
+        passes,
         item_texts=item_texts,
         annotator_id=args.annotator,
         batch=args.batch,

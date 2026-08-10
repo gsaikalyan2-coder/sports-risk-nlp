@@ -44,7 +44,21 @@ from .context import (
     parent_texts,
     sibling_counts,
 )
-from .ingest import IngestError, IngestReport, ingest_potato, parse_annotation
+from .ingest import (
+    IngestError,
+    IngestReport,
+    ingest_passes,
+    ingest_potato,
+    parse_annotation,
+)
+from .potato_output import (
+    PotatoOutputError,
+    PotatoPass,
+    discover_passes,
+    normalise_record,
+    read_pass,
+    resolve_span_surface,
+)
 from .potato_project import POTATO_VERSION, build_config, span_labels, write_project
 from .schema import (
     Annotator,
@@ -70,6 +84,8 @@ __all__ = [
     "GoldWriteRefused",
     "IngestError",
     "IngestReport",
+    "PotatoOutputError",
+    "PotatoPass",
     "align",
     "band",
     "build_config",
@@ -79,12 +95,17 @@ __all__ = [
     "construct_agreement",
     "context_coverage",
     "disagreements",
+    "discover_passes",
+    "ingest_passes",
     "ingest_potato",
     "load_annotators",
     "load_batch",
+    "normalise_record",
     "parent_texts",
     "parse_annotation",
     "quadratic_weighted_kappa",
+    "read_pass",
+    "resolve_span_surface",
     "sibling_counts",
     "span_labels",
     "span_overlap_f1",
