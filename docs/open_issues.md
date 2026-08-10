@@ -1325,3 +1325,83 @@ unchanged and `tests/test_labeling.py` asserts the cached total equals a fresh r
 at a scale of ones and tens. A component that is correct at n=5 and quadratic at n=10,000
 passes every test written at n=5. Phase 13's training loop is the next place this shape
 could appear.
+
+---
+
+## OPEN-025 — No second annotator. Contribution #1 does not exist yet.
+
+**Status:** OPEN — new 2026-08-10 (the Phase 11 tooling is built; the person is not)
+**Owned by:** Phase 11
+**Becomes blocking at:** **now**
+
+`config/annotators.yaml` lists one annotator, A1 (the owner). Cohen's kappa is defined for a
+**pair**. Until a second person completes a pass, `data/gold/` holds a labelled set, not a
+gold standard, and contribution #1 — *"a construct-grounded athlete-text corpus with span→
+construct labels and reported inter-annotator agreement"* — is unsupported.
+
+**This is deliberately not routed around.** `scripts/run_annotation.py --agreement` reports
+UNMEASURABLE and exits non-zero on a single-annotator batch, and `compute_agreement` raises
+rather than returning a placeholder. A function that returned 0.0 or `nan` here would let a
+one-person "kappa" reach a results table, which is the specific failure worth preventing.
+
+**Recruitment brief:** 100 calibration items then 400 evaluation items, double annotated, with
+the per-item time still unmeasured (OPEN-026). `onboarding/README.md` is written and ready to
+hand to a candidate.
+
+**The candidate to prioritise is an SRMIST coach or sport-psychology practitioner**, because
+one person closes three open items: this one, **OPEN-011** (brokering real pre-competition
+athlete text under an A3 consent basis) and **OPEN-004** (the Phase 17 expert rater). Those
+three have one solution between them, and the conversation has now been deferred across six
+phases.
+
+---
+
+## OPEN-026 — Annotation burden is unmeasured, and Phase 12 depends on it
+
+**Status:** OPEN — new 2026-08-10
+**Owned by:** Phase 11
+**Becomes blocking at:** **Phase 12** (the taxonomy freeze)
+
+`config/taxonomy.yaml` states the construct set is *"FROZEN AT PHASE 12, after checking
+annotation burden and inter-annotator agreement. Any construct with poor agreement is a
+candidate to drop."*
+
+Agreement is now computable. **Burden is not, because nobody has timed it.** Each item asks
+for a span pass plus ten intensity judgements plus a modifier, two flags and a note, twice
+over, across 400 evaluation items. Nothing in the project estimates what that costs a person.
+
+**Remedy, and it costs nothing extra:** time the `gold_dev` calibration pass. 100 items with a
+stopwatch produces the number, before the 400-item commitment is made rather than after.
+
+`src/annotation/potato_project.py` accepts a `constructs` filter precisely so the set can be
+trimmed on evidence if the measurement says 400 items is unreasonable. Trimming the taxonomy
+is a Phase 12 owner decision, but it must be made against a measured burden, not a feeling.
+
+**The failure this prevents:** an annotator who rushes the last 200 items produces a worse
+dataset than one who carefully annotates 200, and the damage is invisible in the kappa — two
+tired annotators drift toward the same defaults and *agree more*.
+
+---
+
+## OPEN-027 — The Potato ingest path has not been run against real Potato output
+
+**Status:** OPEN — new 2026-08-10
+**Owned by:** Phase 11
+**Becomes blocking at:** the first completed annotation pass
+
+`src/annotation/ingest.py` is covered by unit tests over fabricated payloads shaped like
+Potato 2.7.1's output, and both generated projects pass Potato's own strict config validator.
+**But no human has yet annotated anything, so the parser has never seen a real
+`annotation_output/` directory.**
+
+This is the same shape as OPEN-007 (the CrewAI backend written but never executed) and the
+Phase 10 live path: a code path that looks finished and has never met its real input.
+
+**Deliberately not resolved by fabricating gold.** Running the ingest CLI end-to-end would
+mean writing invented annotations into `data/gold/` under a real annotator id — precisely what
+the four locks in `src/annotation/store.py` exist to prevent. A verification that requires
+violating the invariant it verifies is not a verification.
+
+**Remedy:** annotate ~5 items in Potato and run `--ingest` on those. Five minutes, and it
+converts this from an unexercised path into a tested one before 400 items depend on it. Do
+this during the `gold_dev` calibration pass, not after.

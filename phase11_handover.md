@@ -405,3 +405,74 @@ A3 consent *and* serve as the Phase 17 expert rater. It has been deferred across
 phases. Phase 11 is where OPEN-011 stops being a risk and becomes a limitation printed in
 the paper: annotating 400 synthetic utterances produces a real inter-annotator agreement
 figure over text no athlete ever said.
+
+---
+
+## PART D — Phase 11 tooling, built 2026-08-10 (update to Part C)
+
+Part C above was written before any Phase 11 code existed. Two of the three
+"do these first" items are now done. **The third is unchanged and is the blocker.**
+
+### What was built
+
+| Path | What |
+|---|---|
+| `src/annotation/context.py` | attaches the parent record to every item — **the defect fix** |
+| `src/annotation/potato_project.py` | emits a Potato project from `config/taxonomy.yaml` |
+| `src/annotation/schema.py` | `GoldLabel` / `GoldConstruct`; no machine author exists |
+| `src/annotation/store.py` | the only write path into `data/gold/`, four locks |
+| `src/annotation/ingest.py` | Potato output → `GoldLabel`; refuses, never coerces |
+| `src/annotation/agreement.py` | Cohen's kappa, weighted kappa, span F1, adjudication list |
+| `scripts/run_annotation.py` | `--build` / `--ingest` / `--agreement` / `--status` |
+| `config/annotators.yaml` | the roster; **A2 is commented out because they do not exist** |
+| `tests/test_annotation.py` | 48 tests |
+| `docs/annotation_tooling.md` | design, verification, honest limitations |
+| `onboarding/README.md` | ready to hand to a candidate annotator |
+
+### The defect from Part C is fixed and the fix is measured
+
+| Batch | Items | Gained multi-utterance context | Mean parent tokens | Mean target tokens |
+|---|---|---|---|---|
+| `gold_dev` | 100 | 84 (84.0%) | 43.2 | 18.5 |
+| `gold_eval` | 400 | 301 (75.3%) | 35.1 | 17.7 |
+
+The annotator now sees **the same context the Phase 10 labeller saw**, so the Phase 14
+comparison is not measuring a context asymmetry. Spans are still marked on the utterance
+alone, so offsets stay aligned with `InterimRecord` and `SilverLabel`.
+
+### Tool decision
+
+**Potato 2.7.1 adopted** (generated, not vendored — `pip install potato-annotation==2.7.1`).
+**`sciknoworg/ALD-E-ImageMiner` rejected:** it is an image/figure annotation dataset project
+for atomic-layer-deposition papers, not a text annotation tool. Its pilot→full task phasing
+and `onboarding/` convention were borrowed; no code was.
+
+### Verification
+
+- Both projects pass **Potato's own** `python -m potato.validate_cli <config> --strict`:
+  *"OK — no issues found."* That caught a real defect — an `html_layout` key carried over
+  from an older Potato API — which was deleted rather than justified.
+- `pytest` **372/373** (the failure is the 3.11 check under the sandbox's 3.10).
+- Phase 7, 8, 9, 10 and benchmark gates all re-run: **PASSED**.
+- `ruff check` / `format --check`: clean, 74 files.
+- A test asserts the roster has exactly one annotator. **If it starts failing, someone has
+  been recruited — update this handover, do not "fix" the test.**
+
+### What remains, in order
+
+1. **Recruit the second annotator (OPEN-025).** No code can close this. `onboarding/README.md`
+   is the brief.
+2. **Time the `gold_dev` pass (OPEN-026).** Phase 12's taxonomy freeze needs a measured
+   burden, and 400 items × 10 constructs × 2 people has never been costed.
+3. **Annotate ~5 items and run `--ingest` (OPEN-027).** The parser has never met real Potato
+   output. Five minutes converts an unexercised path into a tested one.
+4. Then: `gold_dev` in full → compare → amend the guidelines → `gold_eval`.
+
+### Interpretation recorded for review
+
+`CLAUDE.md` sec.4 says agents never write `data/gold/`. `src/annotation/store.py` writes
+there, on the reading that the rule protects **the origin of the content** (a person's
+judgement) rather than forbidding all file writes — under the literal reading gold could never
+come into existence. Four locks enforce the purpose, and they are listed in
+`docs/annotation_tooling.md` §6. **If the owner disagrees with that interpretation, this is
+the module to change.**
