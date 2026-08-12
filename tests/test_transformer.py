@@ -521,15 +521,36 @@ def test_the_interpretation_sentence_always_disclaims_accuracy():
 # ---------------------------------------------------------------------------
 
 
+#: Tiny checkpoint for the integration smoke test. Maintained by Hugging Face
+#: for precisely this purpose, and current (updated 2025).
+#:
+#: NOT `prajjwal1/bert-tiny`, which was the first choice and fails: that
+#: checkpoint dates from 2020 and its `config.json` carries no `model_type` key,
+#: which transformers 5.x refuses with "Unrecognized model". The refusal is
+#: correct -- `resolve_base_model` turned it into a `WeightsUnavailable` exactly
+#: as designed -- but a smoke test should exercise the happy path, not a
+#: checkpoint's metadata rot.
+TINY_CHECKPOINT = "hf-internal-testing/tiny-random-RobertaForSequenceClassification"
+
+
 @needs_torch
 @pytest.mark.slow
 def test_a_short_fine_tune_produces_valid_label_sets(records, labels):
     """Smoke test, not a quality test.
 
-    One epoch on a tiny slice with a small checkpoint. It asserts the plumbing
-    (tokenisation, loss, thresholds, decode) produces well-formed output; it
-    asserts nothing about the score, because a one-epoch run on 200 synthetic
-    records has no score worth asserting.
+    One epoch on a tiny slice with a tiny checkpoint. It asserts the plumbing
+    (tokenisation, loss, thresholds, decode, manifest) produces well-formed
+    output; it asserts nothing about the score, because a one-epoch run on 200
+    synthetic records has no score worth asserting.
+
+    **Marked `slow` and excluded from the default run** (`pyproject.toml`
+    `addopts`), because it is the only test here that needs the network. Run it
+    deliberately with `pytest -m slow`.
+
+    Skips rather than fails when the hub is unreachable. A network outage, a
+    rate limit, or an upstream checkpoint change is not a defect in this
+    repository, and a red test report that means "someone else's server is down"
+    trains people to ignore red test reports.
     """
     split = template_disjoint_split(records, test_size=0.3, seed=42)
     if not split.test:
@@ -538,9 +559,13 @@ def test_a_short_fine_tune_produces_valid_label_sets(records, labels):
     y_train = [index[r.record_id] for r in split.train]
 
     model = TransformerBaseline(
-        hparams=HParams(base_model="prajjwal1/bert-tiny", epochs=1, max_length=64, batch_size=8)
+        hparams=HParams(base_model=TINY_CHECKPOINT, epochs=1, max_length=64, batch_size=8),
+        progress=False,
     )
-    model.fit(split.train, y_train)
+    try:
+        model.fit(split.train, y_train)
+    except WeightsUnavailable as exc:
+        pytest.skip(f"hub unreachable, not a code defect: {exc}")
     predictions = model.predict(split.test)
 
     assert len(predictions) == len(split.test)
@@ -551,3 +576,71 @@ def test_a_short_fine_tune_produces_valid_label_sets(records, labels):
     assert manifest["is_accuracy"] is not True
     assert "NOT accuracy" in manifest["label_semantics"]
     assert manifest["training_fingerprint"]
+
+
+@needs_torch
+@pytest.mark.slow
+def test_a_saved_model_reloads_as_the_same_classifier(records, labels, tmp_path):
+    """Phase 17 depends on this round trip.
+
+    Explainability needs the trained model back. Reloading it with *default*
+    thresholds would make it a different classifier from the one that was
+    evaluated, and every explanation would describe predictions the reported
+    numbers never covered. So the assertion is not merely "it loads" but
+    "it predicts identically".
+    """
+    split = template_disjoint_split(records, test_size=0.3, seed=42)
+    if not split.test:
+        pytest.skip("no test side for this tiny fixture")
+    index = {r.record_id: ls for r, ls in zip(records, labels, strict=True)}
+
+    model = TransformerBaseline(
+        hparams=HParams(base_model=TINY_CHECKPOINT, epochs=1, max_length=64, batch_size=8),
+        progress=False,
+    )
+    try:
+        model.fit(split.train, [index[r.record_id] for r in split.train])
+    except WeightsUnavailable as exc:
+        pytest.skip(f"hub unreachable, not a code defect: {exc}")
+
+    target = model.save(tmp_path / "ckpt")
+    reloaded = TransformerBaseline.load(target)
+
+    assert reloaded._thresholds == model._thresholds, "tuned thresholds must survive"
+    assert reloaded._fingerprint == model._fingerprint
+    assert reloaded.predict(split.test) == model.predict(split.test)
+
+
+@needs_torch
+def test_loading_a_checkpoint_without_its_manifest_is_refused(tmp_path):
+    """A checkpoint with no manifest has no thresholds, no seed and no
+    fingerprint, so it cannot be reloaded as the model that was evaluated."""
+    empty = tmp_path / "no_manifest"
+    empty.mkdir()
+    with pytest.raises(FileNotFoundError, match="manifest"):
+        TransformerBaseline.load(empty)
+
+
+@needs_torch
+def test_loading_refuses_a_checkpoint_fitted_on_a_different_construct_order(tmp_path):
+    """The highest-consequence load-time failure, and a silent one without this.
+
+    Label columns are positional. A taxonomy edit between save and load would
+    map every probability to the wrong construct while every shape check passed.
+    """
+    import json as _json
+
+    target = tmp_path / "reordered"
+    target.mkdir()
+    (target / "manifest.json").write_text(
+        _json.dumps(
+            {
+                "hparams": HParams().as_dict(),
+                "constructs": list(reversed(CONSTRUCTS)),
+                "thresholds": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="different construct order"):
+        TransformerBaseline.load(target)

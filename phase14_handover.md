@@ -214,6 +214,13 @@ python -m pytest -q         # full suite
 - **No HF token is needed.** The warning about unauthenticated requests is a rate-limit notice.
 - Full sweep on CPU: ~5 hours at distilroberta size. One config, one epoch: ~10 minutes.
 - `scripts/diagnose_transformer.py` isolates a native crash one flushed step at a time.
+- **`pytest` excludes `-m slow` by default** (`pyproject.toml` `addopts`). The default run is
+  offline, deterministic and free. The one network-dependent test — the fine-tune smoke test — runs
+  only with `pytest -m slow`, and skips rather than fails when the hub is unreachable. A red report
+  that means "someone else's server is down" trains people to ignore red reports.
+- **`TransformerBaseline.load()`** reloads a saved checkpoint with its tuned thresholds and refuses
+  a construct-order mismatch. Phase 17 needs this; without it, explainability would have to retrain
+  (~5 hours) to get back a model already on disk.
 
 **Do not:** report any number as accuracy; write to `data/gold/`; weaken the `--gold` refusal; add a
 bypass flag to the ingestion checking path; work around a 403.

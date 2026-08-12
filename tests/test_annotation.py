@@ -318,11 +318,33 @@ def roster() -> dict[str, Annotator]:
     }
 
 
-def test_the_shipped_roster_has_exactly_one_real_annotator():
-    """A2 is commented out in config/annotators.yaml because they do not exist
-    yet. If this test starts failing, someone has been recruited -- update the
-    handover, do not 'fix' the test."""
-    assert sorted(load_annotators()) == ["A1"]
+def test_the_shipped_roster_holds_exactly_the_two_recruited_annotators():
+    """**OPEN-025 resolved 2026-08-12.** A2 was recruited -- a teammate of the
+    owner with sports-domain familiarity -- so `config/annotators.yaml` now
+    lists two people and inter-annotator agreement is computable for the first
+    time in this project.
+
+    The previous version of this test asserted `== ["A1"]` and carried the note
+    "if this starts failing, someone has been recruited -- update the handover,
+    do not 'fix' the test". That is what happened, and this is the update.
+
+    The assertion stays *exact* rather than relaxing to `>= 2`. The roster is a
+    lock, not a list: `src/annotation/store.py` refuses any gold label whose
+    `annotator_id` is not here, and a test that tolerates extra entries would
+    let a third annotator appear -- by typo or by a well-meaning future session
+    inventing one to make a pipeline run -- without anything failing. A kappa
+    computed over three annotators where two were intended is a number nobody
+    would question and nobody could reproduce.
+    """
+    assert sorted(load_annotators()) == ["A1", "A2"]
+
+
+def test_exactly_one_roster_entry_is_the_owner():
+    """Agreement is a property of a pair of *distinct* people. Two owner flags
+    would mean the roster had been edited by duplicating A1's entry, which is
+    the cheapest way to fake a second annotator and produce a kappa of 1.0."""
+    owners = [a for a in load_annotators().values() if a.is_owner]
+    assert len(owners) == 1, f"expected exactly one owner, found {[a.annotator_id for a in owners]}"
 
 
 def test_store_refuses_an_annotator_not_on_the_roster(tmp_path):

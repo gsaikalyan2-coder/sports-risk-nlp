@@ -22,10 +22,21 @@ ignore = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+
+# `-m "not slow"` by default, and this is load-bearing rather than a
+# convenience. Everything in this suite is meant to be offline, deterministic
+# and free; the one exception is the Phase 14 fine-tune smoke test, which needs
+# the Hugging Face hub. Leaving it in the default run means `pytest` fails when
+# the network is down, when the hub rate-limits, or when a checkpoint's config
+# changes upstream -- none of which is a defect in this repository, and all of
+# which look like one in a red test report. Observed 2026-08-12.
+#
+# Run the integration test deliberately:  pytest -m slow
+addopts = '-q -m "not slow"'
+
 markers = [
     # Phase 14. A fine-tune, even a one-epoch one on a tiny checkpoint, is
-    # minutes rather than milliseconds, and it needs requirements-ml.txt. Marked
-    # so the fast suite stays fast: `pytest -m "not slow"`.
-    "slow: needs the ML stack and takes minutes (transformer fine-tuning)",
+    # minutes rather than milliseconds, needs requirements-ml.txt, and needs
+    # network access to the hub. Excluded from the default run by `addopts`.
+    "slow: needs the ML stack and the HF hub; minutes, not milliseconds",
 ]

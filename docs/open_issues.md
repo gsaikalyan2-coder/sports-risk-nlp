@@ -1820,3 +1820,54 @@ forever, and `.gitignore` does not help retroactively.
 2. Keep signed forms outside the repository directory entirely.
 3. Record where the mapping lives in `docs/security.md` — a withdrawal route nobody can find is
    the same as no withdrawal route.
+
+---
+
+## OPEN-025 update 2026-08-12 — RESOLVED. A2 recruited.
+
+**Status: ✅ RESOLVED 2026-08-12** (annotation not yet performed).
+
+A second annotator has agreed: a teammate of the owner with sports-domain familiarity.
+`config/annotators.yaml` now lists **A1 and A2**, kept pseudonymous per that file's header —
+the paper reports per-annotator statistics, and a published kappa table naming two students is a
+disclosure nobody consented to.
+
+**Inter-annotator agreement is computable for the first time in this project.** Contribution #1
+("a construct-grounded corpus with reported inter-annotator agreement") moves from impossible to
+merely unperformed.
+
+`tests/test_annotation.py::test_the_shipped_roster_has_exactly_one_real_annotator` failed on this
+change, exactly as its own docstring predicted it would. It was updated rather than deleted, and
+the assertion stays exact (`== ["A1", "A2"]`) rather than relaxing to `>= 2`: the roster is a lock,
+and a test tolerating extra entries would let a third annotator appear by typo without anything
+failing. A companion test now asserts exactly one entry carries `is_owner`, because duplicating
+A1's row is the cheapest way to fake a second annotator and produce a kappa of 1.0.
+
+### What remains before a kappa exists
+
+1. A2 reads `docs/annotation_guidelines.md` and `onboarding/README.md`.
+2. Calibration pass on `data/processed/gold_candidates/gold_dev.jsonl` — 100 items, ~3.03 h
+   estimated, **split across two sittings**. `reports/annotation_burden.md` warns that a rushed
+   second half *raises* kappa while *lowering* data quality, because tired annotators drift toward
+   shared defaults. Agreeing more is not the goal.
+3. `python scripts/run_annotation.py --ingest --annotator A2`, then `--agreement`.
+4. Adjudicate disagreements **against the rubric**, not against each other, and update the
+   guidelines where the rubric was genuinely ambiguous.
+
+### What this does NOT resolve
+
+**OPEN-004 (Phase 17 expert rater) is a different requirement and is still open.** Phase 17's
+contribution is that explanations were validated by *coaches or sport-psychology practitioners* —
+people who work with athletes professionally. A teammate with sports-domain familiarity is a
+perfectly good annotator, and is not the same thing as a practitioner rater.
+
+Two honest options, and the choice must be made before the paper is written:
+
+- **Recruit a coach or sport-psych practitioner** for the Phase 17 validation study, keeping the
+  contribution as scoped in `CLAUDE.md` §1.
+- **Report who actually rated.** If the raters are sports-familiar students rather than
+  practitioners, the paper says so plainly and the contribution is framed as a pilot expert-review
+  rather than practitioner validation.
+
+What is not available is describing student raters as practitioner validation. The claim must
+match the raters.

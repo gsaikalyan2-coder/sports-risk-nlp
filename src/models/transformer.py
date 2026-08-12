@@ -767,6 +767,23 @@ class TransformerBaseline(Baseline):
             # 371 MB model. safetensors is also the safer format: loading a .bin
             # unpickles arbitrary Python objects.
             use_safetensors=True,
+            # Always build a fresh 10-construct head, even when the checkpoint
+            # already carries a classification head of a different width.
+            #
+            # `roberta-base` and `distilroberta-base` ship no head at all, so
+            # this is a no-op for them -- which is why the real Phase 14 sweep
+            # never hit it. Point `--base-model` at any already-fine-tuned
+            # classifier (a sentiment model, or the tiny checkpoint the
+            # integration test uses) and the head is sized for *its* labels, not
+            # for ten sports-psychology constructs, and the load fails with
+            # "You set `ignore_mismatched_sizes` to `False`".
+            #
+            # Reinitialising is unconditionally correct here: no pretrained head
+            # could be meaningful over this label space. The encoder is what is
+            # being transferred; the head is always new. transformers prints
+            # exactly which tensors it reinitialised, so this hides nothing --
+            # the MISSING/UNEXPECTED report in the run log is the audit trail.
+            ignore_mismatched_sizes=True,
         )
         self._device = "cuda" if torch.cuda.is_available() else "cpu"
         self._model.to(self._device)
@@ -983,6 +1000,67 @@ class TransformerBaseline(Baseline):
                 "data/gold/ is empty (OPEN-025)."
             ),
         }
+
+    @classmethod
+    def load(cls, directory: Path | str) -> TransformerBaseline:
+        """Reload a fitted model from `save()`, thresholds and all.
+
+        **Phase 17 depends on this.** Explainability (SHAP, attention rollout)
+        and the Phase 19 dashboard both need the trained classifier back, and
+        without a loader the only way to get it is to retrain -- five hours on
+        CPU to reproduce a model that is already sitting on disk.
+
+        Restores the tuned per-construct thresholds from the manifest rather
+        than defaulting to 0.5. A model reloaded with default thresholds is a
+        *different classifier* from the one that was evaluated, and it would
+        silently produce explanations for predictions the reported numbers never
+        described.
+
+        Verifies the construct order matches the manifest. Label columns are
+        positional, so a taxonomy edit between save and load would map every
+        probability to the wrong construct while every shape check passed --
+        precisely the failure `encode_labels` is written to prevent at fit time,
+        and it deserves the same guard here.
+        """
+        torch, transformers = require_ml_stack()
+        target = Path(directory)
+        manifest_path = target / "manifest.json"
+        if not manifest_path.is_file():
+            raise FileNotFoundError(
+                f"{manifest_path} not found. A checkpoint without its manifest has "
+                "no thresholds, no seed and no training fingerprint, so it cannot "
+                "be reloaded as the model that was evaluated."
+            )
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        constructs = tuple(manifest.get("constructs", ()))
+        if constructs and constructs != CONSTRUCTS:
+            raise ValueError(
+                f"{target} was fitted against a different construct order.\n"
+                f"  saved:   {constructs}\n"
+                f"  current: {CONSTRUCTS}\n"
+                "Label columns are positional, so loading this would map every "
+                "probability to the wrong construct. Re-fit against the current "
+                "taxonomy instead."
+            )
+
+        model = cls(hparams=HParams(**manifest["hparams"]), constructs=constructs or CONSTRUCTS)
+        model._tokenizer = transformers.AutoTokenizer.from_pretrained(target)
+        model._model = transformers.AutoModelForSequenceClassification.from_pretrained(target)
+        model._device = "cuda" if torch.cuda.is_available() else "cpu"
+        model._model.to(model._device)
+        model._model.eval()
+
+        thresholds = manifest.get("thresholds") or {}
+        model._thresholds = [thresholds.get(name, 0.5) for name in model.constructs]
+        model._degenerate = tuple(manifest.get("degenerate_constructs", ()))
+        model._fingerprint = manifest.get("training_fingerprint", "")
+        model._n_train = manifest.get("n_train", 0)
+        model._n_val = manifest.get("n_val", 0)
+        model._best_epoch = manifest.get("best_epoch", 0)
+        model._val_curve = list(manifest.get("val_macro_f1_curve", ()))
+        model._resolved_base = manifest.get("resolved_base_model", "")
+        return model
 
     def save(self, directory: Path | None = None) -> Path:
         """Persist weights, tokenizer and manifest under `models/`."""

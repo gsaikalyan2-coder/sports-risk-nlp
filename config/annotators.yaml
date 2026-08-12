@@ -44,11 +44,20 @@ annotators:
   # expert rater (OPEN-004). Those three open items have one solution between
   # them and it has been deferred across five phases.
   #
-  # Uncomment and edit once the person has said yes. Do not invent an A2 to
-  # make the pipeline run: `scripts/run_annotation.py --agreement` will report
-  # a single-annotator batch as UNMEASURABLE rather than computing a number,
-  # and that refusal is the point.
+  # RESOLVED 2026-08-12. A2 is a real person who has agreed: a teammate of the
+  # owner with sports-domain familiarity. Kept pseudonymous per the header --
+  # the paper reports per-annotator statistics and a published kappa table that
+  # names two students is a disclosure nobody agreed to.
+  #
+  # Before A2 annotates anything:
+  #   1. They read docs/annotation_guidelines.md and onboarding/README.md.
+  #   2. Calibration pass on data/processed/gold_candidates/gold_dev.jsonl
+  #      (100 items, ~3.03 h estimated, split across TWO sittings --
+  #      reports/annotation_burden.md warns that a rushed second half raises
+  #      kappa while lowering data quality, because tired annotators drift
+  #      toward shared defaults).
+  #   3. Adjudicate disagreements against the rubric, not against each other.
   # -------------------------------------------------------------------------
-  # - annotator_id: A2
-  #   role: peer annotator
-  #   is_owner: false
+  - annotator_id: A2
+    role: peer annotator; sports-domain familiarity
+    is_owner: false
