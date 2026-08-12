@@ -24,6 +24,21 @@ transformers>=5.0,<6.0
 datasets>=5.0
 accelerate>=1.0
 
+# REQUIRED for microsoft/deberta-v3-base, which is the Phase 14 default base
+# model (config/settings.yaml -> model.base). DeBERTa-v3 ships its vocabulary as
+# a SentencePiece model (spm.model), and transformers 5.x needs this package to
+# convert it into a fast tokenizer.
+#
+# It is pinned here because omitting it does NOT produce a clean "missing
+# dependency" error. transformers catches the ImportError, falls back to a
+# TikToken extractor, and that extractor tries to parse the SentencePiece
+# protobuf as a text BPE file -- so the surfaced error is an unrelated-looking
+# `ValueError: Error parsing line b'\x0e'` from deep inside tiktoken, several
+# frames away from the actual cause. Encountered on first run, 2026-08-11
+# (OPEN-029). roberta-base does not need it (byte-level BPE), which is why
+# --base-model roberta-base is the documented escape hatch.
+sentencepiece>=0.2
+
 # Explainability & tracking
 shap>=0.46
 wandb>=0.17

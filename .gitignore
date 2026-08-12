@@ -72,6 +72,17 @@ data/processed/silver/*/silver.jsonl
 # Annotation-QA queue: regenerated with the labels, and 1.7 MB of it.
 logs/review_queue.jsonl
 logs/labeling_*.json
+# Phase 14 per-configuration run logs. Not committed, for the same reason the
+# labeling logs above are not: `reports/transformer.json` already carries every
+# field of every one of these blocks, manifests included, so committing them
+# duplicates the artifact rather than adding provenance. A sweep writes twelve
+# of them (6 configurations x 2 splits) and they are pure scratch between runs.
+#
+# They are also where the training fingerprint -- a SHA-256 digest -- lands, and
+# detect-secrets correctly flags any long hex string as a possible secret. Not
+# committing them removes that false positive at the source instead of adding
+# exceptions for it.
+logs/transformer_*.json
 
 # Phase 11 Potato projects. Regenerated from config/taxonomy.yaml by
 # `python scripts/run_annotation.py --build`, so the generator is the artefact
@@ -102,3 +113,5 @@ logs/cost_ledger.csv
 
 # OS / IDE
 .DS_Store
+donations_inbox*.jsonl
+consent_forms/

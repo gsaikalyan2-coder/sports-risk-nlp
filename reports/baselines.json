@@ -1,0 +1,1128 @@
+{
+  "dataset": {
+    "ambiguous_texts_dropped": 0,
+    "constructs_without_support": [],
+    "duplicate_texts_collapsed": 112,
+    "label_support": {
+      "appraisal_orientation": 743,
+      "attentional_focus": 564,
+      "burnout_signal": 557,
+      "cognitive_anxiety": 885,
+      "coping_style": 838,
+      "motivation_orientation": 446,
+      "perceived_stress": 629,
+      "resilience": 544,
+      "self_confidence": 756,
+      "somatic_anxiety": 666
+    },
+    "n": 3888,
+    "n_before_dedup": 4000,
+    "name": "synth_precomp_v1"
+  },
+  "environment": {
+    "bootstrap_resamples": 400,
+    "python": "3.10.12",
+    "seed": 42,
+    "sklearn": "1.7.2",
+    "test_size": 0.2
+  },
+  "generated_on": "2026-08-11",
+  "is_accuracy": false,
+  "label_source": "planted",
+  "phase": 13,
+  "splits": {
+    "random": {
+      "is_template_disjoint": false,
+      "leakage": {
+        "exact_text_overlap": 0.0,
+        "ngram_overlap": {
+          "4": 0.9455327454098598,
+          "6": 0.8469204627897209,
+          "8": 0.7124670585850396
+        }
+      },
+      "n_discarded": 0,
+      "n_test": 778,
+      "n_train": 3110,
+      "shared_templates": 149,
+      "split": "random",
+      "systems": {
+        "lexicon": {
+          "macro_f1": {
+            "high": 0.586583213139472,
+            "low": 0.5355671927656275,
+            "point": 0.5620291117805276
+          },
+          "micro_f1": {
+            "high": 0.6105563480741797,
+            "low": 0.5621890547263682,
+            "point": 0.5867689357622243
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.6448598130841121,
+              "precision": 0.971830985915493,
+              "recall": 0.4825174825174825,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 0.5981308411214953,
+              "precision": 0.7529411764705882,
+              "recall": 0.49612403100775193,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.3157894736842105,
+              "precision": 0.525,
+              "recall": 0.22580645161290322,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 0.56,
+              "precision": 0.8651685393258427,
+              "recall": 0.41397849462365593,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 0.7652733118971061,
+              "precision": 0.8947368421052632,
+              "recall": 0.6685393258426966,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 0.5454545454545454,
+              "precision": 0.6233766233766234,
+              "recall": 0.48484848484848486,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 0.3855421686746988,
+              "precision": 0.6274509803921569,
+              "recall": 0.2782608695652174,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 0.5074626865671642,
+              "precision": 1.0,
+              "recall": 0.34,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 0.49593495934959353,
+              "precision": 0.7530864197530864,
+              "recall": 0.3696969696969697,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 0.8018433179723503,
+              "precision": 0.9560439560439561,
+              "recall": 0.6904761904761905,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.2532133676092545
+        },
+        "majority": {
+          "macro_f1": {
+            "high": 0.0,
+            "low": 0.0,
+            "point": 0.0
+          },
+          "micro_f1": {
+            "high": 0.0,
+            "low": 0.0,
+            "point": 0.0
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.056555269922879174
+        },
+        "memorisation_probe": {
+          "macro_f1": {
+            "high": 0.7393291405081062,
+            "low": 0.699111864976379,
+            "point": 0.7200764957392426
+          },
+          "micro_f1": {
+            "high": 0.740470397404704,
+            "low": 0.7029623698959168,
+            "point": 0.7225130890052357
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.7841726618705036,
+              "precision": 0.8074074074074075,
+              "recall": 0.7622377622377622,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 0.6835443037974683,
+              "precision": 0.75,
+              "recall": 0.627906976744186,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.6179775280898876,
+              "precision": 0.6470588235294118,
+              "recall": 0.5913978494623656,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 0.7352941176470588,
+              "precision": 0.8116883116883117,
+              "recall": 0.6720430107526881,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 0.7687687687687689,
+              "precision": 0.8258064516129032,
+              "recall": 0.7191011235955056,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 0.7978723404255319,
+              "precision": 0.8426966292134831,
+              "recall": 0.7575757575757576,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 0.663594470046083,
+              "precision": 0.7058823529411765,
+              "recall": 0.6260869565217392,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 0.768421052631579,
+              "precision": 0.8111111111111111,
+              "recall": 0.73,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 0.6506849315068494,
+              "precision": 0.7480314960629921,
+              "recall": 0.5757575757575758,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 0.7304347826086955,
+              "precision": 0.8076923076923077,
+              "recall": 0.6666666666666666,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.4473007712082262
+        },
+        "stratified_random": {
+          "macro_f1": {
+            "high": 0.1931328097013303,
+            "low": 0.15503061455321063,
+            "point": 0.17459376278553168
+          },
+          "micro_f1": {
+            "high": 0.2021196063588191,
+            "low": 0.16573348264277718,
+            "point": 0.18325197146075853
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.2535211267605633,
+              "precision": 0.2553191489361702,
+              "recall": 0.2517482517482518,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 0.18884120171673818,
+              "precision": 0.21153846153846154,
+              "recall": 0.17054263565891473,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.10837438423645321,
+              "precision": 0.1,
+              "recall": 0.11827956989247312,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 0.22465753424657534,
+              "precision": 0.22905027932960895,
+              "recall": 0.22043010752688172,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 0.255072463768116,
+              "precision": 0.2634730538922156,
+              "recall": 0.24719101123595505,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 0.11235955056179775,
+              "precision": 0.12658227848101267,
+              "recall": 0.10101010101010101,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 0.09448818897637795,
+              "precision": 0.08633093525179857,
+              "recall": 0.10434782608695652,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 0.1904761904761905,
+              "precision": 0.18181818181818182,
+              "recall": 0.2,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 0.1878787878787879,
+              "precision": 0.18787878787878787,
+              "recall": 0.18787878787878787,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 0.13026819923371646,
+              "precision": 0.1259259259259259,
+              "recall": 0.1349206349206349,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.021850899742930592
+        },
+        "tfidf_linearsvc": {
+          "macro_f1": {
+            "high": 1.0,
+            "low": 1.0,
+            "point": 1.0
+          },
+          "manifest": {
+            "constructs": [
+              "appraisal_orientation",
+              "attentional_focus",
+              "burnout_signal",
+              "cognitive_anxiety",
+              "coping_style",
+              "motivation_orientation",
+              "perceived_stress",
+              "resilience",
+              "self_confidence",
+              "somatic_anxiety"
+            ],
+            "degenerate_constructs": [],
+            "features": {
+              "char_min_df": 3,
+              "char_ngram_range": [
+                3,
+                5
+              ],
+              "lowercase": true,
+              "max_features": 200000,
+              "sublinear_tf": true,
+              "word_min_df": 2,
+              "word_ngram_range": [
+                1,
+                2
+              ]
+            },
+            "n_train": 3110,
+            "name": "tfidf_linearsvc",
+            "seed": 42,
+            "sklearn_version": "1.7.2",
+            "training_fingerprint": "555193e0ab62a37209391e469eb4cff3223538b6145c8a18e9bfd3036b2375cc"
+          },
+          "micro_f1": {
+            "high": 1.0,
+            "low": 1.0,
+            "point": 1.0
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 1.0
+        },
+        "tfidf_logreg": {
+          "macro_f1": {
+            "high": 1.0,
+            "low": 0.9982658959537571,
+            "point": 0.9994594594594595
+          },
+          "manifest": {
+            "constructs": [
+              "appraisal_orientation",
+              "attentional_focus",
+              "burnout_signal",
+              "cognitive_anxiety",
+              "coping_style",
+              "motivation_orientation",
+              "perceived_stress",
+              "resilience",
+              "self_confidence",
+              "somatic_anxiety"
+            ],
+            "degenerate_constructs": [],
+            "features": {
+              "char_min_df": 3,
+              "char_ngram_range": [
+                3,
+                5
+              ],
+              "lowercase": true,
+              "max_features": 200000,
+              "sublinear_tf": true,
+              "word_min_df": 2,
+              "word_ngram_range": [
+                1,
+                2
+              ]
+            },
+            "n_train": 3110,
+            "name": "tfidf_logreg",
+            "seed": 42,
+            "sklearn_version": "1.7.2",
+            "training_fingerprint": "555193e0ab62a37209391e469eb4cff3223538b6145c8a18e9bfd3036b2375cc"
+          },
+          "micro_f1": {
+            "high": 1.0,
+            "low": 0.9988553987027853,
+            "point": 0.9996250468691413
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.9945945945945946,
+              "precision": 1.0,
+              "recall": 0.989247311827957,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 126
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.9987146529562982
+        }
+      }
+    },
+    "template_disjoint": {
+      "is_template_disjoint": true,
+      "leakage": {
+        "exact_text_overlap": 0.0,
+        "ngram_overlap": {
+          "4": 0.39994213521072425,
+          "6": 0.25129015271195365,
+          "8": 0.1393081030879963
+        }
+      },
+      "n_discarded": 854,
+      "n_test": 443,
+      "n_train": 2591,
+      "shared_templates": 0,
+      "split": "template_disjoint",
+      "systems": {
+        "lexicon": {
+          "macro_f1": {
+            "high": 0.49426108617784237,
+            "low": 0.4321915976679949,
+            "point": 0.4617285842599597
+          },
+          "micro_f1": {
+            "high": 0.5724465558194775,
+            "low": 0.49328449328449336,
+            "point": 0.5325153374233129
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.6557377049180326,
+              "precision": 0.9090909090909091,
+              "recall": 0.5128205128205128,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.06779661016949153,
+              "precision": 0.05714285714285714,
+              "recall": 0.08333333333333333,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.5333333333333334,
+              "precision": 0.8648648648648649,
+              "recall": 0.3855421686746988,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.7313432835820896,
+              "precision": 0.8032786885245902,
+              "recall": 0.6712328767123288,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.5714285714285715,
+              "precision": 0.9473684210526315,
+              "recall": 0.4090909090909091,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.5416666666666667,
+              "precision": 0.5,
+              "recall": 0.5909090909090909,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.5341614906832298,
+              "precision": 0.7166666666666667,
+              "recall": 0.42574257425742573,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.9818181818181818,
+              "precision": 1.0,
+              "recall": 0.9642857142857143,
+              "support": 28
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.35214446952595935
+        },
+        "majority": {
+          "macro_f1": {
+            "high": 0.0,
+            "low": 0.0,
+            "point": 0.0
+          },
+          "micro_f1": {
+            "high": 0.0,
+            "low": 0.0,
+            "point": 0.0
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.09932279909706546
+        },
+        "memorisation_probe": {
+          "macro_f1": {
+            "high": 0.22842340501335787,
+            "low": 0.16217802648732096,
+            "point": 0.1973384700767275
+          },
+          "micro_f1": {
+            "high": 0.24948024948024947,
+            "low": 0.17678381256656017,
+            "point": 0.21253985122210417
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.30303030303030304,
+              "precision": 0.25,
+              "recall": 0.38461538461538464,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.054794520547945195,
+              "precision": 0.04081632653061224,
+              "recall": 0.08333333333333333,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.14173228346456693,
+              "precision": 0.20454545454545456,
+              "recall": 0.10843373493975904,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.24,
+              "precision": 0.16981132075471697,
+              "recall": 0.4090909090909091,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.14583333333333331,
+              "precision": 0.30434782608695654,
+              "recall": 0.0958904109589041,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.2531645569620253,
+              "precision": 0.2857142857142857,
+              "recall": 0.22727272727272727,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.3269230769230769,
+              "precision": 0.2833333333333333,
+              "recall": 0.38636363636363635,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.2891566265060241,
+              "precision": 0.36923076923076925,
+              "recall": 0.2376237623762376,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.21875000000000003,
+              "precision": 0.19444444444444445,
+              "recall": 0.25,
+              "support": 28
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.22799097065462753
+        },
+        "stratified_random": {
+          "macro_f1": {
+            "high": 0.12601437941112922,
+            "low": 0.08154566524561199,
+            "point": 0.10395913351255456
+          },
+          "micro_f1": {
+            "high": 0.13143872113676733,
+            "low": 0.0840035746201966,
+            "point": 0.10773240660295395
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.07339449541284404,
+              "precision": 0.05714285714285714,
+              "recall": 0.10256410256410256,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.09523809523809522,
+              "precision": 0.06666666666666667,
+              "recall": 0.16666666666666666,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.18897637795275588,
+              "precision": 0.2727272727272727,
+              "recall": 0.14457831325301204,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.061538461538461535,
+              "precision": 0.037037037037037035,
+              "recall": 0.18181818181818182,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.11464968152866241,
+              "precision": 0.10714285714285714,
+              "recall": 0.1232876712328767,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.09302325581395349,
+              "precision": 0.09523809523809523,
+              "recall": 0.09090909090909091,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.14414414414414414,
+              "precision": 0.11940298507462686,
+              "recall": 0.18181818181818182,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.04938271604938271,
+              "precision": 0.03773584905660377,
+              "recall": 0.07142857142857142,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.1257861635220126,
+              "precision": 0.1724137931034483,
+              "recall": 0.09900990099009901,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.09345794392523366,
+              "precision": 0.06329113924050633,
+              "recall": 0.17857142857142858,
+              "support": 28
+            }
+          },
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.03611738148984198
+        },
+        "tfidf_linearsvc": {
+          "macro_f1": {
+            "high": 0.21222277128116424,
+            "low": 0.15018120852569086,
+            "point": 0.18143057451465872
+          },
+          "manifest": {
+            "constructs": [
+              "appraisal_orientation",
+              "attentional_focus",
+              "burnout_signal",
+              "cognitive_anxiety",
+              "coping_style",
+              "motivation_orientation",
+              "perceived_stress",
+              "resilience",
+              "self_confidence",
+              "somatic_anxiety"
+            ],
+            "degenerate_constructs": [],
+            "features": {
+              "char_min_df": 3,
+              "char_ngram_range": [
+                3,
+                5
+              ],
+              "lowercase": true,
+              "max_features": 200000,
+              "sublinear_tf": true,
+              "word_min_df": 2,
+              "word_ngram_range": [
+                1,
+                2
+              ]
+            },
+            "n_train": 2591,
+            "name": "tfidf_linearsvc",
+            "seed": 42,
+            "sklearn_version": "1.7.2",
+            "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf"
+          },
+          "micro_f1": {
+            "high": 0.2453416149068323,
+            "low": 0.16091954022988506,
+            "point": 0.20097244732576988
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.47058823529411764,
+              "precision": 1.0,
+              "recall": 0.3076923076923077,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.048780487804878044,
+              "precision": 0.058823529411764705,
+              "recall": 0.041666666666666664,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.1935483870967742,
+              "precision": 0.45,
+              "recall": 0.1232876712328767,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.625,
+              "precision": 1.0,
+              "recall": 0.45454545454545453,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.2682926829268293,
+              "precision": 0.2894736842105263,
+              "recall": 0.25,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.1391304347826087,
+              "precision": 0.5714285714285714,
+              "recall": 0.07920792079207921,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.0689655172413793,
+              "precision": 1.0,
+              "recall": 0.03571428571428571,
+              "support": 28
+            }
+          },
+          "saved_to": "models/phase13_tfidf_linearsvc_template_disjoint",
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.16930022573363432
+        },
+        "tfidf_logreg": {
+          "macro_f1": {
+            "high": 0.25865351832325256,
+            "low": 0.1809729315356298,
+            "point": 0.22208037080486936
+          },
+          "manifest": {
+            "constructs": [
+              "appraisal_orientation",
+              "attentional_focus",
+              "burnout_signal",
+              "cognitive_anxiety",
+              "coping_style",
+              "motivation_orientation",
+              "perceived_stress",
+              "resilience",
+              "self_confidence",
+              "somatic_anxiety"
+            ],
+            "degenerate_constructs": [],
+            "features": {
+              "char_min_df": 3,
+              "char_ngram_range": [
+                3,
+                5
+              ],
+              "lowercase": true,
+              "max_features": 200000,
+              "sublinear_tf": true,
+              "word_min_df": 2,
+              "word_ngram_range": [
+                1,
+                2
+              ]
+            },
+            "n_train": 2591,
+            "name": "tfidf_logreg",
+            "seed": 42,
+            "sklearn_version": "1.7.2",
+            "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf"
+          },
+          "micro_f1": {
+            "high": 0.27044025157232704,
+            "low": 0.1881188118811881,
+            "point": 0.22848200312989048
+          },
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.6451612903225806,
+              "precision": 0.8695652173913043,
+              "recall": 0.5128205128205128,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.04761904761904762,
+              "precision": 0.05555555555555555,
+              "recall": 0.041666666666666664,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.046511627906976744,
+              "precision": 0.6666666666666666,
+              "recall": 0.024096385542168676,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.13793103448275862,
+              "precision": 0.2857142857142857,
+              "recall": 0.09090909090909091,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.17582417582417584,
+              "precision": 0.4444444444444444,
+              "recall": 0.1095890410958904,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.6153846153846153,
+              "precision": 0.9523809523809523,
+              "recall": 0.45454545454545453,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.25882352941176473,
+              "precision": 0.2682926829268293,
+              "recall": 0.25,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.1,
+              "precision": 0.3157894736842105,
+              "recall": 0.0594059405940594,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.19354838709677416,
+              "precision": 1.0,
+              "recall": 0.10714285714285714,
+              "support": 28
+            }
+          },
+          "saved_to": "models/phase13_tfidf_logreg_template_disjoint",
+          "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+          "subset_accuracy": 0.1670428893905192
+        }
+      }
+    }
+  },
+  "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+  "unit": "record",
+  "what_this_measures": "Learnability of the synth_precomp_v1 template grammar against the constructs the generator planted, and how much of it is memorisation. NOT detection of psychological constructs in athlete text. No human-verified evaluation set exists (OPEN-025)."
+}

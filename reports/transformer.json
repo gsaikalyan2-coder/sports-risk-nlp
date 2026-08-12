@@ -1,0 +1,1681 @@
+{
+  "best": {
+    "macro_f1": 0.5877114720181955,
+    "slug": "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf"
+  },
+  "dataset": {
+    "constructs_without_support": [],
+    "label_support": {
+      "appraisal_orientation": 743,
+      "attentional_focus": 564,
+      "burnout_signal": 557,
+      "cognitive_anxiety": 885,
+      "coping_style": 838,
+      "motivation_orientation": 446,
+      "perceived_stress": 629,
+      "resilience": 544,
+      "self_confidence": 756,
+      "somatic_anxiety": 666
+    },
+    "n": 3888,
+    "name": "synth_precomp_v1"
+  },
+  "environment": {
+    "base_model": "distilroberta-base",
+    "bootstrap_resamples": 400,
+    "n_configurations": 6,
+    "python": "3.11.9",
+    "seed": 42,
+    "test_size": 0.2,
+    "torch": "2.13.0+cpu",
+    "transformers": "5.15.0"
+  },
+  "gate": {
+    "alpha": 0.05,
+    "best_configuration": "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf",
+    "delta": 0.1259828877582358,
+    "interpretation": "The transformer recovers more of the planted template grammar than the lexicon baseline does, across held-out templates, and the gap survives a paired bootstrap. This is a **corpus property**: it says the near-synonym substitution layer produced realisations varied enough that a pretrained encoder generalises across them, where a bag-of-ngrams model could not. It is **not** evidence that the model detects psychological constructs in athlete text -- no athlete wrote this text and no human verified these labels (OPEN-025). The gate is satisfied for the purposes of PROJECT_PLAN.md Phase 14; the publication-readiness criterion in CLAUDE.md sec.9 is not, and cannot be, until a real gold set exists.",
+    "is_accuracy": false,
+    "paired_bootstrap_p": 0.0,
+    "passed": true,
+    "reference": "lexicon",
+    "reference_macro_f1": 0.4617285842599597,
+    "significant": true,
+    "split": "template_disjoint",
+    "transformer_macro_f1": 0.5877114720181955
+  },
+  "generated_on": "2026-08-11",
+  "is_accuracy": false,
+  "label_source": "planted",
+  "phase": 14,
+  "phase13_bar": {
+    "lexicon": 0.4617285842599597,
+    "majority": 0.0,
+    "memorisation_probe": 0.1973384700767275,
+    "stratified_random": 0.10395913351255456,
+    "tfidf_linearsvc": 0.18143057451465872,
+    "tfidf_logreg": 0.22208037080486936
+  },
+  "splits": {
+    "random": {
+      "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 6,
+          "learning_rate": 2e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.9172393635939905,
+          "low": 0.8902298731484557,
+          "point": 0.9048257591279925
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 6,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 6,
+            "learning_rate": 2e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1894,
+          "n_val": 444,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.85,
+            "attentional_focus": 0.45,
+            "burnout_signal": 0.15,
+            "cognitive_anxiety": 0.6,
+            "coping_style": 0.15,
+            "motivation_orientation": 0.7,
+            "perceived_stress": 0.9,
+            "resilience": 0.3,
+            "self_confidence": 0.35,
+            "somatic_anxiety": 0.9
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "555193e0ab62a37209391e469eb4cff3223538b6145c8a18e9bfd3036b2375cc",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.585501401635427,
+            0.7230778407757279,
+            0.7473680101252443,
+            0.7701081732064629,
+            0.7786910010151209,
+            0.7816183910252767
+          ]
+        },
+        "micro_f1": {
+          "high": 0.9166365932876218,
+          "low": 0.8911880128433821,
+          "point": 0.9050359712230216
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.9124087591240876,
+            "precision": 0.9541984732824428,
+            "recall": 0.8741258741258742,
+            "support": 143
+          },
+          "attentional_focus": {
+            "f1": 0.8571428571428571,
+            "precision": 0.7636363636363637,
+            "recall": 0.9767441860465116,
+            "support": 129
+          },
+          "burnout_signal": {
+            "f1": 0.6666666666666667,
+            "precision": 0.5146198830409356,
+            "recall": 0.946236559139785,
+            "support": 93
+          },
+          "cognitive_anxiety": {
+            "f1": 0.9653333333333334,
+            "precision": 0.9576719576719577,
+            "recall": 0.9731182795698925,
+            "support": 186
+          },
+          "coping_style": {
+            "f1": 0.9270833333333333,
+            "precision": 0.8640776699029126,
+            "recall": 1.0,
+            "support": 178
+          },
+          "motivation_orientation": {
+            "f1": 0.9746192893401016,
+            "precision": 0.9795918367346939,
+            "recall": 0.9696969696969697,
+            "support": 99
+          },
+          "perceived_stress": {
+            "f1": 0.9596412556053812,
+            "precision": 0.9907407407407407,
+            "recall": 0.9304347826086956,
+            "support": 115
+          },
+          "resilience": {
+            "f1": 0.9289099526066351,
+            "precision": 0.8828828828828829,
+            "recall": 0.98,
+            "support": 100
+          },
+          "self_confidence": {
+            "f1": 0.9287925696594428,
+            "precision": 0.9493670886075949,
+            "recall": 0.9090909090909091,
+            "support": 165
+          },
+          "somatic_anxiety": {
+            "f1": 0.9276595744680851,
+            "precision": 1.0,
+            "recall": 0.8650793650793651,
+            "support": 126
+          }
+        },
+        "reference": {
+          "delta": 0.34279664734746484,
+          "macro_f1": 0.5620291117805276,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.0
+        },
+        "slug": "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.7583547557840618,
+        "train_seconds": 3320.0,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.02008543142487773,
+          "macro_f1": {
+            "high": 0.9386264327494425,
+            "low": 0.9127288020237015,
+            "point": 0.9249111905528702
+          },
+          "micro_f1": {
+            "high": 0.938136826783115,
+            "low": 0.9137055837563451,
+            "point": 0.9261447562776957
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.9096774193548386,
+              "precision": 0.844311377245509,
+              "recall": 0.986013986013986,
+              "support": 143
+            },
+            "attentional_focus": {
+              "f1": 0.8719723183391002,
+              "precision": 0.7875,
+              "recall": 0.9767441860465116,
+              "support": 129
+            },
+            "burnout_signal": {
+              "f1": 0.8306010928961749,
+              "precision": 0.8444444444444444,
+              "recall": 0.8172043010752689,
+              "support": 93
+            },
+            "cognitive_anxiety": {
+              "f1": 0.9578947368421052,
+              "precision": 0.9381443298969072,
+              "recall": 0.978494623655914,
+              "support": 186
+            },
+            "coping_style": {
+              "f1": 0.9442815249266862,
+              "precision": 0.9877300613496932,
+              "recall": 0.9044943820224719,
+              "support": 178
+            },
+            "motivation_orientation": {
+              "f1": 0.98,
+              "precision": 0.9702970297029703,
+              "recall": 0.98989898989899,
+              "support": 99
+            },
+            "perceived_stress": {
+              "f1": 0.92,
+              "precision": 0.8518518518518519,
+              "recall": 1.0,
+              "support": 115
+            },
+            "resilience": {
+              "f1": 0.9690721649484536,
+              "precision": 1.0,
+              "recall": 0.94,
+              "support": 100
+            },
+            "self_confidence": {
+              "f1": 0.9090909090909092,
+              "precision": 0.9790209790209791,
+              "recall": 0.8484848484848485,
+              "support": 165
+            },
+            "somatic_anxiety": {
+              "f1": 0.9565217391304348,
+              "precision": 0.952755905511811,
+              "recall": 0.9603174603174603,
+              "support": 126
+            }
+          }
+        }
+      }
+    },
+    "template_disjoint": {
+      "distilroberta-base_lr1e-05_bs16_ep4_len128_c749741c": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 4,
+          "learning_rate": 1e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.5368010563232539,
+          "low": 0.46615780503510135,
+          "point": 0.5040701388073525
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 4,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 4,
+            "learning_rate": 1e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.65,
+            "attentional_focus": 0.65,
+            "burnout_signal": 0.4,
+            "cognitive_anxiety": 0.85,
+            "coping_style": 0.4,
+            "motivation_orientation": 0.7,
+            "perceived_stress": 0.55,
+            "resilience": 0.45,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.55
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.3649438417117504,
+            0.5323684749963571,
+            0.5520277923584053,
+            0.5593561899201493
+          ]
+        },
+        "micro_f1": {
+          "high": 0.580046403712297,
+          "low": 0.5222312045270816,
+          "point": 0.5503458877786319
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.42465753424657526,
+            "precision": 0.2897196261682243,
+            "recall": 0.7948717948717948,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.31683168316831684,
+            "precision": 0.2077922077922078,
+            "recall": 0.6666666666666666,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.38135593220338987,
+            "precision": 0.29411764705882354,
+            "recall": 0.5421686746987951,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.35714285714285715,
+            "precision": 0.8333333333333334,
+            "recall": 0.22727272727272727,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.797752808988764,
+            "precision": 0.6761904761904762,
+            "recall": 0.9726027397260274,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.36666666666666664,
+            "precision": 0.6875,
+            "recall": 0.25,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.5771812080536912,
+            "precision": 0.4095238095238095,
+            "recall": 0.9772727272727273,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.48,
+            "precision": 0.3829787234042553,
+            "recall": 0.6428571428571429,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.8108108108108107,
+            "precision": 0.743801652892562,
+            "recall": 0.8910891089108911,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.5283018867924528,
+            "precision": 0.358974358974359,
+            "recall": 1.0,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.0423415545473928,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.08
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr1e-05_bs16_ep4_len128_c749741c",
+        "slug": "distilroberta-base_lr1e-05_bs16_ep4_len128_c749741c",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.2144469525959368,
+        "train_seconds": 2009.3,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.01365760555357376,
+          "macro_f1": {
+            "high": 0.5450553364098905,
+            "low": 0.48512266503452206,
+            "point": 0.5177277443609263
+          },
+          "micro_f1": {
+            "high": 0.5696465696465696,
+            "low": 0.5179957657021879,
+            "point": 0.5435827041866849
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.4222222222222222,
+              "precision": 0.2695035460992908,
+              "recall": 0.9743589743589743,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.34074074074074073,
+              "precision": 0.2072072072072072,
+              "recall": 0.9583333333333334,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.4067796610169492,
+              "precision": 0.3829787234042553,
+              "recall": 0.43373493975903615,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.3636363636363636,
+              "precision": 0.2222222222222222,
+              "recall": 1.0,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.8554216867469878,
+              "precision": 0.7634408602150538,
+              "recall": 0.9726027397260274,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.5892857142857142,
+              "precision": 0.4852941176470588,
+              "recall": 0.75,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.5088757396449703,
+              "precision": 0.344,
+              "recall": 0.9772727272727273,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.375,
+              "precision": 0.3333333333333333,
+              "recall": 0.42857142857142855,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.8108108108108107,
+              "precision": 0.743801652892562,
+              "recall": 0.8910891089108911,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.5045045045045045,
+              "precision": 0.3373493975903614,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      },
+      "distilroberta-base_lr2e-05_bs16_ep4_len128_716e3861": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 4,
+          "learning_rate": 2e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.5903905603719596,
+          "low": 0.5252520461402556,
+          "point": 0.5576295437044312
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 3,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 4,
+            "learning_rate": 2e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.45,
+            "attentional_focus": 0.35,
+            "burnout_signal": 0.35,
+            "cognitive_anxiety": 0.95,
+            "coping_style": 0.3,
+            "motivation_orientation": 0.6,
+            "perceived_stress": 0.55,
+            "resilience": 0.45,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.6
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.5411384216170093,
+            0.5824370397769089,
+            0.5941351023418362,
+            0.591639753875562
+          ]
+        },
+        "micro_f1": {
+          "high": 0.6197183098591549,
+          "low": 0.5714285714285714,
+          "point": 0.5945525291828794
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.4444444444444444,
+            "precision": 0.2878787878787879,
+            "recall": 0.9743589743589743,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.29629629629629634,
+            "precision": 0.17391304347826086,
+            "recall": 1.0,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.44086021505376344,
+            "precision": 0.39805825242718446,
+            "recall": 0.4939759036144578,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.24000000000000002,
+            "precision": 1.0,
+            "recall": 0.13636363636363635,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.782608695652174,
+            "precision": 0.6486486486486487,
+            "recall": 0.9863013698630136,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.6823529411764706,
+            "precision": 0.7073170731707317,
+            "recall": 0.6590909090909091,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.7333333333333334,
+            "precision": 0.5789473684210527,
+            "recall": 1.0,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.40579710144927533,
+            "precision": 0.34146341463414637,
+            "recall": 0.5,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.9,
+            "precision": 0.9090909090909091,
+            "recall": 0.8910891089108911,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.6506024096385543,
+            "precision": 0.4909090909090909,
+            "recall": 0.9642857142857143,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.09590095944447147,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.0
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr2e-05_bs16_ep4_len128_716e3861",
+        "slug": "distilroberta-base_lr2e-05_bs16_ep4_len128_716e3861",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.2708803611738149,
+        "train_seconds": 2324.9,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.04419089855575575,
+          "macro_f1": {
+            "high": 0.6346682265236148,
+            "low": 0.5683303183176848,
+            "point": 0.6018204422601869
+          },
+          "micro_f1": {
+            "high": 0.662262592898431,
+            "low": 0.6032562125107113,
+            "point": 0.6331983805668016
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.4779874213836478,
+              "precision": 0.31666666666666665,
+              "recall": 0.9743589743589743,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.33070866141732286,
+              "precision": 0.20388349514563106,
+              "recall": 0.875,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.5223880597014925,
+              "precision": 0.6862745098039216,
+              "recall": 0.42168674698795183,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.5194805194805195,
+              "precision": 0.36363636363636365,
+              "recall": 0.9090909090909091,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.8627450980392157,
+              "precision": 0.825,
+              "recall": 0.9041095890410958,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.7254901960784312,
+              "precision": 0.6379310344827587,
+              "recall": 0.8409090909090909,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.676923076923077,
+              "precision": 0.5116279069767442,
+              "recall": 1.0,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.3870967741935484,
+              "precision": 0.35294117647058826,
+              "recall": 0.42857142857142855,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.9,
+              "precision": 0.9090909090909091,
+              "recall": 0.8910891089108911,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.6153846153846153,
+              "precision": 0.4444444444444444,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      },
+      "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 6,
+          "learning_rate": 2e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.6237346918013301,
+          "low": 0.5494099370871259,
+          "point": 0.5877114720181955
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 5,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 6,
+            "learning_rate": 2e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.25,
+            "attentional_focus": 0.35,
+            "burnout_signal": 0.25,
+            "cognitive_anxiety": 0.95,
+            "coping_style": 0.35,
+            "motivation_orientation": 0.7,
+            "perceived_stress": 0.35,
+            "resilience": 0.25,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.4
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.5406998163163937,
+            0.5815113790250184,
+            0.5966600022749184,
+            0.5811475177838593,
+            0.5977441763556676,
+            0.5916333173955812
+          ]
+        },
+        "micro_f1": {
+          "high": 0.6445880452342488,
+          "low": 0.5855704697986578,
+          "point": 0.6141078838174274
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.484472049689441,
+            "precision": 0.319672131147541,
+            "recall": 1.0,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.3129251700680272,
+            "precision": 0.18699186991869918,
+            "recall": 0.9583333333333334,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.4508670520231214,
+            "precision": 0.43333333333333335,
+            "recall": 0.46987951807228917,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.37037037037037035,
+            "precision": 1.0,
+            "recall": 0.22727272727272727,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.8400000000000001,
+            "precision": 0.8181818181818182,
+            "recall": 0.863013698630137,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.7901234567901235,
+            "precision": 0.8648648648648649,
+            "recall": 0.7272727272727273,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.7272727272727273,
+            "precision": 0.5714285714285714,
+            "recall": 1.0,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.41935483870967744,
+            "precision": 0.38235294117647056,
+            "recall": 0.4642857142857143,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.8983957219251336,
+            "precision": 0.9767441860465116,
+            "recall": 0.8316831683168316,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.5833333333333334,
+            "precision": 0.4117647058823529,
+            "recall": 1.0,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.1259828877582358,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.0
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf",
+        "slug": "distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.33860045146726864,
+        "train_seconds": 2831.9,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.02815229497870153,
+          "macro_f1": {
+            "high": 0.6495092111764127,
+            "low": 0.5796771566254986,
+            "point": 0.615863766996897
+          },
+          "micro_f1": {
+            "high": 0.6983842010771993,
+            "low": 0.6331753554502371,
+            "point": 0.6636280765724705
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.5909090909090909,
+              "precision": 0.41935483870967744,
+              "recall": 1.0,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.358974358974359,
+              "precision": 0.22580645161290322,
+              "recall": 0.875,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.5,
+              "precision": 0.7560975609756098,
+              "recall": 0.37349397590361444,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.6229508196721312,
+              "precision": 0.48717948717948717,
+              "recall": 0.8636363636363636,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.8270676691729323,
+              "precision": 0.9166666666666666,
+              "recall": 0.7534246575342466,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.8421052631578948,
+              "precision": 0.7843137254901961,
+              "recall": 0.9090909090909091,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.7787610619469026,
+              "precision": 0.6376811594202898,
+              "recall": 1.0,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.15,
+              "precision": 0.25,
+              "recall": 0.10714285714285714,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.8983957219251336,
+              "precision": 0.9767441860465116,
+              "recall": 0.8316831683168316,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.5894736842105264,
+              "precision": 0.417910447761194,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      },
+      "distilroberta-base_lr2e-05_bs8_ep4_len128_9dbf43fa": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 8,
+          "epochs": 4,
+          "learning_rate": 2e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.5855314456719265,
+          "low": 0.4961087822245501,
+          "point": 0.5464049533119858
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 3,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 8,
+            "epochs": 4,
+            "learning_rate": 2e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.3,
+            "attentional_focus": 0.45,
+            "burnout_signal": 0.15,
+            "cognitive_anxiety": 0.95,
+            "coping_style": 0.25,
+            "motivation_orientation": 0.7,
+            "perceived_stress": 0.4,
+            "resilience": 0.5,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.45
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.5453353305442393,
+            0.5669873600918186,
+            0.5680792365159157,
+            0.5582471657507998
+          ]
+        },
+        "micro_f1": {
+          "high": 0.6183986371379897,
+          "low": 0.5561224489795918,
+          "point": 0.588135593220339
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.44571428571428573,
+            "precision": 0.2867647058823529,
+            "recall": 1.0,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.41379310344827586,
+            "precision": 0.2608695652173913,
+            "recall": 1.0,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.37962962962962965,
+            "precision": 0.3082706766917293,
+            "recall": 0.4939759036144578,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.42857142857142855,
+            "precision": 1.0,
+            "recall": 0.2727272727272727,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.9019607843137256,
+            "precision": 0.8625,
+            "recall": 0.9452054794520548,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.456140350877193,
+            "precision": 1.0,
+            "recall": 0.29545454545454547,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.7394957983193278,
+            "precision": 0.5866666666666667,
+            "recall": 1.0,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.24390243902439027,
+            "precision": 0.38461538461538464,
+            "recall": 0.17857142857142858,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.8715083798882681,
+            "precision": 1.0,
+            "recall": 0.7722772277227723,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.5833333333333334,
+            "precision": 0.4117647058823529,
+            "recall": 1.0,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.08467636905202608,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.005
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr2e-05_bs8_ep4_len128_9dbf43fa",
+        "slug": "distilroberta-base_lr2e-05_bs8_ep4_len128_9dbf43fa",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.35214446952595935,
+        "train_seconds": 2043.1,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.04695517556359963,
+          "macro_f1": {
+            "high": 0.6326524219815312,
+            "low": 0.5525894796198036,
+            "point": 0.5933601288755854
+          },
+          "micro_f1": {
+            "high": 0.662251655629139,
+            "low": 0.5878848063555114,
+            "point": 0.6259541984732825
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.5277777777777778,
+              "precision": 0.3619047619047619,
+              "recall": 0.9743589743589743,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.4247787610619469,
+              "precision": 0.2696629213483146,
+              "recall": 1.0,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.4736842105263158,
+              "precision": 0.8709677419354839,
+              "recall": 0.3253012048192771,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.6249999999999999,
+              "precision": 0.47619047619047616,
+              "recall": 0.9090909090909091,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.6486486486486486,
+              "precision": 0.9473684210526315,
+              "recall": 0.4931506849315068,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.7368421052631579,
+              "precision": 0.875,
+              "recall": 0.6363636363636364,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.7857142857142858,
+              "precision": 0.6470588235294118,
+              "recall": 1.0,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.24390243902439027,
+              "precision": 0.38461538461538464,
+              "recall": 0.17857142857142858,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.8715083798882681,
+              "precision": 1.0,
+              "recall": 0.7722772277227723,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.5957446808510638,
+              "precision": 0.42424242424242425,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      },
+      "distilroberta-base_lr3e-05_bs16_ep4_len128_b3ed1b20": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 4,
+          "learning_rate": 3e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.6149906166103211,
+          "low": 0.5460078851095029,
+          "point": 0.581665372856814
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 3,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 4,
+            "learning_rate": 3e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.25,
+            "attentional_focus": 0.2,
+            "burnout_signal": 0.3,
+            "cognitive_anxiety": 0.95,
+            "coping_style": 0.25,
+            "motivation_orientation": 0.55,
+            "perceived_stress": 0.4,
+            "resilience": 0.45,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.65
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.5435136383311099,
+            0.582524855979788,
+            0.58919604812189,
+            0.5749496701550847
+          ]
+        },
+        "micro_f1": {
+          "high": 0.6212624584717608,
+          "low": 0.5685039370078739,
+          "point": 0.5934065934065934
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.43333333333333335,
+            "precision": 0.2765957446808511,
+            "recall": 1.0,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.2711864406779661,
+            "precision": 0.1568627450980392,
+            "recall": 1.0,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.4550898203592814,
+            "precision": 0.4523809523809524,
+            "recall": 0.4578313253012048,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.4666666666666667,
+            "precision": 0.875,
+            "recall": 0.3181818181818182,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.7717391304347826,
+            "precision": 0.6396396396396397,
+            "recall": 0.9726027397260274,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.7341772151898734,
+            "precision": 0.8285714285714286,
+            "recall": 0.6590909090909091,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.7096774193548387,
+            "precision": 0.55,
+            "recall": 1.0,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.42105263157894735,
+            "precision": 0.41379310344827586,
+            "recall": 0.42857142857142855,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.91005291005291,
+            "precision": 0.9772727272727273,
+            "recall": 0.8514851485148515,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.6436781609195402,
+            "precision": 0.4745762711864407,
+            "recall": 1.0,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.11993678859685425,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.0
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr3e-05_bs16_ep4_len128_b3ed1b20",
+        "slug": "distilroberta-base_lr3e-05_bs16_ep4_len128_b3ed1b20",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.2979683972911964,
+        "train_seconds": 2267.7,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.05778695404293299,
+          "macro_f1": {
+            "high": 0.6755274583070349,
+            "low": 0.607016090621172,
+            "point": 0.639452326899747
+          },
+          "micro_f1": {
+            "high": 0.697463768115942,
+            "low": 0.6352530541012217,
+            "point": 0.6642984014209592
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.5531914893617021,
+              "precision": 0.38235294117647056,
+              "recall": 1.0,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.3931623931623932,
+              "precision": 0.24731182795698925,
+              "recall": 0.9583333333333334,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.5156250000000001,
+              "precision": 0.7333333333333333,
+              "recall": 0.39759036144578314,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.6470588235294118,
+              "precision": 0.4782608695652174,
+              "recall": 1.0,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.8148148148148148,
+              "precision": 0.8870967741935484,
+              "recall": 0.7534246575342466,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.7710843373493976,
+              "precision": 0.8205128205128205,
+              "recall": 0.7272727272727273,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.7652173913043477,
+              "precision": 0.6197183098591549,
+              "recall": 1.0,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.42857142857142855,
+              "precision": 0.42857142857142855,
+              "recall": 0.42857142857142855,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.91005291005291,
+              "precision": 0.9772727272727273,
+              "recall": 0.8514851485148515,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.5957446808510638,
+              "precision": 0.42424242424242425,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      },
+      "distilroberta-base_lr5e-05_bs16_ep4_len128_1f51d54d": {
+        "hparams": {
+          "base_model": "distilroberta-base",
+          "batch_size": 16,
+          "epochs": 4,
+          "learning_rate": 5e-05,
+          "max_length": 128,
+          "max_pos_weight": 10.0,
+          "seed": 42,
+          "val_fraction": 0.25,
+          "warmup_ratio": 0.1,
+          "weight_decay": 0.01
+        },
+        "macro_f1": {
+          "high": 0.5366357440021547,
+          "low": 0.4601166094001178,
+          "point": 0.5004559225804025
+        },
+        "manifest": {
+          "base_model": "distilroberta-base",
+          "best_epoch": 2,
+          "constructs": [
+            "appraisal_orientation",
+            "attentional_focus",
+            "burnout_signal",
+            "cognitive_anxiety",
+            "coping_style",
+            "motivation_orientation",
+            "perceived_stress",
+            "resilience",
+            "self_confidence",
+            "somatic_anxiety"
+          ],
+          "degenerate_constructs": [],
+          "device": "cpu",
+          "hparams": {
+            "base_model": "distilroberta-base",
+            "batch_size": 16,
+            "epochs": 4,
+            "learning_rate": 5e-05,
+            "max_length": 128,
+            "max_pos_weight": 10.0,
+            "seed": 42,
+            "val_fraction": 0.25,
+            "warmup_ratio": 0.1,
+            "weight_decay": 0.01
+          },
+          "label_semantics": "Trained against generation_spec.planted_constructs on a synthetic corpus. Scores are a corpus property, NOT accuracy. data/gold/ is empty (OPEN-025).",
+          "n_train": 1679,
+          "n_val": 355,
+          "name": "transformer",
+          "resolved_base_model": "distilroberta-base",
+          "seed": 42,
+          "thresholds": {
+            "appraisal_orientation": 0.3,
+            "attentional_focus": 0.8,
+            "burnout_signal": 0.2,
+            "cognitive_anxiety": 0.95,
+            "coping_style": 0.25,
+            "motivation_orientation": 0.8,
+            "perceived_stress": 0.55,
+            "resilience": 0.6,
+            "self_confidence": 0.5,
+            "somatic_anxiety": 0.55
+          },
+          "torch": "2.13.0+cpu",
+          "training_fingerprint": "9a08e262812ff21b2701e9607c010a8fcb5be3ebe7e624e8c98e6381216260cf",
+          "transformers": "5.15.0",
+          "val_macro_f1_curve": [
+            0.5670940497203178,
+            0.5769686503035365,
+            0.5527917890216028,
+            0.5436437020483142
+          ]
+        },
+        "micro_f1": {
+          "high": 0.6238377007607776,
+          "low": 0.5490196078431373,
+          "point": 0.5836909871244634
+        },
+        "per_construct": {
+          "appraisal_orientation": {
+            "f1": 0.44571428571428573,
+            "precision": 0.2867647058823529,
+            "recall": 1.0,
+            "support": 39
+          },
+          "attentional_focus": {
+            "f1": 0.11538461538461538,
+            "precision": 0.10714285714285714,
+            "recall": 0.125,
+            "support": 24
+          },
+          "burnout_signal": {
+            "f1": 0.4329896907216495,
+            "precision": 0.3783783783783784,
+            "recall": 0.5060240963855421,
+            "support": 83
+          },
+          "cognitive_anxiety": {
+            "f1": 0.22222222222222218,
+            "precision": 0.6,
+            "recall": 0.13636363636363635,
+            "support": 22
+          },
+          "coping_style": {
+            "f1": 0.7683615819209039,
+            "precision": 0.6538461538461539,
+            "recall": 0.9315068493150684,
+            "support": 73
+          },
+          "motivation_orientation": {
+            "f1": 0.41935483870967744,
+            "precision": 0.7222222222222222,
+            "recall": 0.29545454545454547,
+            "support": 44
+          },
+          "perceived_stress": {
+            "f1": 0.6370370370370371,
+            "precision": 0.4725274725274725,
+            "recall": 0.9772727272727273,
+            "support": 44
+          },
+          "resilience": {
+            "f1": 0.4333333333333333,
+            "precision": 0.40625,
+            "recall": 0.4642857142857143,
+            "support": 28
+          },
+          "self_confidence": {
+            "f1": 0.9214659685863874,
+            "precision": 0.9777777777777777,
+            "recall": 0.8712871287128713,
+            "support": 101
+          },
+          "somatic_anxiety": {
+            "f1": 0.6086956521739131,
+            "precision": 0.4375,
+            "recall": 1.0,
+            "support": 28
+          }
+        },
+        "reference": {
+          "delta": 0.03872733832044278,
+          "macro_f1": 0.4617285842599597,
+          "name": "lexicon",
+          "paired_bootstrap_p": 0.1125
+        },
+        "saved_to": "models\\phase14_transformer_distilroberta-base_lr5e-05_bs16_ep4_len128_1f51d54d",
+        "slug": "distilroberta-base_lr5e-05_bs16_ep4_len128_1f51d54d",
+        "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+        "subset_accuracy": 0.4040632054176072,
+        "train_seconds": 1946.2,
+        "untuned_threshold_0.5": {
+          "delta_from_tuned": -0.11233653538681188,
+          "macro_f1": {
+            "high": 0.645083088831851,
+            "low": 0.5748287070673879,
+            "point": 0.6127924579672144
+          },
+          "micro_f1": {
+            "high": 0.6696588868940754,
+            "low": 0.6022433132010353,
+            "point": 0.63668430335097
+          },
+          "note": "Same fitted model, thresholds fixed at 0.5 instead of tuned. Quantifies how much of the tuned macro-F1 is attributable to the 10 tuned threshold parameters rather than to the encoder.",
+          "per_construct": {
+            "appraisal_orientation": {
+              "f1": 0.5306122448979591,
+              "precision": 0.3611111111111111,
+              "recall": 1.0,
+              "support": 39
+            },
+            "attentional_focus": {
+              "f1": 0.3125,
+              "precision": 0.20833333333333334,
+              "recall": 0.625,
+              "support": 24
+            },
+            "burnout_signal": {
+              "f1": 0.53125,
+              "precision": 0.7555555555555555,
+              "recall": 0.40963855421686746,
+              "support": 83
+            },
+            "cognitive_anxiety": {
+              "f1": 0.6037735849056604,
+              "precision": 0.5161290322580645,
+              "recall": 0.7272727272727273,
+              "support": 22
+            },
+            "coping_style": {
+              "f1": 0.6829268292682927,
+              "precision": 0.84,
+              "recall": 0.5753424657534246,
+              "support": 73
+            },
+            "motivation_orientation": {
+              "f1": 0.7835051546391751,
+              "precision": 0.7169811320754716,
+              "recall": 0.8636363636363636,
+              "support": 44
+            },
+            "perceived_stress": {
+              "f1": 0.6142857142857142,
+              "precision": 0.4479166666666667,
+              "recall": 0.9772727272727273,
+              "support": 44
+            },
+            "resilience": {
+              "f1": 0.5454545454545454,
+              "precision": 0.47368421052631576,
+              "recall": 0.6428571428571429,
+              "support": 28
+            },
+            "self_confidence": {
+              "f1": 0.9214659685863874,
+              "precision": 0.9777777777777777,
+              "recall": 0.8712871287128713,
+              "support": 101
+            },
+            "somatic_anxiety": {
+              "f1": 0.6021505376344086,
+              "precision": 0.4307692307692308,
+              "recall": 1.0,
+              "support": 28
+            }
+          }
+        }
+      }
+    }
+  },
+  "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy",
+  "unit": "record",
+  "what_this_measures": "How much of the synth_precomp_v1 template grammar a fine-tuned transformer recovers against the constructs the generator planted, and how much of that recovery is memorisation. NOT detection of psychological constructs in athlete text. No human-verified evaluation set exists (OPEN-025)."
+}

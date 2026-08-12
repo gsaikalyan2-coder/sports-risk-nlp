@@ -1,0 +1,128 @@
+{
+  "user_id": "A1",
+  "instance_id_ordering": [
+    "synth_precomp_v1-000008#u0",
+    "synth_precomp_v1-000011#u1",
+    "synth_precomp_v1-000017#u0",
+    "synth_precomp_v1-000027#u0",
+    "synth_precomp_v1-000034#u0"
+  ],
+  "current_instance_index": -1,
+  "current_phase_and_page": [
+    "login",
+    null
+  ],
+  "completed_phase_and_pages": [],
+  "max_assignments": -1,
+  "instance_id_to_behavioral_data": {},
+  "instance_id_to_label_to_value": {
+    "synth_precomp_v1-000008#u0": [
+      [
+        {
+          "schema": "intensity_perceived_stress",
+          "name": "2 moderate"
+        },
+        "true"
+      ]
+    ],
+    "synth_precomp_v1-000011#u1": [
+      [
+        {
+          "schema": "intensity_motivation_orientation",
+          "name": "2 moderate"
+        },
+        "true"
+      ]
+    ],
+    "synth_precomp_v1-000027#u0": [
+      [
+        {
+          "schema": "intensity_cognitive_anxiety",
+          "name": "3 strong"
+        },
+        "true"
+      ],
+      [
+        {
+          "schema": "interpretation_modifier",
+          "name": "debilitative"
+        },
+        "true"
+      ]
+    ],
+    "synth_precomp_v1-000034#u0": [
+      [
+        {
+          "schema": "flags",
+          "name": "uncertain -- I labelled it but would not defend it"
+        },
+        "true"
+      ]
+    ]
+  },
+  "instance_id_to_span_to_value": {
+    "synth_precomp_v1-000008#u0": [
+      [
+        {
+          "schema": "evidence",
+          "name": "perceived_stress",
+          "title": "perceived_stress",
+          "start": 23,
+          "end": 41,
+          "id": "span_ce078b3069d041f89a1e8cc82461ec60"
+        },
+        "true"
+      ]
+    ],
+    "synth_precomp_v1-000011#u1": [
+      [
+        {
+          "schema": "evidence",
+          "name": "motivation_orientation:approach",
+          "title": "motivation_orientation:approach",
+          "start": 53,
+          "end": 71,
+          "id": "span_8973463e29044306bbc26bb8bec83a54"
+        },
+        "true"
+      ]
+    ],
+    "synth_precomp_v1-000027#u0": [
+      [
+        {
+          "schema": "evidence",
+          "name": "cognitive_anxiety",
+          "title": "cognitive_anxiety",
+          "start": 0,
+          "end": 2,
+          "id": "span_c354a8dcba82449cb4151abad5297030"
+        },
+        "true"
+      ]
+    ]
+  },
+  "phase_to_page_to_label_to_value": {},
+  "phase_to_page_to_span_to_value": {},
+  "training_state": {
+    "completed_questions": {},
+    "total_correct": 0,
+    "total_attempts": 0,
+    "total_mistakes": 0,
+    "passed": false,
+    "failed": false,
+    "current_question_index": 0,
+    "training_instances": [],
+    "show_feedback": false,
+    "feedback_message": "",
+    "allow_retry": false,
+    "max_mistakes": -1,
+    "max_mistakes_per_question": -1,
+    "category_scores": {}
+  },
+  "qualified_categories": [],
+  "category_qualification_scores": {},
+  "instance_id_to_keyword_highlight_state": {},
+  "instance_id_to_link_to_value": {},
+  "instance_id_to_event_to_value": {},
+  "crowd_metadata": {}
+}

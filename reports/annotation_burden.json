@@ -1,0 +1,172 @@
+{
+  "gold_dev": {
+    "phase": 12,
+    "batch": "gold_dev",
+    "n_items": 100,
+    "n_annotators": 2,
+    "n_constructs": 10,
+    "timing_model": {
+      "read_context_s": 22.0,
+      "span_pass_s": 18.0,
+      "intensity_per_construct_s": 6.0,
+      "modifier_s": 5.0,
+      "flags_and_note_s": 4.0,
+      "measured": false,
+      "basis": "UNMEASURED ASSUMPTION (OPEN-026). Numbers chosen to be plausible for a 9-token median utterance read in its parent-record context; no human has been timed. Replace with TimingModel.from_measurement() after the gold_dev calibration pass."
+    },
+    "estimate_is_measured": false,
+    "seconds_per_item": 109.0,
+    "hours_per_annotator": 3.03,
+    "total_person_hours": 6.06,
+    "fatigue_threshold_hours": 2.0,
+    "exceeds_fatigue_threshold": true,
+    "recommended_sittings": 2,
+    "per_construct": [
+      {
+        "construct": "cognitive_anxiety",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "somatic_anxiety",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "self_confidence",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "motivation_orientation",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "perceived_stress",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "attentional_focus",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "burnout_signal",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "coping_style",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "resilience",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "appraisal_orientation",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 0.333,
+        "share_of_total_burden": 0.055
+      }
+    ]
+  },
+  "gold_eval": {
+    "phase": 12,
+    "batch": "gold_eval",
+    "n_items": 400,
+    "n_annotators": 2,
+    "n_constructs": 10,
+    "timing_model": {
+      "read_context_s": 22.0,
+      "span_pass_s": 18.0,
+      "intensity_per_construct_s": 6.0,
+      "modifier_s": 5.0,
+      "flags_and_note_s": 4.0,
+      "measured": false,
+      "basis": "UNMEASURED ASSUMPTION (OPEN-026). Numbers chosen to be plausible for a 9-token median utterance read in its parent-record context; no human has been timed. Replace with TimingModel.from_measurement() after the gold_dev calibration pass."
+    },
+    "estimate_is_measured": false,
+    "seconds_per_item": 109.0,
+    "hours_per_annotator": 12.11,
+    "total_person_hours": 24.22,
+    "fatigue_threshold_hours": 2.0,
+    "exceeds_fatigue_threshold": true,
+    "recommended_sittings": 7,
+    "per_construct": [
+      {
+        "construct": "cognitive_anxiety",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "somatic_anxiety",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "self_confidence",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "motivation_orientation",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "perceived_stress",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "attentional_focus",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "burnout_signal",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "coping_style",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "resilience",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      },
+      {
+        "construct": "appraisal_orientation",
+        "marginal_seconds_per_item": 6.0,
+        "marginal_hours_over_batch": 1.333,
+        "share_of_total_burden": 0.055
+      }
+    ]
+  }
+}

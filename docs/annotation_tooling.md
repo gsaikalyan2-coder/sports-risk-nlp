@@ -191,6 +191,29 @@ agreement, it cannot be undone, and it makes the headline statistic worthless.
 - 48 tests in `tests/test_annotation.py`, all offline.
 - One test asserts the shipped roster has exactly one annotator — if it starts failing,
   someone has been recruited.
+- **13 tests in `tests/test_potato_output.py` run against output written by Potato 2.7.1's
+  own serialiser** (recorded under `tests/fixtures/potato/`), including a check that the raw
+  `user_state.json` and the JSONL export produce identical payloads, and an end-to-end run
+  from two real passes to a kappa. See §8b for what that check found.
+
+## 8b. What running against real Potato output found (OPEN-027)
+
+The ingest path had been written against an *assumed* Potato interface and never executed
+against the real one. It did not work. Three mismatches — the output lives in
+`annotation_output/<user_id>/user_state.json` rather than any `.jsonl`; the item key is
+`instance_id`; and **Potato spans carry `start`/`end` offsets and no surface text at all.**
+
+The third was the dangerous one. `_collect_spans` silently skipped spans with no surface
+text, so against real output every span would have vanished and the item would then have been
+counted as "not yet annotated" — evidence lost without an error. `src/annotation/
+potato_output.py` is the fix, and it makes the situation better than it was assumed to be:
+because the surface text is now produced by slicing the utterance with Potato's own offsets,
+**a gold evidence span cannot be a paraphrase.** The invariant `SilverLabel` enforces with a
+check, gold gets by construction.
+
+This is the second time in this project that "written carefully, never run" turned out to mean
+"broken" (the first was the Phase 6 cost ledger, OPEN-024). OPEN-007 and OPEN-008 are the two
+remaining unexecuted paths and should be assumed broken until executed.
 
 ## 10. Honest limitations
 
@@ -203,9 +226,15 @@ agreement, it cannot be undone, and it makes the headline statistic worthless.
    generator supports a `constructs` filter so the set can be trimmed on evidence.
 4. **Span F1 uses token overlap**, which is lenient. It rewards finding the same evidence, not
    the same boundaries, and the paper should say so.
-5. **Potato's output format is version-coupled.** `ingest.py` reads 2.7.1's span and
-   annotation keys defensively but is not guaranteed against a future release. The pin is the
-   mitigation.
+5. **Potato's output format is version-coupled, and this is now a demonstrated risk rather
+   than a theoretical one.** The parser was written against an interface Potato 2.7.1 does not
+   have (§8b). `potato_output.py` handles both artifacts 2.7.1 writes and is defensive about
+   shape, but it is not guaranteed against a future release. The pin in `POTATO_VERSION` is
+   the mitigation, and **`tests/fixtures/potato/` must be regenerated if that pin is raised** —
+   the recorded artifacts are the only thing that would catch the same class of change again.
+6. **The recorded fixtures are a rehearsal, not data.** The judgements in them were produced
+   by a script to exercise the parser; they carry no psychological meaning and must never be
+   read as annotations.
 6. **The corpus is still 100% synthetic (OPEN-011).** A real inter-annotator agreement figure
    over text no athlete ever said is a real number about an unreal corpus, and the paper must
    frame it that way.

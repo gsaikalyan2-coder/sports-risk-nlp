@@ -95,7 +95,7 @@ revisited at Phase 7.
 
 | Category | Why |
 |---|---|
-| Scraping personal social-media accounts | Public ≠ consented. Personal posts are not professional-capacity speech and users do not anticipate psychological profiling. |
+| Scraping personal social-media accounts — **account-centred** collection: user timelines, profile harvesting, or following named individuals across posts | Public ≠ consented. Personal posts are not professional-capacity speech and users do not anticipate psychological profiling. **Narrowed 2026-08-11 — see §3.5.** Topic-scoped collection from public pseudonymous forums is now permitted as category A5 under binding conditions. Account-centred collection remains prohibited without exception. |
 | Any text from an identifiable **minor** (under 18) | Youth athletes are a vulnerable population; profiling them requires ethics-board review and guardian consent that this project does not have. |
 | Private communications — DMs, team chats, medical notes, counselling records, journals not donated under A3 | No consent, and the last two are special-category health data. |
 | Any source whose licence forbids research use, or whose terms of service forbid the collection method | Legal exposure and reviewer challenge. |
@@ -172,6 +172,159 @@ personal contact details — record the reference number here instead) and cite 
 Ethics section. Tracked as **OPEN-005** in `docs/open_issues.md`.
 
 ---
+
+### 3.5 Category A5 — public pseudonymous forum text *(owner amendment, 2026-08-11)*
+
+**This section amends a previously non-negotiable prohibition. It is written to be read by a
+reviewer, including the parts that argue against the decision.**
+
+#### What changed and why
+
+Until 2026-08-11 the prohibition on "scraping personal social-media accounts" was absolute. Phase 7
+(2026-08-09) had established that **no public corpus of pre-competition athlete text exists** — all
+four surveyed candidates were post-match, which is the wrong side of the event for an anticipatory
+taxonomy (`appraisal_orientation`, anticipatory `cognitive_anxiety`). That left the project with a
+synthetic corpus and no real text, and contribution #1 depends on real text (**OPEN-011**).
+
+Public pseudonymous forum communities for amateur endurance athletes — r/running, r/triathlon,
+r/swimming, r/climbing and similar — contain genuinely **anticipatory** pre-competition writing
+that exists nowhere else in accessible form. The owner has decided to permit topic-scoped
+collection from these communities, as **category A5**, under the binding conditions in §3.5.3.
+
+**The prohibition is narrowed, not repealed.** Account-centred collection — user timelines, profile
+harvesting, following a named individual across posts, or assembling any per-author history —
+remains prohibited without exception. A5 permits collecting *posts matched by topic*, never
+*people matched by identity*. That distinction is the whole substance of this amendment: it is the
+difference between studying a discourse and profiling a person.
+
+#### 3.5.1 The argument for
+
+1. **Anticipatory by nature.** A post written the night before a race is pre-competition text in the
+   sense the taxonomy requires. Press material is not.
+2. **Pseudonymous at source.** Handles are not legal names, so de-identification begins from a much
+   better baseline than named-athlete material under A4.
+3. **Documented research genre.** Reddit-based psychological NLP is established practice with a
+   published ethics literature (the CLPsych shared tasks; Benton, Coppersmith & Dredze 2017,
+   *Ethical Research Protocols for Social Media Health Research*). The conditions in §3.5.3 are
+   drawn from that literature rather than invented here.
+4. **Amateur, not elite.** Non-public-figure amateurs face no selection, contract, or reputational
+   consequence from a research corpus, unlike the named professionals A4 covers.
+
+#### 3.5.2 The argument against, recorded rather than resolved
+
+**The original prohibition's stated reason is not fully answered by this amendment, and the paper
+must say so.**
+
+P1 objected that *"users do not anticipate psychological profiling."* Pseudonymity, API terms and
+amateur status all address **identifiability**. None of them addresses **anticipation of use**.
+Someone posting "terrified about my race tomorrow" in a running community expects encouragement
+from other runners. They do not expect to be scored on a burnout index. That expectation gap is
+real, it survives every safeguard below, and the honest position is that A5 accepts a residual
+ethical cost rather than eliminating one.
+
+Three further objections that the conditions mitigate but do not remove:
+
+- **Pseudonymity is not anonymity.** A distinctive verbatim sentence is searchable and can
+  re-identify an author. Condition C6 exists for this and is absolute.
+- **No opportunity to withdraw before collection.** Unlike A3, subjects cannot decline in advance.
+  C9 (honouring deletion) is a partial and retrospective substitute.
+- **Selection bias.** People who post about pre-race nerves are not a random sample of athletes,
+  which is a validity problem as well as an ethical one. It belongs in §6 and in the paper's
+  limitations.
+
+**If a reviewer finds this amendment unpersuasive, the fallback is A3** — recruiting the same
+communities for *consented donation* rather than collecting from them. A3 is already permitted and
+was unblocked on 2026-08-08. It remains available and is the ethically cleaner route; it was not
+chosen because recruitment lead time is incompatible with the project's remaining schedule. That
+reasoning is a resourcing constraint, not an ethical argument, and it is recorded here as such.
+
+#### 3.5.3 Binding conditions — all mandatory, none advisory
+
+| # | Condition |
+|---|---|
+| C1 | **Topic-scoped only.** Collection is by subreddit and pre-competition query. Never by author, never a user timeline, never a per-author history. |
+| C2 | **Public and unauthenticated only.** Either **(a)** the official API via a registered application with declared research use, **or** **(b)** public read-only JSON endpoints with a descriptive User-Agent, single-threaded and rate-limited to ≤10 requests/minute. Rate limits respected either way. No login-walled, private, quarantined, or paywalled content (P5 stands). **Route (b) was added 2026-08-12 and carries a caveat — see §3.5.5.** |
+| C3 | **Adults only.** Any post indicating a minor author, or drawn from a youth/school-age community, is excluded (P2 stands, unweakened). |
+| C4 | **No health content.** Posts whose subject is injury, illness, treatment, medication, or a mental-health diagnosis are excluded at ingestion (P6 stands). Pre-competition nerves are in scope; a disclosed anxiety disorder is not. |
+| C5 | **De-identification before use.** §5 pipeline runs before any text reaches a model. Usernames, handles, URLs, club and school names, locations, and race names that pin an individual are replaced. `deidentified` stays false until it has run. |
+| C6 | **No verbatim publication, ever.** No collected sentence appears in the paper, dashboard, figures, or examples. Illustrations are synthetic or paraphrased beyond re-identification. A verbatim quote is an identifier. |
+| C7 | **No individual-level output.** No per-author or per-post risk score is published, exported, or shown. Aggregate only. |
+| C8 | **No contact.** Authors are never messaged, replied to, or approached about their inclusion. |
+| C9 | **Deletion is honoured.** Posts deleted or removed upstream are dropped from the corpus at the next refresh and are not retained in derived artefacts where separable. |
+| C10 | **No redistribution of source text.** Derived artefacts only — labels, statistics, models. The raw collection is not published. Post IDs may be released for reproducibility only if C6 and C9 remain satisfiable. |
+| C11 | **Data minimisation.** Post body and coarse metadata only (subreddit, days-to-competition where stated, sport, level). No author metadata, karma, history, or cross-posting graph. |
+
+Violation of any condition is an ingestion refusal, logged to `logs/ingestion_refusals.log`. The
+fail-closed contract in `config/data_sources_allowlist.yaml` is unchanged and **no bypass flag may
+be added to the checking path**.
+
+#### 3.5.4 What this does not change
+
+- **P1 still prohibits account-centred collection.** Narrowed in scope, not removed.
+- **P2 (minors), P3 (private communications), P4 (licence/ToS), P5 (authenticated/paywalled),
+  P6 (health content), P7 (provenance)** all stand unweakened and apply to A5 in full.
+- **§2.1 non-diagnosis and §2.3 prohibited uses** are unaffected. A5 text may never be used to make
+  a claim about any identifiable person.
+- **Institutional review.** §3.4's exemption was determined for *secondary analysis of public,
+  licensed, consented, and synthetic text*. A5 is public secondary analysis and is within the
+  scope of that determination as written. **This should nonetheless be confirmed rather than
+  assumed** — the exemption predates this amendment and the determining body did not see it.
+  Tracked as **OPEN-030**; resolve before submission, alongside OPEN-005.
+
+---
+#### 3.5.5 C2 route (b) — unauthenticated public endpoints *(2026-08-12)*
+
+**Why it was added.** The owner was unable to register a Reddit application. C2 as originally
+drafted required one, which would have made A5 unusable in practice.
+
+**The caveat, stated plainly because it does not go away.** Reddit's Data API Terms ask
+programmatic users to register an application. Reading public `.json` endpoints without
+registering is **a gray area, not a clearly permitted collection method.** Therefore:
+
+> **P4 (licence or ToS forbids the collection method) is NOT automatically satisfied by route (b).**
+
+This is a weaker compliance position than route (a), and the difference is a genuine one rather
+than a formality. Consequences that follow:
+
+1. **Route (a) is preferred wherever available.** Registering a script application is free and
+   takes minutes. Route (b) exists because a specific person was blocked, not because it is
+   equivalent.
+2. **The paper must describe the collection method accurately** — "public read-only endpoints,
+   unauthenticated, rate-limited to under 10 requests per minute" — and must not describe it as
+   "via the Reddit API" if route (b) was used. Those are different claims.
+3. **Volume stays low.** Route (b) is for assembling a small gold set (order 10²), not a training
+   corpus. If the project ever needs volume, that is the point at which registering stops being
+   optional.
+4. **If Reddit's terms change, or access is refused or rate-limited as a signal, collection
+   stops.** A block is an answer, not an obstacle to route around.
+
+**Tracked as OPEN-031.** Before submission, either register an application and re-collect under
+route (a), or state route (b) explicitly in the paper's ethics section. Do not leave it implicit.
+
+##### Outcome, 2026-08-12: route (b) was attempted and is closed
+
+Route (b) was exercised the day it was added. **Every request returned `HTTP 403 Blocked`** —
+eight of eight communities, zero posts fetched, zero records written. Reddit refuses
+unauthenticated programmatic reads.
+
+Applying point 4 above without argument: **that is the answer, and collection under route (b)
+stops.** No User-Agent rotation, no proxy, no browser impersonation, no retry schedule. Each of
+those is circumvention of an access control, which is **P5**, and P5 stands unweakened under A5
+(§3.5.4). A route granted on the condition that a block ends it does not get to treat the block
+as a bug.
+
+Route (b) is therefore **retained in the policy as written but recorded as non-functional**. It
+is not removed, because the reasoning and its caveat are part of the project's audit trail and a
+future reader should be able to see that the permissive route was tried, failed, and was not
+worked around.
+
+**The remaining routes for OPEN-011 are (a) a registered application, or A3 consented donation.**
+
+
+**The cleaner alternative remains available and unblocked.** A3 consented donation needs no
+credentials, no API, and no ToS judgement at all. It was not chosen because of recruitment lead
+time (§3.5.2), and that remains a resourcing constraint rather than an ethical argument.
+
 
 ## 4. Consent and licensing rules
 

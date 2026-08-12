@@ -23,3 +23,9 @@ ignore = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    # Phase 14. A fine-tune, even a one-epoch one on a tiny checkpoint, is
+    # minutes rather than milliseconds, and it needs requirements-ml.txt. Marked
+    # so the fast suite stays fast: `pytest -m "not slow"`.
+    "slow: needs the ML stack and takes minutes (transformer fine-tuning)",
+]

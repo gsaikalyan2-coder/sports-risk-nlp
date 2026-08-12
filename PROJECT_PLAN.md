@@ -22,7 +22,10 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 
 ## STATUS BOARD (updated 2026-08-10, end of Phase 9)
 
-**Week 3 of 8.** Phases 1–9b complete and gated. Next: **Phase 10** (blocked on an OpenRouter key).
+**Week 3 of 8.** Phases 1–10 complete and gated (10 offline only). Phases 11 and 12 have their
+tooling built, tested and gated; **both gates are blocked on the same missing person**
+(OPEN-025, the second annotator). Every phase from here that consumes gold inherits that
+block, so recruiting is now the critical path and no amount of code shortens it.
 
 | Phase | Status | Evidence |
 |---|---|---|
@@ -36,7 +39,10 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 | 8 Preprocessing & de-ID | ✅ | **9,302** utterances · fixture 34/34 exact, leak rate 0% |
 | 9 EDA & quality profiling | ✅ | `reports/eda.md` · gold plan, 400 items, 0/10 below floor |
 | **9b Corpus hardening** | ✅ | **15 templates/construct**, vocab 625→**860**, duplication 87.4%→**37.6%** |
-| **10 Weak labelling** | **NEXT** — blocked on `OPENROUTER_API_KEY` (OPEN-008) | — |
+| 10 Weak labelling | ✅ **offline only** | **9,302** silver labels verified; no live OpenRouter call has ever been made (OPEN-008/OPEN-023) |
+| 11 Gold verification | **tooling ✅, gate UNMEASURABLE** | Potato ingest verified against real Potato 2.7.1 output (OPEN-027 closed, and it was broken). Kappa needs a second human — **OPEN-025** |
+| **12 Label validation & taxonomy refinement** | **tooling ✅, gate BLOCKED** | `src/taxonomy/` + `scripts/run_taxonomy_refinement.py`. `--burden` and `--propose` run today; `--refine` is blocked on gold, i.e. on OPEN-025 |
+| **13 Baselines** | ✅ **gate PASSED, numbers PROVISIONAL** | `src/models/` + `scripts/run_baselines.py` · `reports/baselines.{md,json}`. Six systems scored with bootstrap CIs. **Honest floor is the lexicon at 0.462 macro-F1** on the template-disjoint split; TF-IDF+LogReg 0.222, LinearSVC 0.181. All figures are planted-label *corpus-property* measurements, **not accuracy** — `data/gold/` is empty (OPEN-025). **OPEN-028 raised:** silver labels are PRNG output |
 
 **Live risks, in order.** These supersede the generic risk list at the foot of this file.
 
@@ -46,6 +52,7 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 | 2 | **OPEN-004 — no expert raters recruited.** Longest lead time of anything left; Phase 17 is the headline contribution. Was due Week 1–2. | open, **3 phases overdue** |
 | 3 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
 | 4 | **OPEN-021 — the lexicon baseline is not independent of the corpus.** Shared ancestry with the template bank via `taxonomy.yaml` examples; macro-F1 0.780 → 0.461 once the bank stopped reusing those phrasings. A paper obligation, not a bug. | open, Phase 18 |
+| 5 | **OPEN-028 — the entire silver set is PRNG output, not labels.** Consequence of OPEN-008, discovered at Phase 13. All 9,302 labels come from the offline stub's `rng.randrange`; single-label, 6/10 constructs, chance agreement. Phase 14's "train on gold+silver" is currently "train on gold + noise". | open, **blocks Phase 14 as written** |
 
 **Closed since the last revision:** OPEN-003 (off-machine backup), OPEN-013, OPEN-015,
 OPEN-016, OPEN-017, OPEN-018, OPEN-020. **Push at the end of every phase; a remote that stops
@@ -296,6 +303,28 @@ Sec = Security/Ethics · Pap = Paper.
 - **Parallel agents:** Mod ×2 (lexicon + classical, in parallel).
 - **Deliverable:** Baseline metrics in `reports/`.
 - **Gate:** Reproducible baseline macro-F1 recorded.
+- **Outcome (2026-08-11): gate PASSED, every number PROVISIONAL.**
+  `src/models/{dataset,classical}.py`, `scripts/run_baselines.py`, `tests/test_models.py` (19 tests).
+  Reproducibility is asserted at full float precision, not `approx`.
+
+  | system | template-disjoint macro-F1 [95% CI] | random | gap |
+  |---|---|---|---|
+  | majority | 0.000 | 0.000 | +0.000 |
+  | stratified random | 0.104 [0.082, 0.126] | 0.175 | +0.071 |
+  | memorisation probe | 0.197 [0.162, 0.228] | 0.720 | +0.523 |
+  | **lexicon** | **0.462 [0.432, 0.494]** | 0.562 | +0.100 |
+  | TF-IDF + LogReg | 0.222 [0.181, 0.259] | 0.999 | +0.777 |
+  | TF-IDF + LinearSVC | 0.181 [0.150, 0.212] | **1.000** | **+0.819** |
+
+  Three findings the paper should carry:
+  1. **The bar for Phase 14 is the lexicon at 0.462**, not the learned models. Both classical
+     models score *below* the lexicon on the honest split. The 0.462 also independently
+     reproduces the OPEN-021 floor of 0.461.
+  2. **A linear model over TF-IDF memorises this corpus perfectly** — 1.000 macro-F1 on a
+     random split, 0.181 template-disjoint. The +0.819 gap is the strongest evidence yet for
+     OPEN-012 and belongs in the paper as a result, not a diagnostic.
+  3. These are **planted-label corpus-property measurements, not accuracy.** `data/gold/` is
+     empty (OPEN-025). `--gold` refuses rather than falling back to silver.
 
 ### Phase 14 — Transformer fine-tuning
 - **Objective:** The main model.

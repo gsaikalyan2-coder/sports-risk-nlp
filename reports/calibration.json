@@ -1,0 +1,359 @@
+{
+  "calibration": {
+    "per_construct": {
+      "appraisal_orientation": {
+        "ece_raw": 0.1149392100380375,
+        "ece_scaled": 0.024261449380124193,
+        "improved": true,
+        "mce_raw": 0.23961432177357989,
+        "mce_scaled": 0.2836233655704291,
+        "support_test": 39,
+        "support_val": 16,
+        "temperature": 0.5152838197199592,
+        "temperature_at_search_bound": false
+      },
+      "attentional_focus": {
+        "ece_raw": 0.1301092607520348,
+        "ece_scaled": 0.09294046780028038,
+        "improved": true,
+        "mce_raw": 0.7650410632442796,
+        "mce_scaled": 0.8339627175667018,
+        "support_test": 24,
+        "support_val": 16,
+        "temperature": 0.7314349766947728,
+        "temperature_at_search_bound": false
+      },
+      "burnout_signal": {
+        "ece_raw": 0.08150429484468502,
+        "ece_scaled": 0.07053757950258593,
+        "improved": true,
+        "mce_raw": 0.4653856582004984,
+        "mce_scaled": 0.46005496779272226,
+        "support_test": 83,
+        "support_val": 29,
+        "temperature": 0.866088023350907,
+        "temperature_at_search_bound": false
+      },
+      "cognitive_anxiety": {
+        "ece_raw": 0.15757276704042247,
+        "ece_scaled": 0.06386927412220049,
+        "improved": true,
+        "mce_raw": 0.626085733246106,
+        "mce_scaled": 0.877331326240351,
+        "support_test": 22,
+        "support_val": 6,
+        "temperature": 0.2620013110457884,
+        "temperature_at_search_bound": false
+      },
+      "coping_style": {
+        "ece_raw": 0.053641358399480796,
+        "ece_scaled": 0.07609223717783699,
+        "improved": false,
+        "mce_raw": 0.4960366809342334,
+        "mce_scaled": 0.503152995101398,
+        "support_test": 73,
+        "support_val": 38,
+        "temperature": 0.7597048387836289,
+        "temperature_at_search_bound": false
+      },
+      "motivation_orientation": {
+        "ece_raw": 0.09126949910307759,
+        "ece_scaled": 0.05441104493177823,
+        "improved": true,
+        "mce_raw": 0.24513791534325258,
+        "mce_scaled": 0.2495977654110333,
+        "support_test": 44,
+        "support_val": 19,
+        "temperature": 0.7983663066605218,
+        "temperature_at_search_bound": false
+      },
+      "perceived_stress": {
+        "ece_raw": 0.10690194499870054,
+        "ece_scaled": 0.07130518904850675,
+        "improved": true,
+        "mce_raw": 0.4054600462108696,
+        "mce_scaled": 0.804323955213741,
+        "support_test": 44,
+        "support_val": 29,
+        "temperature": 0.6764253686945965,
+        "temperature_at_search_bound": false
+      },
+      "resilience": {
+        "ece_raw": 0.02031066745363018,
+        "ece_scaled": 0.08908571179309625,
+        "improved": false,
+        "mce_raw": 0.44327870372139416,
+        "mce_scaled": 0.4357084837721709,
+        "support_test": 28,
+        "support_val": 78,
+        "temperature": 1.4383648086470955,
+        "temperature_at_search_bound": false
+      },
+      "self_confidence": {
+        "ece_raw": 0.08486981614270897,
+        "ece_scaled": 0.20106489733302962,
+        "improved": false,
+        "mce_raw": 0.4016624140907692,
+        "mce_scaled": 0.8383940100760097,
+        "support_test": 101,
+        "support_val": 0,
+        "temperature": 0.3508534494180652,
+        "temperature_at_search_bound": false
+      },
+      "somatic_anxiety": {
+        "ece_raw": 0.07865992169233152,
+        "ece_scaled": 0.06214320916164439,
+        "improved": true,
+        "mce_raw": 0.5407175055317766,
+        "mce_scaled": 0.5442197498916219,
+        "support_test": 28,
+        "support_val": 34,
+        "temperature": 0.920247934059631,
+        "temperature_at_search_bound": false
+      }
+    },
+    "pooled": {
+      "bins_raw": [
+        {
+          "confidence": 0.06440535795512234,
+          "count": 1901,
+          "lower": 0.0,
+          "observed": 0.02998421883219358,
+          "upper": 0.1
+        },
+        {
+          "confidence": 0.1413831563588011,
+          "count": 1423,
+          "lower": 0.1,
+          "observed": 0.08573436401967674,
+          "upper": 0.2
+        },
+        {
+          "confidence": 0.24240007619614537,
+          "count": 519,
+          "lower": 0.2,
+          "observed": 0.2119460500963391,
+          "upper": 0.3
+        },
+        {
+          "confidence": 0.3467475430948103,
+          "count": 273,
+          "lower": 0.3,
+          "observed": 0.29304029304029305,
+          "upper": 0.4
+        },
+        {
+          "confidence": 0.44733182426398943,
+          "count": 173,
+          "lower": 0.4,
+          "observed": 0.3179190751445087,
+          "upper": 0.5
+        },
+        {
+          "confidence": 0.5401780814675163,
+          "count": 80,
+          "lower": 0.5,
+          "observed": 0.375,
+          "upper": 0.6
+        },
+        {
+          "confidence": 0.6348107941653668,
+          "count": 43,
+          "lower": 0.6,
+          "observed": 0.37209302325581395,
+          "upper": 0.7
+        },
+        {
+          "confidence": 0.7405100786014193,
+          "count": 12,
+          "lower": 0.7,
+          "observed": 0.8333333333333334,
+          "upper": 0.8
+        },
+        {
+          "confidence": 0.8345455682034337,
+          "count": 4,
+          "lower": 0.8,
+          "observed": 1.0,
+          "upper": 0.9
+        },
+        {
+          "confidence": 0.9222362119926568,
+          "count": 2,
+          "lower": 0.9,
+          "observed": 1.0,
+          "upper": 1.0
+        }
+      ],
+      "bins_scaled": [
+        {
+          "confidence": 0.03560939355721438,
+          "count": 2820,
+          "lower": 0.0,
+          "observed": 0.04929078014184397,
+          "upper": 0.1
+        },
+        {
+          "confidence": 0.14010246440051013,
+          "count": 924,
+          "lower": 0.1,
+          "observed": 0.12337662337662338,
+          "upper": 0.2
+        },
+        {
+          "confidence": 0.24408844951799408,
+          "count": 301,
+          "lower": 0.2,
+          "observed": 0.2724252491694352,
+          "upper": 0.3
+        },
+        {
+          "confidence": 0.34152092575820797,
+          "count": 155,
+          "lower": 0.3,
+          "observed": 0.32903225806451614,
+          "upper": 0.4
+        },
+        {
+          "confidence": 0.44776595490633464,
+          "count": 89,
+          "lower": 0.4,
+          "observed": 0.42696629213483145,
+          "upper": 0.5
+        },
+        {
+          "confidence": 0.5432722121947194,
+          "count": 57,
+          "lower": 0.5,
+          "observed": 0.38596491228070173,
+          "upper": 0.6
+        },
+        {
+          "confidence": 0.6536130102155704,
+          "count": 39,
+          "lower": 0.6,
+          "observed": 0.3333333333333333,
+          "upper": 0.7
+        },
+        {
+          "confidence": 0.7398867514713361,
+          "count": 24,
+          "lower": 0.7,
+          "observed": 0.625,
+          "upper": 0.8
+        },
+        {
+          "confidence": 0.8444406271761155,
+          "count": 14,
+          "lower": 0.8,
+          "observed": 0.42857142857142855,
+          "upper": 0.9
+        },
+        {
+          "confidence": 0.9353835797307265,
+          "count": 7,
+          "lower": 0.9,
+          "observed": 0.8571428571428571,
+          "upper": 1.0
+        }
+      ],
+      "ece_raw": 0.05054656352282401,
+      "ece_scaled": 0.021881949619953867,
+      "mce_raw": 0.26271777090955284,
+      "mce_scaled": 0.4158691986046869,
+      "n": 4430
+    }
+  },
+  "context_interface": {
+    "context_changed_the_score": true,
+    "context_features_used": [
+      "hours_to_competition",
+      "training_load"
+    ],
+    "contextual_index": 0.5762504142459786,
+    "text_only_index": 0.5342959698227016,
+    "text_only_unchanged_when_context_passed": true
+  },
+  "environment": {
+    "n_test": 443,
+    "n_train": 1828,
+    "n_val": 286,
+    "probability_source": "Phase 13 TF-IDF + logistic regression (interim source; macro-F1 0.222)",
+    "python": "3.10.12",
+    "seed": 42
+  },
+  "gate": {
+    "context_interface_ok": true,
+    "decomposition_readable": true,
+    "ece_reported": true,
+    "note": "The gate asks for ECE to be REPORTED, not to be low. A high ECE that is measured and stated is a result; a low one obtained by fitting the calibrator on the evaluation data is a fabrication.",
+    "passed": true,
+    "risk_index_calibration_correctly_refused": true
+  },
+  "generated_on": "2026-08-11",
+  "is_accuracy": false,
+  "phase": 15,
+  "risk_index_is_calibrated": false,
+  "risk_index_status": "RANKING ONLY -- the fused risk index is not calibrated and is not a probability. No risk outcome exists to calibrate it against.",
+  "scorer": {
+    "context_weights": {},
+    "directions": {
+      "appraisal_orientation": "polar",
+      "attentional_focus": "polar",
+      "burnout_signal": "raises",
+      "cognitive_anxiety": "raises",
+      "coping_style": "polar",
+      "motivation_orientation": "polar",
+      "perceived_stress": "raises",
+      "resilience": "lowers",
+      "self_confidence": "lowers",
+      "somatic_anxiety": "raises"
+    },
+    "fitted": false,
+    "interpretation_multiplier": {
+      "debilitative": 1.5,
+      "facilitative": 0.5,
+      "unclear": 1.0
+    },
+    "is_calibrated": false,
+    "magnitudes": {
+      "appraisal_orientation": 1.0,
+      "attentional_focus": 1.0,
+      "burnout_signal": 1.5,
+      "cognitive_anxiety": 1.5,
+      "coping_style": 1.0,
+      "motivation_orientation": 1.0,
+      "perceived_stress": 1.0,
+      "resilience": 1.0,
+      "self_confidence": 1.0,
+      "somatic_anxiety": 1.0
+    },
+    "polarity_policy": "neutral",
+    "provenance": "Research artifact. Constructs inferred from text by a classifier trained on synthetic data against planted labels; no human-verified labels exist (OPEN-025) and no real athlete text has been used (OPEN-011). Not a clinical instrument and not a judgement about any real person.",
+    "scorer": "LinearRiskScorer",
+    "temperature": 1.0,
+    "text_only": true,
+    "why_not_fitted": "No risk target exists. No athlete in this corpus has a measured pre-competition risk score, so a learned fusion would be fitting an invented target."
+  },
+  "sensitivity": {
+    "baseline_mean_index": 0.6393082494969075,
+    "variants": {
+      "polarity_optimistic": {
+        "mean_absolute_shift": 0.1568489959309567,
+        "mean_index": 0.48245925356595093,
+        "spearman_vs_baseline": 0.6640684891913149
+      },
+      "polarity_pessimistic": {
+        "mean_absolute_shift": 0.12719791219973087,
+        "mean_index": 0.7665061616966385,
+        "spearman_vs_baseline": 0.8302985221721113
+      },
+      "uniform_magnitudes": {
+        "mean_absolute_shift": 0.03961184024089833,
+        "mean_index": 0.5996964092560093,
+        "spearman_vs_baseline": 0.9792589797237254
+      }
+    }
+  },
+  "status": "PROVISIONAL -- planted-label measurement, NOT model accuracy"
+}

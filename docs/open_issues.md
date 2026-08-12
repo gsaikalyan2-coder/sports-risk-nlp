@@ -1074,6 +1074,7 @@ fails, which is worse than an honest interim one.
 | 2026-08-09 | Phase 7 follow-up. OPEN-012 **substantially mitigated** (generator v1.1 lexical variation: vocab 444->638, distinct texts 81%->97%; plus template-disjoint splitting in `src/evaluation/`, memorisation probe drops 0.732->0.198). OPEN-013 **fixture delivered** (34 cases, 8 negatives). Allow-list and ethics.md version headers corrected to 1.1. |
 | 2026-08-09 | Phase 7. Source survey found **no public pre-competition athlete corpus**; owner chose synthetic-first. OPEN-011 (no real athlete text), OPEN-012 (synthetic vocabulary too small), OPEN-013 (de-identification unvalidatable against an identifier-free corpus) logged. OPEN-011 supersedes risk #1 in `PROJECT_PLAN.md` as the project's live highest risk. |
 | 2026-08-09 | **Phase 8. OPEN-013 CLOSED** — de-identifier measured against the fixture: precision 100%, recall 100%, exact 100% (34/34), leak rate 0%, negatives 8/8, reported per difficulty band; held-out 10-case probe 10/10. Fixture case `name_01` corrected: it had required a bare role noun to be redacted, contradicting `negative_04` and `docs/ethics.md` §5.1; the implementation was not changed to chase it. Language-filter defect found and fixed by running the pipeline: unequal stopword profiles dropped 2 English records as Portuguese (`docs/preprocessing.md` §4.1). **OPEN-015 raised** — generator v1.1 substitution produced "corner of me" in 9/1,200 records; owned by Phase 9. |
+| 2026-08-11 | **Phase 13. Gate PASSED; every number PROVISIONAL.** `src/models/{dataset,classical}.py`, `scripts/run_baselines.py`, `tests/test_models.py` (19 tests, 416→435). Six systems scored under template-disjoint and random splits with bootstrap CIs. **The honest floor is the lexicon at 0.462** — both learned classical models score *below* it (LogReg 0.222, LinearSVC 0.181), while LinearSVC hits **1.000 on the random split**, a **+0.819** memorisation gap that is the strongest OPEN-012 evidence yet. **OPEN-028 raised:** the whole silver set is PRNG output keyed on the prompt hash, a consequence of OPEN-008 — single-label, 6/10 constructs, chance agreement; `--gold` refuses rather than falling back to it. |
 | 2026-08-10 | **Phase 9b. OPEN-018 and OPEN-020 CLOSED.** OPEN-020: template bank 7-12 -> **15 realisations per construct** (150 templates, 5 phrasings held out per construct against 2-4); realised vocabulary **625 -> 860** (+38%). OPEN-018: discourse suffixes became **clauses** rather than sentences after the obvious fix (a bigger suffix bank) was implemented and measured to do nothing — utterance duplication **87.4% -> 37.6%**, utterance count 13,651 -> 9,302, median utterance length 9 -> **17 tokens**. The ratchet flagged **28 new unruled substitution frames** and blocked the build until each was judged. All four gates re-run and PASSED; 253 tests. **OPEN-021 raised** — the lexicon baseline is NOT independent of the corpus (shared ancestry via `taxonomy.yaml` positive_examples): it fires on 73% of pre-9b templates and 22% of 9b templates, macro-F1 **0.780 -> 0.461**, and Phase 9's cue-fraction correction is **withdrawn**. |
 | 2026-08-10 | **Phase 9 follow-up. OPEN-016 and OPEN-017 CLOSED.** OPEN-016 by generation-time guard (generator **v1.3**, `substitution_verdicts.py`): defective records **190/1,200 → 0/4,000**, zero synonym groups deleted, realised vocabulary 643 → 625 against 594 had the 34 implicated members been deleted instead. OPEN-017 by raising `DEFAULT_COUNT` 1,200 → **4,000**: gold_eval **235 → 400** items, constructs below the 40-positive floor **7/10 → 0/10**. All four gates re-run and PASSED; 251 tests. **OPEN-020 raised** — corrected for the 0.62 cue fraction, 7/10 constructs still fall short, and the sweep shows no corpus size fixes it; the remedy is ~15 templates per construct. **OPEN-018 worsened as predicted**: utterance duplication 73.6% → **87.4%**. |
 | 2026-08-10 | **Phase 9. OPEN-015 CLOSED** — `("part","portion","corner","piece")` deleted, generator bumped to v1.2, corpus regenerated at seed 42, Phase 7 / Phase 8 / benchmark gates all re-run and PASSED. 4,110 → **4,141** utterances; memorisation probe 0.732/0.198 → 0.738/0.146. Four issues raised: **OPEN-016** (exhaustive synonym sweep — 727 substitution events, 127 flagged signatures, **15.8% of records still carry a broken/degraded substitution**; OPEN-015 was not isolated), **OPEN-017** (gold pool too small — 235 of a 400 target, 7/10 constructs below the 40-positive floor; 4,000 generated records measured as the minimum), **OPEN-018** (**73.6% utterance-level exact duplication**, a segmentation artefact invisible at record level; mitigated in the sampling plan), **OPEN-019** (`generation_spec` replicated onto every utterance). Three published numbers corrected: v1.1 vocabulary 638→**635**, distinct texts 1,163→**1,161**, `"corner of me"` 11→**9** in a code comment. Deliverables: `reports/eda.md`, 9 SVG figures, `notebooks/01_eda.ipynb`, `data/processed/gold_candidates/sampling_plan.json`. |
@@ -1358,9 +1359,33 @@ phases.
 
 ## OPEN-026 — Annotation burden is unmeasured, and Phase 12 depends on it
 
-**Status:** OPEN — new 2026-08-10
+**Status:** OPEN — **half closed 2026-08-10 at Phase 12.** The arithmetic exists; the
+stopwatch does not.
 **Owned by:** Phase 11
 **Becomes blocking at:** **Phase 12** (the taxonomy freeze)
+
+### What Phase 12 added, and what it deliberately could not
+
+`src/taxonomy/burden.py` + `python scripts/run_taxonomy_refinement.py --burden` now compute
+the burden from the same `taxonomy.yaml` that generates the Potato schemes, so the estimate
+and the actual instrument cannot drift. Under the current 10 constructs it projects
+**1.82 min/item → 12.1 h per annotator → 24.2 person-hours for `gold_eval`**, over
+**7 sittings** at the 2 h fatigue threshold.
+
+**That number is an estimate and the report says so in its own text, every time.** The timing
+constants were chosen, not observed. `TimingModel.measured` is `False`, `basis` reads
+`UNMEASURED ASSUMPTION (OPEN-026)`, and both the Markdown and the JSON carry it — because the
+failure mode this issue exists to prevent is an assumption quietly becoming a citation.
+
+**To close it:** time the `gold_dev` pass and re-run with
+`--measured-minutes-per-item <n> --measured-source "<who, when, how>"`. The gate **refuses** a
+measurement with no source; an unattributed number is not an improvement on a declared
+assumption. One stopwatch reading rescales the model for all 400 items.
+
+The marginal-cost table is the part that feeds the freeze: it reports what *dropping* each
+construct returns (≈1.33 h over `gold_eval`, 5.5% each), charging only the per-construct
+intensity judgement and never the shared span pass — overstating what a drop saves is how a
+taxonomy gets trimmed for no gain.
 
 `config/taxonomy.yaml` states the construct set is *"FROZEN AT PHASE 12, after checking
 annotation burden and inter-annotator agreement. Any construct with poor agreement is a
@@ -1383,11 +1408,125 @@ tired annotators drift toward the same defaults and *agree more*.
 
 ---
 
+## OPEN-028 — The entire silver set is PRNG output, not labels
+
+**Status:** OPEN — new 2026-08-11 (Phase 13)
+**Owned by:** Phase 10
+**Becomes blocking at:** **Phase 14**, which is specified as "fine-tune on gold+silver"
+
+`data/processed/silver/synth_precomp_v1/silver.jsonl` holds 9,302 rows that are well-formed,
+schema-valid, provenance-carrying, span-anchored — and contain no information about the text
+they are attached to.
+
+This is a **consequence of OPEN-008, not a separate defect.** No live OpenRouter call has ever
+been made, so every silver row was produced by `OfflineLLM._synthesise_silver`
+(`src/agents/llm.py`), which selects a construct with
+`rng.randrange(len(self.constructs))` where `rng` is seeded from
+`sha256(f"{seed}:{system+user}")`. The label is a hash of the prompt. The stub is honest about
+this in its own docstring — *"The content is meaningless -- that is the point of a stub"* — and
+the rationale string on every row reads *"shape is real, judgement is not."*
+
+**What was measured at Phase 13:**
+
+| Property | Value | Expected if these were labels |
+|---|---|---|
+| Labels per non-abstained utterance | exactly 1, always | 1–3, varying |
+| Constructs attested | **6 of 10** | all 10 |
+| Abstention rate | 33.3% | the stub's hardcoded `rng.random() < 0.33` |
+| Silver construct ∈ parent's planted set | 20.2% | well above the 16.7% chance rate for a uniform pick over 6 |
+| Distinct texts with conflicting label sets | **580** | ~0 |
+
+The four missing constructs — `motivation_orientation`, `attentional_focus`, `coping_style`,
+`appraisal_orientation` — are the categorical ones. `scripts/run_labeling.py` deliberately
+gives the stub only the *graded* construct names, for a good reason (a categorical construct
+would come back with `value="present"` and the parser would correctly refuse it). That
+narrowing is correct for exercising the pipeline and fatal for using the output as data.
+
+**Demonstrated, not just asserted.** `python scripts/run_baselines.py --silver` runs the full
+Phase 13 harness over this source. Every system lands at ~0.10 macro-F1 on the
+template-disjoint split and the lexicon scores **0.040 — below stratified-random**. That
+collapse is the evidence.
+
+**Why this was not caught at Phase 10.** The Phase 10 gate checks that every label carries a
+confidence, a rationale and a routing decision. All 9,302 do. The gate was verifying
+*well-formedness*, which is the right check for a pipeline and the wrong check for a dataset,
+and nothing downstream re-asked the question until something tried to learn from it. This is
+the third instance of the pattern recorded in this register (OPEN-007, OPEN-024, OPEN-027): a
+carefully written path that had never been run against the thing it was for.
+
+**What Phase 13 did about it:** `src/models/dataset.py` refuses to load this source unless the
+caller passes `acknowledge_no_signal=True`, and `load_gold` refuses outright rather than
+falling back to it — a fallback here would silently relabel a chance-agreement score as
+accuracy.
+
+**Resolution, in order:**
+
+1. `python scripts/refresh_pricing.py --check` (OPEN-009).
+2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` — the bounded pilot
+   OPEN-008 already asks for. **Inspect the 50 labels by hand before going further**; that is
+   the step whose absence created this issue.
+3. Full live pass, then re-run `python scripts/run_baselines.py --silver` and confirm the
+   scores separate from chance.
+4. Only then is Phase 14's "gold+silver" training set real.
+
+**Do not delete the offline stub or its output.** The stub is what makes `pytest` free and
+deterministic, and OPEN-023's cost projection depends on its token counts. The defect is not
+that the stub exists; it is that its output was allowed to sit in `data/processed/` looking
+like a dataset for a full phase.
+
+---
+
 ## OPEN-027 — The Potato ingest path has not been run against real Potato output
 
-**Status:** OPEN — new 2026-08-10
+**Status:** ✅ **RESOLVED 2026-08-10 — and it was not a formality.** The path was broken.
 **Owned by:** Phase 11
-**Becomes blocking at:** the first completed annotation pass
+**Became blocking at:** the first completed annotation pass — reached before any human annotated
+
+### What resolving it found
+
+The remedy below assumed the parser worked and merely lacked exercise. It did not work.
+Potato 2.7.1 was installed and its **own serialiser** used to write a pass over real
+`gold_dev` items. Three mismatches, each read out of the installed package:
+
+| `ingest.py` assumed | Potato 2.7.1 actually writes |
+|---|---|
+| `annotation_output/**/*.jsonl` | `annotation_output/<user_id>/user_state.json` |
+| item key `id` | `instance_id`, a dict key in the state file |
+| span carries surface text under `span`/`text` | span carries `start`/`end` **offsets only** |
+
+The first made `--ingest` report "no annotation output" over a completed pass. The third was
+worse: `_collect_spans` *skipped* any span with no surface text, so **every span would have
+been silently dropped** and the item then miscounted as unannotated. Losing evidence quietly
+is the failure this parser exists to prevent, and it was the failure it had.
+
+### The fix
+
+`src/annotation/potato_output.py` — reads both real artifacts (`user_state.json`, and the
+`annotations.jsonl` the exporter writes) and normalises them to one payload. Span surface text
+is recovered by **slicing the utterance with Potato's own offsets**, which makes the
+"evidence spans must be literal substrings" invariant structural on the gold side rather than
+procedural. Out-of-range offsets are refused, never clipped. `_collect_spans` now raises
+`SPAN_WITHOUT_SURFACE` instead of skipping.
+
+`tests/test_potato_output.py` — 13 tests against **recorded real output** committed under
+`tests/fixtures/potato/`. Fixtures written by the parser's own author cannot detect the
+author's wrong assumption; a recorded artifact from the real library can, and did.
+
+### What is still not closed by this
+
+The end-to-end run stops at the roster lock: `--ingest --annotator A2` is refused because A2
+is not a real person (**OPEN-025**). That refusal is correct and was left intact — the
+agreement arithmetic is exercised in tests against a `tmp_path` store and a fixture roster,
+never by inventing an annotator in `config/annotators.yaml`.
+
+**Lesson for the remaining unexecuted paths (OPEN-007, OPEN-008):** "written carefully against
+the documented interface, just never run" was, here, indistinguishable from "does not work".
+Both remaining items should be assumed broken until executed.
+
+---
+
+<details>
+<summary>Original issue as raised (2026-08-10)</summary>
 
 `src/annotation/ingest.py` is covered by unit tests over fabricated payloads shaped like
 Potato 2.7.1's output, and both generated projects pass Potato's own strict config validator.
@@ -1405,3 +1544,279 @@ violating the invariant it verifies is not a verification.
 **Remedy:** annotate ~5 items in Potato and run `--ingest` on those. Five minutes, and it
 converts this from an unexercised path into a tested one before 400 items depend on it. Do
 this during the `gold_dev` calibration pass, not after.
+
+</details>
+
+---
+
+## OPEN-029 — The Phase 14 training loop has been written but never executed
+
+**Status:** OPEN, raised 2026-08-11
+**Owned by:** Phase 14
+**Blocking at:** the moment any Phase 14 number is quoted anywhere
+
+`src/models/transformer.py` and `scripts/run_transformer.py` are complete: the sweep grid,
+the gate, the paired-bootstrap test, the reporting, the run logs and the model card are all
+in place, and the parts that do not need torch are covered by 22 tests. `--dry-run` and
+`--gold` were both executed and behave correctly.
+
+**The fine-tuning path itself has never run.** No weights have been loaded, no gradient step
+has been taken, and `reports/transformer.json` does not exist. Section 5 of
+`docs/model_card.md` is deliberately empty.
+
+### Why it did not run
+
+The session that wrote it had no way to obtain either dependency:
+
+| needed | outcome |
+|---|---|
+| `torch` from `download.pytorch.org/whl/cpu` | proxy returned **403** |
+| `torch` from PyPI (the CUDA build) | resolves, but needs several GB against 3.1 GB free |
+| pretrained weights from `huggingface.co` | proxy returned **403** |
+
+None of these is a defect in the code, and none can be worked around from that environment.
+
+### This is the fourth instance of the register's recurring pattern
+
+OPEN-007 (CrewAI backend), OPEN-008 (live OpenRouter call), OPEN-027 (Potato ingest) and now
+this one: a path written carefully against a documented interface and never executed.
+**OPEN-027 is the precedent that matters — when it was finally run, it was broken, in three
+separate ways, one of which silently discarded evidence.** The lesson recorded there applies
+verbatim here: assume this path is broken until it has run.
+
+Specific things most likely to be wrong on first execution, in rough order of likelihood:
+
+1. DeBERTa-v3's sentencepiece tokenizer conversion under transformers 5.x — the usual
+   failure mode is a slow-tokenizer fallback or an outright load error. `--base-model
+   roberta-base` is the escape hatch and exists for this.
+2. `AutoModelForSequenceClassification` with `problem_type="multi_label_classification"`
+   applies its own `BCEWithLogitsLoss` when `labels` are passed. This code passes no
+   `labels` and computes the loss itself, precisely so `pos_weight` is not silently
+   dropped — but that arrangement should be confirmed against the installed version rather
+   than trusted.
+3. CPU wall-clock. 4 epochs x 2,591 records x 256 tokens x 6 configurations x 2 splits is
+   plausibly hours on a laptop CPU. Run one configuration first, without `--sweep`, and
+   measure before committing to the grid.
+4. The `best_state` deep-copy per improving epoch holds a full model in RAM. Fine for
+   base-size on a normal machine; worth watching.
+
+### Remedy
+
+On the owner's Windows machine (which already has torch 2.13.0+cpu and hub access):
+
+```
+python scripts/run_transformer.py --dry-run                 # confirm the plan
+python scripts/run_transformer.py --epochs 1 --max-length 128   # ~minutes; smoke test
+python scripts/run_transformer.py --sweep                   # the real run
+```
+
+Then fill in section 5 of `docs/model_card.md` from `reports/transformer.json`, and close
+this item with the observed numbers and whatever broke.
+
+**Do not quote a Phase 14 number until this is closed.** There are currently no Phase 14
+numbers to quote, which is the safe failure mode and should be kept that way.
+
+### Update 2026-08-11 — first execution attempted; predicted failure #1 hit immediately
+
+`python scripts/run_transformer.py --epochs 1 --max-length 128` was run on the owner machine.
+It reached the tokenizer load and stopped there. **Predicted failure #1 (DeBERTa-v3's
+SentencePiece tokenizer under transformers 5.x) was correct**, though the mechanism was worse
+than anticipated: the missing package does not produce a missing-package error.
+
+`sentencepiece` was absent. transformers caught the resulting `ImportError`, fell back to a
+TikToken extractor, and that extractor attempted to parse `spm.model` — a SentencePiece
+protobuf — as a text BPE file, dying on a raw `\x0e` byte:
+
+```
+ValueError: Error parsing line b'\x0e' in ...\models--microsoft--deberta-v3-base\...\spm.model
+```
+
+The real cause sits ~40 frames up as a swallowed `__cause__`. Nothing in the surfaced error
+names `sentencepiece` or suggests installing anything.
+
+**Three fixes, all landed:**
+
+1. `requirements-ml.txt` — `sentencepiece>=0.2` pinned, with the reason. Its absence from the
+   ML layer was a genuine repository defect, not a machine-local one: **no environment
+   provisioned from this file could ever have loaded the default base model.**
+2. `src/models/transformer.py` — `load_tokenizer()` translates this specific failure into
+   `MLDependencyMissing` naming both the install command and the `--base-model roberta-base`
+   escape hatch. Narrow by construction: it matches on both signatures and re-raises anything
+   else untouched, because a confident wrong explanation is worse than none.
+3. `scripts/run_transformer.py` — catches `MLDependencyMissing` around training too, not only
+   at the import check, so it exits 2 (config error) instead of dumping a traceback. The
+   tokenizer loads minutes into a run, well past the import check.
+
+`tests/test_transformer.py` gains two regression tests: one pinning the translation, one
+asserting an unrelated tokenizer failure is *not* relabelled.
+
+**Still open.** No gradient step has yet been taken. Predicted failures #2 (the `pos_weight`
+arrangement against the installed transformers version), #3 (CPU wall-clock) and #4 (RAM held
+by the per-epoch `best_state` copy) remain unexercised. The lesson from OPEN-027 stands
+until a run completes.
+
+### Update 2026-08-11 (second attempt) — two of the four predictions were right
+
+**Still OPEN.** `reports/transformer.json` does not exist; no configuration has completed.
+
+Prediction 1 (DeBERTa-v3 tokenizer) **was correct** and has been fixed: `sentencepiece` is
+pinned in `requirements-ml.txt` and `load_tokenizer` translates the un-Googleable
+`ValueError: Error parsing line b'\x0e'` into a message naming the real cause.
+
+Prediction 3 (CPU wall-clock) **was correct** and was worse than estimated, for a reason the
+prediction missed — the run was doing several times more work than it needed to:
+
+| defect | fix | effect |
+|---|---|---|
+| `max_length=256` against a corpus whose longest record is ~125 subword tokens | default is now **128**, measured not guessed (4,000 records: whitespace mean 37.8, median 37, p99 78, max 93) | ~2x |
+| `padding="max_length"` on every batch, median record ~50 tokens | `padding=True` + `_trim_batch` per batch = dynamic padding | ~2.5x on top |
+| both `pytorch_model.bin` **and** `model.safetensors` downloaded (742 MB for a 371 MB model) | `use_safetensors=True` | one download |
+| no output at all during a tens-of-minutes fit | per-25-step progress with running loss and ETA, `flush=True` | a healthy run no longer looks like a hang |
+
+The padding change is a pure cost reduction and cannot alter a result: padded positions are
+masked out of attention, so a trimmed batch and an untrimmed one agree up to floating-point
+associativity. `tests/test_transformer.py` asserts that every token the mask marks real
+survives trimming unchanged.
+
+**The HF token warning is not a defect and needs no action.** It is a rate-limit notice; the
+371 MB download completed. No token, and no account, is required to fetch public weights —
+which also preserves the "a reviewer reproduces the artifact with no account" property that
+`CLAUDE.md` §10 established at Phase 6.
+
+**Sweep grid changed** while fixing this: the sixth configuration was `max_length=128`, which
+became a duplicate of the default once 128 became the default. It is now `learning_rate=5e-5`,
+extending the LR axis to {1e-5, 2e-5, 3e-5, 5e-5}. `test_the_sweep_contains_no_duplicate_configurations`
+caught the collision.
+
+**Not yet ruled out:** prediction 2 (whether `AutoModelForSequenceClassification` drops the
+custom `pos_weight`) and prediction 4 (the `best_state` copy's memory). Both need a completed
+run. `scripts/diagnose_transformer.py` walks the load-tokenize-forward-backward sequence one
+flushed step at a time and projects total sweep time, for the next time a run dies without a
+traceback.
+
+### Update 2026-08-12 — RESOLVED. The path ran, and prediction 2 was wrong in the project's favour
+
+**Status: ✅ RESOLVED 2026-08-12.** `reports/transformer.json` exists. Six configurations
+completed on the template-disjoint split plus the best on the random split.
+
+| | value |
+|---|---|
+| best configuration | `distilroberta-base`, lr 2e-5, batch 16, 6 epochs, len 128 (best epoch 5) |
+| macro-F1, template-disjoint | **0.588** [0.549, 0.624] |
+| macro-F1, random split | 0.905 |
+| memorisation gap | **+0.317** (TF-IDF+LinearSVC gapped +0.819) |
+| vs lexicon bar 0.462 | **+0.126**, paired bootstrap **p = 0.000** |
+| gate | **PASS** |
+
+**Unlike OPEN-027, the path was not broken.** The predictions in the original entry scored:
+
+1. **DeBERTa-v3 tokenizer — correct.** Failed exactly as predicted. Fixed by pinning
+   `sentencepiece` and translating the un-Googleable tiktoken `ValueError` in `load_tokenizer`.
+2. **`pos_weight` silently dropped — wrong.** The custom loss is computed outside the model and
+   `pos_weight` was applied as intended.
+3. **CPU wall-clock — correct, and worse than estimated**, for a reason the prediction missed: the
+   run was doing ~5x more work than needed (`max_length=256` against a 125-token corpus, fixed
+   padding against a 50-token median). Fixed; see the 2026-08-11 update.
+4. **`best_state` memory — not a problem** at distilroberta size across six configurations.
+
+### Findings worth carrying into the paper
+
+**Threshold tuning degraded macro-F1 in all six configurations**, by 0.014 to 0.112. The best
+untuned result (0.639 at lr3e-5, thresholds fixed at 0.5) beats the best tuned result (0.588).
+Per-construct thresholds fitted on a 355-record validation slice were fitting noise. This argues
+for dropping the ten tuned parameters entirely — the rare case where the more conservative choice
+also scores better. Caveat recorded in `docs/model_card.md` §7 item 9: the conclusion was reached
+after seeing test results, and while the direction of travel is toward *fewer* parameters and the
+effect is consistent across all six runs, it is still a decision informed by the test split.
+
+**The top three configurations are statistically indistinguishable** (0.588 / 0.582 / 0.558, CIs
+overlapping heavily). Report as "no configuration clearly dominated", not as having found the best
+hyperparameters.
+
+**The memorisation gap is the headline.** A pretrained encoder generalises across held-out
+templates where TF-IDF collapses: +0.317 versus +0.819. That is the corpus-design contribution and
+it is now measured rather than asserted.
+
+**None of this is accuracy.** `data/gold/` is still empty (OPEN-025). Every figure above is a
+corpus property of `synth_precomp_v1`.
+
+---
+
+## OPEN-030 — The ethics exemption predates the A5 amendment
+
+**Status:** OPEN, raised 2026-08-11
+**Owned by:** Phase 5 / ethics
+**Blocking at:** submission
+
+`docs/ethics.md` §3.4 records SRMIST's determination that this work is **exempt** from full
+institutional ethics review, as secondary analysis of public, licensed, consented and synthetic
+text. That determination was made on 2026-08-08. **Category A5 was added on 2026-08-11**, after it.
+
+A5 is public secondary analysis and is within the scope of the exemption *as written*. But the
+determining body did not see the amendment, and "within the scope as written" is a reading, not a
+confirmation. Combined with **OPEN-005** (the documentary record of the exemption has still not
+been obtained), the project currently claims an exemption it cannot produce, over a category the
+exempting body never reviewed.
+
+**Remedy:** obtain the exemption in writing (OPEN-005) and, in the same email, state that the
+project now includes topic-scoped collection from public pseudonymous forums. One email closes
+both. Do it before submission.
+
+---
+
+## OPEN-031 — A5 route (b) was blocked by Reddit; the amendment is now unused
+
+**Status:** OPEN (route closed, decision pending), raised 2026-08-12
+**Owned by:** Phase 7
+**Blocking at:** OPEN-011, which remains the project's highest live risk
+
+C2 route (b) — unauthenticated public JSON — was added 2026-08-12 because the owner could not
+register a Reddit application. It was exercised the same day.
+
+**Every request returned `HTTP 403 Blocked`.** Eight of eight communities, zero posts fetched,
+zero records written. Reddit refuses unauthenticated programmatic reads.
+
+`docs/ethics.md` §3.5.5 point 4 was written before the attempt and says a block is an answer, not
+an obstacle. It was applied without argument: **no User-Agent rotation, no proxy, no browser
+impersonation, no retry schedule.** Each of those is circumvention of an access control (**P5**),
+and P5 stands unweakened under A5.
+
+**Consequence.** The A5 amendment — which narrowed a previously absolute prohibition and cost a
+recorded residual ethical concession (§3.5.2) — has produced **no data**. It is retained in the
+policy rather than reverted, so the audit trail shows the permissive route was tried, failed, and
+was not worked around.
+
+**Two bugs the failed run exposed, both fixed:**
+
+- `run_reddit.py` reported "nothing survived the filters" after a total fetch failure, sending the
+  reader to tune filters that never ran. It now distinguishes the two cases.
+- An empty source directory was left carrying a `provenance.json` asserting a collection that
+  never happened, and Phase 8 preprocessed it. The runner now warns and gives the cleanup command.
+
+**Decision, 2026-08-12: the owner declines to register an application. OPEN-011 moves to A3.**
+Whether to revert the A5 amendment, having paid its ethical cost for nothing, is a live question
+for the paper's ethics section. The honest options are to remove it as unused, or to keep it and
+report the attempt and the block as a finding about the accessibility of social data for research.
+
+---
+
+## OPEN-032 — A3 donor mapping must live outside the repository
+
+**Status:** OPEN, raised 2026-08-12
+**Owned by:** Phase 7 / ethics
+**Blocking at:** the first real donation
+
+`docs/ethics.md` §7 gives A3 donors a withdrawal right. Actioning a withdrawal requires knowing
+which `record_id` belongs to which donor, which means a name↔id mapping has to exist somewhere.
+
+**It must never be in git.** `scripts/run_donation.py` reads only text and coarse metadata into
+`data/` — verified: a donor name placed in the inbox file does not reach `data/`. But the inbox
+file itself, and any signed consent forms, contain real names. A file committed once is committed
+forever, and `.gitignore` does not help retroactively.
+
+**Remedy before the first real donation:**
+
+1. Add `donations_inbox*.jsonl` and `consent_forms/` to `.gitignore`.
+2. Keep signed forms outside the repository directory entirely.
+3. Record where the mapping lives in `docs/security.md` — a withdrawal route nobody can find is
+   the same as no withdrawal route.
