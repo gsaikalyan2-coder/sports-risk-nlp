@@ -1,0 +1,350 @@
+================================================================================
+HANDOVER — end of Phase 19 -> start of Phase 20
+Pre-Competition Psychological Risk Profiling of Athletes
+Written 2026-08-16. Self-contained: a new session should be able to continue
+from this file alone, after reading CLAUDE.md (which overrides defaults).
+================================================================================
+
+
+PART A — PROJECT SUMMARY
+--------------------------------------------------------------------------------
+
+PROJECT. Pre-Competition Psychological Risk Profiling of Athletes. NLP x sports
+psychology: detect 10 validated constructs (CSAI-2 / SDT / ABQ tradition) in
+athlete text and fuse them into an interpretable risk index with two-level
+explanations. Target: IEEE conference paper (iTriply Explore).
+Owner: Saikalyan, sophomore, SRMIST.
+
+TIMELINE. Week 4 of 8. Paper draft due first week of September 2026. Code freeze
+~Week 7. Today is 2026-08-16.
+
+PHASE JUST COMPLETED: PHASE 19 — results aggregation and narrative.
+Phases 1-15 and 17-19 complete. Phase 16 (DataRobot AutoML) skipped by decision.
+NEXT: Phase 20 — dashboard / visualisation. Nothing blocks it.
+
+
+THE CONSTRAINT THAT GOVERNS EVERYTHING — CARRY THIS FORWARD VERBATIM
+--------------------------------------------------------------------------------
+
+data/gold/ is empty. NO NUMBER IN THIS REPOSITORY IS AN ACCURACY. Every result
+is a corpus property of a synthetic template grammar (synth_precomp_v1, 4,000
+generated records, labels planted by the generator). Never report a figure as
+accuracy. Never write to data/gold/. Never weaken the --gold refusal in
+src/models/dataset.py.
+
+Phase 17's corollary: an attribution is a claim about the model, not about
+athlete psychology.
+
+Phase 18's corollary: a gate that certifies a claim is only as good as what it
+actually checks. A gate that only checks a result EXISTS is worse than no gate,
+because it launders the claim.
+
+Phase 19's corollary: THE CLAIM LEDGER IS UPSTREAM OF THE PROSE. Any headline
+sentence that is not traceable to a row in src/evaluation/ablations.py::CLAIMS
+requires a new Claim — added and passing the gate — BEFORE it is written into
+any narrative, figure, dashboard card or slide.
+
+
+PART B — WHAT WAS DONE THIS SESSION
+--------------------------------------------------------------------------------
+
+B0. INTAKE — OPEN-035 closed
+
+The owner ran both evaluation steps on the real checkpoint
+(phase14_transformer_distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf).
+reports/results.{md,json}, 8 prediction caches and 4 figures all exist.
+ALL SEVEN CLAIMS BACKED, including the two carrying predicates rather than
+presence checks. OPEN-035 is closed.
+
+Two open questions from the Phase 18 handover resolved, both in the good
+direction and one of them unexpectedly:
+
+  - naive_rho came back at 0.100, NOT near 1.0. The taxonomy weighting
+    materially reorders records rather than reproducing a plain construct
+    count. The Phase 18 handover flagged the near-1.0 outcome as the thing to
+    fear; it did not happen.
+  - zeroed_constructs held at 4 of 10 (appraisal_orientation,
+    attentional_focus, coping_style, motivation_orientation), inert under the
+    conservative PolarityPolicy.NEUTRAL default. This is BINDING on wording:
+    the decomposition may not be called ten-construct without qualification.
+
+
+B1. A REPOSITORY-INTEGRITY DEFECT FOUND AND FIXED — READ THIS
+
+Phase 17 AND Phase 18 were both uncommitted. git HEAD was still
+"d18405a feat(phase14)" while src/explainability/, src/evaluation/{harness,
+ablations}.py, scripts/run_{explain,evaluation}.py, both test modules, all of
+reports/explain/ and all of reports/results.* existed only on the owner's disk.
+Two phases of work with no off-machine backup, in a project whose own
+PROJECT_PLAN.md says "push at the end of every phase; a remote that stops
+receiving pushes is not a backup."
+
+Root cause: a stale .git/index.lock aborted the Phase 18 commit, the failure was
+read as success, and the Phase 17 commit had never been made at all.
+
+CARRY FORWARD: after every phase, verify the commit LANDED — `git log --oneline
+-1` must show it — rather than trusting that the command was issued. This is the
+same defect shape as OPEN-034: the check ("I ran git commit") and the thing it
+protects ("the work is backed up") were related by assumption, not by
+construction.
+
+Secondary finding, environment-level: when a Cowork session reaches the repo
+through the desktop folder bridge, git cannot unlink its own lock files
+("Operation not permitted"), so `git add` succeeds and `git commit` fails.
+Git operations in this repo must be run by the owner in PowerShell, or the
+Cowork task must be started on the owner's computer rather than in the cloud.
+
+
+B2. DECISION TAKEN — OPEN-004 CLOSED BY DECISION, NOT BY RECRUITMENT
+
+The owner elected the documented fallback: ship the expert half of Phase 17 as a
+PILOT SELF-AUDIT / pilot expert-review with sports-familiar student raters, with
+practitioner validation named explicitly as a limitation. OPEN-004 is CLOSED.
+
+CLOSING THE TRACKING ITEM DOES NOT UPGRADE THE CLAIM. Binding on everything
+downstream, including Phase 20's dashboard:
+
+  MANDATORY WORDING (verbatim; source of truth is docs/findings.md §2.4):
+    "Explanations were reviewed in a blinded pilot study by sports-familiar
+     student raters. This is a pilot expert review, not practitioner
+     validation: no coach or sport-psychology practitioner rated the
+     explanations. Practitioner validation is the principal outstanding item
+     for this contribution."
+
+  FORBIDDEN ANYWHERE — paper, abstract, figures, dashboard, slides:
+    "expert-validated", "practitioner-validated", "coach-validated".
+
+The instrument (reports/explain/rating_sheet.md) is blinded and re-runnable, and
+the rater population is stamped on it at generation time. If a practitioner is
+found before freeze, `python scripts/run_explain.py --score-study ...` scores
+them and the claim may be upgraded — REOPEN OPEN-004 rather than editing it.
+
+
+B3. FILES CREATED / MODIFIED
+
+  CREATED  docs/findings.md          Phase 19's deliverable. Contribution
+                                     statement, 3 headline findings, 4
+                                     supporting findings, a table of 8 claims
+                                     the evidence does NOT support, the claim
+                                     ledger status, and the methodological
+                                     thread. This is the source of truth for
+                                     every number and every piece of wording
+                                     that goes into the paper.
+  CREATED  handover_phase_19.txt     This file.
+  MODIFIED docs/open_issues.md       OPEN-004 closed by decision (with the
+                                     binding wording); OPEN-035 closed with the
+                                     four checks answered item by item.
+  MODIFIED PROJECT_PLAN.md           Status board rewritten to end of Phase 19;
+                                     live-risk #2 (OPEN-004) struck through.
+
+
+B4. THE NUMBERS, CONSOLIDATED (all from the real checkpoint, 2026-08-16)
+
+Systems, macro-F1 [95% bootstrap CI]:
+
+  split              system          n     macro-F1              micro   subset
+  random             lexicon         778   0.562 [0.535,0.585]   0.587   0.253
+  random             majority        778   0.000 [0.000,0.000]   0.000   0.057
+  random             tfidf_logreg    778   0.999 [0.998,1.000]   1.000   0.999
+  random             transformer     778   0.822 [0.805,0.837]   0.827   0.566
+  template_disjoint  lexicon         443   0.462 [0.431,0.492]   0.533   0.352
+  template_disjoint  majority        443   0.000 [0.000,0.000]   0.000   0.099
+  template_disjoint  tfidf_logreg    443   0.222 [0.181,0.258]   0.228   0.167
+  template_disjoint  transformer     443   0.588 [0.546,0.622]   0.614   0.339
+
+  transformer vs lexicon: delta +0.126, p = 0.000 (paired bootstrap)
+  split gap (transformer): +0.234. TF-IDF's own gap: +0.777.
+
+Per-construct, transformer, template-disjoint — THREE REGIMES, not a spread:
+
+  COMPETENT           self_confidence 0.898 | coping_style 0.840 |
+                      motivation_orientation 0.790
+  THRESHOLD-COLLAPSED attentional_focus P0.187/R0.958 | appraisal_orientation
+                      P0.320/R1.000 | somatic_anxiety P0.412/R1.000 |
+                      perceived_stress P0.571/R1.000
+  THRESHOLD-FROZEN    cognitive_anxiety P1.000/R0.227
+
+  attentional_focus contributes 100 FPs and 1 FN; cognitive_anxiety 0 FPs and
+  17 FNs. Both are a tuned per-construct threshold sitting at a degenerate
+  corner while macro-F1 stays respectable at 0.588.
+
+Errors by construct load — the model is CLEAN on construct-free text:
+  0 constructs: 0/44 records with an error (0%)
+  1 construct:  217/318 (68%)
+  2 constructs: 70/75 (93%)
+  3+:           6/6 (100%)
+  Dominant confusions: burnout_signal->somatic_anxiety x29,
+  burnout_signal->perceived_stress x20. Affect-adjacent cluster — partly a
+  taxonomy signal, not only a model signal.
+
+Explainability (Phase 17, n=211 explanations over 129 records):
+  comprehensiveness 0.500 vs random 0.172 -> margin +0.328
+  sufficiency       0.535 vs random 0.705 -> margin +0.170
+  all 10 constructs beat their control individually
+  IG vs SHAP: Spearman 0.458, top-5 Jaccard 0.384 (report as MIXED)
+  UNEVIDENCED DRIVERS: 104 of 120 driver rows (86.7%) have no supporting span
+
+Risk layer (443 records):
+  naive_rho 0.100 | perturbation_rho 0.989 (+/-0.05 noise)
+  polarity rho vs NEUTRAL: PESSIMISTIC 0.839, OPTIMISTIC 0.855
+  mean index shift: PESSIMISTIC 0.152, OPTIMISTIC 0.174
+  zeroed constructs: 4 of 10
+
+Ablations:
+  silver_classical  MEASURED  0.222 -> 0.255, delta +0.033 at p = 0.107
+                              (NO significant change — do not say "degrades")
+  silver_transformer REFUSED  ~10 CPU-h to measure adding uniform noise
+  risk_fusion       MEASURED  structural sensitivity analysis; no outcome exists
+
+
+PART C — PHASE 20 HANDOFF
+--------------------------------------------------------------------------------
+
+C0. PHASE 20 AS WRITTEN IN PROJECT_PLAN.md
+
+  Objective:   A demo that communicates the system.
+  Tasks:       Streamlit app: paste text -> construct bars + risk gauge +
+               highlighted spans; Dockerized. Becomes a paper figure and a demo.
+  Deliverable: dashboard/ app + screenshots.
+  Gate:        App runs in Docker and reproduces a known example.
+
+
+C1. THE DEFECT TO EXPECT IN PHASE 20 — PREDICTED IN ADVANCE, TWICE
+
+Three phases in a row found the same defect shape:
+
+  Phase 9b  — the obvious fix for utterance duplication (expand the suffix bank
+              8 -> 17) was implemented first and did nothing. Bank size was
+              never the lever; sentence-hood was.
+  Phase 17  — an ethics guard passed its own test while remaining bypassable
+              through a different field.
+  Phase 18  — the claim gate certified silver_is_noise green while the ablation
+              backing it measured +0.033 at p=0.110, pointing the opposite way.
+
+Common shape: THE CHECK AND THE THING IT PROTECTS WERE RELATED BY ASSUMPTION
+RATHER THAN BY CONSTRUCTION.
+
+The Phase 18 handover predicted the fourth instance would appear in Phase 20 as
+"the card renders" being accepted as "the card is honest". Phase 19 agrees and
+sharpens it: the Phase 20 gate as written ("app runs in Docker and reproduces a
+known example") checks RENDERING and REPRODUCIBILITY. It does not check that
+what is rendered is claim-safe. Strengthen the gate so it checks the honesty
+properties too — see C3.
+
+
+C2. HARD CONSTRAINTS ON THE DASHBOARD — NON-NEGOTIABLE
+
+  1. NO VERBATIM CORPUS TEXT is displayed, logged, cached or shipped in
+     screenshots. docs/ethics.md binds this. src/explainability/cards.py
+     already exposes assert_publication_safe — USE IT, do not reimplement it.
+     User-pasted text is the user's own and may be displayed back to them; it
+     must never be persisted.
+  2. NO NUMBER IS LABELLED "accuracy", "confidence in the athlete", or anything
+     implying a measurement of a person. Every score surface carries the
+     PROVISIONAL provenance stamp (src/evaluation/harness.py::PROVISIONAL_STAMP
+     and results.json.provenance).
+  3. NO DIAGNOSIS FRAMING. The risk index is not a clinical instrument. No
+     individual-level claim about any identifiable person.
+  4. "Expert-validated" / "practitioner-validated" / "coach-validated" MUST NOT
+     appear. If the dashboard references the expert study at all, it uses the
+     B2 wording.
+  5. THE RISK DECOMPOSITION IS NOT TEN-CONSTRUCT WITHOUT QUALIFICATION. Four
+     constructs are inert under the default policy. If the dashboard draws ten
+     bars, the four inert ones must be visibly marked as not contributing —
+     otherwise the picture asserts something the numbers do not.
+  6. DO NOT REIMPLEMENT THE PHASE 17 CARDS. src/explainability/cards.py is the
+     dashboard's rendering layer. If the dashboard re-derives highlighting, the
+     paper figure and the demo will drift apart and one of them will be wrong.
+  7. DO NOT RETRAIN AND DO NOT RE-TUNE THRESHOLDS. TransformerBaseline.load
+     restores the model with its tuned thresholds. The paper's model must not
+     silently change.
+
+
+C3. RECOMMENDED GATE FOR PHASE 20 — STRONGER THAN AS WRITTEN
+
+  As written (keep):
+    (a) `docker compose up` serves the app.
+    (b) A known example reproduces byte-identically against a committed fixture.
+  Add (the honesty half):
+    (c) A test asserts assert_publication_safe is called on every rendered card
+        path, and fails if a code path can render without it.
+    (d) A test asserts the PROVISIONAL provenance stamp is present on every
+        page that shows a number.
+    (e) A test asserts the four inert constructs render as visibly
+        non-contributing.
+    (f) A test greps the rendered app surface for the forbidden strings
+        ("expert-validated", "practitioner-validated", "coach-validated",
+        "accuracy") and fails on a hit.
+
+  (c)-(f) are what turn "the card renders" into "the card is honest". They are
+  cheap. Write them BEFORE the app, not after.
+
+
+C4. ARCHITECTURE — FOLLOW THE PROJECT'S DEFAULT SHAPE
+
+PREDICTING AND RENDERING ARE SEPARATE PROGRAMS. This is now the project's
+default and it has paid for itself in three phases (src/risk/ at 15,
+src/explainability/ minus attribution.py at 17, src/evaluation/ at 18).
+
+  - The model layer loads lazily and is the ONLY thing that touches torch.
+  - Everything the dashboard renders is arithmetic over cached/derived values.
+  - The test suite must run with NO ML stack installed. Non-negotiable — every
+    phase since 15 has held this line and it is why tests run in seconds.
+  - Streamlit is a rendering shell over tested pure-Python functions, exactly as
+    notebooks/01_eda.ipynb is a thin viewer over tested functions. Business
+    logic does not live in the .py the Streamlit runtime executes.
+
+
+C5. INPUTS THAT ALREADY EXIST — DO NOT REBUILD ANY OF THESE
+
+  src/explainability/cards.py     build_card, highlight, render_markdown,
+                                  assert_publication_safe, CardSet
+  src/risk/fusion.py              LinearRiskScorer, PolarityPolicy — the gauge
+                                  and the per-construct contributions
+  src/models/                     TransformerBaseline.load / predict_proba
+  src/evaluation/harness.py       PROVISIONAL_STAMP, assert_not_accuracy
+  reports/results.json            every score, comparison, ablation
+  reports/explain/cards.md        20 rendered cards — the known-example source
+  reports/figures/phase18_*.svg   4 paper figures already rendered
+  docs/findings.md                every number and every permitted wording
+  Dockerfile / docker-compose.yml Phase 2, already builds CPU-only
+
+
+C6. OPEN ITEMS, IN PRIORITY ORDER
+
+  OPEN-011  NO REAL ATHLETE TEXT. The project's highest live risk and the only
+            unmitigated high-impact item. Contribution #1 must be stated as a
+            SYNTHETIC construct-grounded corpus throughout. Owner-actionable:
+            SRMIST sports-department contact under A3 consent
+            (docs/recruitment.md).
+  OPEN-025  No second annotator, so no gold and no kappa. Blocks every accuracy
+            claim in the paper.
+  OPEN-021  The lexicon baseline is not independent of the corpus. The caveat
+            travels with the 0.462 floor wherever it is quoted.
+  OPEN-028  Silver is PRNG output. Now MEASURED (+0.033, p=0.107) rather than
+            asserted.
+  OPEN-030/031/032, OPEN-005/006 — before submission, Phases 22-25.
+
+  CLOSED and recorded for their lesson, not as outstanding work:
+  OPEN-004 (by decision), OPEN-033, OPEN-034, OPEN-035.
+
+
+C7. WORKING RULES — UNCHANGED
+
+  - Teach while doing; the owner is a sophomore. Concise in chat, depth in files.
+  - Small verifiable steps; end non-trivial work with a verification step.
+  - pytest excludes -m slow by default. Run those with `pytest -m slow`.
+  - Python 3.11. pip install -r requirements-ml.txt --extra-index-url
+    https://download.pytorch.org/whl/cpu
+  - Ethics binding: no claim about any identifiable person; NO VERBATIM CORPUS
+    TEXT in the paper / dashboard / figures; no individual-level output.
+  - VERIFY THE COMMIT LANDED (`git log --oneline -1`) — see B1. Push at the end
+    of every phase.
+  - PRODUCE A HANDOVER FILE AT THE END OF EVERY PHASE. DO NOT START THE NEXT
+    PHASE UNTIL THE OWNER CONFIRMS RECEIPT.
+
+
+================================================================================
+Phase 19 is COMPLETE. Do not start Phase 20 until receipt of this file is
+confirmed.
+================================================================================

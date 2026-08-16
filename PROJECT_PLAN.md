@@ -20,7 +20,53 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 
 ---
 
-## STATUS BOARD (updated 2026-08-10, end of Phase 9)
+## STATUS BOARD (updated 2026-08-16, end of Phase 19)
+
+**Week 4 of 8.** Phases 1–15 and 17–19 complete; 16 skipped by decision (no DataRobot
+account, and uploading athlete text to a third-party cloud breaks the "reviewer
+reproduces with no account" property). Phase 18 **executed on the real checkpoint**
+2026-08-16 — **OPEN-035 closed, all seven claims backed**. Phase 19 complete:
+`docs/findings.md` written, contribution statement locked, **OPEN-004 closed by
+decision** (pilot self-audit, practitioner validation named as a limitation).
+
+**Next: Phase 20 — dashboard.** Nothing blocks it.
+
+| Phase | Status | Evidence |
+|---|---|---|
+| 14 Transformer | ✅ gate PASSED | distilroberta lr2e-5 bs16 ep6 → macro-F1 **0.588** vs lexicon 0.462, paired bootstrap p=0.000 |
+| 15 Risk scoring | ✅ | `src/risk/` · per-construct ECE reported; `calibrate_risk_index` **refuses** — no observed risk outcome exists |
+| 16 AutoML | ⏭️ skipped | no account; decision recorded in `CLAUDE.md` §10 |
+| 17 Explainability + expert study | ✅ structural halves PASS; expert half shipped as **pilot self-audit** | `reports/explain/` · comprehensiveness margin **+0.328** over random control, all 10 constructs beat control · IG-vs-SHAP top-5 Jaccard 0.384 · **86.7% of driver rows have no supporting span**, counted not hidden · **OPEN-004 closed by decision 2026-08-16** — student raters only, "expert-validated" is forbidden wording |
+| 18 Evaluation harness & ablations | ✅ **gate PASSED on the real checkpoint** | `src/evaluation/{harness,ablations}.py`, `scripts/run_evaluation.py`, 37 tests · `reports/results.{md,json}` + 8 prediction caches + 4 figures · **7/7 claims backed** · **OPEN-034** raised and closed (the claim gate certified a claim its evidence contradicted); **OPEN-035 closed** |
+| **19 Results aggregation & narrative** | **✅ gate PASSED** | `docs/findings.md` — contribution statement locked, 3 headline findings, 8 forbidden claims tabulated, every headline traceable to a `CLAIMS` row |
+
+**Phase 19's three headline findings.**
+
+| # | finding | number |
+|---|---|---|
+| 1 | **The memorisation gap** — a random split massively overstates generalisation on a synthetic corpus | TF-IDF 0.999 → 0.222 (**+0.777**); transformer 0.822 → 0.588 (**+0.234**); lexicon control only +0.100 |
+| 2 | **Two-level interpretability with a measured faithfulness margin** | comprehensiveness **+0.328** over random control, sufficiency +0.170, all 10 constructs beat control — **pilot** expert review, never practitioner validation |
+| 3 | **Negative results reported as results** | silver bought nothing (+0.033, p=0.107) · risk index uncalibratable by construction · **4 of 10 constructs inert** in fusion |
+
+**Two things the real run settled that the handover flagged as open questions.**
+`naive_rho` came back at **0.100**, not near 1.0 — the taxonomy weighting materially
+reorders records rather than reproducing a construct count. And the per-construct table
+resolved into **three regimes**, not a spread: three competent, four threshold-collapsed
+(recall ~1.0 at precision 0.19–0.57), one threshold-frozen (`cognitive_anxiety`,
+P 1.000 / R 0.227) — a finding about per-construct threshold search under macro-F1.
+
+**Phase 18's three ablations, as actually delivered.** The plan named
+baseline-vs-transformer, ±silver and ±risk-fusion. Only the first was runnable as written.
+
+| ablation | delivered as | why |
+|---|---|---|
+| baseline vs transformer | **measured**, paired bootstrap | as planned |
+| ± silver | **measured on the classical model; refused in writing on the transformer** | OPEN-028 — silver labels are `rng.randrange` output, so the transformer arm would spend ~10 CPU-hours measuring the effect of adding noise. The cheap arm demonstrates it instead |
+| ± risk fusion | **structural sensitivity analysis** | no observed risk outcome exists; a proxy target from planted labels would measure whether the model recovers this project's own generator |
+
+---
+
+## STATUS BOARD (superseded — end of Phase 9)
 
 **Week 3 of 8.** Phases 1–10 complete and gated (10 offline only). Phases 11 and 12 have their
 tooling built, tested and gated; **both gates are blocked on the same missing person**
@@ -49,7 +95,7 @@ block, so recruiting is now the critical path and no amount of code shortens it.
 | # | Risk | Status |
 |---|---|---|
 | 1 | **OPEN-011 — no real athlete text.** Contribution #1 claims an *athlete-text* corpus; the corpus is 100% synthetic. Only unmitigated high-impact item. | open, owner-actionable |
-| 2 | **OPEN-004 — no expert raters recruited.** Longest lead time of anything left; Phase 17 is the headline contribution. Was due Week 1–2. | open, **3 phases overdue** |
+| 2 | ~~**OPEN-004 — no expert raters recruited.**~~ | **CLOSED by decision 2026-08-16** — pilot self-audit with student raters; practitioner validation is a named limitation, not a pending task |
 | 3 | **OPEN-008 — no OpenRouter key.** First phase that genuinely needs one. | open, blocks Phase 10 |
 | 4 | **OPEN-021 — the lexicon baseline is not independent of the corpus.** Shared ancestry with the template bank via `taxonomy.yaml` examples; macro-F1 0.780 → 0.461 once the bank stopped reusing those phrasings. A paper obligation, not a bug. | open, Phase 18 |
 | 5 | **OPEN-028 — the entire silver set is PRNG output, not labels.** Consequence of OPEN-008, discovered at Phase 13. All 9,302 labels come from the offline stub's `rng.randrange`; single-label, 6/10 constructs, chance agreement. Phase 14's "train on gold+silver" is currently "train on gold + noise". | open, **blocks Phase 14 as written** |

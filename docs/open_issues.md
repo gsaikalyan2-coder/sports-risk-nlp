@@ -1,3 +1,4 @@
+
 # Open Issues Register
 
 Running list of known-open items that are deliberately deferred rather than resolved.
@@ -996,8 +997,43 @@ Pushing to a private remote would close this in a few minutes.
 
 ## OPEN-004 — Expert-rater recruitment not started
 
-**Status:** OPEN — schedule risk
+**Status:** OPEN — **instrument delivered 2026-08-12 (Phase 17); raters still not recruited.**
 **Owned by:** Phase 17, but `PROJECT_PLAN.md` risk #4 says recruitment starts Week 1-2
+
+### Update 2026-08-12 (Phase 17) — the buildable half is built
+
+Everything that does not require another human now exists:
+
+- `docs/expert_validation_protocol.md` — the full protocol, with the reporting
+  thresholds **fixed in advance** so they cannot be chosen to fit the result.
+- `src/explainability/study.py` — generates a blinded rating sheet mixing genuine
+  model spans with length-matched **random-span controls** and **mismatched**
+  attention-check items, and computes approval rates, the control margin, and
+  unweighted Cohen's kappa.
+- `python scripts/run_explain.py --score-study ratings_R1.json ratings_R2.json`
+  turns returned ratings into `reports/explain/study_result.json`.
+
+**The rating task was reframed, and the reframing is what makes this survivable.**
+Raters are asked whether a highlighted phrase is a *plausible textual cue for the
+named construct* — not whether an athlete is anxious. That question needs sports
+familiarity plus the `docs/annotation_guidelines.md` rubric, not a clinical
+licence, so a sports-familiar student gives a defensible answer to it where they
+could not to a clinical one. It also keeps the instrument inside
+`docs/ethics.md`: there is no person in the synthetic corpus to judge.
+
+**What is still missing is the only thing that ever mattered: a practitioner.**
+The rater population is written onto the sheet's cover page at generation time,
+before any result is seen, precisely so the claim cannot drift upward later. The
+mapping from raters-obtained to permitted-claim is tabulated in the protocol
+§4. With the current default the paper says **"pilot expert-review with
+sports-familiar student raters"**, never "expert validation".
+
+**Resolution:** contact SRMIST sports-department coaches and any sport-psychology
+staff. The ask is 25 minutes and one Markdown file. Pair it with the A3
+consented-donation recruitment (`docs/recruitment.md`) — same population, one
+conversation, and it also moves OPEN-011.
+
+### Original entry follows.
 
 The expert-validation study needs at least one coach or sport-psych practitioner. This is
 the headline differentiator of the paper — the Phase 3 review found that sports XAI
@@ -1007,6 +1043,62 @@ since it depends on someone else's calendar.
 
 Documented fallback if no rater is secured: a self-audit, named explicitly as a limitation.
 That fallback materially weakens the contribution, so it should be a last resort.
+
+---
+
+## OPEN-033 — `scripts/run_explain.py` has never been executed
+
+**Status:** CLOSED 2026-08-13 (Phase 18 intake). The owner ran it on 2026-08-12 and
+`reports/explain/{explain.md,attributions.json,faithfulness.json,cards.md,agreement.json,rating_sheet.md}`
+all exist and are internally consistent. The gradient path executed: 129 of 150
+sampled records attributed, comprehensiveness margin **+0.328** over the random
+control, sufficiency margin **+0.170**, and every one of the ten constructs beats
+its control individually. IG-vs-SHAP top-5 Jaccard 0.384 on 72 comparable items.
+
+The predicted first-contact friction in `inputs_embeds` did **not** materialise.
+Worth recording: the failure this entry was written to anticipate did not happen,
+and the entry was still worth writing, because the cost of being wrong about that
+was one paragraph.
+
+**What did NOT close with it.** `explain.md` still reports the expert-agreement
+half as OUTSTANDING, and that is OPEN-004, not this issue. A run that produces
+artefacts is not a study that produced ratings.
+
+### Original entry follows.
+
+**Status:** OPEN — new 2026-08-12, Phase 17
+**Owned by:** Phase 17
+**Becomes blocking at:** immediately — Phase 17's measured artefacts do not exist until it runs.
+
+The Phase 17 explainability stack was written in a session whose sandbox had no
+torch: `download.pytorch.org` was blocked by the proxy and ~3 GB of free disk
+could not hold the CUDA wheel from PyPI. So `IntegratedGradients.attribute` and
+`ShapPartition.explain_record` — the only genuinely new torch code — have never
+executed against the real checkpoint.
+
+**This is the OPEN-007 failure mode with a different module name**, and it is
+recorded as such rather than as a caveat, because OPEN-007's whole lesson was
+that shipping an unexecuted code path is how a project acquires a defect it
+cannot see.
+
+**What reduces the risk, and what does not.** Everything torch-free was verified
+against hand-built attributions and a stub scorer: span merging over subwords,
+the character-offset invariant, the faithfulness arithmetic (a known-correct
+explanation beats its random control; a known-misleading one does not), the
+blinding, and kappa against a hand-computed value. 23 tests pass. None of that
+tests the gradient path.
+
+**Expected first-contact friction**, so it is recognised rather than debugged
+from scratch: `inputs_embeds`-plus-`attention_mask` forward passes and
+`torch.autograd.grad` against distilroberta. If `get_input_embeddings()` or the
+`inputs_embeds` keyword misbehaves on transformers 5.x, that is where.
+
+**Resolution:** run
+
+    python scripts/run_explain.py --limit 40 --shap-limit 8    # smoke
+    python scripts/run_explain.py                              # full
+
+and record the outcome here. Closes on the first successful full run.
 
 ---
 
@@ -1871,3 +1963,134 @@ Two honest options, and the choice must be made before the paper is written:
 
 What is not available is describing student raters as practitioner validation. The claim must
 match the raters.
+
+---
+
+## OPEN-034 — a presence-only claim gate certified a claim its evidence contradicted
+
+**Status:** CLOSED 2026-08-13, same session, Phase 18. Recorded because the
+*shape* of the defect recurs and the lesson is cheaper than rediscovering it.
+**Owned by:** Phase 18
+
+The Phase 18 gate is `PROJECT_PLAN.md`'s "every claim the paper will make is
+backed by a logged experiment". It was implemented as `ClaimLedger`: enumerate
+the claims in `src/evaluation/ablations.py::CLAIMS`, resolve each one's
+`evidence_key` in `results.json`, fail if the key is missing or empty.
+
+On the first real run it passed, all seven claims green. One of them was wrong.
+
+The claim `silver_is_noise` read *"training on it degrades rather than improves a
+model"*. The `silver_classical` ablation had just measured **delta = +0.033 at
+p = 0.110** — no significant change in either direction, and the point estimate
+pointing the *opposite* way from the sentence. The gate saw a populated evidence
+key and stopped looking.
+
+**A gate that checks only that a result exists will certify a claim its own
+evidence refutes, and it will do so with a green badge that reads like
+verification.** That is strictly worse than no gate, because it launders the
+claim: the next session sees "backed: yes" and never rereads the number.
+
+This is the Phase 17 defect wearing new clothes. There, an ethics guard passed
+its own test while being fully bypassable through a different field. The common
+shape is: *the check and the thing it is supposed to protect are related by
+assumption rather than by construction.*
+
+**Fix.** `Claim` gained an optional `predicate` that inspects the resolved
+evidence. `transformer_beats_lexicon` now requires `delta > 0 AND significant`;
+`silver_is_noise` requires that silver did **not** significantly help. Claims
+without a predicate are presence-checked as before, so the escape hatch still
+exists and is visible. Four regression tests, including one that asserts a
+directly contradicting comparison leaves the claim unbacked.
+
+**The claim was also reworded** to "adding the silver-labelled data produces no
+significant improvement", which is what the experiment supports and is still
+exactly the evidence OPEN-028 needs. Rewording a claim to match the measurement
+is legitimate; loosening a predicate to match a claim is not, and the gate's
+failure message says so in those words.
+
+---
+
+## OPEN-035 — `scripts/run_evaluation.py --cache-predictions` has not been run on the real checkpoint
+
+**Status:** OPEN — new 2026-08-13, Phase 18
+**Owned by:** Phase 18
+**Becomes blocking at:** immediately — `reports/results.md` does not exist until it runs.
+
+Same environment constraint as OPEN-033: the authoring session's sandbox has no
+torch (and Python 3.10, not the project's 3.11), so step 1 — loading the Phase 14
+checkpoint and dumping per-construct probabilities — has never executed.
+
+**Unlike OPEN-033, the untested surface here is small and named.** Step 1 is
+roughly forty lines and calls only APIs that Phase 14 and Phase 17 have both
+already exercised in anger: `TransformerBaseline.load`, `predict_proba`,
+`predict`, `manifest`. Everything downstream of the cache — all scoring, all
+three ablations, the claim ledger, the figures, the report — was executed
+end-to-end in the authoring session against a scratch cache in `/tmp`, and the
+classical rows it produced reproduce the published Phase 13 numbers exactly
+(lexicon 0.462, TF-IDF+LogReg 0.222 template-disjoint; TF-IDF+LogReg 0.999 on the
+random split). That is a meaningful cross-check: the new harness and the Phase 13
+harness agree to three decimals on the same data.
+
+**One consequence to expect and not misread.** In the scratch run the gate
+FAILED on `transformer_beats_lexicon`, correctly — the stand-in "transformer" in
+that cache *was* the lexicon, so delta was 0 and the predicate refused it. On the
+real checkpoint Phase 14 measured 0.588 vs 0.462 at p = 0.000, so the claim
+should pass. If it does not, that is a finding, not a bug to tune around.
+
+**Resolution:** run
+
+    python scripts/run_evaluation.py --cache-predictions   # step 1, needs torch
+    python scripts/run_evaluation.py                       # step 2
+
+and record the outcome here. Closes on the first successful pair.
+
+---
+
+## OPEN-036 — a module-level import cycle that a full-suite pytest run hides
+
+**Status: CLOSED 2026-08-16 (Phase 19), same session it was found.**
+**Owned by:** Phase 18 · **Found at:** Phase 19 pre-commit verification
+
+`python -m pytest tests/test_explainability.py -q` failed at collection with
+`ImportError: cannot import name 'TokenAttribution' from partially initialized
+module 'src.explainability.attribution' (most likely due to a circular
+import)`. `python -m pytest -q` passed **100%** at the same commit.
+
+**The cycle.** Phase 18 added `from .ablations import (...)` to
+`src/evaluation/__init__.py`, and `ablations.py` imported
+`src.explainability.faithfulness` at module level:
+
+    src.evaluation/__init__ -> ablations -> explainability.faithfulness
+    -> explainability.attribution -> models.dataset -> models/__init__
+    -> classical -> evaluation.baselines -> src.evaluation/__init__  (half-built)
+
+It only bites when `src.explainability` is imported **before**
+`src.evaluation`. A full-suite run happens to import them in the safe order, so
+the aggregate green tick was true and meaningless.
+
+**Fix.** `spearman` is used in exactly one function, so the import moved inside
+`risk_sensitivity` with a comment explaining why it must stay there. No API
+changed and no export moved.
+
+**Regression test.** `test_explainability_imports_standalone_in_a_fresh_interpreter`
+in `tests/test_evaluation_harness.py`. It shells out to a **subprocess**,
+because an in-process assertion inherits the parent's already-populated
+`sys.modules` and would pass for the wrong reason. The subprocess IS the test.
+
+### Why this entry exists at all
+
+**This is the fourth instance of the defect shape this project keeps finding,
+and it arrived one phase earlier than predicted.** The Phase 18 handover
+predicted the fourth instance would appear in Phase 20 as "the card renders"
+being accepted as "the card is honest". It appeared here instead, as **"the
+suite passes" being accepted as "the modules import"**.
+
+Same shape as OPEN-034, Phase 17's ethics guard, and Phase 9b's duplication
+fix: *the check and the thing it protects were related by assumption rather
+than by construction.* A green `pytest -q` is evidence about one import order,
+not about importability — and nothing in the suite asserted the difference until
+now.
+
+**Carry forward:** an aggregate pass is not a per-module pass. Where import
+order, environment or ordering can change an outcome, the test must construct
+the condition it claims to check rather than inherit it from the runner.
