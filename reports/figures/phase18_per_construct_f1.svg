@@ -1,0 +1,34 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='720' height='350' viewBox='0 0 720 350' role='img'>
+<rect width='720' height='350' fill='white'/>
+<text x='360' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='14' font-weight='bold' fill='#222222'>Transformer per-construct F1 (planted labels, NOT accuracy)</text>
+<text x='182' y='56' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>appraisal_orientation</text>
+<rect x='190' y='40' width='237.28' height='22' fill='#1f3a5f'/>
+<text x='433.28' y='56' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.484</text>
+<text x='182' y='84' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>attentional_focus</text>
+<rect x='190' y='68' width='153.26' height='22' fill='#1f3a5f'/>
+<text x='349.26' y='84' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.313</text>
+<text x='182' y='112' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>burnout_signal</text>
+<rect x='190' y='96' width='220.82' height='22' fill='#1f3a5f'/>
+<text x='416.82' y='112' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.451</text>
+<text x='182' y='140' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>cognitive_anxiety</text>
+<rect x='190' y='124' width='181.39' height='22' fill='#1f3a5f'/>
+<text x='377.39' y='140' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.370</text>
+<text x='182' y='168' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>coping_style</text>
+<rect x='190' y='152' width='411.40' height='22' fill='#1f3a5f'/>
+<text x='607.40' y='168' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.840</text>
+<text x='182' y='196' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>motivation_orientation</text>
+<rect x='190' y='180' width='386.97' height='22' fill='#1f3a5f'/>
+<text x='582.97' y='196' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.790</text>
+<text x='182' y='224' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>perceived_stress</text>
+<rect x='190' y='208' width='356.19' height='22' fill='#1f3a5f'/>
+<text x='552.19' y='224' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.727</text>
+<text x='182' y='252' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>resilience</text>
+<rect x='190' y='236' width='205.38' height='22' fill='#1f3a5f'/>
+<text x='401.38' y='252' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.419</text>
+<text x='182' y='280' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>self_confidence</text>
+<rect x='190' y='264' width='440.00' height='22' fill='#1f3a5f'/>
+<text x='636.00' y='280' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.898</text>
+<text x='182' y='308' text-anchor='end' font-family='Helvetica,Arial,sans-serif' font-size='12' fill='#222222'>somatic_anxiety</text>
+<rect x='190' y='292' width='285.69' height='22' fill='#1f3a5f'/>
+<text x='481.69' y='308' font-family='Helvetica,Arial,sans-serif' font-size='11' fill='#222222'>0.583</text>
+</svg>

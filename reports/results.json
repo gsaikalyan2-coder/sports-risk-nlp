@@ -1,0 +1,911 @@
+{
+ "phase": 18,
+ "generated_on": "2026-08-16",
+ "environment": {
+  "python": "3.11.9",
+  "seed": 42,
+  "test_size": 0.2,
+  "bootstrap_resamples": 1000,
+  "checkpoint": "phase14_transformer_distilroberta-base_lr2e-05_bs16_ep6_len128_1a551fdf"
+ },
+ "provenance": "PROVISIONAL -- planted-label corpus-property measurement, NOT accuracy. data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011).",
+ "is_accuracy": false,
+ "scores": {
+  "random::lexicon": {
+   "system": "lexicon",
+   "split": "random",
+   "n": 778,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.5620291117805276,
+    "low": 0.5349514439255938,
+    "high": 0.5853596373030856
+   },
+   "micro_f1": {
+    "point": 0.5867689357622243,
+    "low": 0.56187624750499,
+    "high": 0.6105563480741797
+   },
+   "subset_accuracy": 0.2532133676092545,
+   "constructs_at_zero": [],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.971830985915493,
+     "recall": 0.4825174825174825,
+     "f1": 0.6448598130841121,
+     "support": 143
+    },
+    "attentional_focus": {
+     "precision": 0.7529411764705882,
+     "recall": 0.49612403100775193,
+     "f1": 0.5981308411214953,
+     "support": 129
+    },
+    "burnout_signal": {
+     "precision": 0.525,
+     "recall": 0.22580645161290322,
+     "f1": 0.3157894736842105,
+     "support": 93
+    },
+    "cognitive_anxiety": {
+     "precision": 0.8651685393258427,
+     "recall": 0.41397849462365593,
+     "f1": 0.56,
+     "support": 186
+    },
+    "coping_style": {
+     "precision": 0.8947368421052632,
+     "recall": 0.6685393258426966,
+     "f1": 0.7652733118971061,
+     "support": 178
+    },
+    "motivation_orientation": {
+     "precision": 0.6233766233766234,
+     "recall": 0.48484848484848486,
+     "f1": 0.5454545454545454,
+     "support": 99
+    },
+    "perceived_stress": {
+     "precision": 0.6274509803921569,
+     "recall": 0.2782608695652174,
+     "f1": 0.3855421686746988,
+     "support": 115
+    },
+    "resilience": {
+     "precision": 1.0,
+     "recall": 0.34,
+     "f1": 0.5074626865671642,
+     "support": 100
+    },
+    "self_confidence": {
+     "precision": 0.7530864197530864,
+     "recall": 0.3696969696969697,
+     "f1": 0.49593495934959353,
+     "support": 165
+    },
+    "somatic_anxiety": {
+     "precision": 0.9560439560439561,
+     "recall": 0.6904761904761905,
+     "f1": 0.8018433179723503,
+     "support": 126
+    }
+   },
+   "is_accuracy": false
+  },
+  "random::majority": {
+   "system": "majority",
+   "split": "random",
+   "n": 778,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.0,
+    "low": 0.0,
+    "high": 0.0
+   },
+   "micro_f1": {
+    "point": 0.0,
+    "low": 0.0,
+    "high": 0.0
+   },
+   "subset_accuracy": 0.056555269922879174,
+   "constructs_at_zero": [
+    "appraisal_orientation",
+    "attentional_focus",
+    "burnout_signal",
+    "cognitive_anxiety",
+    "coping_style",
+    "motivation_orientation",
+    "perceived_stress",
+    "resilience",
+    "self_confidence",
+    "somatic_anxiety"
+   ],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 143
+    },
+    "attentional_focus": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 129
+    },
+    "burnout_signal": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 93
+    },
+    "cognitive_anxiety": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 186
+    },
+    "coping_style": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 178
+    },
+    "motivation_orientation": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 99
+    },
+    "perceived_stress": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 115
+    },
+    "resilience": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 100
+    },
+    "self_confidence": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 165
+    },
+    "somatic_anxiety": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 126
+    }
+   },
+   "is_accuracy": false
+  },
+  "random::tfidf_logreg": {
+   "system": "tfidf_logreg",
+   "split": "random",
+   "n": 778,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.9994594594594595,
+    "low": 0.9981132075471699,
+    "high": 1.0
+   },
+   "micro_f1": {
+    "point": 0.9996250468691413,
+    "low": 0.9988412514484357,
+    "high": 1.0
+   },
+   "subset_accuracy": 0.9987146529562982,
+   "constructs_at_zero": [],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 143
+    },
+    "attentional_focus": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 129
+    },
+    "burnout_signal": {
+     "precision": 1.0,
+     "recall": 0.989247311827957,
+     "f1": 0.9945945945945946,
+     "support": 93
+    },
+    "cognitive_anxiety": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 186
+    },
+    "coping_style": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 178
+    },
+    "motivation_orientation": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 99
+    },
+    "perceived_stress": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 115
+    },
+    "resilience": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 100
+    },
+    "self_confidence": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 165
+    },
+    "somatic_anxiety": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0,
+     "support": 126
+    }
+   },
+   "is_accuracy": false
+  },
+  "random::transformer": {
+   "system": "transformer",
+   "split": "random",
+   "n": 778,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.8219513236505683,
+    "low": 0.8050027929980308,
+    "high": 0.8372388503912083
+   },
+   "micro_f1": {
+    "point": 0.8267997148966499,
+    "low": 0.8126780626780626,
+    "high": 0.8403908794788273
+   },
+   "subset_accuracy": 0.5655526992287918,
+   "constructs_at_zero": [],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.6782178217821783,
+     "recall": 0.958041958041958,
+     "f1": 0.7942028985507247,
+     "support": 143
+    },
+    "attentional_focus": {
+     "precision": 0.6530612244897959,
+     "recall": 0.9922480620155039,
+     "f1": 0.7876923076923078,
+     "support": 129
+    },
+    "burnout_signal": {
+     "precision": 0.5514705882352942,
+     "recall": 0.8064516129032258,
+     "f1": 0.6550218340611355,
+     "support": 93
+    },
+    "cognitive_anxiety": {
+     "precision": 0.98989898989899,
+     "recall": 0.5268817204301075,
+     "f1": 0.687719298245614,
+     "support": 186
+    },
+    "coping_style": {
+     "precision": 0.9052631578947369,
+     "recall": 0.9662921348314607,
+     "f1": 0.9347826086956522,
+     "support": 178
+    },
+    "motivation_orientation": {
+     "precision": 0.9634146341463414,
+     "recall": 0.797979797979798,
+     "f1": 0.8729281767955802,
+     "support": 99
+    },
+    "perceived_stress": {
+     "precision": 0.8278688524590164,
+     "recall": 0.8782608695652174,
+     "f1": 0.8523206751054851,
+     "support": 115
+    },
+    "resilience": {
+     "precision": 0.71875,
+     "recall": 0.92,
+     "f1": 0.8070175438596492,
+     "support": 100
+    },
+    "self_confidence": {
+     "precision": 0.9058823529411765,
+     "recall": 0.9333333333333333,
+     "f1": 0.9194029850746268,
+     "support": 165
+    },
+    "somatic_anxiety": {
+     "precision": 0.8435374149659864,
+     "recall": 0.9841269841269841,
+     "f1": 0.9084249084249083,
+     "support": 126
+    }
+   },
+   "is_accuracy": false
+  },
+  "template_disjoint::lexicon": {
+   "system": "lexicon",
+   "split": "template_disjoint",
+   "n": 443,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.4617285842599597,
+    "low": 0.43143997763018865,
+    "high": 0.4922078789184489
+   },
+   "micro_f1": {
+    "point": 0.5325153374233129,
+    "low": 0.4924623115577889,
+    "high": 0.571764705882353
+   },
+   "subset_accuracy": 0.35214446952595935,
+   "constructs_at_zero": [
+    "cognitive_anxiety",
+    "resilience"
+   ],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.9090909090909091,
+     "recall": 0.5128205128205128,
+     "f1": 0.6557377049180326,
+     "support": 39
+    },
+    "attentional_focus": {
+     "precision": 0.05714285714285714,
+     "recall": 0.08333333333333333,
+     "f1": 0.06779661016949153,
+     "support": 24
+    },
+    "burnout_signal": {
+     "precision": 0.8648648648648649,
+     "recall": 0.3855421686746988,
+     "f1": 0.5333333333333334,
+     "support": 83
+    },
+    "cognitive_anxiety": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 22
+    },
+    "coping_style": {
+     "precision": 0.8032786885245902,
+     "recall": 0.6712328767123288,
+     "f1": 0.7313432835820896,
+     "support": 73
+    },
+    "motivation_orientation": {
+     "precision": 0.9473684210526315,
+     "recall": 0.4090909090909091,
+     "f1": 0.5714285714285715,
+     "support": 44
+    },
+    "perceived_stress": {
+     "precision": 0.5,
+     "recall": 0.5909090909090909,
+     "f1": 0.5416666666666667,
+     "support": 44
+    },
+    "resilience": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 28
+    },
+    "self_confidence": {
+     "precision": 0.7166666666666667,
+     "recall": 0.42574257425742573,
+     "f1": 0.5341614906832298,
+     "support": 101
+    },
+    "somatic_anxiety": {
+     "precision": 1.0,
+     "recall": 0.9642857142857143,
+     "f1": 0.9818181818181818,
+     "support": 28
+    }
+   },
+   "is_accuracy": false
+  },
+  "template_disjoint::majority": {
+   "system": "majority",
+   "split": "template_disjoint",
+   "n": 443,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.0,
+    "low": 0.0,
+    "high": 0.0
+   },
+   "micro_f1": {
+    "point": 0.0,
+    "low": 0.0,
+    "high": 0.0
+   },
+   "subset_accuracy": 0.09932279909706546,
+   "constructs_at_zero": [
+    "appraisal_orientation",
+    "attentional_focus",
+    "burnout_signal",
+    "cognitive_anxiety",
+    "coping_style",
+    "motivation_orientation",
+    "perceived_stress",
+    "resilience",
+    "self_confidence",
+    "somatic_anxiety"
+   ],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 39
+    },
+    "attentional_focus": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 24
+    },
+    "burnout_signal": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 83
+    },
+    "cognitive_anxiety": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 22
+    },
+    "coping_style": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 73
+    },
+    "motivation_orientation": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 44
+    },
+    "perceived_stress": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 44
+    },
+    "resilience": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 28
+    },
+    "self_confidence": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 101
+    },
+    "somatic_anxiety": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 28
+    }
+   },
+   "is_accuracy": false
+  },
+  "template_disjoint::tfidf_logreg": {
+   "system": "tfidf_logreg",
+   "split": "template_disjoint",
+   "n": 443,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.22208037080486936,
+    "low": 0.18143040815305816,
+    "high": 0.25807267913716847
+   },
+   "micro_f1": {
+    "point": 0.22848200312989048,
+    "low": 0.1858108108108108,
+    "high": 0.2694136291600634
+   },
+   "subset_accuracy": 0.1670428893905192,
+   "constructs_at_zero": [
+    "resilience"
+   ],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.8695652173913043,
+     "recall": 0.5128205128205128,
+     "f1": 0.6451612903225806,
+     "support": 39
+    },
+    "attentional_focus": {
+     "precision": 0.05555555555555555,
+     "recall": 0.041666666666666664,
+     "f1": 0.04761904761904762,
+     "support": 24
+    },
+    "burnout_signal": {
+     "precision": 0.6666666666666666,
+     "recall": 0.024096385542168676,
+     "f1": 0.046511627906976744,
+     "support": 83
+    },
+    "cognitive_anxiety": {
+     "precision": 0.2857142857142857,
+     "recall": 0.09090909090909091,
+     "f1": 0.13793103448275862,
+     "support": 22
+    },
+    "coping_style": {
+     "precision": 0.4444444444444444,
+     "recall": 0.1095890410958904,
+     "f1": 0.17582417582417584,
+     "support": 73
+    },
+    "motivation_orientation": {
+     "precision": 0.9523809523809523,
+     "recall": 0.45454545454545453,
+     "f1": 0.6153846153846153,
+     "support": 44
+    },
+    "perceived_stress": {
+     "precision": 0.2682926829268293,
+     "recall": 0.25,
+     "f1": 0.25882352941176473,
+     "support": 44
+    },
+    "resilience": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 28
+    },
+    "self_confidence": {
+     "precision": 0.3157894736842105,
+     "recall": 0.0594059405940594,
+     "f1": 0.1,
+     "support": 101
+    },
+    "somatic_anxiety": {
+     "precision": 1.0,
+     "recall": 0.10714285714285714,
+     "f1": 0.19354838709677416,
+     "support": 28
+    }
+   },
+   "is_accuracy": false
+  },
+  "template_disjoint::transformer": {
+   "system": "transformer",
+   "split": "template_disjoint",
+   "n": 443,
+   "label_source": "planted",
+   "macro_f1": {
+    "point": 0.5877114720181955,
+    "low": 0.546256792412586,
+    "high": 0.6222430542818375
+   },
+   "micro_f1": {
+    "point": 0.6141078838174274,
+    "low": 0.584026622296173,
+    "high": 0.6432078559738134
+   },
+   "subset_accuracy": 0.33860045146726864,
+   "constructs_at_zero": [],
+   "per_construct": {
+    "appraisal_orientation": {
+     "precision": 0.319672131147541,
+     "recall": 1.0,
+     "f1": 0.484472049689441,
+     "support": 39
+    },
+    "attentional_focus": {
+     "precision": 0.18699186991869918,
+     "recall": 0.9583333333333334,
+     "f1": 0.3129251700680272,
+     "support": 24
+    },
+    "burnout_signal": {
+     "precision": 0.43333333333333335,
+     "recall": 0.46987951807228917,
+     "f1": 0.4508670520231214,
+     "support": 83
+    },
+    "cognitive_anxiety": {
+     "precision": 1.0,
+     "recall": 0.22727272727272727,
+     "f1": 0.37037037037037035,
+     "support": 22
+    },
+    "coping_style": {
+     "precision": 0.8181818181818182,
+     "recall": 0.863013698630137,
+     "f1": 0.8400000000000001,
+     "support": 73
+    },
+    "motivation_orientation": {
+     "precision": 0.8648648648648649,
+     "recall": 0.7272727272727273,
+     "f1": 0.7901234567901235,
+     "support": 44
+    },
+    "perceived_stress": {
+     "precision": 0.5714285714285714,
+     "recall": 1.0,
+     "f1": 0.7272727272727273,
+     "support": 44
+    },
+    "resilience": {
+     "precision": 0.38235294117647056,
+     "recall": 0.4642857142857143,
+     "f1": 0.41935483870967744,
+     "support": 28
+    },
+    "self_confidence": {
+     "precision": 0.9767441860465116,
+     "recall": 0.8316831683168316,
+     "f1": 0.8983957219251336,
+     "support": 101
+    },
+    "somatic_anxiety": {
+     "precision": 0.4117647058823529,
+     "recall": 1.0,
+     "f1": 0.5833333333333334,
+     "support": 28
+    }
+   },
+   "is_accuracy": false
+  }
+ },
+ "comparisons": {
+  "transformer_vs_lexicon": {
+   "system_a": "transformer",
+   "system_b": "lexicon",
+   "split": "template_disjoint",
+   "metric": "macro_f1",
+   "score_a": 0.5877114720181955,
+   "score_b": 0.4617285842599597,
+   "delta": 0.1259828877582358,
+   "p_value": 0.0,
+   "alpha": 0.05,
+   "significant": true,
+   "verdict": "A beats B"
+  },
+  "split_gap": {
+   "system_a": "transformer (random split)",
+   "system_b": "transformer (template-disjoint)",
+   "split": "cross-split",
+   "metric": "macro_f1",
+   "score_a": 0.8219513236505683,
+   "score_b": 0.5877114720181955,
+   "delta": 0.23423985163237282,
+   "p_value": NaN,
+   "verdict": "memorisation gap (not a paired test -- different test sets)"
+  }
+ },
+ "ablations": {
+  "silver_classical": {
+   "id": "silver_classical",
+   "question": "Does adding silver-labelled data help a classical model?",
+   "status": "measured",
+   "rationale": "3625 silver rows added to training only; any row realising a held-out template was dropped, so the template-disjoint split is preserved. macro-F1 0.222 -> 0.255 (delta +0.033, p=0.107): no significant change in either direction. That is the measured evidence for OPEN-028: several thousand additional training rows bought nothing, because their labels are `rng.randrange` output keyed on a prompt hash.",
+   "comparison": {
+    "system_a": "with_silver",
+    "system_b": "without_silver",
+    "split": "template_disjoint",
+    "metric": "macro_f1",
+    "score_a": 0.25490936253611457,
+    "score_b": 0.22208037080486936,
+    "delta": 0.032828991731245205,
+    "p_value": 0.107,
+    "alpha": 0.05,
+    "significant": false,
+    "verdict": "no separation"
+   },
+   "detail": {
+    "n_silver_rows_added": 3625,
+    "blocked_by": [
+     "OPEN-028"
+    ]
+   }
+  },
+  "silver_transformer": {
+   "id": "silver_transformer",
+   "question": "Does adding the silver-labelled utterances to transformer training help?",
+   "status": "refused",
+   "rationale": "OPEN-028: every silver label is `rng.randrange` output from the offline stub (OPEN-008, no live OpenRouter call has ever been made). The experiment would measure the effect of adding uniform noise to the training set, which is known by construction, at a cost of roughly ten CPU-hours across the two arms. The cheap classical arm (`silver_classical`) demonstrates the collapse instead. This ablation becomes worth running the day a real labelling run exists; until then its result would be a fact about `random`, not about weak supervision.",
+   "comparison": null,
+   "detail": {
+    "blocked_by": [
+     "OPEN-028",
+     "OPEN-008"
+    ],
+    "estimated_cost_cpu_hours": 10
+   }
+  },
+  "risk_fusion": {
+   "id": "risk_fusion",
+   "question": "What does the construct->risk fusion layer contribute?",
+   "status": "measured",
+   "rationale": "Reframed as a structural sensitivity analysis. No observed risk outcome exists, so an accuracy-style +/- fusion comparison is impossible and a proxy target derived from planted labels would be circular (Phase 15). rho=0.100 against a plain count of detected constructs -- the taxonomy directions and magnitudes materially change the ordering.",
+   "comparison": null,
+   "detail": {
+    "n": 443,
+    "contribution_share": {
+     "appraisal_orientation": 0.0,
+     "attentional_focus": 0.0,
+     "burnout_signal": 0.22568824939603357,
+     "cognitive_anxiety": 0.20163189594224507,
+     "coping_style": 0.0,
+     "motivation_orientation": 0.0,
+     "perceived_stress": 0.16699500935414407,
+     "resilience": 0.07303810409960873,
+     "self_confidence": 0.1830686035717661,
+     "somatic_anxiety": 0.14957813763620245
+    },
+    "zeroed_constructs": [
+     "appraisal_orientation",
+     "attentional_focus",
+     "coping_style",
+     "motivation_orientation"
+    ],
+    "unresolved_rate": {
+     "appraisal_orientation": 1.0,
+     "attentional_focus": 1.0,
+     "burnout_signal": 0.0,
+     "cognitive_anxiety": 0.0,
+     "coping_style": 1.0,
+     "motivation_orientation": 1.0,
+     "perceived_stress": 0.0,
+     "resilience": 0.0,
+     "self_confidence": 0.0,
+     "somatic_anxiety": 0.0
+    },
+    "polarity_rho": {
+     "PESSIMISTIC": 0.8389834836521863,
+     "OPTIMISTIC": 0.8549020251981346
+    },
+    "polarity_mean_shift": {
+     "PESSIMISTIC": 0.1521069461940717,
+     "OPTIMISTIC": 0.17397942413981632
+    },
+    "naive_rho_vs_construct_count": 0.10012922526093163,
+    "perturbation_rho": 0.988939410795738,
+    "perturbation_epsilon": 0.05,
+    "is_accuracy": false,
+    "note": "Structural sensitivity of the fusion layer. No observed risk outcome exists (Phase 15; `calibrate_risk_index` refuses), so none of these numbers is a measure of whether the risk index is correct."
+   }
+  }
+ },
+ "error_profile": {
+  "system": "transformer",
+  "split": "template_disjoint",
+  "false_positives": {
+   "appraisal_orientation": 83,
+   "attentional_focus": 100,
+   "burnout_signal": 51,
+   "coping_style": 14,
+   "motivation_orientation": 5,
+   "perceived_stress": 33,
+   "resilience": 21,
+   "self_confidence": 2,
+   "somatic_anxiety": 40
+  },
+  "false_negatives": {
+   "attentional_focus": 1,
+   "burnout_signal": 44,
+   "cognitive_anxiety": 17,
+   "coping_style": 10,
+   "motivation_orientation": 12,
+   "resilience": 15,
+   "self_confidence": 17
+  },
+  "confusions": {
+   "burnout_signal->somatic_anxiety": 29,
+   "burnout_signal->perceived_stress": 20,
+   "coping_style->attentional_focus": 10,
+   "motivation_orientation->appraisal_orientation": 10,
+   "burnout_signal->appraisal_orientation": 9,
+   "self_confidence->burnout_signal": 8,
+   "resilience->burnout_signal": 7,
+   "cognitive_anxiety->burnout_signal": 7,
+   "self_confidence->appraisal_orientation": 6,
+   "cognitive_anxiety->appraisal_orientation": 6,
+   "burnout_signal->attentional_focus": 5,
+   "self_confidence->attentional_focus": 3,
+   "self_confidence->coping_style": 3,
+   "resilience->appraisal_orientation": 3,
+   "resilience->attentional_focus": 2,
+   "cognitive_anxiety->attentional_focus": 1,
+   "motivation_orientation->burnout_signal": 1,
+   "cognitive_anxiety->somatic_anxiety": 1,
+   "cognitive_anxiety->perceived_stress": 1,
+   "attentional_focus->coping_style": 1,
+   "resilience->self_confidence": 1,
+   "resilience->motivation_orientation": 1,
+   "resilience->coping_style": 1
+  },
+  "by_load_band": {
+   "0 constructs": {
+    "n": 44,
+    "n_with_error": 0
+   },
+   "1 construct": {
+    "n": 318,
+    "n_with_error": 217
+   },
+   "2 constructs": {
+    "n": 75,
+    "n_with_error": 70
+   },
+   "3+ constructs": {
+    "n": 6,
+    "n_with_error": 6
+   }
+  },
+  "worst_record_ids": [
+   "synth_precomp_v1-000791",
+   "synth_precomp_v1-001312",
+   "synth_precomp_v1-001854",
+   "synth_precomp_v1-001876",
+   "synth_precomp_v1-002085",
+   "synth_precomp_v1-002318",
+   "synth_precomp_v1-002631",
+   "synth_precomp_v1-003458",
+   "synth_precomp_v1-000017",
+   "synth_precomp_v1-000077"
+  ],
+  "note": "Structural only. No verbatim corpus text, per docs/ethics.md."
+ },
+ "explainability": {
+  "faithfulness": {
+   "n": 211,
+   "comprehensiveness": 0.5003167095616172,
+   "sufficiency": 0.5352495911579703,
+   "random_comprehensiveness": 0.17183088570638988,
+   "random_sufficiency": 0.705482232042752,
+   "comprehensiveness_margin": 0.3284858238552279,
+   "sufficiency_margin": 0.1702326408847813,
+   "beats_random": true
+  }
+ },
+ "claim_audit": {
+  "transformer_beats_lexicon": true,
+  "memorisation_gap": true,
+  "per_construct_spread": true,
+  "silver_is_noise": true,
+  "fusion_is_structural": true,
+  "explanations_beat_random": true,
+  "not_accuracy": true
+ }
+}

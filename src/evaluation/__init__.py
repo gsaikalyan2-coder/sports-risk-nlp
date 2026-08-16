@@ -17,6 +17,17 @@ Three pieces:
 All pure Python. No numpy, no scikit-learn, no network, no cost.
 """
 
+from .ablations import (
+    CLAIMS,
+    Ablation,
+    AblationStatus,
+    Claim,
+    ClaimLedger,
+    RiskSensitivity,
+    fusion_ablation,
+    refuse_transformer_silver_ablation,
+    risk_sensitivity,
+)
 from .baselines import (
     ALL_BASELINES,
     CONSTRUCT_CUES,
@@ -27,6 +38,19 @@ from .baselines import (
     StratifiedRandomBaseline,
 )
 from .figures import bar_chart, grouped_bar_chart, histogram_chart
+from .harness import (
+    PROVISIONAL_STAMP,
+    Comparison,
+    ErrorProfile,
+    MisalignedPredictions,
+    PredictionSet,
+    SystemScore,
+    assert_not_accuracy,
+    compare_systems,
+    error_profile,
+    load_cache,
+    score_predictions,
+)
 from .metrics import (
     PRF,
     Interval,
@@ -75,8 +99,28 @@ from .splits import (
 
 __all__ = [
     "ALL_BASELINES",
+    "CLAIMS",
+    "PROVISIONAL_STAMP",
+    "Ablation",
+    "AblationStatus",
     "Baseline",
     "CONSTRUCT_CUES",
+    "Claim",
+    "ClaimLedger",
+    "Comparison",
+    "ErrorProfile",
+    "MisalignedPredictions",
+    "PredictionSet",
+    "RiskSensitivity",
+    "SystemScore",
+    "assert_not_accuracy",
+    "compare_systems",
+    "error_profile",
+    "fusion_ablation",
+    "load_cache",
+    "refuse_transformer_silver_ablation",
+    "risk_sensitivity",
+    "score_predictions",
     "CorpusProfile",
     "Distribution",
     "DuplicateProfile",
