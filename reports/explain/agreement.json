@@ -1,0 +1,440 @@
+{
+  "n_compared": 72,
+  "n_with_defined_rho": 72,
+  "mean_spearman": 0.45830708668374853,
+  "mean_top5_jaccard": 0.3837632275132273,
+  "per_item": [
+    {
+      "record_id": "synth_precomp_v1-002391",
+      "construct": "appraisal_orientation",
+      "spearman": 0.6739079384238861,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002391",
+      "construct": "motivation_orientation",
+      "spearman": 0.06729902244814115,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-003481",
+      "construct": "burnout_signal",
+      "spearman": 0.7965401089815339,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001466",
+      "construct": "attentional_focus",
+      "spearman": 0.5841498806085517,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002053",
+      "construct": "motivation_orientation",
+      "spearman": 0.42135527167170156,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002053",
+      "construct": "resilience",
+      "spearman": 0.5415469313623299,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002053",
+      "construct": "self_confidence",
+      "spearman": 0.26858318486675714,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-001704",
+      "construct": "attentional_focus",
+      "spearman": 0.4357142857142857,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001704",
+      "construct": "coping_style",
+      "spearman": 0.5892857142857143,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002597",
+      "construct": "attentional_focus",
+      "spearman": 0.7022599990839247,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002597",
+      "construct": "coping_style",
+      "spearman": 0.4067797259375911,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002534",
+      "construct": "appraisal_orientation",
+      "spearman": 0.5946851575748833,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002534",
+      "construct": "motivation_orientation",
+      "spearman": 0.5467517266639923,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-002534",
+      "construct": "resilience",
+      "spearman": 0.5202854233078236,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002534",
+      "construct": "self_confidence",
+      "spearman": 0.2872365009880865,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003258",
+      "construct": "appraisal_orientation",
+      "spearman": 0.5274345676517626,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-003258",
+      "construct": "motivation_orientation",
+      "spearman": 0.4992585879365325,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-000321",
+      "construct": "appraisal_orientation",
+      "spearman": 0.5076923076923077,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-000321",
+      "construct": "self_confidence",
+      "spearman": 0.6,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003778",
+      "construct": "burnout_signal",
+      "spearman": 0.4912128263079739,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003778",
+      "construct": "self_confidence",
+      "spearman": 0.11935398588401507,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002503",
+      "construct": "perceived_stress",
+      "spearman": 0.630546955624355,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003242",
+      "construct": "perceived_stress",
+      "spearman": 0.7481648785996612,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003361",
+      "construct": "self_confidence",
+      "spearman": 0.4634856091517605,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001841",
+      "construct": "perceived_stress",
+      "spearman": 0.3849624060150376,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001841",
+      "construct": "somatic_anxiety",
+      "spearman": 0.47218045112781953,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002301",
+      "construct": "motivation_orientation",
+      "spearman": 0.4691729323308271,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002301",
+      "construct": "resilience",
+      "spearman": 0.5112781954887218,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002266",
+      "construct": "cognitive_anxiety",
+      "spearman": 0.3234706503361905,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002929",
+      "construct": "attentional_focus",
+      "spearman": 0.5353383458646617,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-001092",
+      "construct": "attentional_focus",
+      "spearman": 0.3483978168759189,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001092",
+      "construct": "coping_style",
+      "spearman": 0.49876762934830843,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-000419",
+      "construct": "somatic_anxiety",
+      "spearman": 0.38480392156862747,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-001218",
+      "construct": "appraisal_orientation",
+      "spearman": 0.536418481316262,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-000942",
+      "construct": "somatic_anxiety",
+      "spearman": 0.7106950099232704,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001945",
+      "construct": "attentional_focus",
+      "spearman": 0.4684901137285,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001945",
+      "construct": "coping_style",
+      "spearman": 0.36967286300871766,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001945",
+      "construct": "perceived_stress",
+      "spearman": 0.5234424078355481,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-003772",
+      "construct": "perceived_stress",
+      "spearman": 0.6783627163032939,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002473",
+      "construct": "cognitive_anxiety",
+      "spearman": 0.4944467266248243,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002473",
+      "construct": "perceived_stress",
+      "spearman": 0.4648864135960101,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002473",
+      "construct": "somatic_anxiety",
+      "spearman": 0.31194392444692776,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-001876",
+      "construct": "attentional_focus",
+      "spearman": 0.3979431744894346,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001876",
+      "construct": "coping_style",
+      "spearman": 0.3405762809681838,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001876",
+      "construct": "perceived_stress",
+      "spearman": 0.36830814418698754,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001876",
+      "construct": "somatic_anxiety",
+      "spearman": -0.007929862848514126,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002039",
+      "construct": "appraisal_orientation",
+      "spearman": 0.41887781257068596,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-003790",
+      "construct": "attentional_focus",
+      "spearman": 0.3903748063854857,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-003790",
+      "construct": "coping_style",
+      "spearman": 0.3930486064292219,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002676",
+      "construct": "perceived_stress",
+      "spearman": 0.6681492667528323,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-003227",
+      "construct": "attentional_focus",
+      "spearman": 0.5506572567263924,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "appraisal_orientation",
+      "spearman": 0.3968024837360393,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "attentional_focus",
+      "spearman": 0.490207038335338,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "burnout_signal",
+      "spearman": 0.2953731770264944,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "coping_style",
+      "spearman": 0.3593931957100855,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "motivation_orientation",
+      "spearman": 0.260248199213069,
+      "top_k_jaccard": 0.0
+    },
+    {
+      "record_id": "synth_precomp_v1-002318",
+      "construct": "self_confidence",
+      "spearman": 0.31538314116091615,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-002103",
+      "construct": "cognitive_anxiety",
+      "spearman": 0.513925540697435,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-002103",
+      "construct": "somatic_anxiety",
+      "spearman": 0.7012646803445431,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001082",
+      "construct": "appraisal_orientation",
+      "spearman": 0.6246219123585892,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001749",
+      "construct": "cognitive_anxiety",
+      "spearman": 0.5061899254694903,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002437",
+      "construct": "burnout_signal",
+      "spearman": 0.4384494826984889,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002437",
+      "construct": "cognitive_anxiety",
+      "spearman": 0.2552710018192857,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-003350",
+      "construct": "somatic_anxiety",
+      "spearman": 0.7186813186813187,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-001933",
+      "construct": "perceived_stress",
+      "spearman": 0.43393088984659633,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-001933",
+      "construct": "somatic_anxiety",
+      "spearman": 0.46754995827493706,
+      "top_k_jaccard": 0.6666666666666666
+    },
+    {
+      "record_id": "synth_precomp_v1-001461",
+      "construct": "perceived_stress",
+      "spearman": 0.13636363636363635,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001461",
+      "construct": "somatic_anxiety",
+      "spearman": 0.2935064935064935,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-002323",
+      "construct": "attentional_focus",
+      "spearman": 0.27202772309855855,
+      "top_k_jaccard": 0.25
+    },
+    {
+      "record_id": "synth_precomp_v1-001530",
+      "construct": "attentional_focus",
+      "spearman": 0.47927379003359794,
+      "top_k_jaccard": 0.42857142857142855
+    },
+    {
+      "record_id": "synth_precomp_v1-001530",
+      "construct": "coping_style",
+      "spearman": 0.21881884099122936,
+      "top_k_jaccard": 0.1111111111111111
+    },
+    {
+      "record_id": "synth_precomp_v1-001753",
+      "construct": "perceived_stress",
+      "spearman": 0.7905607296960091,
+      "top_k_jaccard": 0.42857142857142855
+    }
+  ]
+}

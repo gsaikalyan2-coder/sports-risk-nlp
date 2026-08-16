@@ -1,0 +1,115 @@
+{
+  "n": 211,
+  "overall": {
+    "n": 211,
+    "comprehensiveness": 0.5003167095616172,
+    "sufficiency": 0.5352495911579703,
+    "random_comprehensiveness": 0.17183088570638988,
+    "random_sufficiency": 0.705482232042752,
+    "comprehensiveness_margin": 0.3284858238552279,
+    "sufficiency_margin": 0.1702326408847813,
+    "beats_random": true
+  },
+  "constructs": {
+    "appraisal_orientation": {
+      "n": 32,
+      "comprehensiveness": 0.4036086594103835,
+      "sufficiency": 0.525926536694169,
+      "random_comprehensiveness": 0.129528102488257,
+      "random_sufficiency": 0.6632620887481607,
+      "comprehensiveness_margin": 0.2740805569221266,
+      "sufficiency_margin": 0.13733555205399173,
+      "beats_random": true
+    },
+    "attentional_focus": {
+      "n": 29,
+      "comprehensiveness": 0.39337821196893163,
+      "sufficiency": 0.5489251907401043,
+      "random_comprehensiveness": 0.1290076357794219,
+      "random_sufficiency": 0.6678820421854997,
+      "comprehensiveness_margin": 0.2643705761895098,
+      "sufficiency_margin": 0.11895685144539536,
+      "beats_random": true
+    },
+    "burnout_signal": {
+      "n": 11,
+      "comprehensiveness": 0.44306435439396985,
+      "sufficiency": 0.5525728004222566,
+      "random_comprehensiveness": 0.20423910739746962,
+      "random_sufficiency": 0.7100260049443353,
+      "comprehensiveness_margin": 0.23882524699650023,
+      "sufficiency_margin": 0.1574532045220787,
+      "beats_random": true
+    },
+    "cognitive_anxiety": {
+      "n": 9,
+      "comprehensiveness": 0.5722708341355125,
+      "sufficiency": 0.559973290314277,
+      "random_comprehensiveness": 0.2013599612646633,
+      "random_sufficiency": 0.6933836524685224,
+      "comprehensiveness_margin": 0.3709108728708493,
+      "sufficiency_margin": 0.13341036215424537,
+      "beats_random": true
+    },
+    "coping_style": {
+      "n": 16,
+      "comprehensiveness": 0.5153822894440964,
+      "sufficiency": 0.580243084905669,
+      "random_comprehensiveness": 0.22421024015638977,
+      "random_sufficiency": 0.7197866673581301,
+      "comprehensiveness_margin": 0.2911720492877066,
+      "sufficiency_margin": 0.13954358245246112,
+      "beats_random": true
+    },
+    "motivation_orientation": {
+      "n": 26,
+      "comprehensiveness": 0.3757863420133409,
+      "sufficiency": 0.5176834439142393,
+      "random_comprehensiveness": 0.13179998002373255,
+      "random_sufficiency": 0.6351944603742316,
+      "comprehensiveness_margin": 0.24398636198960816,
+      "sufficiency_margin": 0.11751101645999232,
+      "beats_random": true
+    },
+    "perceived_stress": {
+      "n": 28,
+      "comprehensiveness": 0.5947815114166587,
+      "sufficiency": 0.6130267389783902,
+      "random_comprehensiveness": 0.19271287961996028,
+      "random_sufficiency": 0.7814255666652957,
+      "comprehensiveness_margin": 0.40206863179669844,
+      "sufficiency_margin": 0.16839882768690587,
+      "beats_random": true
+    },
+    "resilience": {
+      "n": 9,
+      "comprehensiveness": 0.5569001076122125,
+      "sufficiency": 0.45436448330680534,
+      "random_comprehensiveness": 0.19370379630062315,
+      "random_sufficiency": 0.6370139889005159,
+      "comprehensiveness_margin": 0.36319631131158936,
+      "sufficiency_margin": 0.18264950559371046,
+      "beats_random": true
+    },
+    "self_confidence": {
+      "n": 30,
+      "comprehensiveness": 0.5759577363729477,
+      "sufficiency": 0.5738131283471983,
+      "random_comprehensiveness": 0.19303930021822455,
+      "random_sufficiency": 0.767259968444705,
+      "comprehensiveness_margin": 0.38291843615472326,
+      "sufficiency_margin": 0.19344684009750684,
+      "beats_random": true
+    },
+    "somatic_anxiety": {
+      "n": 21,
+      "comprehensiveness": 0.6789503886142656,
+      "sufficiency": 0.3742400866356633,
+      "random_comprehensiveness": 0.20793758134934168,
+      "random_sufficiency": 0.7405029763600657,
+      "comprehensiveness_margin": 0.471012807264924,
+      "sufficiency_margin": 0.3662628897244022,
+      "beats_random": true
+    }
+  }
+}

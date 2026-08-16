@@ -1,0 +1,768 @@
+{
+  "counts_by_type": {
+    "mismatched": 9,
+    "model": 60,
+    "random_span": 15
+  },
+  "items": [
+    {
+      "construct": "motivation_orientation",
+      "item_id": "c012",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-001994",
+      "span_end": 54,
+      "span_start": 39,
+      "span_text": "end of it, I do"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "x007",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 94,
+      "span_start": 67,
+      "span_text": "be told, I just need to get"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m008",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 116,
+      "span_start": 71,
+      "span_text": "I am the best prepared I have ever been going"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m055",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 94,
+      "span_start": 67,
+      "span_text": "be told, I just need to get"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "c014",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002473",
+      "span_end": 106,
+      "span_start": 81,
+      "span_text": "a bit flat this build-up,"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m004",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001530",
+      "span_end": 84,
+      "span_start": 67,
+      "span_text": "it, I keep myself"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m021",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-000506",
+      "span_end": 43,
+      "span_start": 0,
+      "span_text": "I write down the three things I control and"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c005",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 110,
+      "span_start": 0,
+      "span_text": "The tip-off is scheduled for the evening session. If I'm being candid, I am the best prepared I have ever been"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c001",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 128,
+      "span_start": 25,
+      "span_text": "for the evening session. If I'm being candid, I am the best prepared I have ever been going into a game"
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m049",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002103",
+      "span_end": 128,
+      "span_start": 74,
+      "span_text": ", I can feel my heart pick up a bit when I think about"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "c003",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 196,
+      "span_start": 181,
+      "span_text": "I know what I'm"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m037",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 144,
+      "span_start": 125,
+      "span_text": "going badly badly \u2014"
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m046",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003745",
+      "span_end": 106,
+      "span_start": 42,
+      "span_text": "this afternoon. Truth be told, there's just a lot on right now \u2014"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m040",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002484",
+      "span_end": 68,
+      "span_start": 37,
+      "span_text": "this block. I want the win, but"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m014",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 333,
+      "span_start": 230,
+      "span_text": "\u2014 I'll leave it there. Look, I've been avoiding the footage and anything to do with the entry list \u2014 it"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m041",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002777",
+      "span_end": 90,
+      "span_start": 42,
+      "span_text": "block. The way I see it, I keep myself busy with"
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m039",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002473",
+      "span_end": 91,
+      "span_start": 72,
+      "span_text": "way, I'm a bit flat"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "x008",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-002103",
+      "span_end": 95,
+      "span_start": 59,
+      "span_text": ". At this stage, I can feel my heart"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m033",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001749",
+      "span_end": 108,
+      "span_start": 91,
+      "span_text": "up short has been"
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m019",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003350",
+      "span_end": 68,
+      "span_start": 21,
+      "span_text": ", my hands were quivering when I was packing my"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m022",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002689",
+      "span_end": 125,
+      "span_start": 80,
+      "span_text": "I don't even care how this one goes anymore \u2014"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m053",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003850",
+      "span_end": 74,
+      "span_start": 37,
+      "span_text": "Monday. At this stage, I'm a bit flat"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m002",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002396",
+      "span_end": 86,
+      "span_start": 34,
+      "span_text": ". I don't even care how this one goes anymore \u2014 make"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "x000",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 116,
+      "span_start": 71,
+      "span_text": "I am the best prepared I have ever been going"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c004",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 277,
+      "span_start": 179,
+      "span_text": "setback would not be the end of it, I do not think \u2014 I'll leave it there. Look, I've been avoiding"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m005",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001603",
+      "span_end": 35,
+      "span_start": 0,
+      "span_text": "Put it this way, I just need to get"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m028",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001997",
+      "span_end": 115,
+      "span_start": 26,
+      "span_text": "that's one thing sorted. Honestly, I expect to win this and I have expected it for weeks."
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m044",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001945",
+      "span_end": 87,
+      "span_start": 64,
+      "span_text": "days \u2014 that's about the"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m047",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001994",
+      "span_end": 122,
+      "span_start": 97,
+      "span_text": "myself a fair chance if I"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "c002",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-000506",
+      "span_end": 43,
+      "span_start": 0,
+      "span_text": "I write down the three things I control and"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m038",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003129",
+      "span_end": 91,
+      "span_start": 79,
+      "span_text": "fair shot if"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m032",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002521",
+      "span_end": 45,
+      "span_start": 0,
+      "span_text": "Between us, I have stopped looking forward to"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "x006",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-001088",
+      "span_end": 50,
+      "span_start": 0,
+      "span_text": "Put it this way, there's just a lot on right now \u2014"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m020",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001163",
+      "span_end": 136,
+      "span_start": 48,
+      "span_text": "want to go out and take this match on and see what I'm capable of \u2014 for what it's worth."
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m036",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001570",
+      "span_end": 117,
+      "span_start": 93,
+      "span_text": ", there is a little more"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m034",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002794",
+      "span_end": 103,
+      "span_start": 54,
+      "span_text": "I'm still avoiding the footage \u2014 that's about the"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m052",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003964",
+      "span_end": 54,
+      "span_start": 0,
+      "span_text": "Sitting here now, a setback would not be the end of it"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "c000",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002053",
+      "span_end": 56,
+      "span_start": 37,
+      "span_text": "end of it, I do not"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m045",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003586",
+      "span_end": 26,
+      "span_start": 4,
+      "span_text": "way I see it, I aim to"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c006",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-001530",
+      "span_end": 127,
+      "span_start": 112,
+      "span_text": "not the fight \u2014"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "x001",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-001994",
+      "span_end": 96,
+      "span_start": 74,
+      "span_text": "here now, I would give"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "c007",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002484",
+      "span_end": 50,
+      "span_start": 18,
+      "span_text": "at the usual times this block. I"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m042",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 210,
+      "span_start": 175,
+      "span_text": ", a setback would not be the end of"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c011",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-001530",
+      "span_end": 103,
+      "span_start": 78,
+      "span_text": "myself busy with anything"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m027",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002301",
+      "span_end": 92,
+      "span_start": 34,
+      "span_text": "through this without anything going badly wrong \u2014 for what"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m018",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 215,
+      "span_start": 174,
+      "span_text": "stage, I know what I'm capable of when it"
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m029",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001841",
+      "span_end": 40,
+      "span_start": 22,
+      "span_text": "tiredness has been"
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m016",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001647",
+      "span_end": 36,
+      "span_start": 9,
+      "span_text": "ness has been sitting on me"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m050",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-000067",
+      "span_end": 78,
+      "span_start": 0,
+      "span_text": "This is a demand I have the tools for and I want it \u2014 that's me being straight"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m000",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003909",
+      "span_end": 69,
+      "span_start": 0,
+      "span_text": "I want to go out and take this event on and see what I'm capable of \u2014"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "x002",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-001507",
+      "span_end": 97,
+      "span_start": 54,
+      "span_text": "I'm being straight, I keep myself busy with"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m058",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001692",
+      "span_end": 105,
+      "span_start": 63,
+      "span_text": "head is at. At this stage, a setback would"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m003",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002266",
+      "span_end": 118,
+      "span_start": 27,
+      "span_text": "the match is on Saturday morning. Sitting here now, the thought of coming up short has been"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m025",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002484",
+      "span_end": 154,
+      "span_start": 76,
+      "span_text": "I need to not fall apart like last time. Honestly, this is exactly the kind of"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "x005",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-002689",
+      "span_end": 125,
+      "span_start": 80,
+      "span_text": "I don't even care how this one goes anymore \u2014"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m030",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 225,
+      "span_start": 188,
+      "span_text": "what I'm capable of when it matters \u2014"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "c009",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-001604",
+      "span_end": 37,
+      "span_start": 11,
+      "span_text": "I would give myself a fair"
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m026",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001088",
+      "span_end": 50,
+      "span_start": 0,
+      "span_text": "Put it this way, there's just a lot on right now \u2014"
+    },
+    {
+      "construct": "appraisal_orientation",
+      "item_id": "m010",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002039",
+      "span_end": 122,
+      "span_start": 62,
+      "span_text": "I've been waiting to test myself against \u2014 that's the honest"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m015",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001994",
+      "span_end": 96,
+      "span_start": 74,
+      "span_text": "here now, I would give"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "c013",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 336,
+      "span_start": 303,
+      "span_text": "to do with the entry list \u2014 it is"
+    },
+    {
+      "construct": "self_confidence",
+      "item_id": "m048",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003778",
+      "span_end": 134,
+      "span_start": 110,
+      "span_text": "I believe my preparation"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "c010",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002312",
+      "span_end": 144,
+      "span_start": 103,
+      "span_text": "this without anything going badly badly \u2014"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m011",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003284",
+      "span_end": 63,
+      "span_start": 44,
+      "span_text": "studies, selection,"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m001",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002718",
+      "span_end": 119,
+      "span_start": 63,
+      "span_text": "Put it this way, I write down the three things I control"
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m006",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003242",
+      "span_end": 89,
+      "span_start": 0,
+      "span_text": "Between us, there is a little more noise around me than I would choose \u2014 not much more to"
+    },
+    {
+      "construct": "burnout_signal",
+      "item_id": "m012",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-000326",
+      "span_end": 145,
+      "span_start": 66,
+      "span_text": ", I have stopped looking forward to the fight the way I once did \u2014 that's where"
+    },
+    {
+      "construct": "perceived_stress",
+      "item_id": "m056",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-003029",
+      "span_end": 80,
+      "span_start": 3,
+      "span_text": "I'm being honest, there is a little more noise around me than I would choose."
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m009",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-000419",
+      "span_end": 68,
+      "span_start": 0,
+      "span_text": "Between us, I'm a bit flat this fortnight, if I'm honest \u2014 take that"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "x004",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-003242",
+      "span_end": 89,
+      "span_start": 0,
+      "span_text": "Between us, there is a little more noise around me than I would choose \u2014 not much more to"
+    },
+    {
+      "construct": "somatic_anxiety",
+      "item_id": "m059",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001876",
+      "span_end": 86,
+      "span_start": 68,
+      "span_text": "tiredness has been"
+    },
+    {
+      "construct": "motivation_orientation",
+      "item_id": "m035",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002058",
+      "span_end": 60,
+      "span_start": 21,
+      "span_text": ", so that's one thing sorted. I want to"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m023",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002718",
+      "span_end": 310,
+      "span_start": 293,
+      "span_text": "up short has been"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m054",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001092",
+      "span_end": 103,
+      "span_start": 58,
+      "span_text": "I write down the three things I control and I"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m017",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001603",
+      "span_end": 94,
+      "span_start": 66,
+      "span_text": "going badly wrong \u2014 not much"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m057",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001604",
+      "span_end": 49,
+      "span_start": 24,
+      "span_text": "myself a fair chance if I"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "c008",
+      "item_type": "random_span",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 128,
+      "span_start": 25,
+      "span_text": "for the evening session. If I'm being candid, I am the best prepared I have ever been going into a game"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "x003",
+      "item_type": "mismatched",
+      "record_id": "synth_precomp_v1-000326",
+      "span_end": 145,
+      "span_start": 66,
+      "span_text": ", I have stopped looking forward to the fight the way I once did \u2014 that's where"
+    },
+    {
+      "construct": "coping_style",
+      "item_id": "m024",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-000506",
+      "span_end": 45,
+      "span_start": 0,
+      "span_text": "I write down the three things I control and I"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m031",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002318",
+      "span_end": 289,
+      "span_start": 251,
+      "span_text": ". Look, I've been avoiding the footage"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m013",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002473",
+      "span_end": 96,
+      "span_start": 77,
+      "span_text": "I'm a bit flat this"
+    },
+    {
+      "construct": "cognitive_anxiety",
+      "item_id": "m043",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002103",
+      "span_end": 95,
+      "span_start": 59,
+      "span_text": ". At this stage, I can feel my heart"
+    },
+    {
+      "construct": "attentional_focus",
+      "item_id": "m051",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-001507",
+      "span_end": 97,
+      "span_start": 54,
+      "span_text": "I'm being straight, I keep myself busy with"
+    },
+    {
+      "construct": "resilience",
+      "item_id": "m007",
+      "item_type": "model",
+      "record_id": "synth_precomp_v1-002053",
+      "span_end": 114,
+      "span_start": 89,
+      "span_text": "myself a fair chance if I"
+    }
+  ],
+  "n_items": 84,
+  "rater_population": "sports-familiar student raters (pilot expert-review; NOT coaches or sport-psychology practitioners -- see OPEN-004)",
+  "seed": 42
+}
