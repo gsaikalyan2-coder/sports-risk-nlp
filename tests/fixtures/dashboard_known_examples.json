@@ -1,0 +1,853 @@
+{
+ "source": "reports/explain/cards.md",
+ "built_by": "scripts/build_dashboard_fixture.py",
+ "provenance": "PROVISIONAL -- planted-label corpus-property measurement, NOT accuracy. data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011).",
+ "note": "Frozen Phase 17 outputs on synthetic corpus records. Probabilities recovered from each card's contribution/weight; polarity-bearing constructs taken from reports/explain/attributions.json. Verified to re-render reports/explain/cards.md byte for byte at build time.",
+ "examples": [
+  {
+   "record_id": "synth_precomp_v1-003481",
+   "text": "Honestly, I'm just drained. I don't even care how this one goes anymore \u2014 that's where my head is at.",
+   "method": "integrated_gradients",
+   "provenance": "Attribution over a classifier fine-tuned on synthetic text (synth_precomp_v1) against generator-planted labels. No human-verified labels exist (OPEN-025) and no real athlete text was used (OPEN-011). This shows what the model used, not what predicts psychological risk in people. Not a clinical instrument.",
+   "synthetic": true,
+   "probabilities": {
+    "appraisal_orientation": 0.0,
+    "attentional_focus": 0.0,
+    "burnout_signal": 0.89,
+    "cognitive_anxiety": 0.148,
+    "coping_style": 0.0,
+    "motivation_orientation": 0.0,
+    "perceived_stress": 0.076,
+    "resilience": 0.04,
+    "self_confidence": 0.016,
+    "somatic_anxiety": 0.327
+   },
+   "explanations": [
+    {
+     "construct": "burnout_signal",
+     "probability": 0.889845882962785,
+     "method": "integrated_gradients",
+     "completeness_error": 0.06739716697484255,
+     "tokens": [
+      {
+       "token": "Honestly",
+       "start": 0,
+       "end": 8,
+       "score": 0.3154706358909607
+      },
+      {
+       "token": ",",
+       "start": 8,
+       "end": 9,
+       "score": 0.20860695838928223
+      },
+      {
+       "token": "\u0120I",
+       "start": 10,
+       "end": 11,
+       "score": 0.22749535739421844
+      },
+      {
+       "token": "'m",
+       "start": 11,
+       "end": 13,
+       "score": 0.06963495910167694
+      },
+      {
+       "token": "\u0120just",
+       "start": 14,
+       "end": 18,
+       "score": 0.13621529936790466
+      },
+      {
+       "token": "\u0120drained",
+       "start": 19,
+       "end": 26,
+       "score": -0.4930039644241333
+      },
+      {
+       "token": ".",
+       "start": 26,
+       "end": 27,
+       "score": 0.08836476504802704
+      },
+      {
+       "token": "\u0120I",
+       "start": 28,
+       "end": 29,
+       "score": 0.6583322286605835
+      },
+      {
+       "token": "\u0120don",
+       "start": 30,
+       "end": 33,
+       "score": 0.5849900245666504
+      },
+      {
+       "token": "'t",
+       "start": 33,
+       "end": 35,
+       "score": 0.5759795308113098
+      },
+      {
+       "token": "\u0120even",
+       "start": 36,
+       "end": 40,
+       "score": 0.25032126903533936
+      },
+      {
+       "token": "\u0120care",
+       "start": 41,
+       "end": 45,
+       "score": 0.3905637264251709
+      },
+      {
+       "token": "\u0120how",
+       "start": 46,
+       "end": 49,
+       "score": 0.23753966391086578
+      },
+      {
+       "token": "\u0120this",
+       "start": 50,
+       "end": 54,
+       "score": 0.6240369081497192
+      },
+      {
+       "token": "\u0120one",
+       "start": 55,
+       "end": 58,
+       "score": 0.13183481991291046
+      },
+      {
+       "token": "\u0120goes",
+       "start": 59,
+       "end": 63,
+       "score": 0.24365243315696716
+      },
+      {
+       "token": "\u0120anymore",
+       "start": 64,
+       "end": 71,
+       "score": 0.7182870507240295
+      },
+      {
+       "token": "\u0120\u00e2\u0122\u0136",
+       "start": 72,
+       "end": 73,
+       "score": 0.27130451798439026
+      },
+      {
+       "token": "\u0120that",
+       "start": 74,
+       "end": 78,
+       "score": 0.13814407587051392
+      },
+      {
+       "token": "'s",
+       "start": 78,
+       "end": 80,
+       "score": 0.035316407680511475
+      },
+      {
+       "token": "\u0120where",
+       "start": 81,
+       "end": 86,
+       "score": 0.15449900925159454
+      },
+      {
+       "token": "\u0120my",
+       "start": 87,
+       "end": 89,
+       "score": 0.023629769682884216
+      },
+      {
+       "token": "\u0120head",
+       "start": 90,
+       "end": 94,
+       "score": -0.09008147567510605
+      },
+      {
+       "token": "\u0120is",
+       "start": 95,
+       "end": 97,
+       "score": 0.012042422778904438
+      },
+      {
+       "token": "\u0120at",
+       "start": 98,
+       "end": 100,
+       "score": -0.005708405748009682
+      },
+      {
+       "token": ".",
+       "start": 100,
+       "end": 101,
+       "score": -0.040000297129154205
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "record_id": "synth_precomp_v1-002391",
+   "text": "Put it this way, I mean to go out and take this game on and see what I'm capable of \u2014 make of that what you will.",
+   "method": "integrated_gradients",
+   "provenance": "Attribution over a classifier fine-tuned on synthetic text (synth_precomp_v1) against generator-planted labels. No human-verified labels exist (OPEN-025) and no real athlete text was used (OPEN-011). This shows what the model used, not what predicts psychological risk in people. Not a clinical instrument.",
+   "synthetic": true,
+   "probabilities": {
+    "appraisal_orientation": 0.7312644079295572,
+    "attentional_focus": 0.0,
+    "burnout_signal": 0.066,
+    "cognitive_anxiety": 0.032,
+    "coping_style": 0.0,
+    "motivation_orientation": 0.578299485453722,
+    "perceived_stress": 0.015,
+    "resilience": 0.043,
+    "self_confidence": 0.183,
+    "somatic_anxiety": 0.024
+   },
+   "explanations": [
+    {
+     "construct": "appraisal_orientation",
+     "probability": 0.7312644079295572,
+     "method": "integrated_gradients",
+     "completeness_error": 0.06910635810345411,
+     "tokens": [
+      {
+       "token": "Put",
+       "start": 0,
+       "end": 3,
+       "score": 0.11103330552577972
+      },
+      {
+       "token": "\u0120it",
+       "start": 4,
+       "end": 6,
+       "score": 0.10776123404502869
+      },
+      {
+       "token": "\u0120this",
+       "start": 7,
+       "end": 11,
+       "score": 0.1244359016418457
+      },
+      {
+       "token": "\u0120way",
+       "start": 12,
+       "end": 15,
+       "score": -0.07283531129360199
+      },
+      {
+       "token": ",",
+       "start": 15,
+       "end": 16,
+       "score": -0.0011614197865128517
+      },
+      {
+       "token": "\u0120I",
+       "start": 17,
+       "end": 18,
+       "score": -0.09931542724370956
+      },
+      {
+       "token": "\u0120mean",
+       "start": 19,
+       "end": 23,
+       "score": 0.08094841241836548
+      },
+      {
+       "token": "\u0120to",
+       "start": 24,
+       "end": 26,
+       "score": 0.24270939826965332
+      },
+      {
+       "token": "\u0120go",
+       "start": 27,
+       "end": 29,
+       "score": 0.14799098670482635
+      },
+      {
+       "token": "\u0120out",
+       "start": 30,
+       "end": 33,
+       "score": 0.15071435272693634
+      },
+      {
+       "token": "\u0120and",
+       "start": 34,
+       "end": 37,
+       "score": 0.02562428079545498
+      },
+      {
+       "token": "\u0120take",
+       "start": 38,
+       "end": 42,
+       "score": 0.2616385221481323
+      },
+      {
+       "token": "\u0120this",
+       "start": 43,
+       "end": 47,
+       "score": 0.37795889377593994
+      },
+      {
+       "token": "\u0120game",
+       "start": 48,
+       "end": 52,
+       "score": 0.09214218705892563
+      },
+      {
+       "token": "\u0120on",
+       "start": 53,
+       "end": 55,
+       "score": 0.10629165917634964
+      },
+      {
+       "token": "\u0120and",
+       "start": 56,
+       "end": 59,
+       "score": 0.11796170473098755
+      },
+      {
+       "token": "\u0120see",
+       "start": 60,
+       "end": 63,
+       "score": 0.22532495856285095
+      },
+      {
+       "token": "\u0120what",
+       "start": 64,
+       "end": 68,
+       "score": 0.10922620445489883
+      },
+      {
+       "token": "\u0120I",
+       "start": 69,
+       "end": 70,
+       "score": 0.2688351273536682
+      },
+      {
+       "token": "'m",
+       "start": 70,
+       "end": 72,
+       "score": 0.22149641811847687
+      },
+      {
+       "token": "\u0120capable",
+       "start": 73,
+       "end": 80,
+       "score": 0.6753956079483032
+      },
+      {
+       "token": "\u0120of",
+       "start": 81,
+       "end": 83,
+       "score": 0.16783492267131805
+      },
+      {
+       "token": "\u0120\u00e2\u0122\u0136",
+       "start": 84,
+       "end": 85,
+       "score": 0.031394243240356445
+      },
+      {
+       "token": "\u0120make",
+       "start": 86,
+       "end": 90,
+       "score": 0.13476726412773132
+      },
+      {
+       "token": "\u0120of",
+       "start": 91,
+       "end": 93,
+       "score": 0.157353937625885
+      },
+      {
+       "token": "\u0120that",
+       "start": 94,
+       "end": 98,
+       "score": 0.12321043014526367
+      },
+      {
+       "token": "\u0120what",
+       "start": 99,
+       "end": 103,
+       "score": 0.15526795387268066
+      },
+      {
+       "token": "\u0120you",
+       "start": 104,
+       "end": 107,
+       "score": 0.044621311128139496
+      },
+      {
+       "token": "\u0120will",
+       "start": 108,
+       "end": 112,
+       "score": 0.19641588628292084
+      },
+      {
+       "token": ".",
+       "start": 112,
+       "end": 113,
+       "score": 0.02150779962539673
+      }
+     ]
+    },
+    {
+     "construct": "motivation_orientation",
+     "probability": 0.578299485453722,
+     "method": "integrated_gradients",
+     "completeness_error": 0.07477807626128197,
+     "tokens": [
+      {
+       "token": "Put",
+       "start": 0,
+       "end": 3,
+       "score": 0.2136899083852768
+      },
+      {
+       "token": "\u0120it",
+       "start": 4,
+       "end": 6,
+       "score": 0.013301052153110504
+      },
+      {
+       "token": "\u0120this",
+       "start": 7,
+       "end": 11,
+       "score": 0.049166709184646606
+      },
+      {
+       "token": "\u0120way",
+       "start": 12,
+       "end": 15,
+       "score": 0.25347447395324707
+      },
+      {
+       "token": ",",
+       "start": 15,
+       "end": 16,
+       "score": -0.01898777112364769
+      },
+      {
+       "token": "\u0120I",
+       "start": 17,
+       "end": 18,
+       "score": 0.07179555296897888
+      },
+      {
+       "token": "\u0120mean",
+       "start": 19,
+       "end": 23,
+       "score": 0.6359084248542786
+      },
+      {
+       "token": "\u0120to",
+       "start": 24,
+       "end": 26,
+       "score": 0.33221933245658875
+      },
+      {
+       "token": "\u0120go",
+       "start": 27,
+       "end": 29,
+       "score": -0.09586358070373535
+      },
+      {
+       "token": "\u0120out",
+       "start": 30,
+       "end": 33,
+       "score": -0.10741060227155685
+      },
+      {
+       "token": "\u0120and",
+       "start": 34,
+       "end": 37,
+       "score": 0.17464321851730347
+      },
+      {
+       "token": "\u0120take",
+       "start": 38,
+       "end": 42,
+       "score": 0.057699188590049744
+      },
+      {
+       "token": "\u0120this",
+       "start": 43,
+       "end": 47,
+       "score": 0.18922336399555206
+      },
+      {
+       "token": "\u0120game",
+       "start": 48,
+       "end": 52,
+       "score": 0.06961099803447723
+      },
+      {
+       "token": "\u0120on",
+       "start": 53,
+       "end": 55,
+       "score": -0.2301054149866104
+      },
+      {
+       "token": "\u0120and",
+       "start": 56,
+       "end": 59,
+       "score": -0.3045791685581207
+      },
+      {
+       "token": "\u0120see",
+       "start": 60,
+       "end": 63,
+       "score": -0.2725921869277954
+      },
+      {
+       "token": "\u0120what",
+       "start": 64,
+       "end": 68,
+       "score": 0.16240978240966797
+      },
+      {
+       "token": "\u0120I",
+       "start": 69,
+       "end": 70,
+       "score": 0.1594734787940979
+      },
+      {
+       "token": "'m",
+       "start": 70,
+       "end": 72,
+       "score": 0.0919700562953949
+      },
+      {
+       "token": "\u0120capable",
+       "start": 73,
+       "end": 80,
+       "score": 0.19662509858608246
+      },
+      {
+       "token": "\u0120of",
+       "start": 81,
+       "end": 83,
+       "score": 0.41275107860565186
+      },
+      {
+       "token": "\u0120\u00e2\u0122\u0136",
+       "start": 84,
+       "end": 85,
+       "score": -0.3902946710586548
+      },
+      {
+       "token": "\u0120make",
+       "start": 86,
+       "end": 90,
+       "score": 0.2086162120103836
+      },
+      {
+       "token": "\u0120of",
+       "start": 91,
+       "end": 93,
+       "score": -0.019811157137155533
+      },
+      {
+       "token": "\u0120that",
+       "start": 94,
+       "end": 98,
+       "score": -0.008094418793916702
+      },
+      {
+       "token": "\u0120what",
+       "start": 99,
+       "end": 103,
+       "score": 0.11377133429050446
+      },
+      {
+       "token": "\u0120you",
+       "start": 104,
+       "end": 107,
+       "score": -0.13312797248363495
+      },
+      {
+       "token": "\u0120will",
+       "start": 108,
+       "end": 112,
+       "score": 0.2005607634782791
+      },
+      {
+       "token": ".",
+       "start": 112,
+       "end": 113,
+       "score": -0.1230788454413414
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "record_id": "synth_precomp_v1-001466",
+   "text": "We have been on the same food and rest routine all week. Put it this way, I have spent more time on the timeline this fortnight than on preparing \u2014 anyway, that's the reality.",
+   "method": "integrated_gradients",
+   "provenance": "Attribution over a classifier fine-tuned on synthetic text (synth_precomp_v1) against generator-planted labels. No human-verified labels exist (OPEN-025) and no real athlete text was used (OPEN-011). This shows what the model used, not what predicts psychological risk in people. Not a clinical instrument.",
+   "synthetic": true,
+   "probabilities": {
+    "appraisal_orientation": 0.0,
+    "attentional_focus": 0.8372330672055796,
+    "burnout_signal": 0.268,
+    "cognitive_anxiety": 0.019333,
+    "coping_style": 0.0,
+    "motivation_orientation": 0.0,
+    "perceived_stress": 0.286,
+    "resilience": 0.032,
+    "self_confidence": 0.06,
+    "somatic_anxiety": 0.024
+   },
+   "explanations": [
+    {
+     "construct": "attentional_focus",
+     "probability": 0.8372330672055796,
+     "method": "integrated_gradients",
+     "completeness_error": 0.08083273842930794,
+     "tokens": [
+      {
+       "token": "We",
+       "start": 0,
+       "end": 2,
+       "score": 0.008601726964116096
+      },
+      {
+       "token": "\u0120have",
+       "start": 3,
+       "end": 7,
+       "score": 0.023250125348567963
+      },
+      {
+       "token": "\u0120been",
+       "start": 8,
+       "end": 12,
+       "score": 0.019866183400154114
+      },
+      {
+       "token": "\u0120on",
+       "start": 13,
+       "end": 15,
+       "score": 0.11594659835100174
+      },
+      {
+       "token": "\u0120the",
+       "start": 16,
+       "end": 19,
+       "score": 0.13547641038894653
+      },
+      {
+       "token": "\u0120same",
+       "start": 20,
+       "end": 24,
+       "score": -0.12980586290359497
+      },
+      {
+       "token": "\u0120food",
+       "start": 25,
+       "end": 29,
+       "score": -0.2593075931072235
+      },
+      {
+       "token": "\u0120and",
+       "start": 30,
+       "end": 33,
+       "score": 0.12600107491016388
+      },
+      {
+       "token": "\u0120rest",
+       "start": 34,
+       "end": 38,
+       "score": -0.05485258251428604
+      },
+      {
+       "token": "\u0120routine",
+       "start": 39,
+       "end": 46,
+       "score": 0.25892651081085205
+      },
+      {
+       "token": "\u0120all",
+       "start": 47,
+       "end": 50,
+       "score": 0.0430990494787693
+      },
+      {
+       "token": "\u0120week",
+       "start": 51,
+       "end": 55,
+       "score": 0.007903879508376122
+      },
+      {
+       "token": ".",
+       "start": 55,
+       "end": 56,
+       "score": 0.12256112694740295
+      },
+      {
+       "token": "\u0120Put",
+       "start": 57,
+       "end": 60,
+       "score": 0.2407229095697403
+      },
+      {
+       "token": "\u0120it",
+       "start": 61,
+       "end": 63,
+       "score": 0.20830707252025604
+      },
+      {
+       "token": "\u0120this",
+       "start": 64,
+       "end": 68,
+       "score": 0.08539280295372009
+      },
+      {
+       "token": "\u0120way",
+       "start": 69,
+       "end": 72,
+       "score": 0.19088907539844513
+      },
+      {
+       "token": ",",
+       "start": 72,
+       "end": 73,
+       "score": 0.07775335013866425
+      },
+      {
+       "token": "\u0120I",
+       "start": 74,
+       "end": 75,
+       "score": 0.3016785979270935
+      },
+      {
+       "token": "\u0120have",
+       "start": 76,
+       "end": 80,
+       "score": -0.2924914062023163
+      },
+      {
+       "token": "\u0120spent",
+       "start": 81,
+       "end": 86,
+       "score": 0.46817874908447266
+      },
+      {
+       "token": "\u0120more",
+       "start": 87,
+       "end": 91,
+       "score": 0.35516586899757385
+      },
+      {
+       "token": "\u0120time",
+       "start": 92,
+       "end": 96,
+       "score": 0.3952578902244568
+      },
+      {
+       "token": "\u0120on",
+       "start": 97,
+       "end": 99,
+       "score": 0.2065727710723877
+      },
+      {
+       "token": "\u0120the",
+       "start": 100,
+       "end": 103,
+       "score": 0.40503808856010437
+      },
+      {
+       "token": "\u0120timeline",
+       "start": 104,
+       "end": 112,
+       "score": 0.3131798803806305
+      },
+      {
+       "token": "\u0120this",
+       "start": 113,
+       "end": 117,
+       "score": -0.11022357642650604
+      },
+      {
+       "token": "\u0120fortnight",
+       "start": 118,
+       "end": 127,
+       "score": -0.30728358030319214
+      },
+      {
+       "token": "\u0120than",
+       "start": 128,
+       "end": 132,
+       "score": 0.26268821954727173
+      },
+      {
+       "token": "\u0120on",
+       "start": 133,
+       "end": 135,
+       "score": 0.4398840665817261
+      },
+      {
+       "token": "\u0120preparing",
+       "start": 136,
+       "end": 145,
+       "score": 0.5387730002403259
+      },
+      {
+       "token": "\u0120\u00e2\u0122\u0136",
+       "start": 146,
+       "end": 147,
+       "score": 0.3035859167575836
+      },
+      {
+       "token": "\u0120anyway",
+       "start": 148,
+       "end": 154,
+       "score": 0.1751755028963089
+      },
+      {
+       "token": ",",
+       "start": 154,
+       "end": 155,
+       "score": 0.05802285298705101
+      },
+      {
+       "token": "\u0120that",
+       "start": 156,
+       "end": 160,
+       "score": -0.14062882959842682
+      },
+      {
+       "token": "'s",
+       "start": 160,
+       "end": 162,
+       "score": -0.060643311589956284
+      },
+      {
+       "token": "\u0120the",
+       "start": 163,
+       "end": 166,
+       "score": 0.16372179985046387
+      },
+      {
+       "token": "\u0120reality",
+       "start": 167,
+       "end": 174,
+       "score": -0.02523038536310196
+      },
+      {
+       "token": ".",
+       "start": 174,
+       "end": 175,
+       "score": -0.04044490307569504
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

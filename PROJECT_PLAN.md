@@ -29,7 +29,9 @@ reproduces with no account" property). Phase 18 **executed on the real checkpoin
 `docs/findings.md` written, contribution statement locked, **OPEN-004 closed by
 decision** (pilot self-audit, practitioner validation named as a limitation).
 
-**Next: Phase 20 — dashboard.** Nothing blocks it.
+**Next: Phase 21 — security scan, dependency & PII audit.** Nothing blocks it.
+Phase 20 complete 2026-08-16; its one remaining gate item is the owner-run
+`docker compose up dashboard` check (see `handover_phase_20.txt` C1).
 
 | Phase | Status | Evidence |
 |---|---|---|
@@ -39,6 +41,7 @@ decision** (pilot self-audit, practitioner validation named as a limitation).
 | 17 Explainability + expert study | ✅ structural halves PASS; expert half shipped as **pilot self-audit** | `reports/explain/` · comprehensiveness margin **+0.328** over random control, all 10 constructs beat control · IG-vs-SHAP top-5 Jaccard 0.384 · **86.7% of driver rows have no supporting span**, counted not hidden · **OPEN-004 closed by decision 2026-08-16** — student raters only, "expert-validated" is forbidden wording |
 | 18 Evaluation harness & ablations | ✅ **gate PASSED on the real checkpoint** | `src/evaluation/{harness,ablations}.py`, `scripts/run_evaluation.py`, 37 tests · `reports/results.{md,json}` + 8 prediction caches + 4 figures · **7/7 claims backed** · **OPEN-034** raised and closed (the claim gate certified a claim its evidence contradicted); **OPEN-035 closed** |
 | **19 Results aggregation & narrative** | **✅ gate PASSED** | `docs/findings.md` — contribution statement locked, 3 headline findings, 8 forbidden claims tabulated, every headline traceable to a `CLAIMS` row |
+| **20 Dashboard / visualisation** | **✅ gate PASSED** (Docker check owner-run) | `src/dashboard/` + `dashboard/app.py` + 23 tests · `docs/dashboard.md` · `reports/dashboard/` 3 screenshots incl. a **grayscale proof** · `reports/figures/phase20_explanation_card.svg` · gate **strengthened before the app was written**: known example reproduces `reports/explain/cards.md` **byte-identically**; `assert_publication_safe` unavoidable by construction; PROVISIONAL stamp unconstructable-if-absent *and* rendered above the fold; 4 inert constructs derived from the scorer, never a name list; forbidden-vocabulary screen over the rendered surface. **Two defects found by looking, not by asserting** — duplicate SVG ids blanked one chart's inert hatch, and the stamp sat inside a collapsed expander |
 
 **Phase 19's three headline findings.**
 
