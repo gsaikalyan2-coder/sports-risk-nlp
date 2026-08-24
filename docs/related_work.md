@@ -14,7 +14,8 @@ broad mental-health prediction [Zhao2024, Floyd2021, Biro2024]; psychology studi
 cross-sectional self-report [Dominguez-Gonzalez2024, Li2025, Daumiller2021]; and sports XAI rarely
 tests whether explanations are meaningful to practitioners [Kranzinger2025]. This project targets
 that intersection: a **construct-grounded athlete-text corpus + two-level interpretability
-(span→construct, construct→risk) that is expert-validated.**
+(span→construct, construct→risk) whose faithfulness margin is measured, and which a
+pilot review found sensible. Practitioner validation remains outstanding (OPEN-004).**
 
 ## 1. Pre-competition psychological constructs
 
@@ -62,7 +63,7 @@ emerging and argues current models miss temporal/multimodal structure [Feng2025,
 1. **Construct-grounded athlete-text corpus** — span→construct labels mapping text to CSAI-2-style
    anxiety/confidence, stress/pressure, coping, motivation orientation, attentional disruption,
    resilience, appraisal orientation, and ABQ-style burnout. Bridges the survey↔text gap.
-2. **Two-level, expert-validated interpretability** — span→construct evidence + construct→risk
+2. **Two-level interpretability with a measured faithfulness margin** — span→construct evidence + construct→risk
    weighting, with a small validation study asking coaches/sport-psychology practitioners whether the
    explanations are sensible. Directly fills the Interpretability-Validation gap.
 3. **Time-aware, fusion-ready design** — pre-competition sampling records timing and light context so

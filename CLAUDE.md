@@ -58,7 +58,7 @@ coaches or practitioners.
 **The three-part contribution:**
 1. **Construct-grounded athlete-text corpus** — span→construct labels bridging the survey↔text gap
    (with inter-annotator agreement reported). This is the core dataset contribution.
-2. **Two-level, expert-validated interpretability** — span→construct evidence + construct→risk
+2. **Two-level interpretability with a measured faithfulness margin** — span→construct evidence + construct→risk
    weighting, with a small validation study asking coaches/sport-psych practitioners whether the
    explanations are sensible. *This directly fills the biggest gap and is the headline differentiator.*
 3. **Time-aware, fusion-ready design** — pre-competition sampling records timing + light context so

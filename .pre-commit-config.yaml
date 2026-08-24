@@ -38,4 +38,9 @@ repos:
     hooks:
       - id: detect-secrets
         args: ["--baseline", ".secrets.baseline"]
-        exclude: (?x)^(\.secrets\.baseline|\.env\.example|data/.*|paper/.*)$
+        # MUST match the `should_exclude_file` pattern inside .secrets.baseline.
+        # Phase 21 (SEC-02) found the two lists disagreeing about `models/`: the
+        # baseline excluded it, this hook did not. Two exclusion lists for one
+        # scanner is one list nobody can audit -- if they diverge again, the
+        # baseline is authoritative and this line is the one to correct.
+        exclude: (?x)^(\.secrets\.baseline|\.env\.example|data/.*|paper/.*|models/.*)$

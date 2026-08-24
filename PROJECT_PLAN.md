@@ -8,7 +8,7 @@ public/licensed datasets first (hybrid synthetic fallback) · DeBERTa/RoBERTa ·
 
 **Evidence-backed novelty (updated 2026-08 from the Phase 3 review — see `docs/related_work.md`):**
 Three-part contribution — (1) construct-grounded athlete-text corpus bridging validated constructs to
-text; (2) **two-level, expert-validated interpretability** (span→construct + construct→risk), the
+text; (2) **two-level interpretability with a measured faithfulness margin** (span→construct + construct→risk), the
 headline differentiator that fills the Interpretability-Validation gap; (3) time-aware, fusion-ready
 design. Taxonomy expanded with **resilience** and **appraisal orientation (challenge/threat)** plus an
 **interpretation-direction** modifier on anxiety.
@@ -20,7 +20,7 @@ stretch attempted in-window if data allows; *Team aggregation* stays Future Work
 
 ---
 
-## STATUS BOARD (updated 2026-08-16, end of Phase 19)
+## STATUS BOARD (updated 2026-08-23, end of Phase 21)
 
 **Week 4 of 8.** Phases 1–15 and 17–19 complete; 16 skipped by decision (no DataRobot
 account, and uploading athlete text to a third-party cloud breaks the "reviewer
@@ -29,9 +29,13 @@ reproduces with no account" property). Phase 18 **executed on the real checkpoin
 `docs/findings.md` written, contribution statement locked, **OPEN-004 closed by
 decision** (pilot self-audit, practitioner validation named as a limitation).
 
-**Next: Phase 21 — security scan, dependency & PII audit.** Nothing blocks it.
-Phase 20 complete 2026-08-16; its one remaining gate item is the owner-run
-`docker compose up dashboard` check (see `handover_phase_20.txt` C1).
+**Next: Phase 22 — reproducibility packaging.** Nothing blocks it.
+Phase 21 complete 2026-08-23: `src/security/` + `scripts/run_security_audit.py`
++ 49 tests + `docs/security.md`. **Gate PASSES** (exit 0, zero HIGH findings,
+every scanner proven). The two HIGH findings the first run raised were **fixed,
+not suppressed**; SEC-03 stays open deliberately because that fix corrected
+verdicts and was not a re-scan. The Phase 20 `docker compose up dashboard` check
+is **still outstanding** (`handover_phase_20.txt` C1).
 
 | Phase | Status | Evidence |
 |---|---|---|
@@ -42,6 +46,7 @@ Phase 20 complete 2026-08-16; its one remaining gate item is the owner-run
 | 18 Evaluation harness & ablations | ✅ **gate PASSED on the real checkpoint** | `src/evaluation/{harness,ablations}.py`, `scripts/run_evaluation.py`, 37 tests · `reports/results.{md,json}` + 8 prediction caches + 4 figures · **7/7 claims backed** · **OPEN-034** raised and closed (the claim gate certified a claim its evidence contradicted); **OPEN-035 closed** |
 | **19 Results aggregation & narrative** | **✅ gate PASSED** | `docs/findings.md` — contribution statement locked, 3 headline findings, 8 forbidden claims tabulated, every headline traceable to a `CLAIMS` row |
 | **20 Dashboard / visualisation** | **✅ gate PASSED** (Docker check owner-run) | `src/dashboard/` + `dashboard/app.py` + 23 tests · `docs/dashboard.md` · `reports/dashboard/` 3 screenshots incl. a **grayscale proof** · `reports/figures/phase20_explanation_card.svg` · gate **strengthened before the app was written**: known example reproduces `reports/explain/cards.md` **byte-identically**; `assert_publication_safe` unavoidable by construction; PROVISIONAL stamp unconstructable-if-absent *and* rendered above the fold; 4 inert constructs derived from the scorer, never a name list; forbidden-vocabulary screen over the rendered surface. **Two defects found by looking, not by asserting** — duplicate SVG ids blanked one chart's inert hatch, and the stamp sat inside a collapsed expander |
+| **21 Security, dependency & PII audit** | **✅ gate PASSED** | `src/security/` (audit/sweep/baseline/deps) + `scripts/run_security_audit.py` + **49 tests, ~1.2s, no ML stack** · `docs/security.md` · `reports/security_audit.md`. Gate **strengthened before any scanner ran**: `ScannerResult` requires a non-empty `does_not_cover` sentence, so a findings table with no coverage statement is unconstructable; sweep scope is `git ls-files`, so a file's position cannot put it out of scope; `run_sweep` **refuses to report** unless every detector has just fired on a canary planting its own target, and an unproven scanner fails the gate with zero findings. **The predicted defect happened on the first run and the mechanism caught it** — the credential pattern's leading `\b` never matched `OPENROUTER_API_KEY`, and without the canary that sweep returns zero credential findings over 251 files and reads as clean. **10 findings**: 2 HIGH — the `.secrets.baseline` entries were all marked `is_secret: true`, and the baseline was platform-locked in both directions — **both fixed in-phase, not suppressed** (verdicts corrected after verifying all four values are `training_fingerprint` SHA-256 digests; every path converted to POSIX; the disagreeing `.pre-commit-config.yaml` exclude list reconciled). `generated_at` was deliberately **not** refreshed, so SEC-03 stays open: the fix corrected verdicts, it was not a re-scan. Plus 5 MEDIUM, 2 LOW, 1 method note — including **SEC-10**, the forbidden contribution claim still asserted in `CLAUDE.md`, `PROJECT_PLAN.md` and `docs/related_work.md`, i.e. the exact sentences Phase 23 drafts from; fixed. **Clean with evidence**: `.env` never committed (checked in *history*, not the index), 257 paths ever added = 257 tracked now, every historical blob matched against 5 credential shapes across 34 commits, no LFS, no checkpoint ever committed |
 
 **Phase 19's three headline findings.**
 
