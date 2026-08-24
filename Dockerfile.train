@@ -14,8 +14,13 @@ FROM sports-risk-nlp-base:latest
 
 USER root
 
-COPY requirements-ml.txt .
-RUN pip install -r requirements-ml.txt \
+# Installs the LOCK, not requirements-ml.txt (SEC-07, fixed at Phase 22).
+# requirements-ml.txt pins `torch>=2.2` -- a floor that resolves differently on
+# every build -- while the only auditable file pins torch==2.13.0+cpu. The flag
+# below and the pin used to live in two different files, so no image ever saw
+# both.
+COPY requirements-base.lock.txt requirements-ml.lock.txt ./
+RUN pip install -r requirements-ml.lock.txt \
         --extra-index-url https://download.pytorch.org/whl/cpu
 
 USER appuser

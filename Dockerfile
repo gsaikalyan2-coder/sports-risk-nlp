@@ -13,7 +13,16 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONPATH=/app
+
+# PYTHONPATH is load-bearing, not decoration (Phase 22, 2026-08-24).
+# `streamlit run dashboard/app.py` puts /app/dashboard on sys.path -- NOT /app --
+# so `from src.dashboard import ...` raised ModuleNotFoundError and the dashboard
+# service had never once started in a container. The suite did not catch it
+# because tests/__init__.py makes pytest insert the repo root itself, so the
+# tests and the container disagreed about what "importable" means. Phase 20's
+# gate read "app runs in Docker" and was met with host screenshots.
 
 WORKDIR /app
 
@@ -26,9 +35,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Dependency layer first, so editing source code does not invalidate the pip
 # cache layer. This is the single biggest build-time saving on rebuilds.
-COPY requirements-base.txt .
+#
+# Installs the LOCK, not requirements-base.txt (SEC-07, fixed at Phase 22).
+# requirements-base.txt carries twelve version FLOORS, and a floor is not a
+# version: `crewai>=1.15,<2.0` resolves to a different answer on every build, so
+# this image used to match no auditable file in the repository while the
+# reproducibility statement claimed otherwise. The lock resolves with zero
+# unpinned extras -- verified 2026-08-24 with `pip install --dry-run`, which is
+# the property that makes "pinned" true rather than aspirational.
+COPY requirements-base.lock.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements-base.txt
+    pip install -r requirements-base.lock.txt
 
 # Run as a non-root user. The container bind-mounts the repo in development, so
 # the UID is chosen to be a common Linux default; on Docker Desktop for Windows

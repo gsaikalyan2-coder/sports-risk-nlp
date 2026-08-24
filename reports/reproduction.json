@@ -1,0 +1,420 @@
+{
+  "declaration": {
+    "byte_identical_artefacts": [
+      "corpus_records",
+      "utterances",
+      "lexicon_template_disjoint_macro_f1",
+      "tfidf_template_disjoint_macro_f1",
+      "tfidf_random_macro_f1",
+      "transformer_template_disjoint_macro_f1",
+      "transformer_vs_lexicon_delta",
+      "memorisation_gap_transformer",
+      "transformer_random_macro_f1"
+    ],
+    "declared_on": "2026-08-24",
+    "declared_sha256": "6389b2c8fcfcf33e0f4bdac3d90f69583f545c1fb7b03e53d4f09d0a4ded7763",
+    "headline": {
+      "lexicon_template_disjoint_macro_f1": 0.4617285842599597,
+      "memorisation_gap_transformer": 0.23423985163237282,
+      "tfidf_random_macro_f1": 0.9994594594594595,
+      "tfidf_template_disjoint_macro_f1": 0.22208037080486936,
+      "transformer_random_macro_f1": 0.8219513236505683,
+      "transformer_template_disjoint_macro_f1": 0.5877114720181955,
+      "transformer_vs_lexicon_delta": 0.1259828877582358
+    },
+    "not_reproducible_artefacts": {
+      "human_agreement_scores": "OPEN-025 again, the same block as the kappa. Every figure in this repository is agreement with generator-planted labels on synthetic text, and no human-labelled comparison set exists to reproduce.",
+      "inter_annotator_kappa": "OPEN-025: data/gold/ is empty because no second annotator was recruited, and src/models/dataset.py refuses --gold rather than falling back to silver. This is not a step a reviewer can run."
+    },
+    "plan": {
+      "steps": [
+        {
+          "cannot_reproduce": "Nothing numeric. This step installs no torch, so every tier-C artefact is out of its reach; it also cannot verify the ML layer's pins, which only the `env-ml` step exercises.",
+          "command": "git clone <repo-url> sports-risk-nlp-repro && cd sports-risk-nlp-repro && python -m venv .venv && . .venv/bin/activate && pip install -r requirements-base.lock.txt",
+          "id": "env",
+          "produces": [],
+          "purpose": "Stand up the light environment from the lock, in a NEW directory, so the reproduction cannot read four months of accumulated artefacts.",
+          "reads": [
+            "requirements-base.lock.txt"
+          ],
+          "runnable": false,
+          "tier": "A -- seeded, minutes, base dependencies only"
+        },
+        {
+          "cannot_reproduce": "Any property of real athlete text. The corpus is 100% synthetic template grammar (OPEN-011); reproducing it proves the generator is deterministic and proves nothing about athletes.",
+          "command": "python scripts/run_ingestion.py --count 4000 --seed 42",
+          "id": "corpus",
+          "produces": [
+            {
+              "locator": "data/raw/synth_precomp_v1/records.jsonl",
+              "match": "byte-identical",
+              "name": "corpus_records",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            }
+          ],
+          "purpose": "Regenerate the synth_precomp_v1 corpus. A fresh clone has no data/, so this is where the text a reviewer scores actually comes from.",
+          "reads": [
+            "config",
+            "src/ingestion",
+            "scripts/run_ingestion.py"
+          ],
+          "runnable": true,
+          "tier": "A -- seeded, minutes, base dependencies only"
+        },
+        {
+          "cannot_reproduce": "The de-identification recall figure against real text. The fixture measures the failure modes we thought to write down on a generator that plants no identifiers, so 0% leak rate is an upper bound (Phase 8).",
+          "command": "python scripts/run_preprocessing.py",
+          "id": "preprocess",
+          "produces": [
+            {
+              "locator": "data/interim/synth_precomp_v1/utterances.jsonl",
+              "match": "byte-identical",
+              "name": "utterances",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            }
+          ],
+          "purpose": "Clean, segment and de-identify the generated corpus into the 9,302 utterances every downstream step consumes.",
+          "reads": [
+            "data/raw",
+            "config",
+            "src/preprocessing"
+          ],
+          "runnable": true,
+          "tier": "A -- seeded, minutes, base dependencies only"
+        },
+        {
+          "cannot_reproduce": "Independence of the lexicon floor from the corpus. OPEN-021: the lexicon shares ancestry with the template bank via taxonomy.yaml examples, so the 0.462 floor travels with that caveat wherever it is quoted.",
+          "command": "python scripts/run_baselines.py --seed 42",
+          "id": "baselines",
+          "produces": [
+            {
+              "locator": "reports/baselines.json:splits.template_disjoint.systems.lexicon.macro_f1.point",
+              "match": "byte-identical",
+              "name": "lexicon_template_disjoint_macro_f1",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            },
+            {
+              "locator": "reports/baselines.json:splits.template_disjoint.systems.tfidf_logreg.macro_f1.point",
+              "match": "byte-identical",
+              "name": "tfidf_template_disjoint_macro_f1",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            },
+            {
+              "locator": "reports/baselines.json:splits.random.systems.tfidf_logreg.macro_f1.point",
+              "match": "byte-identical",
+              "name": "tfidf_random_macro_f1",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            }
+          ],
+          "purpose": "Re-fit the lexicon and classical baselines and re-derive the honest floor the transformer is measured against.",
+          "reads": [
+            "data/interim",
+            "config",
+            "src/models",
+            "src/evaluation"
+          ],
+          "runnable": true,
+          "tier": "A -- seeded, minutes, base dependencies only"
+        },
+        {
+          "cannot_reproduce": "The transformer itself. This step reads reports/predictions/, which IS committed, so it re-derives the SCORING of the transformer's predictions and never the predictions. A green tick here is not evidence that the checkpoint retrains to the same place -- that is step `retrain`, tier C.",
+          "command": "python scripts/run_evaluation.py --seed 42 --resamples 1000",
+          "id": "rescore",
+          "produces": [
+            {
+              "locator": "reports/results.json:scores.template_disjoint::transformer.macro_f1.point",
+              "match": "byte-identical",
+              "name": "transformer_template_disjoint_macro_f1",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            },
+            {
+              "locator": "reports/results.json:comparisons.transformer_vs_lexicon.delta",
+              "match": "byte-identical",
+              "name": "transformer_vs_lexicon_delta",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            },
+            {
+              "locator": "reports/results.json:comparisons.split_gap.delta",
+              "match": "byte-identical",
+              "name": "memorisation_gap_transformer",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            },
+            {
+              "locator": "reports/results.json:scores.random::transformer.macro_f1.point",
+              "match": "byte-identical",
+              "name": "transformer_random_macro_f1",
+              "tolerance": null,
+              "units": "",
+              "why_not": ""
+            }
+          ],
+          "purpose": "Re-score every system from the committed prediction caches and rebuild reports/results.json, including the paired bootstrap comparisons.",
+          "reads": [
+            "reports/predictions",
+            "data/interim",
+            "config",
+            "src/evaluation"
+          ],
+          "runnable": true,
+          "tier": "B -- rescoring a committed cache, seconds, base dependencies only"
+        },
+        {
+          "cannot_reproduce": "Bit-level equivalence of the numeric stack. A different CPU, BLAS build or torch build changes float results, which is exactly why tier C is measured against a tolerance and tiers A and B are not.",
+          "command": "pip install -r requirements-ml.lock.txt --extra-index-url https://download.pytorch.org/whl/cpu",
+          "id": "env-ml",
+          "produces": [],
+          "purpose": "Install the training layer. Separated from `env` so a reviewer reproducing tiers A and B never pays for a multi-gigabyte ML stack.",
+          "reads": [
+            "requirements-base.lock.txt",
+            "requirements-ml.lock.txt"
+          ],
+          "runnable": true,
+          "tier": "C -- retraining, ~10 CPU-hours, full ML stack"
+        },
+        {
+          "cannot_reproduce": "Anything gold-derived, and anything about real athletes. It also costs roughly ten CPU-hours, so most reviewers will not run it; that is why its artefact is reported SKIPPED rather than silently folded into tier B.",
+          "command": "python scripts/run_transformer.py --seed 42 && python scripts/run_evaluation.py --cache-predictions",
+          "id": "retrain",
+          "produces": [
+            {
+              "locator": "reports/results.json:scores.template_disjoint::transformer.macro_f1.point",
+              "match": "within tolerance",
+              "name": "retrained_transformer_macro_f1",
+              "tolerance": 0.01,
+              "units": "absolute macro-F1",
+              "why_not": ""
+            }
+          ],
+          "purpose": "Actually re-derive the transformer predictions rather than reading the committed cache -- the only step that tests the headline model end to end.",
+          "reads": [
+            "data/interim",
+            "config",
+            "src/models",
+            "reports/predictions"
+          ],
+          "runnable": true,
+          "tier": "C -- retraining, ~10 CPU-hours, full ML stack"
+        },
+        {
+          "cannot_reproduce": "Everything it covers. data/gold/ is empty and no second annotator exists (OPEN-025), so no kappa and no human-agreement figure can be produced by anyone, the author included.",
+          "command": "# no command exists",
+          "id": "gold",
+          "produces": [
+            {
+              "locator": "reports/iaa.md",
+              "match": "not reproducible",
+              "name": "inter_annotator_kappa",
+              "tolerance": null,
+              "units": "",
+              "why_not": "OPEN-025: data/gold/ is empty because no second annotator was recruited, and src/models/dataset.py refuses --gold rather than falling back to silver. This is not a step a reviewer can run."
+            },
+            {
+              "locator": "reports/results.json:human_agreement",
+              "match": "not reproducible",
+              "name": "human_agreement_scores",
+              "tolerance": null,
+              "units": "",
+              "why_not": "OPEN-025 again, the same block as the kappa. Every figure in this repository is agreement with generator-planted labels on synthetic text, and no human-labelled comparison set exists to reproduce."
+            }
+          ],
+          "purpose": "Named so that the gold-derived figures are visible as an absence with a reason, rather than as rows a reader has to notice are missing.",
+          "reads": [],
+          "runnable": true,
+          "tier": "D -- cannot be run by anyone, including the author"
+        }
+      ]
+    },
+    "plan_sha256": "6389b2c8fcfcf33e0f4bdac3d90f69583f545c1fb7b03e53d4f09d0a4ded7763",
+    "retrain_tolerance_macro_f1": 0.01,
+    "within_tolerance_artefacts": {
+      "retrained_transformer_macro_f1": {
+        "tolerance": 0.01,
+        "units": "absolute macro-F1"
+      }
+    }
+  },
+  "verification": {
+    "artefacts": [
+      {
+        "declared_match": "byte-identical",
+        "delta": null,
+        "expected": "sha256:fa09f5adeea7e4f3",
+        "locator": "data/raw/synth_precomp_v1/records.jsonl",
+        "name": "corpus_records",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": "sha256:fa09f5adeea7e4f3",
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": null,
+        "expected": "sha256:87a796caf7d8ce11",
+        "locator": "data/interim/synth_precomp_v1/utterances.jsonl",
+        "name": "utterances",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": "sha256:87a796caf7d8ce11",
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.4617285842599597,
+        "locator": "reports/baselines.json:splits.template_disjoint.systems.lexicon.macro_f1.point",
+        "name": "lexicon_template_disjoint_macro_f1",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.4617285842599597,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.22208037080486936,
+        "locator": "reports/baselines.json:splits.template_disjoint.systems.tfidf_logreg.macro_f1.point",
+        "name": "tfidf_template_disjoint_macro_f1",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.22208037080486936,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.9994594594594595,
+        "locator": "reports/baselines.json:splits.random.systems.tfidf_logreg.macro_f1.point",
+        "name": "tfidf_random_macro_f1",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.9994594594594595,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.5877114720181955,
+        "locator": "reports/results.json:scores.template_disjoint::transformer.macro_f1.point",
+        "name": "transformer_template_disjoint_macro_f1",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.5877114720181955,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.1259828877582358,
+        "locator": "reports/results.json:comparisons.transformer_vs_lexicon.delta",
+        "name": "transformer_vs_lexicon_delta",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.1259828877582358,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.23423985163237282,
+        "locator": "reports/results.json:comparisons.split_gap.delta",
+        "name": "memorisation_gap_transformer",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.23423985163237282,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "byte-identical",
+        "delta": 0.0,
+        "expected": 0.8219513236505683,
+        "locator": "reports/results.json:scores.random::transformer.macro_f1.point",
+        "name": "transformer_random_macro_f1",
+        "note": "",
+        "outcome": "reproduced",
+        "produced": 0.8219513236505683,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "within tolerance",
+        "delta": null,
+        "expected": null,
+        "locator": "reports/results.json:scores.template_disjoint::transformer.macro_f1.point",
+        "name": "retrained_transformer_macro_f1",
+        "note": "tier C -- retraining, ~10 CPU-hours, full ML stack; not selected on this pass",
+        "outcome": "skipped -- runnable, not run on this pass",
+        "produced": null,
+        "tolerance": 0.01,
+        "units": "absolute macro-F1"
+      },
+      {
+        "declared_match": "not reproducible",
+        "delta": null,
+        "expected": null,
+        "locator": "reports/iaa.md",
+        "name": "inter_annotator_kappa",
+        "note": "OPEN-025: data/gold/ is empty because no second annotator was recruited, and src/models/dataset.py refuses --gold rather than falling back to silver. This is not a step a reviewer can run.",
+        "outcome": "blocked -- not runnable by anyone",
+        "produced": null,
+        "tolerance": null,
+        "units": ""
+      },
+      {
+        "declared_match": "not reproducible",
+        "delta": null,
+        "expected": null,
+        "locator": "reports/results.json:human_agreement",
+        "name": "human_agreement_scores",
+        "note": "OPEN-025 again, the same block as the kappa. Every figure in this repository is agreement with generator-planted labels on synthetic text, and no human-labelled comparison set exists to reproduce.",
+        "outcome": "blocked -- not runnable by anyone",
+        "produced": null,
+        "tolerance": null,
+        "units": ""
+      }
+    ],
+    "attempted_tiers": [
+      "A_SEEDED",
+      "B_RESCORE"
+    ],
+    "declared_sha256": "6389b2c8fcfcf33e0f4bdac3d90f69583f545c1fb7b03e53d4f09d0a4ded7763",
+    "gate": "PASS",
+    "is_accuracy": false,
+    "phase": 22,
+    "plan_sha256": "6389b2c8fcfcf33e0f4bdac3d90f69583f545c1fb7b03e53d4f09d0a4ded7763",
+    "provenance": "PROVISIONAL -- planted-label corpus-property measurement, NOT accuracy. data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011).",
+    "reasons": [],
+    "tree": {
+      "contaminants": [],
+      "is_fresh": true,
+      "is_usable": true,
+      "missing": [],
+      "root": "/home/claude/clone6"
+    },
+    "undeclared_reads": [],
+    "unreported": []
+  }
+}

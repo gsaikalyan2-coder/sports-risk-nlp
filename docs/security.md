@@ -448,7 +448,7 @@ SEC-01 and SEC-02 are already fixed and the gate passes without these steps. The
 running: the first closes SEC-03, which the fix above deliberately did not.
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 if (Test-Path .git\index.lock) { Remove-Item .git\index.lock }
 
 # 0. Confirm the gate for yourself before trusting this document.
@@ -479,3 +479,70 @@ git push
 
 SEC-04, SEC-05 and SEC-07 are handed to **Phase 22**, where anonymised-artifact preparation and
 version pinning are already tasks. SEC-06 is re-checked at **Phase 25**.
+
+
+---
+
+## Phase 22 follow-up (2026-08-24)
+
+Three Phase 21 findings were closed as Phase 22 tasks, and one new finding was
+raised while closing them.
+
+| id | status | what changed |
+|---|---|---|
+| **SEC-03** | owner-run | `detect-secrets scan` re-run inside the container; the baseline's `generated_at` now reflects an actual scan rather than a verdict correction. |
+| **SEC-04** | **OPEN** | A personal Gmail address remains the participant contact route in `docs/consent_form.md` (x2), `docs/ethics.md` (x2), `docs/open_issues.md` (x3), `docs/recruitment.md` and `phase10_handover.md` -- 9 occurrences across 5 files, one file more than Phase 21 recorded. `docs/ethics.md` sec.7.1 names the remedy (an SRMIST institutional address plus a named supervisor). Owner-actionable and due before the artifact is released. |
+| **SEC-05** | **CLOSED** | 27 occurrences of the author's home-directory path across 21 tracked files rewritten to `C:\Users\x\sports-risk-nlp`, matching the existing `tests/test_transformer.py` precedent. Grep count is zero. |
+| **SEC-07** | **CLOSED** | Neither image installed a lock. `Dockerfile` now installs `requirements-base.lock.txt` (162 pins) and `Dockerfile.train` installs `requirements-ml.lock.txt` (20 pins plus the base lock) with `--extra-index-url` in the same command as the pin it needs. Both locks are partitioned from the 180-pin `requirements.lock.txt` by a *computed* dependency closure, not by hand. The base lock resolves with **zero unpinned extras**, verified 2026-08-24 with `pip install --dry-run`. |
+| **SEC-11** | **NEW, fixed** | `requirements.lock.txt` -- the single file backing the reproducibility claim -- was incomplete in two ways, both consequences of being captured by `pip freeze` on Windows on 2026-08-09. `uvloop`, a Linux-only transitive dependency of `uvicorn`, was absent, so installing the lock in a Linux container pulled it **unpinned**. `sentencepiece` was absent entirely despite being required by `requirements-ml.txt`, which added it on 2026-08-11 -- two days after the lock was captured. Both are now pinned in the per-layer locks with the reason recorded in each file's header. |
+
+### A provenance gap the reproduction check exposed
+
+Verifying tiers A and B in a genuine fresh clone on Linux found
+`data/raw/synth_precomp_v1/records.jsonl` matching the owner's tree byte-for-byte
+while `data/interim/synth_precomp_v1/utterances.jsonl` did not -- identical
+content, exactly 9,302 bytes apart, one CR per line. The two stores' code was
+identical; the corpus had been generated in the Linux container on 2026-08-10 and
+the utterances on Windows on 2026-08-12, and **nothing in the repository recorded
+which artefact came from which environment**. No number was affected; the
+byte-identity claim was. `src/ingestion/store.py`,
+`src/preprocessing/store.py` and `src/labeling/store.py` now pin
+`newline="\n"` as `src/evaluation/sampling.py` already did, and
+`tests/test_reproducibility.py` asserts it at source level.
+
+### Standing triage note (SEC-10)
+
+The forbidden-vocabulary screen is a case-insensitive substring test and cannot
+tell a claim from a statement of the prohibition. Running it over
+`docs/model_card.md` returns five hits: four are prohibition sentences
+("no number ... may be described as accuracy") and one, line 194, is the metric
+label `subset accuracy` on a reader-facing table. That last one is a genuine
+triage item for Phase 24's figure and table pass, not a Phase 22 regression.
+
+## Phase 22 addendum — 2026-08-24
+
+**SEC-04 CLOSED.** The participant contact route is now the SRMIST institutional
+address `sk8069@srmist.edu.in` with **Dr. Shankar Ram** named as supervisor /
+secondary contact. No personal-webmail address remains in any tracked document,
+including historical notes, which keep the decision and redact the value.
+`python scripts/run_security_audit.py --online` reporting SEC-04 at zero
+occurrences is what makes this closure checkable rather than asserted.
+
+Closing it surfaced a second, larger problem. `docs/ethics.md` §7.1 requires the
+route to appear in `README.md`, `docs/model_card.md` and the consent form, "or
+none of the mechanisms in §7 is reachable in practice and the withdrawal right
+is decorative". Two of the three carried no contact route at all, and had not
+since Phase 5 — a governance rule that nothing checked. All reader-facing
+surfaces now carry it, and `tests/test_security.py` enforces both halves: the
+address and the supervisor's name must be present on each surface, and no
+personal-webmail domain may appear in any of them.
+
+**DASH-01 (new, HIGH for the artefact).** The dashboard had never started in a
+container: `streamlit run dashboard/app.py` prepends the script's directory to
+`sys.path` and not the repository root, so `from src.dashboard import ...` raised
+`ModuleNotFoundError`. The test suite could not see it because `tests/__init__.py`
+makes pytest insert the root itself. Fixed by a `sys.path` bootstrap in the shell
+plus `ENV PYTHONPATH=/app` in the image, and pinned by a test that reproduces the
+Streamlit runtime's `sys.path` in a subprocess rather than asserting the fix's
+text is present. Found by running the container and reading the traceback — not
+by any test.

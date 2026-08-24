@@ -19,9 +19,25 @@ Run:  streamlit run dashboard/app.py
 
 from __future__ import annotations
 
-import streamlit as st
+import sys
+from pathlib import Path
 
-from src.dashboard import (
+# Repo root on sys.path before the first `src.` import. `streamlit run
+# dashboard/app.py` puts THIS file's directory on sys.path, not the repository
+# root, so without these two lines the import below raises ModuleNotFoundError
+# in any environment that has not been told the root some other way -- which is
+# every container and every fresh clone. The test suite could not see it:
+# tests/__init__.py makes pytest insert the root itself, so `pytest` and
+# `streamlit run` disagreed about what is importable, and the disagreement was
+# invisible until Phase 22 ran the container and read the traceback. Idempotent,
+# and a no-op when PYTHONPATH already covers it (as the images now do).
+_ROOT = str(Path(__file__).resolve().parent.parent)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
+import streamlit as st  # noqa: E402
+
+from src.dashboard import (  # noqa: E402
     LexiconBackend,
     build_view,
     construct_contribution_chart,

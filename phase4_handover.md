@@ -128,7 +128,7 @@ for having done the primary-source resolution rather than trusting the aggregato
 
 You are continuing a multi-phase research-engineering project. Read `CLAUDE.md` (the standing
 brief and single source of truth) and `PROJECT_PLAN.md` (the 25-phase blueprint) in the
-connected folder `C:\Users\saika\sports-risk-nlp` before doing any work. Also read
+connected folder `C:\Users\x\sports-risk-nlp` before doing any work. Also read
 `phase3_summary.md` and `docs/related_work.md`.
 
 **Your job this session is Phase 4 only. Do not start Phase 5.**

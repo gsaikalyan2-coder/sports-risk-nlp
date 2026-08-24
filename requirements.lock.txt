@@ -1,7 +1,7 @@
 # EXACT resolved versions — reproducibility lock.
 #
 # Captured 2026-08-09 from the owner's working Windows venv
-# (Python 3.11.9, C:\Users\saika\sports-risk-nlp\.venv).
+# (Python 3.11.9, C:\Users\x\sports-risk-nlp\.venv).
 #
 # This file backs the reproducibility claim in CLAUDE.md sec.9 and the paper's
 # artifact statement. Regenerate on the owner machine after any dependency

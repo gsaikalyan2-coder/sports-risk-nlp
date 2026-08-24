@@ -264,7 +264,7 @@ OPEN-028.
 ## Commit commands (PowerShell)
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 
 # Re-verify on the real interpreter first -- expect 435/435 on Python 3.11.
 .\.venv\Scripts\Activate.ps1

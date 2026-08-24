@@ -241,7 +241,7 @@ A follow-up commit is outstanding for the fixture correction described in B5 and
 it changed:
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 Remove-Item -LiteralPath ".git\index.lock" -Force -ErrorAction SilentlyContinue
 .\.venv\Scripts\Activate.ps1
 

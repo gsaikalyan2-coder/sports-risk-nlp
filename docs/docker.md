@@ -89,7 +89,7 @@ BIOS/UEFI. Nothing in software can work around that.
 ## 3. Build and verify
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 .\.venv\Scripts\Activate.ps1
 ```
 

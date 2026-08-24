@@ -70,7 +70,7 @@ Short, honest, no hype. Longer asks get read less.
 >
 > Full details and the consent form are here: [link/attach `docs/consent_form.md`]
 >
-> If you're up for it, reply to this or email `gsaikalyan2@gmail.com` with subject
+> If you're up for it, reply to this or email `sk8069@srmist.edu.in` (SRMIST) with subject
 > `[SPORTS-RISK-NLP]`. And if it's not for you, no worries at all — a share with anyone who
 > competes would help just as much.
 >

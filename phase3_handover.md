@@ -1,7 +1,7 @@
 # Phase 3 Handover Prompt — Literature Review & Novelty Positioning (completion pass)
 
 > Copy everything below the line into a fresh Claude Cowork chat opened on the folder
-> `C:\Users\saika\sports-risk-nlp`.
+> `C:\Users\x\sports-risk-nlp`.
 
 ---
 

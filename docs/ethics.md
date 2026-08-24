@@ -421,7 +421,8 @@ Named honestly, because the paper is stronger for naming them than for being cau
 
 **Primary contact for withdrawal, correction, and incident reports:**
 
-> **Saikalyan — `gsaikalyan2@gmail.com`**
+> **Saikalyan — `sk8069@srmist.edu.in`** (SRMIST institutional address)
+> Secondary / supervisor: **Dr. Shankar Ram**, SRMIST
 > Subject line prefix: `[SPORTS-RISK-NLP]`
 > Acknowledgement target: **7 days**. Withdrawal actioned before the next data release.
 
@@ -507,7 +508,7 @@ Before any public release of code, data, or model:
 |---|---|---|---|
 | 1 | Institutional review (§3.4) | **EXEMPT** — secondary analysis of public/licensed/consented/synthetic text; no primary human-subjects collection. A3 and A4 collection **unblocked**. | Obtain the determination **in writing** (reference number or email) and cite it in the paper. **OPEN-005** — before submission. |
 | 2 | Category A4, press-conference text (§3.3) | **CONFIRMED permitted** under all four mandatory conditions. Conservative A1+A2+A3 fallback **not** taken. | None. Conditions 1–4 are now binding on Phases 7, 9, and the paper. |
-| 3 | Contact route (§7.1) | **NOMINATED** — `gsaikalyan2@gmail.com`, prefix `[SPORTS-RISK-NLP]`, 7-day acknowledgement. | Replace with an SRMIST institutional address + named supervisor **before any public release**. **OPEN-006** — release blocker, not a Phase 7 blocker. |
+| 3 | Contact route (§7.1) | **INSTITUTIONAL** — `sk8069@srmist.edu.in`, supervisor Dr. Shankar Ram, prefix `[SPORTS-RISK-NLP]`, 7-day acknowledgement. | **OPEN-006 closed at Phase 22 (2026-08-24)** — personal address replaced by the SRMIST route plus a named supervisor, propagated to the consent form, `README.md`, `docs/model_card.md` and `ARTIFACT.md`. Supervisor's own address still to be added if the institution requires a second reachable mailbox. |
 
 **Nothing in this section now blocks Phase 7 ingestion.** The two residual items are a
 pre-submission item and a pre-release item respectively, both tracked in

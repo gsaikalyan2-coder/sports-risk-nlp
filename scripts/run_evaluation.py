@@ -102,6 +102,22 @@ def _rule(title: str) -> None:
     print(f"\n{title}\n{'-' * max(12, len(title))}")
 
 
+def _load_reproduction_declaration() -> dict:
+    """Read the frozen reproduction declaration, if one has been made.
+
+    Deliberately returns `{}` rather than rebuilding the declaration from
+    `src/reproducibility/manifest.py`. Rebuilding it here would make the two
+    hashes agree by construction and the `reproduction_tolerance` claim would
+    certify itself -- the OPEN-034 shape, a gate whose evidence it also
+    authored. Absent declaration means unbacked claim, which is the correct
+    reading: the tolerances were never frozen.
+    """
+    path = REPORTS_DIR / "reproduction.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 # ---------------------------------------------------------------------------
 # Step 1 -- cache predictions (the only part that needs torch)
 # ---------------------------------------------------------------------------
@@ -675,6 +691,14 @@ def main() -> int:
         "ablations": ablations,
         "error_profile": errors,
         "explainability": explainability,
+        # Phase 22. The reproduction declaration is merged in rather than
+        # recomputed, so the tolerances this payload reports are the ones frozen
+        # by `scripts/run_reproduction.py --declare` and not whatever
+        # src/reproducibility/manifest.py happens to say right now. The
+        # `reproduction_tolerance` claim compares the two hashes and fails when
+        # they diverge, which is what makes "declared before the run" checkable
+        # rather than asserted.
+        "reproduction": _load_reproduction_declaration(),
     }
 
     ledger = ClaimLedger()

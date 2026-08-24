@@ -1,4 +1,4 @@
-You are continuing an ongoing IEEE conference paper project as a Claude Cowork session. The repository is at `C:\Users\saika\sports-risk-nlp` and is connected to this session as a folder. Read `CLAUDE.md` first — it overrides defaults — then `handover_phase_20.txt`, `docs/findings.md`, `docs/ethics.md`, and `PROJECT_PLAN.md`. Everything below is a summary so you know what you're walking into; the files are the source of truth.
+You are continuing an ongoing IEEE conference paper project as a Claude Cowork session. The repository is at `C:\Users\x\sports-risk-nlp` and is connected to this session as a folder. Read `CLAUDE.md` first — it overrides defaults — then `handover_phase_20.txt`, `docs/findings.md`, `docs/ethics.md`, and `PROJECT_PLAN.md`. Everything below is a summary so you know what you're walking into; the files are the source of truth.
 
 ## The project
 
@@ -27,7 +27,7 @@ Transformer macro-F1 **0.588** [0.546, 0.622] template-disjoint vs a lexicon flo
 **One Phase 20 gate item is outstanding and it is your step 0.** In PowerShell:
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 docker compose build app
 docker compose up dashboard   # http://localhost:8501, click BOTH tabs, then Ctrl-C
 ```

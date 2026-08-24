@@ -1131,13 +1131,31 @@ keep the document out of the repo. Cite it in the paper's Ethics section.
 
 ## OPEN-006 — Withdrawal/incident contact route is a personal address
 
-**Status:** OPEN — interim route live, institutional route required
+**Status:** **CLOSED 2026-08-24 (Phase 22)** — institutional route live
 **Owned by:** Phase 5 (ethics & data governance)
-**Becomes blocking at:** **any public release** — corpus, code, or paper (~Phase 24/25).
-Does **not** block Phase 7 ingestion.
+**Was blocking at:** any public release — corpus, code, or paper.
 
-`docs/ethics.md` §7.1 nominates `gsaikalyan2@gmail.com` (prefix `[SPORTS-RISK-NLP]`, 7-day
-acknowledgement) as the route for withdrawal, correction, and incident reports. That is adequate
+**Resolution as shipped.** `docs/ethics.md` §7.1 now names
+**`sk8069@srmist.edu.in`** (SRMIST institutional address) as primary, with
+**Dr. Shankar Ram**, SRMIST, as the named supervisor / secondary contact. The
+same pair is propagated to `docs/consent_form.md` (both occurrences),
+`docs/recruitment.md`, `README.md`, `docs/model_card.md` and `ARTIFACT.md`. No
+personal webmail address remains in any tracked file; `python
+scripts/run_security_audit.py --online` reports SEC-04 at **zero occurrences**,
+which is what makes this closure checkable rather than asserted.
+
+**Residual, not blocking.** The supervisor is named but no separate mailbox for
+him is published. If SRMIST requires two independently reachable addresses on a
+released artefact, add his institutional address to §7.1 and re-propagate — one
+edit, same six files.
+
+---
+
+### Original statement (retained for the record)
+
+`docs/ethics.md` §7.1 nominated the owner's personal webmail address (redacted here at
+Phase 22 — quoting it back is the same disclosure the fix removes; prefix `[SPORTS-RISK-NLP]`, 7-day
+acknowledgement) as the route for withdrawal, correction, and incident reports. That was adequate
 for a project with nothing released yet.
 
 It is not adequate on a published artefact, for two reasons. **Accountability:** the project's only

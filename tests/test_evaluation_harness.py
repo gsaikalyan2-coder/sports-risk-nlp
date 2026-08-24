@@ -368,6 +368,19 @@ def test_a_fully_populated_payload_backs_every_claim():
             "risk_fusion": {"status": "measured"},
         },
         "explainability": {"faithfulness": {"comprehensiveness_margin": 0.3}},
+        # Added at Phase 22 with the `reproduction_tolerance` claim. The two
+        # hashes must agree: `declared_sha256` is frozen when the tolerances are
+        # declared and `plan_sha256` is recomputed from
+        # src/reproducibility/manifest.py, so a tolerance widened after a run
+        # makes them diverge and the claim goes unbacked. See
+        # tests/test_reproducibility.py for that case measured directly.
+        "reproduction": {
+            "declaration": {
+                "retrain_tolerance_macro_f1": 0.010,
+                "declared_sha256": "a" * 64,
+                "plan_sha256": "a" * 64,
+            }
+        },
     }
     assert ClaimLedger().unbacked(payload) == ()
 

@@ -471,7 +471,7 @@ budget, not a code decision. One-constant change in `src/evaluation/sampling.py`
 ### B10. Commit commands
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 Remove-Item -LiteralPath ".git\index.lock" -Force -ErrorAction SilentlyContinue
 .\.venv\Scripts\Activate.ps1
 

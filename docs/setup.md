@@ -2,7 +2,7 @@
 
 Reproducible setup for **sports-risk-nlp** on Windows 11 + VS Code, and in Docker.
 Target: Python **3.11**. Everything below assumes the repo root
-`C:\Users\saika\sports-risk-nlp` and PowerShell.
+`C:\Users\x\sports-risk-nlp` and PowerShell.
 
 > **Why two environments?** The local `.venv` is for fast day-to-day work in VS Code.
 > The Docker image is the *reproducibility contract* — it is what a reviewer or a future
@@ -30,7 +30,7 @@ A *virtual environment* is a private copy of Python for this project, so this pr
 package versions can never clash with another project's.
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1      # prompt should now start with (.venv)
 python -m pip install --upgrade pip
@@ -197,7 +197,7 @@ The Ruff extension reads `pyproject.toml`, so editor formatting matches the pre-
 ## 10. Daily workflow
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 .\.venv\Scripts\Activate.ps1
 pytest
 # ...work...

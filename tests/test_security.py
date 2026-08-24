@@ -381,3 +381,150 @@ def test_the_unpinned_count_reaches_the_coverage_statement(tmp_path: Path) -> No
     path.write_text("streamlit>=1.37\npyyaml==6.0\n", encoding="utf-8")
     _, result = audit_requirements([path], {})
     assert "1 floor-or-range requirement" in result.does_not_cover
+
+
+# --------------------------------------------------------------------------
+# SEC-04 / OPEN-006, closed at Phase 22. Two halves, and both are needed.
+#
+# Removing the personal address is only half the fix: `docs/ethics.md` §7.1
+# requires the replacement route to appear on every reader-facing surface,
+# because a withdrawal right a reader cannot find is decorative. That mandate
+# had gone unmet since Phase 5 -- neither README.md nor docs/model_card.md
+# carried any contact route at all, while §7.1 asserted they must. Same shape
+# as every defect this project has found: the rule and the thing it governs
+# were related by assumption.
+# --------------------------------------------------------------------------
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+_INSTITUTIONAL = "sk8069@srmist.edu.in"
+_READER_FACING = (
+    "README.md",
+    "ARTIFACT.md",
+    "docs/model_card.md",
+    "docs/consent_form.md",
+    "docs/ethics.md",
+)
+
+
+@pytest.mark.parametrize("relpath", _READER_FACING)
+def test_every_reader_facing_surface_carries_the_contact_route(relpath: str) -> None:
+    text = (_REPO_ROOT / relpath).read_text(encoding="utf-8")
+    assert _INSTITUTIONAL in text, (
+        f"{relpath} has no contact route; docs/ethics.md §7.1 requires one on "
+        "every surface a reader actually holds"
+    )
+    assert "Shankar Ram" in text, f"{relpath} names no supervisor / secondary contact"
+
+
+@pytest.mark.parametrize("relpath", _READER_FACING + ("docs/recruitment.md", "docs/open_issues.md"))
+def test_no_personal_webmail_survives_in_a_document(relpath: str) -> None:
+    """The address is gone from the prose, including the historical notes.
+
+    Quoting the old address back inside a 'retained for the record' block
+    republishes exactly what the fix removed, so the record keeps the decision
+    and redacts the value.
+    """
+    text = (_REPO_ROOT / relpath).read_text(encoding="utf-8")
+    for domain in ("@gmail.com", "@googlemail.com", "@outlook.com", "@yahoo.com"):
+        assert domain not in text, f"{relpath} still publishes a personal {domain} address"
+
+
+# --------------------------------------------------------------------------
+# The COMMITTED baseline, not a fixture. Every other baseline test in this file
+# builds its own file under tmp_path, so they prove the parser works and prove
+# nothing at all about the artefact that ships. On 2026-08-24 the suite was
+# fully green while `.secrets.baseline` in the working tree was UTF-16LE with a
+# BOM and unreadable by detect-secrets -- PowerShell's `>` redirect encodes
+# UTF-16 by default, so `docker compose run ... detect-secrets scan >
+# .secrets.baseline` corrupts the file it is supposed to regenerate.
+#
+# Seventh instance of this project's defect shape: the check (baseline parsing
+# works) and the property (the shipped baseline parses) were related by
+# assumption. The fix is to read the real path.
+# --------------------------------------------------------------------------
+
+
+def test_the_committed_baseline_is_utf8_and_parses() -> None:
+    path = _REPO_ROOT / ".secrets.baseline"
+    assert path.exists(), ".secrets.baseline is missing from the repository"
+
+    raw = path.read_bytes()
+    for bom, name in (
+        (b"\xff\xfe", "UTF-16LE"),
+        (b"\xfe\xff", "UTF-16BE"),
+        (b"\xef\xbb\xbf", "UTF-8 with BOM"),
+    ):
+        assert not raw.startswith(bom), (
+            f".secrets.baseline is {name}. detect-secrets reads UTF-8 and will "
+            "fail on it. Regenerate with the redirect INSIDE the container: "
+            "docker compose run --rm app sh -c 'detect-secrets scan > .secrets.baseline'"
+        )
+
+    payload = json.loads(raw.decode("utf-8"))
+    assert "results" in payload, ".secrets.baseline has no results block"
+    assert "generated_at" in payload, ".secrets.baseline records no scan time"
+
+
+def test_the_committed_baseline_is_evidence_of_a_scan_that_saw_the_repo() -> None:
+    """An empty baseline is indistinguishable from a scan that read no files.
+
+    Found 2026-08-24. `detect-secrets scan` enumerates via `git ls-files`; run
+    inside the container against the bind-mounted tree, git refuses the repo for
+    dubious ownership, so the scan sees ZERO files and writes results: {}. That
+    file then silently filters nothing, while looking exactly like a clean repo.
+    Phase 21's canary corollary, in the artefact rather than the scanner: a
+    result that a broken run and a clean run produce identically is not a result.
+
+    The canary here is the project's own SHA-256 digests. They are known to be
+    present, known not to be secrets, and their absence from the baseline proves
+    the scan did not reach the source tree.
+    """
+    payload = json.loads((_REPO_ROOT / ".secrets.baseline").read_text(encoding="utf-8"))
+    results = payload.get("results", {})
+    assert results, (
+        "the baseline records zero findings over the whole repository. That is "
+        "what a scan which read no files produces. Regenerate with git able to "
+        "enumerate the tree:\n"
+        "  docker compose run --rm app sh -c "
+        "'git config --global --add safe.directory /app && "
+        "detect-secrets scan > .secrets.baseline'"
+    )
+    scanned = {p.replace("\\", "/") for p in results}
+    assert "src/reproducibility/manifest.py" in scanned, (
+        "the baseline does not cover src/reproducibility/manifest.py, whose "
+        "FILE_DIGESTS entries are high-entropy hex by construction. Either the "
+        "scan missed the source tree or the exclusion list has drifted."
+    )
+
+
+def test_no_baseline_entry_is_left_unaudited() -> None:
+    """Every entry carries a human verdict, and none of them is `true`.
+
+    Phase 21 found all four entries marked is_secret: true -- the baseline was
+    asserting the repository contained four live secrets. They are SHA-256
+    digests: corpus fingerprints and a claim-ledger digest. A digest published
+    on purpose is not a credential, but that is a judgement a person makes once
+    and records, never one the tool makes.
+    """
+    payload = json.loads((_REPO_ROOT / ".secrets.baseline").read_text(encoding="utf-8"))
+    for path, entries in payload.get("results", {}).items():
+        for entry in entries:
+            assert "is_secret" in entry, (
+                f"{path}:{entry.get('line_number')} has no verdict -- run "
+                "`detect-secrets audit .secrets.baseline` and rule on it"
+            )
+            assert entry["is_secret"] is False, (
+                f"{path}:{entry.get('line_number')} is marked as a REAL secret. "
+                "Either it is one and must be removed from the repository, or "
+                "the audit verdict is wrong."
+            )
+
+
+def test_every_committed_baseline_path_is_posix() -> None:
+    """Phase 21 converted these; a Windows-host rescan silently reverts them."""
+    payload = json.loads((_REPO_ROOT / ".secrets.baseline").read_text(encoding="utf-8"))
+    offenders = [p for p in payload.get("results", {}) if "\\" in p]
+    assert not offenders, (
+        f"baseline paths are backslash-separated and platform-locked: {offenders}. "
+        "The same entries will not match on a reviewer's machine."
+    )

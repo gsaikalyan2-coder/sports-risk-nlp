@@ -1,0 +1,770 @@
+================================================================================
+HANDOVER — PHASE 22 (Reproducibility packaging) → PHASE 23 (IEEE draft assembly)
+Written 2026-08-24. Self-contained: a fresh session can continue from this alone.
+================================================================================
+
+--------------------------------------------------------------------------------
+PART A — PROJECT SUMMARY
+--------------------------------------------------------------------------------
+
+Pre-Competition Psychological Risk Profiling of Athletes. NLP x sports
+psychology: detect 10 validated constructs (CSAI-2 / SDT / ABQ tradition) in
+athlete text and fuse them into an interpretable risk index with two-level
+explanations (span->construct, construct->risk). Owner: Saikalyan, sophomore at
+SRMIST. Target: IEEE conference (iTriply Explore), full paper, draft due first
+week of September 2026. Python 3.11. Repo: C:\Users\x\sports-risk-nlp.
+
+Phases 1-15 and 17-22 are complete. Phase 16 (DataRobot AutoML) was skipped by
+decision. **Phase 22 is complete and its gate PASSED.** Next is Phase 23, IEEE
+draft assembly.
+
+THE CONSTRAINT THAT GOVERNS EVERYTHING — carry it forward verbatim.
+
+data/gold/ is empty. **No number in this repository is an accuracy.** Every
+result is a corpus property of a synthetic template grammar (synth_precomp_v1,
+4,000 generated records, labels planted by the generator). Never report a figure
+as accuracy. Never write to data/gold/. Never weaken the --gold refusal in
+src/models/dataset.py. An attribution is a claim about the model, not about
+athlete psychology.
+
+Six corollaries, all binding:
+
+  Phase 18: a gate that only checks a result *exists* is worse than no gate,
+            because it launders the claim.
+  Phase 19: the claim ledger is upstream of the prose. Any headline sentence not
+            traceable to a row in src/evaluation/ablations.py::CLAIMS requires a
+            new Claim, added and passing the gate, BEFORE it is written anywhere.
+  Phase 20: a property the unit tests can see is not the whole property. Two
+            defects passed every test and were caught only by rendering the page
+            and looking at it.
+  Phase 21: a detector that fires on everything is exactly as uninformative as
+            one that fires on nothing. A gate needs a proven floor and a legible
+            ceiling.
+  Phase 22: a claim about an artefact and the STRENGTH of that claim are one
+            object. "It reproduces" with the strength left unstated is not a
+            finding; and a check performed where it could not have failed is not
+            evidence.
+  Running through all six: the check and the thing it protects keep turning out
+  to be related by ASSUMPTION rather than by CONSTRUCTION. That is the defect
+  shape this project has now found six times. Assume it is present in your phase.
+
+WHERE THE NUMBERS STAND (real checkpoint 2026-08-16; re-verified 2026-08-24).
+
+Transformer macro-F1 0.588 [0.546, 0.622] template-disjoint vs a lexicon floor of
+0.462 [0.431, 0.492], delta +0.126 at p=0.000 paired bootstrap. Headline result
+is the memorisation gap: TF-IDF+LogReg 0.999 random-split -> 0.222
+template-disjoint (+0.777); the transformer's own gap is +0.234; the lexicon
+control moves only +0.100. Explanations beat a random-span control by +0.328
+comprehensiveness with all ten constructs beating control individually, but 104
+of 120 driver rows (86.7%) have no supporting span, published rather than hidden.
+Three negative results reported as results: silver supervision bought nothing
+(+0.033, p=0.107), the risk index cannot be calibrated because no observed
+outcome exists, and four of ten constructs are inert in the fusion layer.
+
+Full precision, for the paper and for the reproduction gate:
+  transformer template-disjoint macro-F1   0.5877114720181955
+  lexicon    template-disjoint macro-F1    0.4617285842599597
+  transformer vs lexicon delta             0.1259828877582358
+  memorisation gap (transformer)           0.23423985163237282
+  transformer random-split macro-F1        0.8219513236505683
+  tfidf      template-disjoint macro-F1    0.22208037080486936
+  tfidf      random-split macro-F1         0.9994594594594595
+
+--------------------------------------------------------------------------------
+PART B — WHAT THIS SESSION DID
+--------------------------------------------------------------------------------
+
+B1. STEP-0 ITEMS — NOT RUN BY THIS SESSION, STILL OWED
+------------------------------------------------------
+The session reached the repo through the Cowork desktop folder bridge, which
+provides a Linux VM with Python 3.10, no project dependencies and **no docker
+binary**. Both step-0 items are Docker-on-Windows operations and remain the
+owner's to run:
+
+  (1) Phase 20 Docker dashboard check — still outstanding across THREE sessions.
+        docker compose build app
+        docker compose up dashboard     # localhost:8501, click BOTH tabs, Ctrl-C
+      Expect synth_precomp_v1-003481 at risk index 0.87 with burnout_signal at
+      +1.335, and the four inert constructs carrying a hatched dashed marker on
+      BOTH tabs. Missing hatch on one tab = the duplicate-SVG-id defect regressed.
+
+  (2) SEC-03 — regenerate the secrets baseline inside the container.
+        docker compose run --rm app detect-secrets scan > .secrets.baseline
+        docker compose run --rm app detect-secrets audit .secrets.baseline
+        python -m pytest tests/test_security.py -q     # expect 49 passed
+      If the audit offers anything that is NOT a training_fingerprint hash, stop
+      and read it.
+
+  NOTE for (1) and for any future container work: docker compose build now
+  installs requirements-base.lock.txt instead of requirements-base.txt, so the
+  first build after this phase is a full rebuild of the dependency layer.
+
+B2. THE PHASE 22 DELIVERABLE
+----------------------------
+NEW PACKAGE src/reproducibility/ — pure Python, no ML imports, no network, no
+disk writes. Tests run in about a second with no torch installed, holding the
+line every phase since 15 has held.
+
+  plan.py         Tier, Match, Artefact, Step, ReproductionPlan. The by-
+                  construction teeth live here.
+  environment.py  MUST_BE_ABSENT_IN_FRESH_CLONE, IGNORE_PROBES,
+                  PRESENT_IN_FRESH_CLONE, inspect_tree, assert_fresh.
+  verify.py       Outcome, ArtefactResult, StepResult, VerificationReport.gate(),
+                  render_markdown.
+  manifest.py     PLAN (8 steps, 12 artefacts), HEADLINE, FILE_DIGESTS,
+                  RETRAIN_TOLERANCE_MACRO_F1.
+
+RUNNER scripts/run_reproduction.py — owns the three things the package must never
+do: shelling out, touching the filesystem, writing reports. Same split as
+scripts/run_security_audit.py.
+    python scripts/run_reproduction.py --declare
+    python scripts/run_reproduction.py --verify --root <fresh-clone> --tiers A,B
+  Exit 0 gate passed, 1 gate failed, 2 the run was REFUSED (contaminated tree,
+  missing declaration, git unable to answer). 2 is deliberately not 1.
+
+TESTS tests/test_reproducibility.py — 52 tests. The ones worth reading first
+assert that something is UNCONSTRUCTABLE.
+
+DOCS docs/reproducibility.md (the deliverable), ARTIFACT.md (release README),
+docs/model_card.md section 9 rewritten, README.md quickstart, docs/security.md
+Phase 22 appendix, PROJECT_PLAN.md status board.
+
+EVIDENCE reports/reproduction.json (declaration + verification),
+reports/reproduction.md (the rendered run, committed as evidence).
+
+B3. HOW THE GATE WAS STRENGTHENED — BEFORE ANYTHING RAN
+-------------------------------------------------------
+The plan's gate as written ("fresh clone reproduces headline numbers within
+tolerance") is answerable by a person sitting in a directory that already
+contains everything. Six additions, each mechanical:
+
+  1. AN ARTEFACT CANNOT BE DECLARED WITHOUT ITS STRENGTH. Match.BYTE_IDENTICAL
+     forbids a tolerance; WITHIN_TOLERANCE demands a positive one AND its units;
+     NOT_REPRODUCIBLE demands a why_not sentence. There is no way to write "it
+     reproduces" and leave the strength unstated.
+  2. THE TOLERANCE WAS DECLARED BEFORE ANY RE-RUN, AND IS HASHED.
+     ReproductionPlan.declaration_sha256() fingerprints the whole plan including
+     every tolerance; --declare freezes it in reports/reproduction.json; every
+     verification carries the frozen hash and gate() fails if it no longer
+     matches. A tolerance widened after the delta is known invalidates the run
+     that used it. Claim row: reproduction_tolerance in ablations.py::CLAIMS,
+     added and passing the gate before the sentence was written anywhere.
+  3. A VERIFICATION IN A CONTAMINATED TREE IS REFUSED. inspect_tree checks the
+     directory before measuring and exits 2. This is the defect
+     handover_phase_21.txt predicted for this phase, refused mechanically rather
+     than remembered.
+  4. cannot_reproduce IS MANDATORY PER STEP, copying ScannerResult.does_not_cover.
+     A declared artefact carrying no verdict fails the gate, so the run cannot be
+     silent about what it skipped.
+  5. A pip COMMAND INSTALLING A LOCAL-VERSION LOCK WITHOUT --extra-index-url IS
+     UNCONSTRUCTABLE (MissingExtraIndex). torch==2.13.0+cpu exists on no default
+     index; a command that only works for a reader who remembers a flag is not a
+     one-command path.
+  6. EACH STEP DECLARES THE PATHS IT MAY READ; an observed read outside that set
+     fails the gate as a hidden input.
+
+THE TOLERANCE: byte-identical for everything seeded (Phase 13 asserts the
+classical baselines at full float precision, not approx, so anything weaker would
+understate what the code already promises); +/-0.010 absolute macro-F1 for the ONE
+genuinely-retrained artefact. 0.010 is under a thirteenth of the +0.126 headline
+delta (cannot launder a regression) and well under the ~0.038 bootstrap
+half-width on 0.588 (cannot fail on measurement noise). Both bounds are asserted
+in tests.
+
+B4. THE VERIFICATION — AND WHAT IT FOUND
+----------------------------------------
+Verified by extracting the tracked tree (git ls-files) into a NEW directory on a
+DIFFERENT operating system, with no data/ and no models/, and running tiers A and
+B end to end through the runner. GATE PASSED.
+
+  corpus_records                          byte-identical  sha256 matched
+  utterances                              byte-identical  sha256 matched
+  lexicon_template_disjoint_macro_f1      byte-identical  0.4617285842599597
+  tfidf_template_disjoint_macro_f1        byte-identical  0.22208037080486936
+  tfidf_random_macro_f1                   byte-identical  0.9994594594594595
+  transformer_template_disjoint_macro_f1  byte-identical  0.5877114720181955
+  transformer_vs_lexicon_delta            byte-identical  0.1259828877582358
+  memorisation_gap_transformer            byte-identical  0.23423985163237282
+  transformer_random_macro_f1             byte-identical  0.8219513236505683
+  retrained_transformer_macro_f1          SKIPPED (tier C, ~10 CPU-hours)
+  inter_annotator_kappa                   BLOCKED (OPEN-025)
+  human_agreement_scores                  BLOCKED (OPEN-025)
+
+Bootstrap interval bounds matched too. All 8 claims backed; Phase 18 gate PASSED
+in the clone.
+
+**THE ANSWER TO "WHAT DID IT READ".** reports/predictions/ is COMMITTED — all 8
+caches. So a fresh clone re-derives the transformer's SCORES in seconds with no
+torch, no weights and no corpus, because the transformer's predictions arrived
+with the clone. That is genuinely useful (the scoring, bootstrap and ablations
+are independently checkable in seconds) and reporting it as "the transformer
+result reproduced" would be a lie of emphasis. Tier B says what it is; tier C is
+the step that actually re-derives it. Do not let Phase 23 collapse them.
+
+What a fresh clone DOES carry, and the first version of this check got wrong:
+data/raw/*/provenance.json, data/interim/*/{provenance,preprocessing}.json,
+data/processed/gold_candidates/sampling_plan.json, and reports/predictions/.
+Treating a populated data/interim/ directory as contamination rejects every
+honest clone.
+
+ALSO: docker compose run app is NOT a fresh tree. Every service bind-mounts
+.:/app, so the container sees the host working tree, data/ and models/ included.
+
+B5. THREE DEFECTS FOUND BY RUNNING AND READING, NONE BY THE TESTS
+-----------------------------------------------------------------
+Phase 20's lesson arrived three more times in one phase.
+
+  (a) THE GATE PASSED HAVING REPRODUCED NOTHING. With no tiers selected, every
+      artefact was honestly marked SKIPPED, every other check was satisfied, and
+      the gate went green. Phase 18's corollary in a new costume. Fixed: a pass
+      requires at least one runnable tier attempted, and an artefact inside an
+      attempted tier may not be skipped.
+  (b) A STEP THAT EXITED NON-ZERO DID NOT FAIL THE GATE. On the first real run
+      the `env` step failed (its command clones the repository, which cannot be
+      done from inside the clone) and the gate passed on the strength of the
+      later steps, because a step producing no artefacts had no way to report
+      failure. Fixed: StepResult.exit_code, gated; and Step.runnable marks the
+      clone step as one the checker must not pretend to have run.
+  (c) utterances.jsonl WAS NOT BYTE-IDENTICAL ACROSS PLATFORMS. records.jsonl
+      matched the owner's tree byte-for-byte; utterances.jsonl did not —
+      identical content, exactly 9,302 bytes apart, one CR per line. The two
+      stores' code was IDENTICAL. The corpus had been generated in the Linux
+      container on 2026-08-10 and the utterances on Windows on 2026-08-12, and
+      NOTHING IN THE REPOSITORY RECORDED WHICH ARTEFACT CAME FROM WHICH
+      ENVIRONMENT. No number was affected; the byte-identity claim was.
+      Fixed: src/ingestion/store.py, src/preprocessing/store.py and
+      src/labeling/store.py now pin newline="\n" as src/evaluation/sampling.py
+      already did, plus the manifest writers.
+      **OWNER ACTION: regenerate data/interim/ once, or its bytes will not match
+      FILE_DIGESTS. Content is unchanged.**
+
+Two more found the same way and fixed in-phase: file artefacts were being
+existence-checked and rendered as "byte-identical / reproduced" (fixed with
+FILE_DIGESTS SHA-256 comparison), and three baseline artefacts pointed at
+reports/baselines.json with no key so they were existence-checked too (fixed with
+dotted locators). Both are now asserted by tests.
+
+B6. SECURITY FINDINGS CLOSED AND RAISED
+---------------------------------------
+  SEC-05  CLOSED. 27 occurrences of C:\Users\<name>\sports-risk-nlp across 21
+          tracked files rewritten to C:\Users\x\..., matching the existing
+          tests/test_transformer.py precedent. Grep count zero. NOTE: every
+          document written from here uses C:\Users\x\ so real paths never
+          re-enter the repo.
+  SEC-07  CLOSED. Dockerfile installs requirements-base.lock.txt (162 pins);
+          Dockerfile.train installs requirements-ml.lock.txt (20 pins + the base
+          lock) with --extra-index-url in the same command as the pin needing it.
+          Both partitioned from the 180-pin requirements.lock.txt by a COMPUTED
+          dependency closure (pip install --dry-run --report with the lock as a
+          constraint file), not by hand. The base lock resolves with ZERO
+          unpinned extras — verified 2026-08-24.
+  SEC-11  NEW, fixed. requirements.lock.txt was incomplete in two ways, both from
+          being a Windows pip freeze taken 2026-08-09. uvloop (Linux-only,
+          transitive via uvicorn) was absent, so installing the lock in a Linux
+          container pulled it UNPINNED. sentencepiece was absent entirely despite
+          being required by requirements-ml.txt, which added it 2026-08-11 — two
+          days AFTER the lock was captured. The single file backing the
+          reproducibility claim was missing a required dependency for 15 days.
+  SEC-04  **STILL OPEN — OWNER ACTION REQUIRED.** A personal Gmail address is the
+          participant contact route in docs/consent_form.md (x2), docs/ethics.md
+          (x2), docs/open_issues.md (x3), docs/recruitment.md and
+          phase10_handover.md — 9 occurrences across 5 files, one file more than
+          Phase 21 recorded. docs/ethics.md sec.7.1 names the remedy: an SRMIST
+          institutional address plus a named supervisor. The owner was asked and
+          the answer received was the same personal address, which is a no-op; a
+          clarification was requested and had not been resolved when this
+          handover was written. **This must be settled before the artifact is
+          released**, since the address ships to every reader.
+
+  Measured while building the locks and worth a sentence in the paper: resolving
+  the ML layer WITHOUT the extra index pulls 19 additional nvidia-*/cuda-*/triton
+  packages — several GB of CUDA runtime a CPU-only container never loads.
+
+B7. FILES CREATED / MODIFIED
+----------------------------
+  NEW      src/reproducibility/{__init__,plan,environment,verify,manifest}.py
+           scripts/run_reproduction.py
+           tests/test_reproducibility.py
+           requirements-base.lock.txt, requirements-ml.lock.txt
+           docs/reproducibility.md, ARTIFACT.md
+           reports/reproduction.json, reports/reproduction.md
+           handover_phase_22.txt
+  MODIFIED Dockerfile, Dockerfile.train
+           src/evaluation/ablations.py       (+1 Claim row)
+           src/ingestion/store.py, src/preprocessing/store.py,
+           src/labeling/store.py             (newline pinning)
+           scripts/run_evaluation.py         (merges the reproduction declaration)
+           tests/test_evaluation_harness.py  (payload fixture + the new claim)
+           docs/model_card.md sec.9, README.md, docs/security.md, PROJECT_PLAN.md
+           21 files for SEC-05 (path scrub)
+
+B8. VERIFICATION PERFORMED IN-SESSION
+-------------------------------------
+  ruff check + ruff format --check clean on every touched file.
+  tests/test_reproducibility.py         52 passed, no ML stack.
+  tests/test_evaluation_harness.py      passed (the new claim broke the
+                                        "fully populated payload" test until its
+                                        fixture was extended — the claim gate
+                                        working correctly on its own author).
+  tests/test_security.py                49 passed, unchanged.
+  tests/test_ingestion/preprocessing/labeling  passed after the newline change.
+  pip install --dry-run of requirements-base.lock.txt: exit 0, zero unpinned
+                                        extras.
+  Full end-to-end tiers A+B in a genuine fresh clone: GATE PASSED.
+  Rendered reports/reproduction.md read by eye — which is how (a) and (b) above
+                                        were found.
+
+B9. WHAT THE OWNER STILL OWES BEFORE PHASE 23 CLOSES ANYTHING
+-------------------------------------------------------------
+  1. The two step-0 Docker items in B1.
+  2. SEC-04 — decide the contact address (B6).
+  3. Regenerate data/interim/ once, post-newline-fix (B5c).
+  4. Commit. Git in this repo must be run by the owner in PowerShell; through the
+     folder bridge git cannot unlink its own lock files, so `git add` succeeds
+     and `git commit` fails with "Operation not permitted".
+
+        cd C:\Users\<you>\sports-risk-nlp
+        if (Test-Path .git\index.lock) { Remove-Item .git\index.lock }
+        Remove-Item _p22_stage.tar.gz, _p22_clone.tar.gz, _p22_out.tar.gz -EA SilentlyContinue
+        ruff check .
+        ruff format --check .
+        python -m pytest -q
+        git add -A
+        git commit -m "Phase 22: reproducibility packaging - declared tiered
+        reproduction path, per-layer locks (SEC-07), path scrub (SEC-05),
+        cross-platform newline fix"
+        git log --oneline -1        # RUN THIS AS ITS OWN COMMAND
+
+     Phases 17 and 18 were both discovered uncommitted because a stale index.lock
+     aborted a commit and the failure was read as success. Verify separately.
+     Pre-commit will run: ruff and ruff format must be clean (they were when this
+     was written), and detect-private-key honours no inline waiver.
+  5. Push. A remote that stops receiving pushes is not a backup.
+
+--------------------------------------------------------------------------------
+PART C — HANDOFF TO PHASE 23 (IEEE draft assembly)
+--------------------------------------------------------------------------------
+
+C1. OBJECTIVE, TASKS, GATE (from PROJECT_PLAN.md)
+-------------------------------------------------
+Objective: full first draft. Tasks: draft abstract, intro, related work, method,
+dataset, experiments, results, ablation, ethics & limitations, conclusion from
+the artifacts; resolve each Consensus link in docs/related_work.md to a primary
+DOI and populate paper/refs.bib (deferred from Phase 3). Deliverable:
+paper/main.tex compiling in the IEEE template. Gate: compiles two-column, every
+section present, every figure and table referenced.
+
+C2. HARD CONSTRAINTS — NON-NEGOTIABLE, CARRY THESE FORWARD
+----------------------------------------------------------
+  * Display or commit NO verbatim corpus text anywhere outside the synthetic A2
+    source: not in the paper, the artifact, the model card, logs, or a
+    reproduction transcript. docs/ethics.md binds this;
+    src/explainability/cards.py::assert_publication_safe is the existing
+    mechanism — use it rather than reimplementing it.
+    src/security/audit.py::shape() is how Phase 21 complied when it had to report
+    matched text.
+  * Label no number "accuracy", "confidence in the athlete", or anything implying
+    a measurement of a person. Every score surface carries
+    src/evaluation/harness.py::PROVISIONAL_STAMP. The literal denial "not
+    accuracy" is the one permitted exception, because the stamp contains it.
+  * ANY PHRASE CLAIMING THE EXPLANATIONS WERE VALIDATED BY EXPERTS,
+    PRACTITIONERS OR COACHES IS FORBIDDEN EVERYWHERE — paper, abstract, figures,
+    dashboard, slides, model card, artifact README, any new document. The three
+    exact banned strings are in src/dashboard/view.py::FORBIDDEN_SUBSTRINGS.
+    OPEN-004 was closed by DECISION, not recruitment: the study shipped as a
+    blinded pilot self-audit with sports-familiar student raters, with
+    practitioner validation named as a limitation. If any document references the
+    study, use the mandatory wording fixed verbatim in docs/findings.md sec.2.4.
+    assert_no_forbidden_language implements the screen; reuse it.
+  * SEC-10 STANDING CAVEAT: the screen is a case-insensitive substring test and
+    cannot tell a claim from a statement of the prohibition. Run it blanket over
+    reader-facing surfaces, where every hit is real; triage the rest by hand. A
+    known triage item is waiting for you: docs/model_card.md line 194 carries the
+    metric label "subset accuracy" on a reader-facing table. Four other hits in
+    that file are prohibition sentences and are fine.
+  * CONTRIBUTION #1 MUST BE STATED AS A **SYNTHETIC** CONSTRUCT-GROUNDED CORPUS
+    EVERYWHERE, including the abstract. OPEN-011 is the project's highest live
+    risk and its only unmitigated high-impact item.
+  * Do not describe the risk decomposition as ten-construct without
+    qualification. Four constructs — appraisal_orientation, attentional_focus,
+    coping_style, motivation_orientation — are inert under the conservative
+    PolarityPolicy.NEUTRAL default.
+  * Do not retrain, do not re-tune thresholds, do not regenerate the corpus
+    except as the reproduction path does it. Do not weaken any guard to make
+    something pass — if a guard fires, that is the finding.
+
+C3. THE CLAIM LEDGER IS UPSTREAM OF THE PROSE — THIS IS YOUR MAIN WORKFLOW
+--------------------------------------------------------------------------
+Phase 23 is the phase that writes sentences, so Phase 19's corollary binds harder
+here than anywhere. src/evaluation/ablations.py::CLAIMS now holds EIGHT rows:
+
+  transformer_beats_lexicon   memorisation_gap        per_construct_spread
+  silver_is_noise             fusion_is_structural    explanations_beat_random
+  reproduction_tolerance      not_accuracy
+
+Any headline sentence not traceable to one of those needs a NEW Claim, added and
+passing `python scripts/run_evaluation.py`, BEFORE it is written into main.tex.
+Not after. A Claim may carry a predicate that inspects its own evidence —
+transformer_beats_lexicon and silver_is_noise both do, because presence is not
+support (OPEN-034). Use predicates for anything the sentence actually asserts.
+
+C4. YOUR ARTIFACTS — EVERYTHING IS BUILT, NOTHING NEEDS RE-RUNNING
+------------------------------------------------------------------
+  docs/findings.md          contribution statement locked, 3 headline findings,
+                            8 forbidden claims tabulated, every headline
+                            traceable to a CLAIMS row. START HERE.
+  docs/related_work.md      14 sources, two validated gaps. Needs primary DOIs
+                            resolved into paper/refs.bib — a Phase 23 task.
+  reports/results.{md,json} every number, with claim_audit.
+  reports/figures/          8 SVGs incl. phase18_* and phase20_explanation_card.
+  reports/explain/cards.md  worked examples.
+  reports/dashboard/        3 screenshots incl. a grayscale proof.
+  docs/model_card.md        complete, sec.9 rewritten this phase.
+  docs/reproducibility.md   the artifact statement, ready to cite.
+  ARTIFACT.md               the release README, ready to cite.
+  reports/security_audit.md, reports/reproduction.md   evidence of the gates.
+
+C5. PREDICTED DEFECT SHAPE FOR PHASE 23
+---------------------------------------
+Every handover since 18 has named one. The shape is always the same: THE CHECK
+AND THE PROPERTY IT PROTECTS ARE RELATED BY ASSUMPTION RATHER THAN BY
+CONSTRUCTION. Here is where it will land in Phase 23.
+
+**The paper will be checked by the tools that check STRINGS, and its claims live
+in NUMBERS AND FIGURES.**
+
+Specifically: assert_no_forbidden_language and the CLAIMS ledger both operate on
+text. main.tex will pass both while asserting something false, because the
+falsehood will live in a place neither tool reads:
+
+  * A NUMBER TRANSCRIBED BY HAND. Every figure in the paper will be typed or
+    copy-pasted out of reports/results.json into LaTeX. Nothing checks that
+    "0.588" in main.tex is the 0.5877114720181955 in the ledger — the claim gate
+    checks that the EVIDENCE exists, never that the PROSE quotes it correctly.
+    One transposed digit passes every gate this project has. Phase 22's answer to
+    the analogous problem was FILE_DIGESTS and dotted locators; the analogue here
+    is a macro file generated from results.json (\newcommand{\macroF}{0.588}) so
+    the paper cannot quote a number the ledger does not hold. Build that BEFORE
+    writing the results section, not after.
+  * A FIGURE THAT DISAGREES WITH ITS CAPTION. The screen reads the caption and
+    never the SVG. Phase 20 already found a chart whose hatch silently vanished
+    and every test still passed.
+  * A CAVEAT THAT TRAVELS SEPARATELY FROM ITS NUMBER. OPEN-021 (the lexicon floor
+    is not independent of the corpus) and the four-inert-constructs
+    qualification are both attached to figures by CONVENTION. The moment 0.462 or
+    "ten constructs" appears in an abstract, an intro and a results table, three
+    of the four copies will lose their caveat, and no tool will notice — a
+    caveat's binding to its number is exactly the relationship-by-assumption this
+    project keeps rediscovering.
+  * AND THE ONE MOST LIKELY TO EMBARRASS: the paper will describe a reproduction
+    the reader cannot perform, because "we release a reproducible artifact" will
+    be written from the artifact's OWN documentation rather than from what tier B
+    actually does. If main.tex says the transformer result is reproducible in
+    minutes without saying reports/predictions/ is committed, the paper overstates
+    exactly where Phase 22 was most careful not to.
+
+Recommended first move: generate paper/generated_numbers.tex from
+reports/results.json and reports/reproduction.json, add a Claim row asserting the
+paper quotes only generated macros, and make the compile depend on it. Then write
+prose.
+
+C6. OPEN ITEMS, PRIORITY ORDER
+------------------------------
+  OPEN-011  no real athlete text. Highest live risk, only unmitigated
+            high-impact item. Contribution #1 is a SYNTHETIC corpus everywhere.
+  OPEN-025  no second annotator, so no gold and no kappa. Bounds every claim the
+            paper can make and bounds what the reproduction can reproduce.
+  OPEN-021  the lexicon baseline is not independent of the corpus; the caveat
+            travels with the 0.462 floor wherever it is quoted.
+  OPEN-028  silver is PRNG output; measured (+0.033, p=0.107) rather than
+            asserted.
+  SEC-04    contact address. OWNER DECISION OUTSTANDING. Blocks release.
+  SEC-03    owner-run, one command (B1).
+  SEC-06    chromadb==1.1.1 carries an open advisory with no fixed release;
+            transitive via crewai, never imported by this project, severity not
+            retrievable. Re-check at Phase 25; do not remove crewai for it.
+  OPEN-030/031/032, OPEN-005/006   pre-submission items for Phases 23-25.
+
+C7. WORKING RULES
+-----------------
+Teach while doing — the owner is a sophomore. Be concise in chat, put depth in
+files. Small verifiable steps, and END NON-TRIVIAL WORK WITH A VERIFICATION STEP:
+Phase 20 found three defects by rendering output and looking at it, Phase 21's
+canary caught a broken detector on its first run, and Phase 22 found three more
+the same way and none by its tests. Anything checked repeatedly goes in tested
+pure Python under src/ with a thin runner in scripts/; the test suite must run
+with NO ML stack installed. pytest excludes -m slow by default.
+
+Git is owner-run in PowerShell (B9.4). Through the folder bridge, `git status`
+prints a warning and returns NO OUTPUT because it cannot write index.lock — an
+empty git status there reads exactly like "clean working tree" and is evidence of
+nothing. Run git queries against a copied index instead:
+    cp .git/index /tmp/gidx; export GIT_INDEX_FILE=/tmp/gidx
+
+Produce handover_phase_23.txt at the end of the phase — Part A project summary,
+Part B session summary, Part C handoff for Phase 24 — self-contained enough that
+a fresh session can continue from it alone, and including a named prediction of
+the defect shape to expect in Phase 24. Do not start Phase 24 until the owner
+confirms receipt.
+
+================================================================================
+END OF HANDOVER — PHASE 22
+================================================================================
+
+================================================================================
+ADDENDUM — 2026-08-24, owner's step-0 run (appended after the handover above)
+================================================================================
+
+Two items in the handover above were still open pending owner-run checks. Both
+are now resolved, and the Docker check found a real defect that three sessions
+of green tests had not.
+
+A22.1  DASHBOARD NEVER RAN IN A CONTAINER  (new, found by looking — fixed)
+-------------------------------------------------------------------------
+`docker compose up dashboard` failed at import:
+
+    /app/dashboard/app.py:24  from src.dashboard import (
+    ModuleNotFoundError: No module named 'src'
+
+CAUSE. `streamlit run dashboard/app.py` prepends the SCRIPT'S directory to
+sys.path — /app/dashboard — and never the repository root. Nothing else put the
+root there: the image set no PYTHONPATH, and the project is not installed as a
+package (pyproject.toml declares no [tool.setuptools] packages and nothing runs
+`pip install -e .`).
+
+WHY 23 DASHBOARD TESTS PASSED ANYWAY. `tests/__init__.py` exists, so pytest
+walks past tests/ and inserts the REPOSITORY ROOT into sys.path itself. pytest
+and the Streamlit runtime therefore disagreed about what "importable" means, and
+nothing in the suite could see the disagreement. This is the project's recurring
+defect shape — the check and the thing it protects related by ASSUMPTION rather
+than by construction — found for the sixth consecutive phase, and again by
+running the artefact rather than by asserting about it.
+
+CONSEQUENCE FOR THE RECORD. Phase 20's gate reads "App runs in Docker and
+reproduces a known example". The Docker half was signed off on host screenshots;
+it had never been true. The Phase 20 status-board row should be read as "app
+runs on the host" for everything dated before 2026-08-24.
+
+FIX, in two places deliberately.
+  1. dashboard/app.py — a three-line sys.path bootstrap deriving the root from
+     __file__, ahead of the first src. import. Makes the shell self-sufficient
+     on every platform and in a fresh clone, with or without an env var.
+     Permitted by tests/test_dashboard.py, which restricts `from src.` imports
+     and says nothing about stdlib ones.
+  2. Dockerfile — ENV PYTHONPATH=/app. The bootstrap only rescues app.py; every
+     other entry point (scripts/, python -m) has the same sys.path shape and no
+     bootstrap of its own.
+
+REGRESSION TEST — tests/test_dashboard.py::
+  test_app_reaches_src_the_way_streamlit_runs_it
+Asserting that the bootstrap line EXISTS would be a Phase 18 no-gate: it checks
+that the remedy is present, not that the property holds. The test instead
+REPRODUCES the runtime's sys.path in a subprocess (repo root and cwd removed,
+script directory prepended, PYTHONPATH emptied, cwd set to a tmp dir) and
+requires `import src.dashboard` to succeed from it. Verified to discriminate:
+with the bootstrap the import resolves; with the bootstrap deleted it reproduces
+the owner's exact container traceback. A second test pins PYTHONPATH=/app in the
+Dockerfile for the non-app.py entry points.
+
+STILL OWED BY THE OWNER: `docker compose build app` then `docker compose up
+dashboard`, and then LOOK AT BOTH TABS — the original Phase 20 check has still
+never actually been performed. Expect synth_precomp_v1-003481 at risk index 0.87
+with burnout_signal at +1.335, and a hatched dashed marker on the four inert
+constructs ON BOTH TABS. A missing hatch on one tab is the duplicate-SVG-id
+defect regressing.
+
+A22.2  SEC-04 / OPEN-006 CLOSED — institutional contact route
+-------------------------------------------------------------
+Owner supplied: sk8069@srmist.edu.in (SRMIST), supervisor Dr. Shankar Ram.
+The personal webmail address is gone from every tracked document, including the
+"retained for the record" block in docs/open_issues.md — quoting the old value
+back republishes exactly what the fix removes, so the record keeps the decision
+and redacts the value.
+
+A THIRD DEFECT FELL OUT OF THIS. docs/ethics.md §7.1 states the contact route
+"must appear verbatim in the released README.md, in docs/model_card.md, and in
+the A3 consent form, or none of the mechanisms in §7 is reachable in practice
+and the withdrawal right is decorative." README.md and docs/model_card.md
+carried NO contact route at all, and had not since Phase 5. The ethics document
+mandated a propagation that nothing checked — the same assumption-shaped gap,
+in the governance layer rather than the code. Both now carry the route, as does
+ARTIFACT.md, and two parametrised tests in tests/test_security.py enforce it:
+one requires the address and the supervisor's name on all five reader-facing
+surfaces, the other refuses any personal-webmail domain in any of seven files.
+
+Residual, NOT blocking: Dr. Shankar Ram is named but no mailbox of his is
+published. If SRMIST requires two independently reachable addresses on a
+released artefact, add his institutional address to docs/ethics.md §7.1 and
+re-propagate — one edit, the same six files.
+
+Note for Phase 23+: docs/open_issues.md lines ~963 and ~1270 still contain the
+GitHub username `gsaikalyan2-coder` in an OPEN-003 changelog entry. Not an email
+and not SEC-04, but it is SEC-05-class author identification and should be
+scrubbed before any anonymised submission.
+
+A22.4  THE POWERSHELL REDIRECT CORRUPTS THE BASELINE  (found 2026-08-24)
+------------------------------------------------------------------------
+    docker compose run --rm app detect-secrets scan > .secrets.baseline
+    -> UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0
+
+PowerShell's `>` writes **UTF-16LE with a BOM**, and CRLF line endings. The 0xff
+is the BOM's first byte. detect-secrets reads UTF-8, so the very command the
+Phase 21 handover prescribed for closing SEC-03 destroys the file it is meant to
+regenerate. Confirmed on disk: BOM `377 376`, CRLF throughout, 5,120 bytes.
+
+CORRECT FORM — the redirect must happen INSIDE the container, where the shell is
+POSIX and the encoding is UTF-8:
+
+    docker compose run --rm app sh -c 'detect-secrets scan > .secrets.baseline'
+
+AND THE SUITE WAS FULLY GREEN WHILE THE FILE WAS CORRUPT. Every baseline test in
+tests/test_security.py builds its own file under tmp_path, so they prove the
+PARSER works and prove nothing about the artefact that ships. Seventh instance
+of the project's defect shape, and the first one found in the test suite's own
+coverage rather than in the code it covers.
+
+FIX: two tests that read the real path —
+  test_the_committed_baseline_is_utf8_and_parses    (rejects all three BOMs,
+      then json.loads the actual committed bytes and requires results +
+      generated_at)
+  test_every_committed_baseline_path_is_posix       (a Windows-host rescan
+      silently reverts Phase 21's POSIX conversion; this catches the revert)
+
+BOTH TESTS FAIL RIGHT NOW, CORRECTLY, and will keep failing until the baseline
+is regenerated with the sh -c form. Do not "fix" them by deleting them.
+
+A22.5  RUFF, 2026-08-24
+------------------------
+Four UP038 errors fixed by hand (`--unsafe-fixes` was not used): tuple-form
+isinstance replaced with the `int | float` union in src/evaluation/ablations.py,
+src/labeling/parser.py and src/reproducibility/verify.py (two occurrences on one
+line). Three test files still need `ruff format .` before the commit --
+tests/test_evaluation.py, tests/test_preprocessing.py, tests/test_security.py.
+Remember detect-private-key honours no inline waiver: a literal PEM header
+anywhere in a staged file blocks the commit outright.
+
+A22.6  THE REGENERATED BASELINE WAS EMPTY — AND EMPTY READ AS CLEAN
+--------------------------------------------------------------------
+After fixing the UTF-16 corruption (A22.4), the container scan produced a
+well-formed, UTF-8, POSIX baseline with `"results": {}` — zero findings over the
+entire repository — and `generated_at` freshly stamped. It looked like the
+cleanest possible outcome. It was a scan that read no files.
+
+CAUSE. `detect-secrets scan` enumerates the tree via `git ls-files`. Inside the
+container the repo arrives as a bind mount owned by the host UID, while the
+image runs as `appuser` (UID 1000), so git refuses it for dubious ownership,
+`git ls-files` returns nothing, and the scan dutifully finds no secrets in the
+zero files it was handed. Nothing in the output says "I scanned 0 files".
+
+The pre-commit hook then blocked the commit with three Hex High Entropy String
+findings the empty baseline could not filter:
+    src/reproducibility/manifest.py:90  FILE_DIGESTS["corpus_records"]
+    src/reproducibility/manifest.py:91  FILE_DIGESTS["utterances"]
+    reports/reproduction.json:15        declared_sha256
+All three are SHA-256 digests this project publishes ON PURPOSE — two corpus
+fingerprints and the claim-ledger digest that makes the Tier-A reproduction
+checkable. None is a credential. The hook was right to stop; the baseline was
+wrong to be empty.
+
+CORRECT REGENERATION COMMAND (all three fixes, together):
+    docker compose run --rm app sh -c 'git config --global --add safe.directory /app && detect-secrets scan > /tmp/baseline.json && cp /tmp/baseline.json .secrets.baseline'
+    docker compose run --rm app detect-secrets audit .secrets.baseline
+
+THREE fixes, not two, and the third was learned the hard way. Redirecting
+straight onto `.secrets.baseline` TRUNCATES IT THE INSTANT THE COMMAND STARTS,
+before the scan has produced anything. The scan is slow over a Docker Desktop
+bind mount (realpath on every tracked file crossing the Windows filesystem
+boundary), and an owner who interrupts it — reasonably, because it looks hung —
+is left with a ZERO-BYTE baseline and no way back except regenerating. Observed
+2026-08-24. Writing to /tmp inside the container and copying on success makes
+the operation atomic: a failed or interrupted scan leaves the previous baseline
+untouched. Apply the same shape to any command that regenerates a committed
+artefact.
+
+BE PATIENT WITH THE SCAN. Several minutes is normal here and is not a hang.
+Rule all three entries NOT a secret. Anything offered that is not a SHA-256
+digest is a new finding, not a formality.
+
+THE TEST I WROTE FOR A22.4 PASSED ON THE EMPTY FILE. It required the `results`
+key to exist, not to mean anything — precisely the Phase 18 laundering mistake,
+committed by the person who wrote the Phase 18 corollary into this handover.
+Recorded rather than quietly corrected, because it is the cleanest small example
+of the failure mode in the whole project.
+
+FIX: three tests in tests/test_security.py that read the committed artefact —
+  test_the_committed_baseline_is_utf8_and_parses
+  test_the_committed_baseline_is_evidence_of_a_scan_that_saw_the_repo
+      Canary logic borrowed from Phase 21's sweep and applied to the artefact:
+      the project's own SHA-256 digests are known-present and known-benign, so
+      their ABSENCE proves the scan never reached the source tree. Requires a
+      non-empty results block AND coverage of src/reproducibility/manifest.py.
+  test_no_baseline_entry_is_left_unaudited
+      Every entry carries a verdict and none says is_secret: true. Phase 21
+      found all four entries marked true; this is that regression pinned shut.
+
+SEC-03 is closed only when all three pass on a baseline generated by the command
+above. A green suite with an empty baseline is what this phase spent its last
+hour learning to distrust.
+
+A22.7  THE AUDIT PROMPT'S POLARITY IS INVERTED — AND IT RECREATED PHASE 21's BUG
+--------------------------------------------------------------------------------
+`detect-secrets audit` asks, for each finding, whether it is a VALID SECRET —
+i.e. not a false positive. Answering `y` therefore writes is_secret: true, which
+is the opposite of what "yes, I have checked this and it is fine" feels like.
+All seven entries came out of the 2026-08-24 audit marked TRUE: the baseline was
+asserting the repository contains seven live secrets.
+
+That is character-for-character Phase 21's first HIGH finding, recreated three
+months later by the same tool with the same prompt, on a fresh scan. It is not a
+mistake anyone learns their way out of; it is an interface that produces the
+wrong answer for the intuitive keypress. The defence has to be a check, not care.
+
+test_no_baseline_entry_is_left_unaudited CAUGHT IT — written an hour earlier for
+exactly this, and it fired on the first run after the audit, before the commit.
+This is the phase's one unambiguous win for the tests over inspection.
+
+FIX. Verdicts corrected deterministically rather than by re-running an
+interactive prompt with confusing polarity, following the Phase 21 precedent.
+Each of the seven was re-verified FIRST — exactly one 64-hex SHA-256 on the line,
+sitting on a published digest field — and the script REFUSES to flip anything
+that is not a plain digest, so the correction cannot be applied in bulk on trust:
+    4x training_fingerprint  (reports/baselines.json x2, reports/transformer.json x2)
+    1x declared_sha256       (reports/reproduction.json:15)
+    2x FILE_DIGESTS          (src/reproducibility/manifest.py:90,91)
+All seven are fingerprints this project publishes ON PURPOSE so a reviewer can
+check the reproduction. A digest published to be verified is the opposite of a
+credential.
+
+The full scan finds SEVEN entries where the pre-commit hook reported three: the
+hook scans staged files only. The four training_fingerprint entries are the same
+ones Phase 21 audited, so the regenerated baseline agrees with Phase 21's
+verdicts rather than contradicting them — which is what SEC-03 was always about.
+It was never that the verdicts were wrong; it was that `generated_at` asserted a
+scan that had not happened. It now reads a timestamp from a scan that genuinely
+read the tree.
+
+RUNTIME, so nobody interrupts it again: the scan takes roughly 30 MINUTES on a
+Docker Desktop bind mount. Not I/O — 303 tracked files totalling 8 MB — but line
+count: reports/explain/attributions.json is 72,983 lines and reports/predictions/
+adds ~30,000 more, and detect-secrets runs ~20 plugins per line, several doing
+Shannon-entropy math per token. Dense numeric dumps are the pathological input
+for an entropy detector. If that becomes unbearable, the narrow fix is to exclude
+attributions.json and predictions/ from BOTH exclusion lists together (the
+should_exclude_file filter in .secrets.baseline and the exclude: regex in
+.pre-commit-config.yaml -- Phase 21's SEC-02 was those two lists disagreeing).
+Do NOT exclude reports/ wholesale: reports/reproduction.json must stay in scope
+or the hook flags declared_sha256 against a baseline that no longer covers it.
+
+A22.3  STILL OWED
+------------------
+  - The dashboard visual check above (build, up, look at both tabs).
+  - SEC-03: regenerate .secrets.baseline in the container; expect 49 tests to
+    stay green, and stop if `detect-secrets audit` offers anything that is not a
+    training_fingerprint hash.
+  - ruff check . / ruff format --check . / pytest, then the owner-run commit.
+  - data/interim regenerated with LF newlines: DONE by the owner 2026-08-24
+    (9,302 utterances, leak rate 0.0%, 34/34 fixture exact).
+
+================================================================================
+END OF ADDENDUM
+================================================================================

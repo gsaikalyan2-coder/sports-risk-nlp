@@ -398,6 +398,31 @@ CLAIMS: tuple[Claim, ...] = (
         "results",
     ),
     Claim(
+        "reproduction_tolerance",
+        "The artifact declares, per artefact, whether a reproduction is expected to be "
+        "byte-identical or to fall within a stated numeric tolerance, and the tolerance "
+        "was fixed before any re-run rather than fitted to one.",
+        # Added at Phase 22, BEFORE the first reproduction run, because a
+        # tolerance is a claim (Phase 19's corollary) and a tolerance chosen
+        # after seeing the delta is not a gate. The evidence node is written by
+        # `scripts/run_reproduction.py --declare` and merged into this payload by
+        # `scripts/run_evaluation.py`; it carries the declared tolerance and the
+        # SHA-256 of the declaring plan.
+        "reproduction.declaration",
+        "artifact",
+        # The equality is the enforcement. `declared_sha256` is frozen when the
+        # tolerances are declared; `plan_sha256` is recomputed from
+        # src/reproducibility/manifest.py every time this gate runs. Widen a
+        # tolerance afterwards and the two diverge, so the paper claim goes
+        # unbacked instead of the edit passing unnoticed.
+        predicate=lambda e: (
+            isinstance(e.get("retrain_tolerance_macro_f1"), int | float)
+            and e["retrain_tolerance_macro_f1"] > 0
+            and bool(e.get("declared_sha256"))
+            and e.get("declared_sha256") == e.get("plan_sha256")
+        ),
+    ),
+    Claim(
         "not_accuracy",
         "No number reported is an accuracy; every score is agreement with generator-planted "
         "labels on synthetic text.",

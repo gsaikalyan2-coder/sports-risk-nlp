@@ -82,7 +82,7 @@ class SilverWriter:
         self.manifest: dict[str, Any] = {}
 
     def __enter__(self) -> SilverWriter:
-        self._handle = self._path.open("w", encoding="utf-8")
+        self._handle = self._path.open("w", encoding="utf-8", newline="\n")
         return self
 
     def __exit__(
@@ -115,9 +115,11 @@ class SilverWriter:
             "policy": "docs/labeling.md",
             **self.manifest,
         }
-        (self._dir / MANIFEST_FILENAME).write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
+        # See the newline note in __enter__: write_text translates newlines on
+        # Windows too, so a manifest written there differs byte-wise from the
+        # same manifest written in the container.
+        with (self._dir / MANIFEST_FILENAME).open("w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
     def write(self, label: SilverLabel) -> None:
         if self._handle is None:

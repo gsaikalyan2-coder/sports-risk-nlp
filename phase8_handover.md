@@ -281,7 +281,7 @@ is the same blocker as the Phase 6 session. All changes are on disk and verified
 **On the owner machine, in PowerShell:**
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 # Close VS Code first if the lock persists; kill any stray git processes.
 Remove-Item -LiteralPath ".git\index.lock" -Force
 

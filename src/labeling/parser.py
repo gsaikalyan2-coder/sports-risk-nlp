@@ -93,7 +93,7 @@ def _as_float(value: Any, field: str) -> float:
 
 def _as_intensity(value: Any, construct: str) -> int:
     # bool is an int subclass in Python; `True` must not silently become 1.
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, int | float):
         raise LabelParseError("BAD_INTENSITY", f"{construct}: intensity {value!r} is not a number")
     if float(value) != int(value):
         raise LabelParseError(

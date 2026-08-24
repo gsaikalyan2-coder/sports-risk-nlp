@@ -91,7 +91,15 @@ class InterimWriter:
         self.manifest: dict[str, Any] = {}
 
     def __enter__(self) -> InterimWriter:
-        self._handle = self._path.open("w", encoding="utf-8")
+        # newline="\n" is not decoration. Without it, Python translates "\n" to
+        # "\r\n" on Windows, so this file's bytes depend on which machine ran the
+        # pipeline -- and Phase 22 found exactly that on the owner's disk:
+        # records.jsonl carried LF and utterances.jsonl carried CRLF, identical
+        # content, different bytes, generated two days apart on two platforms.
+        # A byte-identity claim that holds only on one OS is not a byte-identity
+        # claim. `src/evaluation/sampling.py` already used this idiom; the other
+        # writers did not.
+        self._handle = self._path.open("w", encoding="utf-8", newline="\n")
         return self
 
     def __exit__(
@@ -121,9 +129,11 @@ class InterimWriter:
             "policy": "docs/ethics.md sec.5.1",
             **self.manifest,
         }
-        (self._dir / MANIFEST_FILENAME).write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
+        # See the newline note in __enter__: write_text translates newlines on
+        # Windows too, so a manifest written there differs byte-wise from the
+        # same manifest written in the container.
+        with (self._dir / MANIFEST_FILENAME).open("w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
     def write(self, record: InterimRecord) -> None:
         if self._handle is None:

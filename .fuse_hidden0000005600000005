@@ -1,0 +1,520 @@
+================================================================================
+HANDOVER -- end of Phase 21 -> start of Phase 22
+Pre-Competition Psychological Risk Profiling of Athletes
+Written 2026-08-23. Self-contained: a new session should be able to continue
+from this file alone, after reading CLAUDE.md (which overrides defaults).
+================================================================================
+
+
+PART A -- PROJECT SUMMARY
+--------------------------------------------------------------------------------
+
+PROJECT. Pre-Competition Psychological Risk Profiling of Athletes. NLP x sports
+psychology: detect 10 validated constructs (CSAI-2 / SDT / ABQ tradition) in
+athlete text and fuse them into an interpretable risk index with two-level
+explanations (span->construct, construct->risk). Target: IEEE conference paper
+(iTriply Explore). Owner: Saikalyan, sophomore, SRMIST.
+
+TIMELINE. Paper draft due first week of September 2026. Code freeze ~Week 7.
+Today is 2026-08-23.
+
+PHASE JUST COMPLETED: PHASE 21 -- security scan, dependency and PII audit.
+Phases 1-15 and 17-21 complete. Phase 16 (DataRobot AutoML) skipped by decision.
+NEXT: Phase 22 -- reproducibility packaging.
+
+STATUS OF THE PHASE 21 GATE: PASS (exit code 0). The audit is COMPLETE, its
+deliverable (docs/security.md) is written, and the generated run is committed as
+reports/security_audit.md. Zero HIGH findings; every scanner proved its detectors
+fire on the run.
+
+The first execution reported FAIL on two HIGH findings (SEC-01, SEC-02, both in
+.secrets.baseline). BOTH WERE FIXED, NOT SUPPRESSED -- no severity was lowered,
+no threshold moved, no guard weakened. What a PASS means here: no credential
+shape survives on the released surface or in 34 commits of history, no released
+file carries a third party's identifier, and nothing is suppressed by a verdict
+nobody checked. What it does NOT mean: seven findings remain open at MEDIUM and
+LOW, four handed to Phase 22.
+
+STATUS OF THE PHASE 20 GATE ITEM (docker compose up dashboard): STILL
+OUTSTANDING. It could not be run in this session -- the Cowork sandbox has no
+Docker daemon, and the desktop bridge reaches the repository's files but not the
+owner's Docker. It remains one command; see Part C, item 0.
+
+
+THE CONSTRAINT THAT GOVERNS EVERYTHING -- CARRY THIS FORWARD VERBATIM
+--------------------------------------------------------------------------------
+
+data/gold/ is empty. NO NUMBER IN THIS REPOSITORY IS AN ACCURACY. Every result
+is a corpus property of a synthetic template grammar (synth_precomp_v1, 4,000
+generated records, labels planted by the generator). Never report a figure as
+accuracy. Never write to data/gold/. Never weaken the --gold refusal in
+src/models/dataset.py.
+
+Phase 17's corollary: an attribution is a claim about the model, not about
+athlete psychology.
+
+Phase 18's corollary: a gate that only checks a result EXISTS is worse than no
+gate, because it launders the claim.
+
+Phase 19's corollary: THE CLAIM LEDGER IS UPSTREAM OF THE PROSE. Any headline
+sentence not traceable to a row in src/evaluation/ablations.py::CLAIMS requires a
+new Claim -- added and passing the gate -- BEFORE it is written anywhere.
+
+Phase 20's corollary: a property the unit tests can see is not the whole
+property. Render it and look at it.
+
+PHASE 21'S COROLLARY: A DETECTOR THAT FIRES ON EVERYTHING IS EXACTLY AS
+UNINFORMATIVE AS ONE THAT FIRES ON NOTHING. Both make the difference between
+0 findings and N findings meaningless. The predicted defect for this phase was
+"a zero from a broken scanner is read as a clean repository", and it is real --
+it happened, see B2 -- but its mirror image cost more time this session: two
+detectors returned ~900 hits between them, all noise, and a table nobody can read
+is a table nobody checks. A gate needs BOTH a proven floor and a legible ceiling.
+
+
+PART B -- WHAT WAS DONE THIS SESSION
+--------------------------------------------------------------------------------
+
+B0. THE GATE WAS STRENGTHENED BEFORE ANY SCANNER WAS RUN
+
+PROJECT_PLAN.md gates Phase 21 on "no secrets in git history; no high-severity
+dep issues; released data PII-clean". All three are answerable with a clean
+report from a tool nobody interrogated. Three constructional additions were
+written into src/security/ first, and each is paired with a mechanism rather
+than a convention:
+
+  (1) ScannerResult REQUIRES a non-empty, non-perfunctory `does_not_cover`
+      sentence, validated in __post_init__. A findings table with no coverage
+      statement is unconstructable. This is the Phase 18 defect refused at the
+      level of the report format itself.
+
+  (2) The sweep's file set is `git ls-files` output, never a directory walk. The
+      handover predicted a sweep scoped to data/ would miss donations_inbox.jsonl
+      at the repo root; the fix is not "also remember the root", it is to stop
+      enumerating directories. A file's POSITION cannot put it out of scope.
+
+  (3) run_sweep REFUSES to report unless every detector has just fired on a
+      canary planting its own target (sweep.verify_detectors). A zero produced by
+      a broken pattern is not reportable. An unproven scanner FAILS the gate even
+      with zero findings (AuditReport.gate).
+
+  Plus: a failed advisory lookup marks the dependency scanner unproven rather
+  than being counted as "no advisories", and an offline run is unproven by
+  construction.
+
+  Result: 49 tests in tests/test_security.py, passing in ~1.2s with NO ML STACK.
+
+
+B1. WHAT THE AUDIT FOUND -- 9 items, full detail in docs/security.md sec.2
+
+  SEC-01  HIGH   FIXED THIS PHASE. All 4 entries in .secrets.baseline were
+                 recorded `is_secret: true` -- detect-secrets' verdict for "a
+                 human looked and it IS a secret". A baseline is for reviewed
+                 FALSE POSITIVES. This was OPEN-034 in a new costume.
+                 The values were verified mechanically before anything moved:
+                 each is 64 lowercase hex chars under key `training_fingerprint`,
+                 which src/models/classical.py computes as a SHA-256 over the
+                 synthetic training pairs. Published on purpose. Verdict
+                 corrected to `is_secret: false`, which is the TRUE value, not a
+                 convenient one.
+  SEC-02  HIGH   FIXED THIS PHASE. The baseline was platform-locked in BOTH
+                 directions: results keys used Windows separators, so on
+                 Linux/CI they matched nothing and suppressed nothing, while its
+                 own exclude pattern used forward slashes, so on Windows the
+                 dirs it claimed to exclude were scanned after all. Invisible
+                 from a green hook. Every key and filename field converted to
+                 POSIX (27 plugins / 13 filters / 4 entries preserved, verified
+                 by count). .pre-commit-config.yaml carried a SECOND, DIFFERENT
+                 exclude list disagreeing about models/ -- reconciled, with the
+                 baseline named authoritative if they diverge again.
+  SEC-03  MED    STILL OPEN, DELIBERATELY. Baseline generated 2026-08-12; 57
+                 tracked paths changed since. The SEC-01/02 fix corrected two
+                 recorded VERDICTS; it was NOT A RE-SCAN, and `generated_at` was
+                 deliberately left untouched rather than refreshed, because
+                 moving it would assert a scan that never happened -- the same
+                 laundering this phase refuses, applied to its own remediation.
+                 The baseline is now internally correct and still stale.
+                 Why that is tolerable rather than alarming, and it is not a
+                 matter of trust: the release sweep covered all 251 tracked text
+                 files with PROVEN detectors and found no credential shape, and
+                 the history scan covered every blob in all 34 commits. Together
+                 those are stronger evidence about the current tree than a fresh
+                 baseline. Closing move is C1 item 1.
+  SEC-04  MED    A personal Gmail address is committed in 6 documents as the
+                 participant contact/withdrawal route. docs/ethics.md sec.7.1
+                 already names the remedy. De-anonymises a blind submission.
+  SEC-05  LOW    C:\Users\<name> in 25 tracked files, naming the author.
+  SEC-06  MED    chromadb==1.1.1 carries GHSA-f4j7-r4q5-qw2c / CVE-2026-45829.
+                 Transitive via crewai; NO FIX EXISTS (still open against 1.5.9);
+                 severity NOT RETRIEVABLE from this environment. Mitigation:
+                 nothing in this project imports chromadb -- one grep hit in the
+                 whole repo, in requirements.lock.txt. Unreachable code path.
+  SEC-07  MED    Neither shipped image installs the lock file. Dockerfile
+                 installs requirements-base.txt and Dockerfile.train installs
+                 requirements-ml.txt, both FLOOR-ONLY and therefore unauditable.
+                 The one auditable file (180 pins) is the one no image uses. This
+                 is a reproducibility finding as much as a security one --
+                 PHASE 22 OWNS IT.
+  SEC-08  LOW    donations_inbox.jsonl sits INSIDE the repo though its own _note
+                 says it must live outside. Gitignored (.gitignore:116), never
+                 tracked, currently placeholder-only (no donation exists under
+                 OPEN-011). One `git add -f` from failing.
+  SEC-10  MED    FIXED THIS PHASE. The claim OPEN-004 forbids -- the
+                 "validated-by-an-expert" family in view.FORBIDDEN_SUBSTRINGS --
+                 was still asserted in CLAUDE.md:61, .claude.md:61,
+                 PROJECT_PLAN.md:11 and docs/related_work.md:17,65. The screen
+                 exists and Phase 20 applied it to every dashboard surface;
+                 NOBODY HAD EVER RUN IT OVER THE PROJECT'S OWN PLANNING
+                 DOCUMENTS -- which are the exact sentences Phase 23 will draft
+                 the contribution paragraph FROM. All five replaced with the
+                 qualified docs/findings.md wording.
+                 STANDING CAVEAT: the screen is a case-insensitive substring test
+                 and cannot tell a CLAIM from a STATEMENT OF THE PROHIBITION.
+                 findings.md, dashboard.md, the handovers and view.py itself all
+                 contain the strings while doing the opposite of claiming them,
+                 and related_work.md:93 has one inside a cited paper's TITLE. So
+                 its output is a TRIAGE QUEUE, not a findings list. Run it
+                 blanket over reader-facing surfaces (paper, abstract, figures,
+                 dashboard, slides), where every hit is real; triage the rest.
+  SEC-09  INFO   METHOD NOTE, and read this one: reached through the Cowork
+                 folder bridge, `git status` prints a warning and returns NO
+                 OUTPUT because it cannot write index.lock. An empty git status
+                 here reads exactly like "clean". Every git query in the audit
+                 was re-run against a copied index (GIT_INDEX_FILE=/tmp/gidx).
+
+  CLEAN, with the evidence that makes it a claim rather than an absence:
+    - .env never committed. Checked with `git log --all --full-history -- .env`
+      (empty), NOT with `git ls-files` -- history, not index.
+    - 257 paths ever added; 257 tracked now. The sets coincide, so history holds
+      no file that is not also in the working tree.
+    - Every historical blob (34 commits) piped through `git cat-file --batch` and
+      matched against 5 credential shapes: 2 hits, both the DOCUMENTED FAKE key
+      in docs/setup.md's "prove the hook works" walkthrough.
+    - models/ holds only .gitkeep. .venv/ gitignored. NO GIT LFS is configured --
+      .gitattributes is a line-ending policy only.
+    - data/ is gitignored entirely, AND SO IS annotation/*/data/ (.gitignore:93),
+      which is the 218 KB second copy of corpus text living outside data/. A
+      sweep scoped to data/ would have been clean and meaningless.
+    - No .claude/ directory exists. CLAUDE.md, .claude.md, config/*.yaml and
+      .vscode/ are tracked, swept, and carry no key literal.
+
+
+B2. THE PREDICTED DEFECT HAPPENED, ON THE FIRST RUN, AND THE MECHANISM CAUGHT IT
+
+  run_sweep's refusal fired before it scanned anything: `credential_assignment`
+  did not match the canary. The pattern opened with `\b(api[_-]?key|...)`, and
+  the field name in this repository is OPENROUTER_API_KEY -- `\bAPI_KEY` never
+  matches it, because the preceding underscore is a word character.
+
+  Without the canary that sweep returns ZERO credential findings over 251 files
+  and is reported as clean. It would have been correct about six patterns and
+  blind to the one that matters most in a repository whose only real secret is
+  an OpenRouter key.
+
+  Same shape as 9b / 17 / 18 / 20. What is new is WHERE it hid: in the detector
+  itself -- the last place a security review looks, because the detector is what
+  everything else is trusted through.
+
+
+B3. THE MIRROR-IMAGE DEFECT, WHICH COST MORE TIME
+
+  The first full run returned ~600 telephone hits (every one a float such as
+  0.5462... in reports/*.json, or an ISO date) and 314 handle hits (every one a
+  @dataclass decorator or a BibTeX @article{). Nine hundred rows of noise is a
+  table nobody reads, and an unread table is an unchecked table.
+
+  Fixes, and both generalise:
+    - telephone: 9-15 digits (E.164's own ceiling), no decimal point, no bracket.
+      -> 27 hits, then 10, all DOI/ISSN runs.
+    - handle: must not BEGIN its line. Decorators and BibTeX entries always do;
+      a handle in prose never does. Distinguishing by POSITION rather than by a
+      list of decorator names is the difference between a detector that stays
+      correct and one that needs editing every time a new library is imported.
+      -> 8 hits, all in de-ID fixtures and prose about handles.
+
+
+B4. SUPPRESSIONS ARE HONOURED AND COUNTED, NEVER SILENT
+
+  The sweep honours detect-secrets' own `# pragma: allowlist secret` so the
+  repository does not need two vocabularies for one idea -- and PRINTS EVERY
+  WAIVER IT APPLIED (currently one: docs/setup.md:125, the deliberately fake key
+  in the hook-proving walkthrough). A suppression nobody can total up is
+  .secrets.baseline's problem rewritten as a comment.
+
+  Likewise no scanner ever puts a matched string in a committed document.
+  audit.shape() emits the character-class silhouette (k.mensah_07 ->
+  a.aaaaaa_99), truncated at 40 chars because a full-length silhouette of a
+  high-entropy string is close to an identifier itself.
+  test_no_finding_carries_the_text_it_matched pins this.
+
+
+B5. FILES CREATED / MODIFIED
+
+  CREATED  src/security/__init__.py     package rationale + public surface
+  CREATED  src/security/audit.py        Severity, shape(), Finding, ScannerResult
+                                        (mandatory does_not_cover), AuditReport,
+                                        gate(), render_markdown
+  CREATED  src/security/sweep.py        DETECTORS, CANARY, verify_detectors,
+                                        iter_release_paths, scan_text, run_sweep
+  CREATED  src/security/baseline.py     BaselineAudit, audit_baseline,
+                                        files_added_since
+  CREATED  src/security/deps.py         Requirement, parse_requirements,
+                                        audit_requirements
+  CREATED  scripts/run_security_audit.py  thin runner; owns git, network, disk
+  CREATED  tests/test_security.py       49 tests
+  REWROTE  docs/security.md             was a 182-byte stub; now the deliverable
+  CREATED  handover_phase_21.txt        this file
+  EDITED   CLAUDE.md, .claude.md, PROJECT_PLAN.md, docs/related_work.md
+                                        SEC-10 only -- five occurrences of the
+                                        forbidden contribution claim replaced
+                                        with the docs/findings.md wording. No
+                                        other content changed in any of them
+                                        beyond PROJECT_PLAN.md's status board.
+  CREATED  reports/security_audit.md    the generated run, committed as evidence
+  EDITED   .secrets.baseline             SEC-01 + SEC-02 fix: 4 verdicts
+                                        corrected to is_secret:false, 2 result
+                                        keys and 4 filename fields converted to
+                                        POSIX. generated_at NOT touched -- see
+                                        SEC-03. 27 plugins / 13 filters / 4
+                                        entries preserved, verified by count.
+  EDITED   .pre-commit-config.yaml       SEC-02 fix: exclude list reconciled with
+                                        the baseline's own (was missing models/)
+
+  NOT MODIFIED, deliberately: no existing guard was weakened to make a scan
+  pass. src/preprocessing/deidentify.py, src/explainability/cards.py,
+  src/evaluation/harness.py, src/dashboard/view.py, src/risk/ and src/models/
+  were READ and REUSED, never edited. Nothing was retrained, no threshold
+  re-tuned, no corpus regenerated.
+
+  REUSED RATHER THAN REIMPLEMENTED:
+    view.assert_no_forbidden_language -- called inside Finding.__post_init__,
+      ScannerResult.__post_init__, AND over the fully rendered report. A finding
+      or coverage sentence using forbidden wording cannot be constructed.
+    harness.PROVISIONAL_STAMP -- its literal "NOT accuracy" denial stays quotable
+      and is pinned by a test.
+    cards.assert_publication_safe -- untouched; src/security/ never handles cards.
+
+
+B6. ARCHITECTURE, FOR THE RECORD
+
+  src/security/audit.py     report primitives; the mandatory coverage statement
+  src/security/sweep.py     detectors + the canary; scope comes from git
+  src/security/baseline.py  interrogates .secrets.baseline, never trusts it
+  src/security/deps.py      pinned-vs-floor classification; advisories INJECTED
+  scripts/run_security_audit.py  the only place that shells out to git, touches
+                                 the network, or writes to disk
+
+  That last line is why the suite runs offline, with no git repository and no ML
+  stack, in 1.2 seconds. Advisories are passed IN to audit_requirements; the
+  runner fetches them. The same split as src/dashboard/ at Phase 20.
+
+
+PART C -- PHASE 22 HANDOFF
+--------------------------------------------------------------------------------
+
+C0. THE PHASE 20 GATE ITEM IS STILL OUTSTANDING -- ONE COMMAND
+
+      cd C:\Users\saika\sports-risk-nlp
+      docker compose build app
+      docker compose up dashboard   # http://localhost:8501, click BOTH tabs, ^C
+
+  Expected: "Known examples" shows synth_precomp_v1-003481 at risk index 0.87
+  with burnout_signal at +1.335, and the four inert constructs carry a hatched
+  dashed marker ON BOTH TABS. If the hatch is missing on one tab, the duplicate
+  SVG-id defect (Phase 20 B2.1) has regressed.
+
+
+C1. OWNER ACTIONS FROM PHASE 21 -- RUN THESE IN POWERSHELL
+
+  The gate already PASSES without any of these. Item 1 closes SEC-03, which the
+  in-phase fix deliberately did not; item 2 closes SEC-08; item 3 is the commit,
+  which only the owner can run.
+
+      cd C:\Users\saika\sports-risk-nlp
+      if (Test-Path .git\index.lock) { Remove-Item .git\index.lock }
+
+      # 0. Confirm the gate yourself before trusting the documents.
+      python -m pytest tests/test_security.py -q        # EXPECT: 49 passed
+      python scripts/run_security_audit.py --online --out reports/security_audit.md
+      echo $LASTEXITCODE                                # EXPECT: 0
+
+      # 1. SEC-03: regenerate inside the container. This is a re-SCAN, which the
+      #    in-phase fix deliberately was not.
+      docker compose run --rm app detect-secrets scan > .secrets.baseline
+      docker compose run --rm app detect-secrets audit .secrets.baseline
+      python -m pytest tests/test_security.py -q        # EXPECT: still 49 passed
+      #    If the audit offers anything that is NOT a training_fingerprint hash,
+      #    STOP AND READ IT. That is a new finding, not a formality.
+
+      # SEC-08: move the donation inbox out of the repository.
+      Move-Item donations_inbox.jsonl ..\sports-risk-nlp-private\donations_inbox.jsonl
+
+      # Verify and commit.
+      python scripts/run_security_audit.py --online --out reports/security_audit.md
+      git add src/security/ scripts/run_security_audit.py tests/test_security.py `
+              docs/security.md reports/security_audit.md .secrets.baseline `
+              .pre-commit-config.yaml CLAUDE.md .claude.md docs/related_work.md `
+              handover_phase_21.txt PROJECT_PLAN.md
+      git commit -m "feat(phase21): security, dependency and PII audit with proven-detector gate"
+      git log --oneline -1     # VERIFY IT LANDED. Do not trust the command was issued.
+      git push
+
+  Git in this repo must be run by the OWNER. Through the Cowork folder bridge
+  git cannot unlink its own lock files, so `git add` succeeds and `git commit`
+  fails with "Operation not permitted" -- which is how Phases 17 and 18 were both
+  discovered uncommitted. If `git log --oneline -1` does not show the new commit,
+  the commit did NOT happen regardless of what was printed.
+
+
+C2. PHASE 22 AS WRITTEN IN PROJECT_PLAN.md
+
+  Objective:   A reviewer can rerun it.
+  Tasks:       Pin versions; fix all seeds; finalize Docker; write run scripts;
+               complete the model card; prepare an anonymized artifact.
+  Deliverable: One-command reproduction path + artifact.
+  Gate:        Fresh clone reproduces headline numbers within tolerance.
+
+
+C3. WHAT PHASE 21 HANDS PHASE 22, SPECIFICALLY
+
+  SEC-07 IS A PHASE 22 TASK AND IT IS THE BIGGEST ONE. Neither shipped image
+  installs requirements.lock.txt. Dockerfile installs requirements-base.txt
+  (12 floors), Dockerfile.train installs requirements-ml.txt (7 floors). A floor
+  is not a version: what pip resolves differs every build. So today, "pin
+  versions" is not a polish task -- the artifact's security statement and its
+  reproducibility statement BOTH currently describe the owner's host venv rather
+  than either container. Fix by having the images install the lock, or by
+  generating per-layer locks.
+
+  SEC-04 AND SEC-05 ARE THE "anonymized artifact" TASK, pre-scoped so it starts
+  with a file list instead of a search:
+    - personal email: docs/consent_form.md (x2), docs/ethics.md (x2),
+      docs/open_issues.md, docs/recruitment.md. Replace with an SRMIST
+      institutional address -- docs/ethics.md sec.7.1 already says so.
+    - C:\Users\<name>: 25 tracked files, incl. docs/setup.md, docs/docker.md,
+      requirements.lock.txt line 4, and most phase*_handover.md.
+      tests/test_transformer.py already uses C:\Users\x\... -- copy that.
+    - Re-run `python scripts/run_security_audit.py` after the pass: SEC-04 and
+      SEC-05 should reach zero, which is a checkable end state.
+
+  SEC-06: re-check for a chromadb fix at Phase 25. Do not remove crewai for it.
+
+
+C4. THE DEFECT TO EXPECT IN PHASE 22 -- PREDICTED IN ADVANCE
+
+  Five phases in a row have found the same shape. Phase 22's version:
+
+      THE REPRODUCTION WILL BE VERIFIED BY A PERSON WHO ALREADY HAS THE ARTEFACTS
+      THAT MAKE IT REPRODUCE. "Fresh clone reproduces the headline numbers" will
+      be checked in a directory holding models/, data/, reports/ and a warm pip
+      cache from four months of work, and the step that silently reads one of
+      those will pass -- and will fail for the first reviewer who has none of
+      them.
+
+  It is the same relationship-by-assumption as every previous instance: the check
+  ("it reproduced") and the property ("a stranger can reproduce it") are related
+  by an environment nobody enumerated. Concretely, before trusting a green run:
+
+    - Run the reproduction in a container built with `--no-cache` from a `git
+      clone` of the repo into a NEW directory, not in the working tree. data/ and
+      models/ are gitignored, so a genuine fresh clone HAS NEITHER -- if the path
+      still reproduces, ask what it read, because the corpus has to come from
+      somewhere. (`scripts/run_ingestion.py` at seed 42 is the intended answer;
+      verify it IS the answer.)
+    - The lock file was captured on Windows and pins torch==2.13.0+cpu, a local
+      version that does not exist on the default PyPI index. `pip install -r
+      requirements.lock.txt` FAILS without --extra-index-url. Confirm the
+      one-command path passes it; a reproduction command that only works with an
+      undocumented flag is not a one-command path.
+    - "Within tolerance" needs a NUMBER, chosen and written down BEFORE the
+      re-run, and a claim it is checked against. Phase 19's corollary applies:
+      any tolerance is a claim, so it belongs in ablations.py::CLAIMS first. A
+      tolerance picked after seeing the delta is not a gate.
+    - Check what the reproduction does NOT reproduce, and print it: gold-derived
+      figures cannot be reproduced because data/gold/ is empty, and the
+      transformer arm needs ~10 CPU-hours. A one-command path that quietly skips
+      them is claiming more than it delivers.
+
+
+C5. INPUTS THAT ALREADY EXIST -- DO NOT REBUILD ANY OF THESE
+
+  src/security/                   Phase 21, this session
+  src/dashboard/                  Phase 20
+  src/explainability/cards.py     build_card, assert_publication_safe, CardSet
+  src/risk/fusion.py              LinearRiskScorer, PolarityPolicy
+  src/models/                     TransformerBaseline.load / predict_proba
+  src/evaluation/harness.py       PROVISIONAL_STAMP, assert_not_accuracy
+  src/evaluation/ablations.py     CLAIMS -- the ledger, upstream of all prose
+  src/preprocessing/deidentify.py the Phase 8 de-ID pass (READ ITS LIMITATIONS)
+  src/ingestion/allowlist.py      the fail-closed data-source allow-list
+  reports/results.json            every score, comparison, ablation
+  reports/explain/cards.md        20 rendered cards
+  docs/findings.md                every number and every permitted wording
+  docs/security.md                Phase 21's deliverable
+  docs/dashboard.md               Phase 20's documentation
+  Dockerfile / Dockerfile.train / docker-compose.yml
+
+
+C6. HARD CONSTRAINTS -- UNCHANGED, CARRY THEM FORWARD
+
+  - No verbatim corpus text outside the A2 synthetic source -- not in docs, not
+    in scan output pasted into a report, not in logs. docs/ethics.md binds this;
+    cards.assert_publication_safe is the mechanism. src/security/audit.py::shape
+    is how scanner evidence complies.
+  - No number labelled "accuracy", "confidence in the athlete", or anything
+    implying a measurement of a person. Every score surface carries
+    PROVISIONAL_STAMP.
+  - The "validated-by-an-expert" family of phrases -- the three strings listed in
+    src/dashboard/view.py::FORBIDDEN_SUBSTRINGS -- are FORBIDDEN everywhere.
+    OPEN-004 was closed by DECISION (blinded pilot self-audit, student raters),
+    not by recruitment. Use the wording fixed verbatim in docs/findings.md
+    sec.2.4. view.assert_no_forbidden_language implements the screen; reuse it.
+    The one permitted exception is the literal denial inside PROVISIONAL_STAMP.
+    SEE SEC-10 BELOW: that screen had never been run over this project's own
+    planning documents, and five occurrences were found and fixed at Phase 21.
+  - Do not describe the risk decomposition as ten-construct unqualified. Four
+    constructs -- appraisal_orientation, attentional_focus, coping_style,
+    motivation_orientation -- are inert under PolarityPolicy.NEUTRAL.
+  - Do not retrain, re-tune thresholds, or regenerate the corpus.
+  - Do not weaken a guard to make a check pass. If a guard fires, that IS the
+    finding.
+
+
+C7. OPEN ITEMS, IN PRIORITY ORDER
+
+  OPEN-011  NO REAL ATHLETE TEXT. Highest live risk, only unmitigated
+            high-impact item. Contribution #1 must be stated as a SYNTHETIC
+            construct-grounded corpus throughout. Owner-actionable.
+  OPEN-025  No second annotator, so no gold and no kappa.
+  OPEN-021  The lexicon baseline is not independent of the corpus. The caveat
+            travels with the 0.462 floor wherever it is quoted.
+  OPEN-028  Silver is PRNG output. Measured (+0.033, p=0.107), not asserted.
+  OPEN-030/031/032, OPEN-005/006 -- pre-submission, Phases 22-25.
+
+  RAISED THIS PHASE: SEC-01 through SEC-09 (docs/security.md sec.2). SEC-04,
+  SEC-05 and SEC-07 are Phase 22 work; SEC-01, SEC-02, SEC-03 and SEC-08 are
+  owner commands in C1; SEC-06 is re-checked at Phase 25; SEC-09 is a standing
+  method note for any session working through the folder bridge.
+
+
+C8. WORKING RULES -- UNCHANGED
+
+  - Teach while doing; the owner is a sophomore. Concise in chat, depth in files.
+  - Small verifiable steps; end non-trivial work with a verification step.
+  - pytest excludes -m slow by default. The suite must run with NO ML STACK --
+    every phase since 15 has held this line.
+  - Python 3.11. pip install -r requirements-ml.txt --extra-index-url
+    https://download.pytorch.org/whl/cpu
+  - Git is run by the OWNER in PowerShell. VERIFY THE COMMIT LANDED
+    (`git log --oneline -1`). Push at the end of every phase.
+  - PRODUCE A HANDOVER FILE AT THE END OF EVERY PHASE. DO NOT START THE NEXT
+    PHASE UNTIL THE OWNER CONFIRMS RECEIPT.
+
+
+================================================================================
+Phase 21 is COMPLETE and its gate PASSES (exit code 0, zero HIGH findings, every
+scanner proven). The two HIGH findings the first run raised were FIXED, not
+suppressed. Seven findings remain open at MEDIUM and LOW; four are Phase 22 work
+and are pre-scoped in C3.
+Do not start Phase 22 until receipt of this file is confirmed.
+================================================================================

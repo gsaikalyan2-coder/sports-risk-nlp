@@ -236,7 +236,7 @@ potato_output 13 · preprocessing 42 · profile 63 · smoke 17 · synonym_audit 
 ### B7. Commit commands
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 Remove-Item -LiteralPath ".git\index.lock" -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath "sitecustomize.py" -Force -ErrorAction SilentlyContinue  # sandbox shim
 .\.venv\Scripts\Activate.ps1

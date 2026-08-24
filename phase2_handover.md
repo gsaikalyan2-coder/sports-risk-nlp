@@ -30,7 +30,7 @@ later phases run identically on the owner's machine and in Docker.
 | Docker Desktop running | container build | [CONFIRM] |
 | VS Code + Python & Docker extensions | primary IDE | [CONFIRM] |
 | PyPI network access | `pip install` | Assumed available |
-| Owner's OS | path/shell syntax | Windows (`C:\Users\saika\sports-risk-nlp`) |
+| Owner's OS | path/shell syntax | Windows (`C:\Users\x\sports-risk-nlp`) |
 | OpenRouter key | **NOT** needed in Phase 2 (Phase 6) | Defer |
 
 **Relevant tools this phase:** VS Code (primary) + Claude Code (fix env/Docker issues).
@@ -40,7 +40,7 @@ Google Colab, Supabase, and Stitch are **not** used in Phase 2.
 
 ## 3. Step-by-Step Execution Plan
 
-> Work in the project root `C:\Users\saika\sports-risk-nlp`. Do small, verifiable steps.
+> Work in the project root `C:\Users\x\sports-risk-nlp`. Do small, verifiable steps.
 
 | Step | Task | Expected outcome | Acceptance criteria |
 |---|---|---|---|

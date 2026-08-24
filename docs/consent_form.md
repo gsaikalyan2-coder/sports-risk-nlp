@@ -2,7 +2,8 @@
 
 **Study:** Pre-Competition Psychological Risk Profiling of Athletes
 **Researcher:** Saikalyan, undergraduate student, SRM Institute of Science and Technology (SRMIST)
-**Contact:** `gsaikalyan2@gmail.com` — subject line `[SPORTS-RISK-NLP]`
+**Contact:** `sk8069@srmist.edu.in` (SRMIST) — subject line `[SPORTS-RISK-NLP]`
+**Supervisor:** Dr. Shankar Ram, SRMIST
 **Form version:** 1.0 (2026-08-12) — allow-list category **A3**, `docs/ethics.md` §3.1, §4, §7
 
 > **Read this before you write anything.** If any part is unclear, email and ask. Do not donate
@@ -97,7 +98,8 @@ You can stop at any point.
 
 Contact for all of the above:
 
-> **`gsaikalyan2@gmail.com`** — subject line `[SPORTS-RISK-NLP]`
+> **`sk8069@srmist.edu.in`** (SRMIST institutional address) — subject line `[SPORTS-RISK-NLP]`
+> Supervisor / secondary contact: **Dr. Shankar Ram**, SRMIST
 > I aim to acknowledge within **7 days**. Withdrawals are actioned before the next release.
 
 *(Interim contact. This project intends to replace it with an institutional SRMIST address and a

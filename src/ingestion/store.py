@@ -56,7 +56,15 @@ class SourceWriter:
         self._seen_ids: set[str] = set()
 
     def __enter__(self) -> SourceWriter:
-        self._handle = self._path.open("w", encoding="utf-8")
+        # newline="\n" is not decoration. Without it, Python translates "\n" to
+        # "\r\n" on Windows, so this file's bytes depend on which machine ran the
+        # pipeline -- and Phase 22 found exactly that on the owner's disk:
+        # records.jsonl carried LF and utterances.jsonl carried CRLF, identical
+        # content, different bytes, generated two days apart on two platforms.
+        # A byte-identity claim that holds only on one OS is not a byte-identity
+        # claim. `src/evaluation/sampling.py` already used this idiom; the other
+        # writers did not.
+        self._handle = self._path.open("w", encoding="utf-8", newline="\n")
         return self
 
     def __exit__(

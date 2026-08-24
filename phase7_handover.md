@@ -218,10 +218,10 @@ expect 43/43.
 
 **BLOCKER — the work is not committed.** `.git/index.lock` exists and the sandbox cannot
 delete it (`Operation not permitted`). All changes are on disk and verified but the tree
-is dirty. **Delete `C:\Users\saika\sports-risk-nlp\.git\index.lock`**, then:
+is dirty. **Delete `C:\Users\x\sports-risk-nlp\.git\index.lock`**, then:
 
 ```powershell
-cd C:\Users\saika\sports-risk-nlp
+cd C:\Users\x\sports-risk-nlp
 del .git\index.lock
 .\.venv\Scripts\Activate.ps1
 pytest                              # expect 43/43 on 3.11

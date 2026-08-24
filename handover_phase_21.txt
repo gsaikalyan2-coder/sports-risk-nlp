@@ -314,7 +314,7 @@ PART C -- PHASE 22 HANDOFF
 
 C0. THE PHASE 20 GATE ITEM IS STILL OUTSTANDING -- ONE COMMAND
 
-      cd C:\Users\saika\sports-risk-nlp
+      cd C:\Users\x\sports-risk-nlp
       docker compose build app
       docker compose up dashboard   # http://localhost:8501, click BOTH tabs, ^C
 
@@ -330,7 +330,7 @@ C1. OWNER ACTIONS FROM PHASE 21 -- RUN THESE IN POWERSHELL
   in-phase fix deliberately did not; item 2 closes SEC-08; item 3 is the commit,
   which only the owner can run.
 
-      cd C:\Users\saika\sports-risk-nlp
+      cd C:\Users\x\sports-risk-nlp
       if (Test-Path .git\index.lock) { Remove-Item .git\index.lock }
 
       # 0. Confirm the gate yourself before trusting the documents.

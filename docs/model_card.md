@@ -310,14 +310,51 @@ attached to a named athlete could affect selection, contracts, or reputation.
 
 ## 9. Reproducibility
 
+Phase 22 replaced an informal claim here with a declared, checked one. The full
+path, its tiers, and everything it cannot reproduce are in
+[`docs/reproducibility.md`](reproducibility.md); the machine-readable form is
+`src/reproducibility/manifest.py::PLAN` and the checker is
+`python scripts/run_reproduction.py`.
+
+**Install the locks, not the floors.** `requirements-base.txt` and
+`requirements-ml.txt` carry version *floors*, and a floor resolves to a
+different answer on every build. The auditable files are the per-layer locks:
+
 ```bash
-pip install -r requirements-ml.txt \
+# light layer -- corpus, baselines, rescoring, dashboard. No torch.
+pip install -r requirements-base.lock.txt
+
+# training layer. The extra index is NOT optional: torch is pinned to
+# 2.13.0+cpu, a PEP 440 local version that exists on no default index.
+pip install -r requirements-ml.lock.txt \
     --extra-index-url https://download.pytorch.org/whl/cpu
 
-python scripts/run_baselines.py                 # establishes the bar
+python scripts/run_baselines.py --seed 42       # establishes the bar
 python scripts/run_transformer.py --dry-run     # plan; no torch, no weights
 python scripts/run_transformer.py --sweep       # the real run
 ```
+
+**Verified 2026-08-24** by cloning the tracked tree into a new directory on a
+different operating system, with no `data/` and no `models/`, and running tiers
+A and B end to end. Every headline number came back at full float precision:
+transformer template-disjoint macro-F1 0.5877114720181955, the +0.1259828877582358
+delta over the lexicon floor, the +0.23423985163237282 split gap, and the
+bootstrap interval bounds. `records.jsonl` and `utterances.jsonl` matched by
+SHA-256.
+
+Two things that check found, both now fixed and both worth a reviewer's
+attention:
+
+* **The tier-B path reads `reports/predictions/`, which is committed.** So a
+  fresh clone re-derives the transformer's *scores* in seconds without torch,
+  weights or corpus — and does not re-derive the transformer. Retraining is
+  tier C, roughly ten CPU-hours, and is reported separately so a cheap green
+  tick cannot stand in for it.
+* **`utterances.jsonl` was not byte-identical across platforms** before this
+  phase. The owner's copy carried CRLF and a container-generated corpus carried
+  LF — identical content, 9,302 bytes apart, produced two days apart on two
+  machines with nothing recording which. The pipeline writers now pin
+  `newline="\n"`.
 
 Each fitted model persists `manifest.json` beside its weights, carrying the seed,
 torch and transformers versions, the resolved base checkpoint, the full
@@ -351,3 +388,16 @@ honest finding that the corpus has no generalisable signal.
 
 Until all four are done, every figure here is a measurement of a template
 generator.
+
+## Contact — withdrawal, correction, incident reports
+
+**`sk8069@srmist.edu.in`** (SRMIST institutional address)
+Supervisor / secondary contact: **Dr. Shankar Ram**, SRMIST
+Subject-line prefix: `[SPORTS-RISK-NLP]` · Acknowledgement target: **7 days**
+
+`docs/ethics.md` §7.1 requires this route to appear on every reader-facing
+surface. It is the mechanism behind §7's withdrawal and correction rights: if it
+is not reachable from the document a reader actually has, those rights are
+decorative. Note that the released corpus is 100% synthetic (OPEN-011), so no
+real person's text is presently subject to withdrawal — the route exists so that
+it already works on the day that stops being true.

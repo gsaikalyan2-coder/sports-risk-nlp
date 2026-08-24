@@ -57,6 +57,10 @@ services:
     volumes:
       - .:/app
     working_dir: /app
+    # `streamlit run dashboard/app.py` puts dashboard/ -- not /app -- on
+    # sys.path[0], so `import src.dashboard` fails without this. (Phase 22 fix.)
+    environment:
+      PYTHONPATH: /app
     command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"

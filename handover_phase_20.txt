@@ -293,7 +293,7 @@ C2. COMMIT — RUN THESE YOURSELF, IN POWERSHELL
   permitted"), so `git add` succeeds and `git commit` fails — which is exactly
   how Phases 17 and 18 were both discovered uncommitted.
 
-      cd C:\Users\saika\sports-risk-nlp
+      cd C:\Users\x\sports-risk-nlp
 
       # If a previous run left a lock behind, clear it FIRST:
       if (Test-Path .git\index.lock) { Remove-Item .git\index.lock }

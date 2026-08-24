@@ -1,4 +1,4 @@
-You are continuing a multi-phase research-engineering project. Read `CLAUDE.md` (the standing brief and single source of truth) and `PROJECT_PLAN.md` (the 25-phase blueprint) in the connected folder `C:\Users\saika\sports-risk-nlp` before doing any work. Also read `phase7_handover.md`, `docs/open_issues.md`, `docs/ethics.md`, `config/data_sources_allowlist.yaml`, and `docs/agents.md`. Your job this session is **Phase 7 only**. Do not start Phase 8.
+You are continuing a multi-phase research-engineering project. Read `CLAUDE.md` (the standing brief and single source of truth) and `PROJECT_PLAN.md` (the 25-phase blueprint) in the connected folder `C:\Users\x\sports-risk-nlp` before doing any work. Also read `phase7_handover.md`, `docs/open_issues.md`, `docs/ethics.md`, `config/data_sources_allowlist.yaml`, and `docs/agents.md`. Your job this session is **Phase 7 only**. Do not start Phase 8.
 
 ## Context — where the project stands
 

@@ -56,7 +56,7 @@ Phase 1 = **repository reset and re-scaffold from scratch**, plus locking projec
 
 ## 4. Artifacts Produced — Locations & Status
 
-All paths are under the project root `C:\Users\saika\sports-risk-nlp`.
+All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 
 | Artifact | Location | Status |
 |---|---|---|

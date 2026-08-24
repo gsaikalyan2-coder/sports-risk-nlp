@@ -471,3 +471,89 @@ def test_pasted_text_is_never_written_to_disk(tmp_path, monkeypatch):
     view = build_view(text=LIVE_TEXT, backend=LexiconBackend())
     _ = view.render_text()
     assert written == [], f"the live path wrote to {written}"
+
+
+# --------------------------------------------------------------------------
+# Phase 22 regression: the shell must be importable the way Streamlit runs it.
+#
+# `streamlit run dashboard/app.py` executes the file with the file's OWN
+# directory on sys.path and the repository root nowhere on it. Every test above
+# imports `src.` under pytest, which inserts the root itself because
+# tests/__init__.py exists -- so the suite and the Streamlit runtime disagreed
+# about what "importable" means, and `from src.dashboard import ...` raised
+# ModuleNotFoundError in every container while 23 dashboard tests passed.
+#
+# Asserting that a bootstrap line EXISTS would be a Phase 18 no-gate: it checks
+# the remedy is present, not that the property holds. This reproduces the
+# runtime's sys.path instead, executes the app's real prologue in a subprocess
+# with a cleaned environment, and requires the src import to succeed from it.
+# --------------------------------------------------------------------------
+
+
+def _app_prologue() -> str:
+    """The app's source up to (but excluding) its first `src.` import."""
+    source = APP_PATH.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("src."):
+            return "\n".join(source.splitlines()[: node.lineno - 1])
+    raise AssertionError("app.py no longer imports anything from src.")
+
+
+def test_app_reaches_src_the_way_streamlit_runs_it(tmp_path):
+    """Reproduce the Streamlit runtime's sys.path and require the import to work."""
+    import os
+    import subprocess
+    import sys
+
+    pytest.importorskip("streamlit")
+
+    root = str(APP_PATH.parent.parent)
+    probe = tmp_path / "probe.py"
+    probe.write_text(
+        "import os, sys\n"
+        # Streamlit PREPENDS the script's directory and leaves the rest of
+        # sys.path (stdlib, site-packages) alone. What it does not do is put the
+        # repository root there -- so drop the root and the implicit cwd entry,
+        # which is exactly the shape a container sees.
+        f"root = {root!r}\n"
+        "sys.path[:] = [p for p in sys.path if p not in ('', root, os.getcwd())]\n"
+        f"sys.path.insert(0, {str(APP_PATH.parent)!r})\n"
+        "assert root not in sys.path, 'probe failed to remove the repo root'\n"
+        # exec needs the app's own __file__: the bootstrap derives the repo
+        # root from it, and probe.py's __file__ would silently point elsewhere.
+        f"g = {{'__file__': {str(APP_PATH)!r}, '__name__': '__main__'}}\n"
+        f"exec(compile({_app_prologue()!r}, {str(APP_PATH)!r}, 'exec'), g)\n"
+        "import src.dashboard\n"
+        "print('OK')\n",
+        encoding="utf-8",
+    )
+
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    env["PYTHONPATH"] = ""  # a container that forgot the env var must still work
+    result = subprocess.run(
+        [sys.executable, str(probe)],
+        capture_output=True,
+        text=True,
+        cwd=str(tmp_path),  # never the repo: cwd must not be what rescues it
+        env=env,
+    )
+    assert result.returncode == 0, (
+        "dashboard/app.py cannot reach src/ with only its own directory "
+        f"prepended to sys.path -- this is what every container shows:\n{result.stderr}"
+    )
+    assert "OK" in result.stdout
+
+
+def test_the_images_put_the_repo_root_on_the_import_path():
+    """Belt and braces to the bootstrap above, and the fix for the container.
+
+    The bootstrap makes app.py self-sufficient; this keeps `docker compose run`
+    working for every OTHER entry point (scripts/, python -m), which have the
+    same sys.path shape and no bootstrap of their own.
+    """
+    dockerfile = (APP_PATH.parent.parent / "Dockerfile").read_text(encoding="utf-8")
+    assert "PYTHONPATH=/app" in dockerfile, (
+        "the light image no longer puts /app on the import path; "
+        "`from src...` will fail for every entry point that is not app.py"
+    )
