@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
     Sync the dashboard subset from the private research repo into the public
-    deploy repo, then commit and push so Streamlit Cloud rebuilds.
+    deploy repo, then commit and push so the Hugging Face Space rebuilds.
 
 .DESCRIPTION
     Two repositories hold the same dashboard code:
 
       C:\Users\saika\sports-risk-nlp   private  -- the research repo, source of truth
-      C:\Users\saika\srn-dashboard     public   -- the deploy repo, feeds Streamlit Cloud
+      C:\Users\saika\srn-dashboard     public   -- the deploy repo, feeds the HF Space
 
     The research repo is authoritative for CODE. The deploy repo is authoritative
     for its own DEPLOYMENT FILES -- README.md, requirements.txt,
@@ -67,19 +67,54 @@ if ($dirty -and $Apply) {
 
 # --- what gets copied -------------------------------------------------------
 # Directories mirrored wholesale (with /MIR, so deletions upstream propagate).
+# NAMED PACKAGES, not "src" wholesale.
+#
+# Mirroring all of src\ was quietly publishing the entire research tree into a
+# PUBLIC repository: src\agents (the OpenRouter routing layer), src\annotation,
+# src\labeling, src\reproducibility, src\security and src\taxonomy -- about
+# thirty files the dashboard never imports. Nothing secret was in them, but
+# "what is public" is a decision the owner makes deliberately, not a side effect
+# of a convenience flag. Found by reading a dry run on 2026-09-15.
+#
+# This list is what `src.dashboard` actually pulls in, transitively. If an
+# import is added that reaches a new package, the deploy build fails loudly on a
+# ModuleNotFoundError -- which is the right failure, and better than the silent
+# over-share it replaces.
 $dirs = @(
-    "src",
+    "src\biosignals",
+    "src\dashboard",
+    "src\evaluation",
+    "src\explainability",
+    "src\ingestion",
+    "src\media",
+    "src\models",
+    "src\preprocessing",
+    "src\risk",
     "dashboard",
-    "config",
     "assets\narration"
 )
 # Individual files. tests\fixtures holds the committed known examples the
 # ReplayBackend reads; paper\refs.bib is REQUIRED -- atlas_map.load_atlas()
 # raises AtlasError rather than render a brain figure whose instrument anchors
 # cannot be verified, so a sync that drops it breaks the Brain atlas page.
+# packages.txt (Phase 27) is REQUIRED and is the quietest dependency in the
+# deploy repo: it installs the Tesseract OCR engine before requirements.txt is
+# read. Without it the Space starts healthy, shows the uploader, and refuses
+# every photo with "this build cannot read photos" -- correct behaviour, and
+# indistinguishable from the feature being broken. A sync that drops it
+# therefore breaks the photo path silently rather than loudly, which is the
+# worst way for a deployment file to go missing.
 $files = @(
+    @{ From = "src\__init__.py";                              To = "src\__init__.py" },
     @{ From = "tests\fixtures\dashboard_known_examples.json"; To = "tests\fixtures\dashboard_known_examples.json" },
-    @{ From = "paper\refs.bib";                               To = "paper\refs.bib" }
+    @{ From = "paper\refs.bib";                               To = "paper\refs.bib" },
+    @{ From = "packages.txt";                                  To = "packages.txt" },
+    # config\ is copied FILE BY FILE for the same reason src\ is: mirroring the
+    # directory also carried annotators.yaml, data_sources_allowlist.yaml and
+    # model_routing.yaml, none of which the dashboard reads.
+    @{ From = "config\taxonomy.yaml";                          To = "config\taxonomy.yaml" },
+    @{ From = "config\brain_atlas.yaml";                       To = "config\brain_atlas.yaml" },
+    @{ From = "config\settings.yaml";                          To = "config\settings.yaml" }
 )
 
 # Never copied, whatever they contain.
@@ -134,7 +169,18 @@ Push-Location $Deploy
 try {
     $changed = git status --porcelain
     if (-not $changed) {
-        Note "Deploy repo is already up to date. Nothing to commit."
+        if ($Apply) {
+            Note "Deploy repo is already up to date. Nothing to commit."
+        } else {
+            # In a dry run robocopy copied nothing, so git sees a clean tree no
+            # matter what the listing above said. Reporting "up to date" here
+            # was telling the reader the opposite of what the run had just
+            # shown them -- the listing above is the answer, not this line.
+            Note "DRY RUN -- the deploy repo is unchanged because nothing was copied."
+            Note "Read the robocopy listing ABOVE to see what -Apply would do."
+            Note "  'New File' = would be ADDED to the public repo."
+            Note "  'Older' / 'Newer' = content or timestamp differs; would be overwritten."
+        }
         exit 0
     }
 
@@ -168,7 +214,9 @@ try {
     if ($LASTEXITCODE -ne 0) { Fail "git push failed" }
 
     Write-Host ""
-    Note "Pushed. Streamlit Cloud rebuilds automatically -- give it 2-3 minutes."
+    Note "Pushed. The Space rebuilds automatically -- give it 2-3 minutes."
+    Note "Check the build log for tesseract-ocr in the apt step, or the photo path"
+    Note "will refuse every upload while looking perfectly healthy."
 }
 finally {
     Pop-Location
