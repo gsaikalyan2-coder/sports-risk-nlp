@@ -175,13 +175,19 @@ def test_the_stamp_is_rendered_outside_any_collapsed_container():
 
     So the stamp must appear before the first `st.expander` call in the shell.
     """
-    source = APP_PATH.read_text(encoding="utf-8")
-    stamp_at = source.index("view.risk.stamp")
-    expander_at = source.index("st.expander")
-    assert stamp_at < expander_at, (
-        "the provenance stamp is only rendered inside a collapsed expander; "
-        "a reader looking at the page would not see it"
+    EXEMPT_BECAUSE = (
+        "Owner instruction, 2026-09-14, given after the consequence was put in "
+        "writing: the stamp is no longer rendered above the fold on page 1. "
+        "Phase 26 gate #3 therefore does not hold for that page, and a "
+        "screenshot of the risk index taken from it travels without the sentence "
+        "saying the number is agreement with planted labels and is not accuracy. "
+        "tests/test_dashboard_pages.py carries the matching exemption. This "
+        "assertion is narrowed rather than deleted so the rule still fails if "
+        "the stamp leaves the page altogether, and so restoring it is one line."
     )
+    source = APP_PATH.read_text(encoding="utf-8")
+    assert "view.risk.stamp" in source, EXEMPT_BECAUSE
+    assert "st.expander" in source
 
 
 # ---------------------------------------------------------------------------

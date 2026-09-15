@@ -401,3 +401,110 @@ is not reachable from the document a reader actually has, those rights are
 decorative. Note that the released corpus is 100% synthetic (OPEN-011), so no
 real person's text is presently subject to withdrawal — the route exists so that
 it already works on the day that stops being true.
+
+---
+
+## 11. Phase 27 — the media path and the register gate (added 2026-09-15)
+
+### 11.1 What was added to the system
+
+| Component | What it does | Where |
+|---|---|---|
+| Media admission | Decides whether an uploaded file is a readable photo or video, from its bytes | `src/media/admission.py` |
+| Text extraction | Recovers words: OCR from a photo, speech recognition from a video | `src/media/extract.py` |
+| Text admission | Refuses recovered text that is not language | `src/dashboard/gibberish.py` |
+| Register gate | Reports whether recovered text reads as athlete self-report | `src/media/relevance.py` |
+| Non-verbal channel | Three bounded scalars from the file; **weight 0 by default** | `src/media/nonverbal.py` |
+
+**The scoring model is unchanged.** The construct layer, the fusion layer, the
+polarity policies and the explanation layer are byte-for-byte the same as
+Phase 26. Media contributes words, and words are scored exactly as typed words
+are. Every figure elsewhere in this card still describes the same model.
+
+### 11.2 Register gate — measured behaviour
+
+The only new component in this phase that produces a judgement, and therefore
+the only one that owes a number.
+
+| Quantity | Value | Basis |
+|---|---|---|
+| Recall, development split | 0.820 | `gold_dev.jsonl`, n=100. The split the weights were chosen on. |
+| **Recall, held-out split** | **0.850** | `gold_eval.jsonl`, n=400. Not consulted until the weights were fixed. |
+| False positives | 1 of 20 (0.05) | Authored negatives, `tests/test_relevance.py::NEGATIVES` |
+| Decision threshold | 0.25 | Declared, not grid-searched. See below. |
+
+Held-out recall above development recall is the evidence that the gate matched a
+register rather than memorising the development sentences.
+`tests/test_relevance.py` asserts the dev-to-eval gap never opens, because a
+collapse there is the signature of a fitted threshold.
+
+**Features and weights**, all declared rather than fitted, in the tradition of
+`src/risk/fusion.py`:
+
+| Term | Weight | Note |
+|---|---|---|
+| First-person rate | +5.0 | Dominant. 80% of corpus utterances vs 5% of negatives. |
+| Sport vocabulary (saturating at 3) | +0.25 | Small: a large weight makes this a topic detector. |
+| Self-state vocabulary (saturating at 3) | +0.30 | Overlaps the construct lexicon. See 11.3. |
+| Capitalisation share | −1.0 | Catches signage by shape, not by word list. |
+| Digit share | −4.0 | As above. |
+
+### 11.3 Limitations of the register gate
+
+1. **The negative set is authored by this project.** Twenty texts written for the
+   test. The 0.05 figure is therefore a sanity check against plausible off-topic
+   writing, not an estimate of behaviour on whatever a user uploads. This is the
+   weaker half of the evaluation and it is weak in a way more data would fix.
+2. **The positives are synthetic.** OPEN-011 applies unchanged: the register
+   being matched is the register this project's generator writes, which is a
+   hypothesis about how athletes talk rather than an observation of it.
+3. **The gate is not independent of the thing being measured.** `STATE_WORDS`
+   overlaps the construct lexicon, so a text can score as on-register partly
+   because it is strained. The overlap is declared rather than engineered away,
+   because a register test blind to self-state language would not be testing the
+   register. `tests/test_relevance.py` asserts the overlap still exists, so it
+   cannot quietly stop being true.
+4. **One known false positive**, named rather than special-cased: "Our offices
+   will be closed on Monday and will reopen on Tuesday morning" carries a
+   first-person plural and a weekday, which is most of what the gate looks for.
+5. **The gate does not refuse.** Off-register text is scored and flagged. A
+   reader who ignores the flag gets a number that is arithmetically correct and
+   is not a reading of an athlete.
+
+### 11.4 OCR and speech recognition — provenance
+
+Words recovered from a file carry a `MACHINE-READ` stamp and are never presented
+as something a person typed.
+
+* **OCR**: the Tesseract engine (Apache-2.0, `tesseract-ocr/tesseract`), invoked
+  as a subprocess at `--psm 6 --oem 1 -l eng`. Not vendored, not wrapped. The
+  engine build is recorded in `MediaExtraction.method` and rendered on the page,
+  because a different build or segmentation mode returns different words and
+  therefore a different score. Cited as `Smith2007`.
+* **Speech**: `faster-whisper` (`tiny`, English), optional and absent in a clean
+  checkout. Cited as `Radford2023`.
+* **Neither is evaluated by this project.** No word-error rate is reported here
+  and none should be quoted from here. Recovery is imperfect and the page says
+  so above every recovered passage.
+* **An absent backend reports absence, never an empty string.** This is a
+  correctness property, not a nicety: an empty string scores 0.50 through the
+  logistic squash, so a missing OCR engine would otherwise yield a confident
+  mid-scale reading of a file nobody could read.
+
+### 11.5 The non-verbal channel
+
+Reported here for completeness and because its absence from the numbers is
+itself a claim.
+
+* Emits `expressivity`, `vocal_strain`, `steadiness`, each in [0, 1], named for
+  properties of a signal rather than states of a person.
+* Enters `LinearRiskScorer.context` with `context_weights={}` by default, which
+  is the text-only path. `tests/test_media.py` asserts the risk index is
+  **bit-identical** with and without an attached file.
+* The default reader is `SimulatedNonVerbalReader`, which derives its values from
+  a digest of the file bytes and **does not look at a face**. Its stamp carries
+  `NOT A MEASUREMENT`.
+* `GatedRealReader` — any reader that would look at a real face or voice —
+  raises on construction. See `docs/ethics.md` §13.5 for what must be true first.
+* **No number in this card, in any table, or in the paper was produced with this
+  channel switched on.**

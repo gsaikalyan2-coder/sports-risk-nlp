@@ -1,0 +1,133 @@
+================================================================================
+HANDOVER — Phase 22b (side task): dashboard readability + motion UI
+Repository: C:\Users\saika\sports-risk-nlp
+Date: 2026-09-04
+================================================================================
+
+PART A — PROJECT SUMMARY
+--------------------------------------------------------------------------------
+Project: Pre-Competition Psychological Risk Profiling of Athletes.
+NLP x sports psychology; ten validated constructs detected in athlete text and
+fused into an interpretable risk index with two-level explanations.
+Owner: Saikalyan, sophomore, SRMIST. Target: IEEE conference full paper.
+
+Status before this session: Phases 1-15 and 17-22 complete; Phase 16 skipped by
+decision; Phase 23 (IEEE draft assembly) not started.
+
+This session did NOT advance Phase 23. It was a side task on the Phase 20
+dashboard, requested by the owner: the page was correct but unreadable to anyone
+without a machine-learning background. Phase 23 remains the next phase and is
+untouched.
+
+The governing constraint is unchanged and was respected throughout: data/gold/
+is empty, no number in this repository is an accuracy, every figure is agreement
+with labels the project's own generator planted in synthetic text.
+
+PART B — WHAT THIS SESSION DID
+--------------------------------------------------------------------------------
+Decisions taken (confirmed by the owner before work started):
+  1. Keep Streamlit as the shell. The animated surface is a self-contained HTML
+     document mounted with st.components.v1.html, animated with motion.dev
+     (https://motion.dev) loaded as an ES module from jsDelivr. A separate
+     FastAPI + static frontend rewrite was considered and rejected as too large
+     a change to the architecture this close to the paper.
+  2. Register: written for a coach or athlete with no ML background. The
+     technical vocabulary is not deleted, it is moved into a glossary so a
+     reviewer can still map every plain phrase back to the paper's term.
+
+Files created
+  src/dashboard/copy.py
+      Every plain-English caption on the page, as data. Ten constructs get an
+      everyday name, a one-sentence meaning and a direction ("pushes the number
+      up" / "pulls the number down" / "shown, but counted as zero"). Also
+      HOW_IT_WORKS (four steps), the three headline-number explainers, section
+      explainers and a 10-entry GLOSSARY covering construct, risk index,
+      "not calibrated / ranking only", inert construct, span, unevidenced
+      driver, lexicon baseline, macro-F1, the PROVISIONAL stamp and
+      OPEN-011/021/025.
+      HONESTY MECHANISM: _screen() walks this module's own namespace at import
+      time and passes every string through assert_no_forbidden_language. A
+      caption added next month is screened without anyone remembering to. This
+      matters because view.render_text()'s screen never sees a caption the
+      Streamlit shell writes itself, and a plain-English rewrite is the change
+      most likely to smuggle back "accuracy" or an upgraded validation claim.
+
+  src/dashboard/motion.py
+      motion_panel(view)  -> the animated risk panel as one HTML document
+      spans_panel(view)   -> the evidence list (which words triggered which signal)
+      panel_height/evidence_height -> iframe heights (an iframe does not grow)
+      Renders NO number the view does not already carry: it reads
+      ConstructBar.probability/.contribution/.inert and nothing else, so it
+      cannot disagree with the SVG figures beside it. Rows are ordered by
+      absolute contribution (a demo is scanned top-down for "what drove this");
+      charts.py keeps alphabetical order (a figure is scanned for a named row).
+      Inert constructs keep all three redundant channels from charts.py — hatch
+      fill, dashed outline, the literal word "inert". Animation is a fourth
+      channel, never a replacement. prefers-reduced-motion is honoured, and a
+      light-theme palette is supplied via prefers-color-scheme.
+      Every emitted string is screened by assert_no_forbidden_language before
+      it is returned.
+
+Files modified
+  dashboard/app.py       Rewritten as a renderer over the new copy. New order:
+                         lede -> "New here? Read this first" (four steps, ten
+                         signals, what the two tabs are) -> per-tab: source,
+                         caveat, PROVISIONAL stamp, animated panel, plain
+                         explanation of the risk index, two metric tiles with
+                         plain notes, "Which words produced this" evidence
+                         panel, unevidenced-driver error, then "The same two
+                         facts, as the paper prints them" with the unchanged
+                         SVG meter and both SVG charts, then the committed
+                         explanation card and the provenance expander. A
+                         glossary expander closes the page. CSS injected is
+                         typography and spacing only — no colour carries meaning.
+  src/dashboard/__init__.py   Exports plain (copy), motion_panel, spans_panel,
+                              panel_height, evidence_height; docstring updated.
+
+Files added as artefacts
+  reports/dashboard_preview.html
+      The two panels rendered from the first committed known example, standalone.
+      Used for the screenshot verification below; safe to regenerate or delete.
+
+DEFECT FOUND BY RENDERING, NOT BY THE SUITE (the Phase 20 lesson, again)
+  The first build put everything — DOM construction and animation — inside one
+  ES module script. Screenshotted with the CDN unreachable, the module never
+  executed and the panel came back as an empty card while all 25 dashboard
+  tests stayed green. Fixed by splitting: a classic <script> builds the rows and
+  paints the final state with no imports, and the module script only animates
+  from a start state it sets itself to the state already painted. A failed
+  import now changes nothing a reader can see. This is the sixth instance of
+  "the check and the thing it protects were related by assumption".
+
+VERIFICATION RUN
+  pytest tests/test_dashboard.py            25 passed
+  pytest tests/test_security.py
+         tests/test_reproducibility.py      117 passed
+  ruff check src/dashboard dashboard        clean
+  ruff format                               applied to dashboard/app.py
+  Headless Chromium screenshot of reports/dashboard_preview.html, inspected:
+  risk 0.87, six contributing rows with signed bars, four inert rows hatched and
+  labelled, evidence panel showing the three burnout spans and five "no words in
+  the text back this up" rows.
+  NOTE: tests/test_agents.py fails under Python 3.10 (datetime.UTC) — that is an
+  interpreter artefact of the throwaway Linux venv used for verification, not a
+  regression. The project targets Python 3.11.
+
+NOT DONE / OPEN
+  - No test was added for src/dashboard/copy.py or motion.py beyond the
+    import-time screen. A future phase should add: (a) motion_panel emits no
+    number absent from view.render_text(), (b) every inert construct appears in
+    the panel with the word "inert", (c) the classic script alone produces all
+    ten rows (parse the emitted HTML). Recommended before Phase 24's figure gate.
+  - The animated panel is not a paper figure and must not become one; the SVGs
+    in charts.py remain the figures.
+  - Phase 23 (IEEE draft assembly) is untouched. Start it from phase23_prompt.md
+    and handover_phase_22.txt including its addendum.
+
+PART C — HOW TO RUN
+--------------------------------------------------------------------------------
+  streamlit run dashboard/app.py
+  docker compose up dashboard
+Offline behaviour: without network the page still renders in full; only the
+motion is lost.
+================================================================================

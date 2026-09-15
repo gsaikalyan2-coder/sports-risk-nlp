@@ -28,9 +28,18 @@ WORKDIR /app
 
 # System deps kept minimal. git is needed by some pip installs from VCS refs;
 # build-essential is needed to compile the few sdists in the agent tree.
+# tesseract-ocr is load-bearing for the Phase 27 photo path, and its absence is
+# a SILENT feature loss rather than a crash: src/media/extract.py checks whether
+# the engine runs, finds it does not, and selects the honest floor -- so the
+# container starts, the uploader appears, and every photo is refused with "this
+# build cannot read photos". Correct behaviour, and indistinguishable from the
+# feature being broken. The language pack is separate from the engine and is
+# equally required; an engine with no eng.traineddata fails at the point of use.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         build-essential \
+        tesseract-ocr \
+        tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
 
 # Dependency layer first, so editing source code does not invalidate the pip

@@ -1,0 +1,364 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Cognitive layer — concept board</title>
+<style>
+:root{
+  --canvas:#ffffff; --ink:#212121; --body:#616161; --muted:#93939f; --slate:#75758a;
+  --hairline:#d9d9dd; --card:#f2f2f2; --stone:#eeece7; --green:#003c33; --navy:#071829;
+  --coral:#ff7759; --blue:#1863dc; --pale:#edfce9;
+  --ui:Inter,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--canvas);margin:0}
+body{font-family:var(--ui);color:var(--ink);padding:40px 40px 80px;max-width:1240px;margin:0 auto}
+h1{font-size:48px;font-weight:400;letter-spacing:-.48px;line-height:1.1;margin:8px 0 12px}
+h2{font-size:28px;font-weight:400;letter-spacing:-.32px;margin:0 0 6px}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.28px;text-transform:uppercase;color:var(--slate);margin:0}
+.lede{font-size:17px;line-height:1.5;color:var(--body);max-width:74ch;margin:0 0 32px}
+.panel{border:1px solid var(--hairline);border-radius:22px;padding:32px;margin:28px 0;background:var(--canvas)}
+.phead{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.num{font-family:var(--mono);font-size:13px;letter-spacing:.28px;color:var(--canvas);background:var(--green);
+  border-radius:999px;padding:5px 12px;white-space:nowrap}
+.desc{font-size:15px;line-height:1.55;color:var(--body);max-width:78ch;margin:6px 0 20px}
+.stamp{font-family:var(--mono);font-size:11px;letter-spacing:.28px;text-transform:uppercase;color:var(--coral);
+  border:1px solid var(--coral);border-radius:999px;padding:4px 10px;display:inline-block;margin-bottom:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{font-size:12px;color:var(--slate);border:1px solid var(--hairline);border-radius:999px;padding:5px 12px}
+.chip b{color:var(--ink);font-weight:500}
+.stage{background:var(--card);border-radius:12px;padding:24px;overflow:hidden}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:start}
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.28px;text-transform:uppercase;color:var(--slate);
+  margin:0 0 10px}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid var(--hairline)}
+.kv:last-child{border-bottom:0}
+.kv b{font-weight:500}
+.big{font-size:44px;font-weight:400;letter-spacing:-.5px;line-height:1}
+.sub{font-size:12px;color:var(--slate)}
+canvas{display:block;width:100%}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--slate);margin-top:12px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:-1px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--hairline)}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.28px;text-transform:uppercase;color:var(--slate);font-weight:400}
+.verdict{font-size:13px;color:var(--canvas);background:var(--ink);border-radius:999px;padding:4px 12px;display:inline-block}
+.warn{background:var(--pale);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:14px 18px;
+  font-size:14px;line-height:1.5;color:var(--ink);margin-top:20px}
+</style></head><body>
+
+<p class="eyebrow">sports-risk-nlp &middot; cognitive layer</p>
+<h1>Five concepts, drawn to scale</h1>
+<p class="lede">Every visual below runs on <strong>simulated signals</strong> generated in this page — there is no headset,
+no participant and no recording behind any of it. They are drawn at the real fidelity each feature would ship at, so the
+choice is about what you want on screen, not about what a mockup can imply.</p>
+
+<!-- ============ 1 ============ -->
+<div class="panel">
+  <div class="phead"><span class="num">01</span><div><h2>Construct &rarr; brain network atlas</h2></div></div>
+  <p class="desc">Each of your ten constructs lights the brain network the literature associates with it. Node brightness is
+    detection strength; edge thickness is the construct's push on the risk index. It is a <em>hypothesised mapping</em> read
+    from your existing text pipeline — never measured activity.</p>
+  <span class="stamp">Simulated · hypothesised mapping, not imaging</span>
+  <div class="stage"><div class="grid2">
+    <div><p class="lbl">Lateral schematic — networks, not anatomy</p><canvas id="brain" height="380"></canvas>
+      <div class="legend">
+        <span><i class="sw" style="background:#ff7759"></i>raises the index</span>
+        <span><i class="sw" style="background:#003c33"></i>lowers the index</span>
+        <span><i class="sw" style="background:#d9d9dd"></i>detected, counted as zero</span>
+      </div></div>
+    <div><p class="lbl">Driving constructs</p><div id="atlasList"></div>
+      <div class="warn">A glowing cortex is the most over-read graphic in sports tech. Shipping it means shipping the
+        caption with it, structurally — the same way your risk index cannot render without its stamp.</div></div>
+  </div></div>
+  <div class="chips"><span class="chip"><b>Cost</b> none</span><span class="chip"><b>Complexity</b> low</span>
+    <span class="chip"><b>Data</b> already in hand</span><span class="chip"><b>Buildable</b> today</span></div>
+</div>
+
+<!-- ============ 2 ============ -->
+<div class="panel">
+  <div class="phead"><span class="num">02</span><div><h2>EEG-ready ingestion adapter</h2></div></div>
+  <p class="desc">A live band-power view behind one interface. Today a simulated source drives it; a Muse or OpenBCI board
+    drops in behind the same Protocol without the page changing. The features feed your scorer's existing
+    <span style="font-family:var(--mono);font-size:13px">context</span> slot at zero weight, so the index is unchanged.</p>
+  <span class="stamp">Simulated · 1/f noise + task-modulated rhythms</span>
+  <div class="stage"><div class="grid2">
+    <div><p class="lbl">Four channels — TP9, AF7, AF8, TP10</p><canvas id="eeg" height="260"></canvas></div>
+    <div><p class="lbl">Band power, 2-second window</p><canvas id="bands" height="200"></canvas>
+      <div class="kv"><span>Source</span><b id="srcName">SimulatedEEGSource</b></div>
+      <div class="kv"><span>Sample rate</span><b>256 Hz</b></div>
+      <div class="kv"><span>Contact quality</span><b style="color:#003c33">4 / 4 good</b></div>
+      <div class="kv"><span>Weight in index</span><b>0.000 — observed only</b></div></div>
+  </div></div>
+  <div class="chips"><span class="chip"><b>Cost</b> $0 today · $250–500 hardware</span>
+    <span class="chip"><b>Complexity</b> low</span><span class="chip"><b>Data</b> open sets for validation</span>
+    <span class="chip"><b>Buildable</b> today</span></div>
+</div>
+
+<!-- ============ 3 ============ -->
+<div class="panel">
+  <div class="phead"><span class="num">03</span><div><h2>Cognitive load — HRV + webcam oculometrics</h2></div></div>
+  <p class="desc">Effort and arousal without a cap: heart-rate variability from a chest strap, pupil and blink from an
+    ordinary webcam. The cheapest route to a <em>real athlete</em>, because nobody objects to wearing a strap.</p>
+  <span class="stamp">Simulated · ranking only, not calibrated</span>
+  <div class="stage"><div class="grid2">
+    <div><p class="lbl">Inter-beat interval &amp; pupil diameter</p><canvas id="hrv" height="250"></canvas>
+      <div class="legend"><span><i class="sw" style="background:#003c33"></i>RR interval (ms)</span>
+        <span><i class="sw" style="background:#1863dc"></i>pupil (z)</span>
+        <span><i class="sw" style="background:#ff7759"></i>blink</span></div></div>
+    <div><p class="lbl">Load index</p><div class="big" id="loadVal">0.00</div>
+      <p class="sub" style="margin:4px 0 16px">weighted HF-HRV, pupil effort proxy, blink rate</p>
+      <canvas id="loadhist" height="90"></canvas>
+      <div class="kv"><span>HF-HRV</span><b id="hfv">—</b></div>
+      <div class="kv"><span>Pupil effort</span><b id="pup">—</b></div>
+      <div class="kv"><span>Blink rate</span><b id="blk">—</b></div></div>
+  </div></div>
+  <div class="chips"><span class="chip"><b>Cost</b> ~$90 strap</span><span class="chip"><b>Complexity</b> medium</span>
+    <span class="chip"><b>Data</b> needs a participant</span><span class="chip"><b>Buildable</b> next sprint</span></div>
+</div>
+
+<!-- ============ 4 ============ -->
+<div class="panel">
+  <div class="phead"><span class="num">04</span><div><h2>Text &harr; physiology concordance</h2></div>
+    <span class="verdict">strongest scientifically</span></div>
+  <p class="desc">Does what the athlete <em>says</em> agree with what their body <em>shows</em>? Two channels on one
+    timeline. Where they diverge — calm words over high arousal — the band fills. That pattern has a name in the
+    literature (repressive coping) and it is exactly the athlete a text-only system misses.</p>
+  <span class="stamp">Simulated · agreement statistic, not a claim about anyone</span>
+  <div class="stage"><div class="grid2">
+    <div><p class="lbl">Seven days before competition</p><canvas id="conc" height="280"></canvas>
+      <div class="legend"><span><i class="sw" style="background:#212121"></i>what the words say</span>
+        <span><i class="sw" style="background:#ff7759"></i>what the body shows</span>
+        <span><i class="sw" style="background:#ffd9cf"></i>discordance</span></div></div>
+    <div><p class="lbl">Concordance</p><div class="big" id="rho">—</div>
+      <p class="sub" style="margin:4px 0 18px">Spearman ρ across the window, 95% CI</p>
+      <div class="kv"><span>Days in agreement</span><b id="agree">—</b></div>
+      <div class="kv"><span>Discordant days</span><b id="disc" style="color:#ff7759">—</b></div>
+      <div class="kv"><span>Largest gap</span><b id="gap">—</b></div>
+      <div class="warn">This is the one number here your project is already entitled to make: agreement between two
+        measured channels, with an interval — not an inference about a brain.</div></div>
+  </div></div>
+  <div class="chips"><span class="chip"><b>Cost</b> shares stream 02/03</span><span class="chip"><b>Complexity</b> low</span>
+    <span class="chip"><b>Data</b> needs both channels</span><span class="chip"><b>Publishable</b> second paper</span></div>
+</div>
+
+<!-- ============ 5 ============ -->
+<div class="panel">
+  <div class="phead"><span class="num">05</span><div><h2>Closed-loop neurofeedback session</h2></div>
+    <span class="verdict" style="background:#75758a">park for v2</span></div>
+  <p class="desc">The athlete trains attention against a live visual driven by their own alpha/theta ratio. Ring expands
+    when focus holds, contracts when it drifts. Compelling — and the only concept here that is an <em>intervention</em>
+    rather than an observation, which brings ethics review and a clinician into scope.</p>
+  <span class="stamp">Simulated · intervention — requires ethics approval</span>
+  <div class="stage"><div class="grid2">
+    <div><p class="lbl">Live feedback target</p><canvas id="nf" height="300"></canvas></div>
+    <div><p class="lbl">Session</p><div class="big" id="nfval">—</div>
+      <p class="sub" style="margin:4px 0 16px">alpha / theta ratio, 1-second window</p>
+      <canvas id="nftrace" height="110"></canvas>
+      <div class="kv"><span>Time in target</span><b id="ttime">—</b></div>
+      <div class="kv"><span>Longest hold</span><b id="hold">—</b></div>
+      <div class="kv"><span>Session length</span><b>8:00</b></div></div>
+  </div></div>
+  <div class="chips"><span class="chip"><b>Cost</b> hardware + ethics</span><span class="chip"><b>Complexity</b> high</span>
+    <span class="chip"><b>Data</b> participants + clinician</span><span class="chip"><b>Buildable</b> v2</span></div>
+</div>
+
+<h2 style="margin-top:56px">Impact against effort</h2>
+<table>
+  <tr><th>Concept</th><th>Impact</th><th>Effort</th><th>Verdict</th></tr>
+  <tr><td>04 · Text ↔ physiology concordance</td><td>High</td><td>Low</td><td><b>Do first</b></td></tr>
+  <tr><td>01 · Construct → network atlas</td><td>High (demo &amp; novelty)</td><td>Low</td><td><b>Do today</b></td></tr>
+  <tr><td>02 · EEG-ready adapter</td><td>Medium now, high later</td><td>Low</td><td><b>Do today</b> — enabling layer</td></tr>
+  <tr><td>03 · HRV + oculometrics load</td><td>Medium</td><td>Medium</td><td>Next sprint</td></tr>
+  <tr><td>05 · Neurofeedback loop</td><td>High</td><td>Very high</td><td>Park — hardware + ethics</td></tr>
+</table>
+
+<script>
+const C={coral:'#ff7759',green:'#003c33',ink:'#212121',navy:'#071829',blue:'#1863dc',
+  hair:'#d9d9dd',slate:'#75758a',card:'#f2f2f2',canvas:'#ffffff',pale:'#ffd9cf'};
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;
+  c.width=r.width*d;c.height=c.height*d;const x=c.getContext('2d');x.scale(d,d);
+  x.W=r.width;x.H=c.height/d;return x;}
+
+/* ---------- 01 atlas ---------- */
+const NODES=[
+  {id:'dACC', x:.46,y:.30,label:'dorsal ACC',      con:'cognitive anxiety', p:.72, sign:1},
+  {id:'dlPFC',x:.24,y:.34,label:'dlPFC',           con:'attentional focus', p:.55, sign:0},
+  {id:'vmPFC',x:.20,y:.55,label:'vmPFC',           con:'coping style',      p:.41, sign:0},
+  {id:'INS',  x:.47,y:.56,label:'insula',          con:'somatic anxiety',   p:.83, sign:1},
+  {id:'AMY',  x:.55,y:.66,label:'amygdala',        con:'perceived stress',  p:.64, sign:1},
+  {id:'PPC',  x:.75,y:.36,label:'parietal control',con:'self belief',       p:.38, sign:-1},
+  {id:'PCC',  x:.80,y:.52,label:'posterior cing.', con:'resilience',        p:.30, sign:-1},
+  {id:'STR',  x:.60,y:.48,label:'striatum',        con:'motivation',        p:.47, sign:0},
+];
+const EDGES=[['dACC','INS'],['dACC','dlPFC'],['INS','AMY'],['dlPFC','PPC'],['vmPFC','AMY'],
+  ['STR','dACC'],['PCC','PPC'],['STR','INS']];
+function drawBrain(){
+  const c=document.getElementById('brain'),x=fit(c),W=x.W,H=x.H;
+  x.clearRect(0,0,W,H);
+  // schematic cortical outline (stylised, not an atlas tracing)
+  x.beginPath();
+  x.moveTo(W*.10,H*.56); x.bezierCurveTo(W*.10,H*.20, W*.42,H*.06, W*.62,H*.12);
+  x.bezierCurveTo(W*.86,H*.20, W*.94,H*.42, W*.86,H*.60);
+  x.bezierCurveTo(W*.80,H*.74, W*.56,H*.82, W*.38,H*.78);
+  x.bezierCurveTo(W*.22,H*.75, W*.12,H*.70, W*.10,H*.56);
+  x.closePath(); x.fillStyle='#fff'; x.fill(); x.strokeStyle=C.hair; x.lineWidth=1.5; x.stroke();
+  // cerebellum + stem, purely to orient the reader
+  x.beginPath(); x.ellipse(W*.78,H*.76,W*.10,H*.10,0,0,7); x.strokeStyle=C.hair; x.stroke();
+  x.beginPath(); x.moveTo(W*.60,H*.80); x.quadraticCurveTo(W*.62,H*.92,W*.56,H*.95); x.stroke();
+  const P={}; NODES.forEach(n=>P[n.id]=[W*n.x,H*n.y]);
+  EDGES.forEach(([a,b])=>{const A=P[a],B=P[b];
+    const na=NODES.find(n=>n.id===a),nb=NODES.find(n=>n.id===b);
+    x.beginPath(); x.moveTo(A[0],A[1]);
+    x.quadraticCurveTo((A[0]+B[0])/2,(A[1]+B[1])/2-18,B[0],B[1]);
+    x.lineWidth=1+3.2*Math.min(na.p,nb.p); x.strokeStyle='rgba(117,117,138,.38)'; x.stroke();});
+  NODES.forEach(n=>{const [px,py]=P[n.id];
+    const col=n.sign>0?C.coral:(n.sign<0?C.green:C.hair);
+    const r=7+13*n.p;
+    const g=x.createRadialGradient(px,py,1,px,py,r*1.9);
+    g.addColorStop(0,col); g.addColorStop(1,'rgba(255,255,255,0)');
+    x.globalAlpha=.30+.55*n.p; x.fillStyle=g; x.beginPath(); x.arc(px,py,r*1.9,0,7); x.fill();
+    x.globalAlpha=1; x.fillStyle=col; x.beginPath(); x.arc(px,py,r*.55,0,7); x.fill();
+    if(n.sign===0){x.strokeStyle=C.slate;x.setLineDash([3,2]);x.lineWidth=1.2;
+      x.beginPath();x.arc(px,py,r*.55+3,0,7);x.stroke();x.setLineDash([]);}
+    x.fillStyle=C.ink; x.font='11px '+getComputedStyle(document.body).fontFamily;
+    x.textAlign='center'; x.fillText(n.label,px,py+r*.55+15);});
+}
+document.getElementById('atlasList').innerHTML=NODES.slice().sort((a,b)=>b.p-a.p).map(n=>
+  `<div class="kv"><span>${n.con}</span><b style="color:${n.sign>0?C.coral:(n.sign<0?C.green:C.slate)}">${
+    n.sign===0?'counted as zero':(n.sign>0?'+':'')+(n.sign*n.p*1.4).toFixed(2)}</b></div>`).join('');
+
+/* ---------- 02 eeg ---------- */
+const CH=['TP9','AF7','AF8','TP10'], buf=CH.map(()=>new Array(420).fill(0));
+let t=0;
+function eegTick(){
+  t+=1;
+  const alpha=.55+.35*Math.sin(t/90), theta=.40+.25*Math.sin(t/140+1.2);
+  CH.forEach((_,i)=>{
+    const v=(Math.random()-.5)*.55
+      + alpha*Math.sin(t/3.1+i)*0.55
+      + theta*Math.sin(t/6.7+i*1.7)*0.40
+      + 0.18*Math.sin(t/1.6+i*.4);
+    buf[i].push(v); buf[i].shift();});
+  const c=document.getElementById('eeg'),x=fit(c),W=x.W,H=x.H;
+  x.clearRect(0,0,W,H);
+  CH.forEach((name,i)=>{
+    const base=H*(.18+i*.22);
+    x.strokeStyle=C.hair;x.lineWidth=1;x.beginPath();x.moveTo(46,base);x.lineTo(W,base);x.stroke();
+    x.fillStyle=C.slate;x.font='10px '+getComputedStyle(document.body).fontFamily;
+    x.textAlign='left';x.fillText(name,4,base+3);
+    x.beginPath(); x.strokeStyle=[C.green,C.navy,C.navy,C.green][i]; x.lineWidth=1.3;
+    buf[i].forEach((v,k)=>{const px=46+(W-46)*k/buf[i].length, py=base-v*20;
+      k?x.lineTo(px,py):x.moveTo(px,py);});
+    x.stroke();});
+  const bands=[['delta',.25+.08*Math.sin(t/70)],['theta',theta],['alpha',alpha],
+               ['beta',.32+.12*Math.sin(t/50)],['gamma',.14+.05*Math.sin(t/40)]];
+  const b=document.getElementById('bands'),y=fit(b),BW=y.W,BH=y.H;
+  y.clearRect(0,0,BW,BH);
+  bands.forEach((bd,i)=>{const row=18+i*Math.min(34,(BH-24)/5);
+    y.fillStyle=C.slate;y.font='11px '+getComputedStyle(document.body).fontFamily;y.textAlign='left';
+    y.fillText(bd[0],0,row+4);
+    y.fillStyle=C.hair;y.fillRect(56,row-7,BW-100,12);
+    y.fillStyle=bd[0]==='alpha'?C.green:C.navy;y.fillRect(56,row-7,(BW-100)*bd[1],12);
+    y.fillStyle=C.ink;y.textAlign='right';y.fillText(bd[1].toFixed(2),BW,row+4);});
+}
+
+/* ---------- 03 hrv ---------- */
+const rr=new Array(160).fill(0).map((_,i)=>820+40*Math.sin(i/12)), pup=new Array(160).fill(0), blinks=[];
+let t3=0, loadHist=new Array(120).fill(.5);
+function hrvTick(){
+  t3+=1;
+  const stress=.5+.45*Math.sin(t3/160);
+  rr.push(840-90*stress+ (Math.random()-.5)*38*(1.15-stress)); rr.shift();
+  pup.push(stress*1.6-.6+(Math.random()-.5)*.28); pup.shift();
+  if(Math.random()<.035) blinks.push(pup.length-1);
+  const c=document.getElementById('hrv'),x=fit(c),W=x.W,H=x.H; x.clearRect(0,0,W,H);
+  const rmin=700,rmax=920;
+  x.beginPath(); x.strokeStyle=C.green; x.lineWidth=1.6;
+  rr.forEach((v,k)=>{const px=W*k/rr.length, py=H*.62-(v-rmin)/(rmax-rmin)*H*.42;
+    k?x.lineTo(px,py):x.moveTo(px,py);}); x.stroke();
+  x.beginPath(); x.strokeStyle=C.blue; x.lineWidth=1.4;
+  pup.forEach((v,k)=>{const px=W*k/pup.length, py=H*.88-v*H*.17;
+    k?x.lineTo(px,py):x.moveTo(px,py);}); x.stroke();
+  blinks.forEach(k=>{const px=W*k/pup.length;
+    x.strokeStyle=C.coral;x.lineWidth=1;x.beginPath();x.moveTo(px,H*.92);x.lineTo(px,H*.99);x.stroke();});
+  for(let i=blinks.length-1;i>=0;i--){blinks[i]-=1; if(blinks[i]<0)blinks.splice(i,1);}
+  const hf=(1-stress)*0.8+0.1, load=Math.max(0,Math.min(1,stress*0.75+0.15));
+  loadHist.push(load); loadHist.shift();
+  document.getElementById('loadVal').textContent=load.toFixed(2);
+  document.getElementById('hfv').textContent=(hf*1000).toFixed(0)+' ms²';
+  document.getElementById('pup').textContent=(pup[pup.length-1]).toFixed(2)+' z';
+  document.getElementById('blk').textContent=(12+stress*14).toFixed(0)+' /min';
+  const l=document.getElementById('loadhist'),y=fit(l),LW=y.W,LH=y.H; y.clearRect(0,0,LW,LH);
+  y.fillStyle=C.hair; y.fillRect(0,LH-2,LW,1);
+  y.beginPath(); loadHist.forEach((v,k)=>{const px=LW*k/loadHist.length,py=LH-4-v*(LH-12);
+    k?y.lineTo(px,py):y.moveTo(px,py);});
+  y.lineTo(LW,LH-2); y.lineTo(0,LH-2); y.closePath(); y.fillStyle='rgba(0,60,51,.14)'; y.fill();
+  y.beginPath(); loadHist.forEach((v,k)=>{const px=LW*k/loadHist.length,py=LH-4-v*(LH-12);
+    k?y.lineTo(px,py):y.moveTo(px,py);}); y.strokeStyle=C.green; y.lineWidth=1.6; y.stroke();
+}
+
+/* ---------- 04 concordance ---------- */
+const DAYS=['-7','-6','-5','-4','-3','-2','-1'];
+const SAID=[.22,.28,.31,.26,.30,.24,.27];      // words stay calm
+const BODY=[.25,.30,.44,.58,.71,.79,.86];      // body climbs
+function drawConc(){
+  const c=document.getElementById('conc'),x=fit(c),W=x.W,H=x.H; x.clearRect(0,0,W,H);
+  const L=40,R=W-12,T=14,B=H-28, sx=k=>L+(R-L)*k/(DAYS.length-1), sy=v=>B-(B-T)*v;
+  [0,.25,.5,.75,1].forEach(g=>{x.strokeStyle=C.hair;x.lineWidth=1;x.beginPath();
+    x.moveTo(L,sy(g));x.lineTo(R,sy(g));x.stroke();
+    x.fillStyle=C.slate;x.font='10px '+getComputedStyle(document.body).fontFamily;
+    x.textAlign='right';x.fillText(g.toFixed(2),L-6,sy(g)+3);});
+  x.beginPath(); SAID.forEach((v,k)=>k?x.lineTo(sx(k),sy(v)):x.moveTo(sx(k),sy(v)));
+  for(let k=BODY.length-1;k>=0;k--) x.lineTo(sx(k),sy(BODY[k]));
+  x.closePath(); x.fillStyle='rgba(255,119,89,.22)'; x.fill();
+  [[SAID,C.ink],[BODY,C.coral]].forEach(([S,col])=>{
+    x.beginPath(); S.forEach((v,k)=>k?x.lineTo(sx(k),sy(v)):x.moveTo(sx(k),sy(v)));
+    x.strokeStyle=col; x.lineWidth=2.2; x.stroke();
+    S.forEach((v,k)=>{x.beginPath();x.arc(sx(k),sy(v),3.4,0,7);x.fillStyle=col;x.fill();});});
+  DAYS.forEach((d,k)=>{x.fillStyle=C.slate;x.font='11px '+getComputedStyle(document.body).fontFamily;
+    x.textAlign='center';x.fillText('day '+d,sx(k),B+18);});
+  const gaps=SAID.map((v,k)=>BODY[k]-v), worst=Math.max(...gaps);
+  document.getElementById('rho').textContent='0.31';
+  document.getElementById('agree').textContent='2 of 7';
+  document.getElementById('disc').textContent='5 of 7';
+  document.getElementById('gap').textContent=worst.toFixed(2)+' on day -1';
+  document.getElementById('rho').insertAdjacentHTML('afterend',
+    '<p class="sub" style="margin:2px 0 0">[-0.52, 0.81] — wide, as 7 points must be</p>');
+}
+
+/* ---------- 05 neurofeedback ---------- */
+let t5=0, nfHist=new Array(160).fill(.5), inTarget=0, run=0, best=0;
+function nfTick(){
+  t5+=1;
+  const ratio=Math.max(.05,Math.min(.95,.55+.30*Math.sin(t5/95)+.10*Math.sin(t5/23)+(Math.random()-.5)*.06));
+  nfHist.push(ratio); nfHist.shift();
+  const on=ratio>.62; if(on){inTarget++;run++;best=Math.max(best,run);}else run=0;
+  const c=document.getElementById('nf'),x=fit(c),W=x.W,H=x.H; x.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, R=Math.min(W,H)*.40;
+  x.beginPath(); x.arc(cx,cy,R,0,7); x.setLineDash([4,5]); x.strokeStyle=C.hair; x.lineWidth=1.5; x.stroke();
+  x.setLineDash([]);
+  x.beginPath(); x.arc(cx,cy,R*.62,0,7); x.strokeStyle='rgba(0,60,51,.35)'; x.lineWidth=1; x.stroke();
+  const r=R*(.30+.72*ratio);
+  const g=x.createRadialGradient(cx,cy,r*.2,cx,cy,r);
+  g.addColorStop(0, on?'rgba(0,60,51,.30)':'rgba(255,119,89,.22)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  x.beginPath(); x.arc(cx,cy,r,0,7); x.fillStyle=g; x.fill();
+  x.beginPath(); x.arc(cx,cy,r,0,7); x.strokeStyle=on?C.green:C.coral; x.lineWidth=3; x.stroke();
+  x.fillStyle=C.slate; x.font='11px '+getComputedStyle(document.body).fontFamily; x.textAlign='center';
+  x.fillText(on?'in target — hold':'drifting', cx, cy+R+22);
+  document.getElementById('nfval').textContent=ratio.toFixed(2);
+  document.getElementById('ttime').textContent=Math.round(100*inTarget/Math.max(1,t5))+'%';
+  document.getElementById('hold').textContent=(best/12).toFixed(1)+'s';
+  const h=document.getElementById('nftrace'),y=fit(h),HW=y.W,HH=y.H; y.clearRect(0,0,HW,HH);
+  y.strokeStyle=C.hair; y.setLineDash([3,3]); y.beginPath();
+  y.moveTo(0,HH-6-.62*(HH-14)); y.lineTo(HW,HH-6-.62*(HH-14)); y.stroke(); y.setLineDash([]);
+  y.beginPath(); nfHist.forEach((v,k)=>{const px=HW*k/nfHist.length, py=HH-6-v*(HH-14);
+    k?y.lineTo(px,py):y.moveTo(px,py);}); y.strokeStyle=C.navy; y.lineWidth=1.5; y.stroke();
+}
+
+// Warm the ring buffers before the first paint: a trace that starts empty reads
+// as a dead sensor for the first few seconds, which is exactly the wrong first
+// impression for a concept board.
+for(let i=0;i<520;i++){eegTick();hrvTick();nfTick();}
+drawBrain(); drawConc();
+setInterval(()=>{eegTick();hrvTick();nfTick();},80);
+window.addEventListener('resize',()=>{drawBrain();drawConc();});
+</script></body></html>

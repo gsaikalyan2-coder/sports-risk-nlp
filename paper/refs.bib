@@ -377,3 +377,38 @@
   pages   = {76--82},
   doi     = {10.1002/da.10113}
 }
+
+% ---------------------------------------------------------------------------
+% Phase 27 tooling. Cited because the media path runs these engines rather than
+% reimplementing them, and a reader reproducing the artifact needs to know which
+% engine produced the words that were then scored. Licences recorded alongside,
+% per the provenance rule in docs/data_sources.md.
+% ---------------------------------------------------------------------------
+
+% Tesseract OCR engine. Apache-2.0. https://github.com/tesseract-ocr/tesseract
+% Invoked as a subprocess (v4+ LSTM engine, --oem 1), not vendored.
+@inproceedings{Smith2007,
+  author    = {Smith, Ray},
+  title     = {An Overview of the {Tesseract} {OCR} Engine},
+  booktitle = {Proceedings of the Ninth International Conference on Document
+               Analysis and Recognition (ICDAR 2007)},
+  year      = {2007},
+  volume    = {2},
+  pages     = {629--633},
+  address   = {Curitiba, Brazil},
+  publisher = {IEEE Computer Society},
+  doi       = {10.1109/ICDAR.2007.4376991}
+}
+
+% Speech recognition for the video path. MIT-licensed model weights and code.
+% Optional: absent in a clean checkout, in which case the video path refuses
+% rather than returning an empty transcript. See src/media/extract.py.
+@inproceedings{Radford2023,
+  author    = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg
+               and McLeavey, Christine and Sutskever, Ilya},
+  title     = {Robust Speech Recognition via Large-Scale Weak Supervision},
+  booktitle = {Proceedings of the 40th International Conference on Machine
+               Learning (ICML)},
+  year      = {2023},
+  pages     = {28492--28518}
+}

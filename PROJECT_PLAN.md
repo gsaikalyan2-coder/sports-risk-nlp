@@ -508,6 +508,37 @@ Sec = Security/Ethics · Pap = Paper.
 
 ---
 
+## WEEK 8+ — Post-submission extension
+
+### Phase 26 — Cognitive layer (V1 / V3 / V5) *(stretch; starts only after Phase 23 ships)*
+- **Objective:** Add a cognitive/physiological presentation layer over the existing text pipeline —
+  a construct→brain-network atlas (V1), a cognitive-load panel from HRV + webcam oculometrics (V3),
+  and a closed-loop neurofeedback demo (V5) — **without moving a single number in the paper**.
+- **Scope decision (owner, 2026-09-13):** simulated signals only, behind a hardware-ready seam.
+  No headset, no strap, no participant. V5 ships in **demo mode**: the loop closes against a
+  simulated signal and trains nobody.
+- **Why it is safe to bolt on:** `LinearRiskScorer` has carried an unused `context` /
+  `context_weights` seam since Phase 15, with the text-only path as a separate tested code path.
+  The layer fills that slot at weight zero.
+- **Tasks:** new `src/biosignals/` package (Protocol + simulated sources + pure feature functions);
+  `src/dashboard/neurovis.py` renderers; `config/brain_atlas.yaml` with one citation per construct;
+  three new pages after Dashboard and Score; feature flag `SRN_COGNITIVE_LAYER`.
+- **Parallel agents:** Vis, Test.
+- **Deliverable:** Three widgets behind a flag; full spec in `.claude.md` §11.
+- **Gate (all four required):**
+  1. With the flag unset, the dashboard output is byte-identical to Phase 24.
+  2. `LinearRiskScorer.score()` is bit-identical with and without the context mapping.
+  3. No simulated surface renders without its provenance stamp — asserted, not reviewed.
+  4. The atlas contains no activation vocabulary and states "hypothesised association, not imaging".
+- **Blocking gate for any real signal:** `docs/ethics.md` and `docs/model_card.md` must be updated
+  **before** any physiological data from any person — including the owner's own — reaches this code.
+  V5 additionally requires ethics approval and a clinician in the loop before it runs against a
+  person, because a closed feedback loop is an intervention, not an observation.
+- **Explicitly out of scope for this phase:** real hardware, participant recruitment,
+  text↔physiology concordance (the strongest scientific item — deferred to a second paper).
+
+---
+
 ## Parallelization Map (what actually runs at once)
 
 - **Week 1:** Phase 3 fans out to 3–4 Literature agents while Phase 2 setup proceeds.
@@ -528,6 +559,7 @@ Sec = Security/Ethics · Pap = Paper.
 | 6 | 20–22 | Dashboard, security, reproducible artifact |
 | 7 | 23–25 | IEEE draft → reviewed → submission-ready |
 | 8 | buffer | Slack for slippage + final proofing |
+| 8+ | 26 | Cognitive layer V1/V3/V5 — stretch, flag-gated, simulated only |
 
 ## Risk Register (top 5)
 
@@ -535,6 +567,8 @@ Sec = Security/Ethics · Pap = Paper.
    high-quality gold set; decided in Q3 / Phase 6–7.
 2. **Weak labels too noisy** — mitigate with confidence thresholds, human gold anchor, Phase 12 refinement.
 3. **Scope creep** — mitigate by parking stretch goals (see expansion list) until core is done.
+   **Phase 26 is the live instance of this risk**: it is visually compelling, it is not on the
+   critical path to the paper, and it must not start before Phase 23 ships.
 4. **Expert-rater access** (new — Phase 17) — the expert-validation contribution needs ≥1 coach or
    sport-psych practitioner. **Start recruiting in Week 1–2**, not Week 5. Fallback: documented
    self-audit named as a limitation.
@@ -542,3 +576,63 @@ Sec = Security/Ethics · Pap = Paper.
    raise labeling load; mitigate by freezing the final set at Phase 12 after an agreement check, and
    dropping any construct with poor inter-annotator agreement.
 ```
+
+---
+
+## PHASE 27 — Media input, admission gates and the register test ✅ COMPLETE (2026-09-15)
+
+**Goal.** Let the live-scoring page accept a photograph or a short video, recover
+the words from it, and score them exactly as typed words are — while refusing
+everything that cannot honestly be scored, and without letting a face move a
+number in the paper.
+
+**Why it was not in the original 25-phase plan.** It was not. It arrived as an
+owner request during the Phase 26 deployment pass. It is recorded here as its own
+phase rather than folded into 26 because it introduces a new input modality, a
+new privacy class, and a blocking ethics gate — three things that deserve their
+own row in a plan.
+
+### Work items
+
+| # | Item | State |
+|---|---|---|
+| 27.1 | Remove "Research prototype" from headers; fix dark-mode announcement colours | ✅ |
+| 27.2 | Remove every em dash from user-facing copy | ✅ 0 remaining |
+| 27.3 | Policy selector shared across pages; the four two-sided tiles react to it | ✅ two bugs fixed |
+| 27.4 | Junk-text admission gate on the live-scoring page | ✅ `src/dashboard/gibberish.py` |
+| 27.5 | Photo and video upload, parsed and scored | ✅ `src/media/` |
+| 27.6 | Media admission gate — ignore unreadable and unwanted files | ✅ `src/media/admission.py` |
+| 27.7 | Non-verbal channel, stamped, zero-weighted, ethics-gated | ✅ `src/media/nonverbal.py` |
+| 27.8 | Register test, fitted on dev, reported on held-out | ✅ 0.85 held-out recall |
+| 27.9 | OCR direct to the upstream Tesseract engine | ✅ two dependencies removed |
+| 27.10 | `docs/ethics.md` §13 — the blocking gate, discharged | ✅ |
+| 27.11 | `docs/model_card.md` §11 | ✅ |
+| 27.12 | Deployment: `packages.txt` (HF Space) and `Dockerfile` apt layer | ✅ |
+
+### Merge gates (all met)
+
+* Every existing test green; 93 new tests added across three files.
+* Risk index **bit-identical** with and without an attached file at default weights.
+* Register test reports a held-out figure, not a development figure.
+* No new surface renders a number without its stamp.
+* `docs/ethics.md` updated **before** the media path was allowed to remain.
+
+### Two defects found and fixed during the phase
+
+1. **The policy selector never crossed pages.** Streamlit garbage-collects a
+   widget's state when that widget is not rendered on the current page, so the
+   Score page always scored under the conservative default no matter what the
+   dashboard was set to. Same defect the light/dark control had in Phase 22, same
+   fix: a plain session key.
+2. **OCR availability checked the wrong thing.** It asked whether `pytesseract`
+   and `PIL` imported. Both are pip packages that install cleanly on a machine
+   with no OCR engine — so the check returned True on exactly the machines where
+   OCR does not work, and every upload showed a coach a Python exception type.
+
+### Known limitation carried forward
+
+The default known example (`synth_precomp_v1-003481`) triggers none of the four
+two-sided constructs, so the policy selector correctly changes nothing on it.
+Both pages now report how many two-sided signals the text triggered, so a no-op
+switch explains itself rather than looking broken. **OPEN-027:** consider
+ordering the example list so the default selection demonstrates the control.

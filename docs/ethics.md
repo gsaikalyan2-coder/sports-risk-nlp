@@ -522,3 +522,139 @@ pre-submission item and a pre-release item respectively, both tracked in
 |---|---|---|
 | 1.0 | 2026-08-08 | Initial policy. Phase 5. Allow-list A1–A4 defined with prohibitions; de-identification spec written for Phase 8; non-diagnosis, limitations, and prohibited-use statements drafted paper-ready. |
 | 1.1 | 2026-08-08 | All three §11 owner decisions resolved. §3.4 institutional review determined **exempt** (documentary record pending, OPEN-005). §3.3 category **A4 confirmed** permitted with conditions 1–4 made binding. §7.1 contact route **nominated** (interim personal address; institutional replacement required before release, OPEN-006). A3/A4 collection unblocked for Phase 7. |
+
+---
+
+## 13. Phase 27 — uploaded photographs and video (added 2026-09-15)
+
+**Status: this section is the blocking gate named in `.claude.md` §11.2 and
+`CLAUDE.md` §11.2, discharged for media. It was written before the media path
+was allowed to remain in the repository, not after.**
+
+### 13.1 What changed, and why this document had to change with it
+
+Until Phase 27 every input to this system was text: synthetic text from the
+project's own generator, or text a reader typed into the live-scoring box.
+`data/gold/` is empty and no real athlete's words have ever entered the pipeline
+(OPEN-011). Sections 1–12 above are written for that world, and in that world the
+strongest privacy claim the project had to make was about a user's pasted
+sentences.
+
+Phase 27 accepts a photograph or a video. That is a different privacy class and
+it is worth being exact about why, because the difference is easy to wave away:
+
+* **A photograph of a person is biometric data in a way a sentence is not.** A
+  face identifies the person it belongs to, permanently and without their
+  further participation. A sentence about feeling nervous does not.
+* **The uploader is frequently not the subject.** A person may upload a clip of
+  a press conference, a team-mate, or somebody they do not know. The consent
+  route in §2 covers a participant supplying their own words; it does not cover
+  a third party appearing in a frame.
+* **A face invites inference that the research does not support.** The
+  affective-science literature does not establish a reliable mapping from facial
+  configuration to internal state across people, contexts and cultures. A
+  dashboard that draws one is asserting something the field does not have.
+
+### 13.2 What the system does, stated precisely
+
+1. **The risk index is produced from words.** A photograph contributes by
+   yielding words (OCR); a video contributes by yielding words (speech
+   recognition). The construct layer, the fusion layer and the explanation layer
+   are unchanged and see text only.
+2. **A non-verbal channel exists and is off.** `src/media/nonverbal.py` emits
+   three bounded scalars named for properties of a signal (`expressivity`,
+   `vocal_strain`, `steadiness`) rather than for states of a person. They enter
+   `LinearRiskScorer.context`, whose weights default to `{}`. Empty weights is
+   the text-only path, and `tests/test_media.py` asserts the index is
+   **bit-identical** with and without a file attached. Switching the channel on
+   is a visible act by the reader, and no number produced with it on appears in
+   the paper.
+3. **The default reader measures nothing.** `SimulatedNonVerbalReader` derives
+   its values deterministically from a digest of the file's bytes. It does not
+   look at a face. Its stamp says `SIMULATED ... NOT A MEASUREMENT OF A PERSON`
+   and `NonVerbalReading` refuses construction without that token in the stamp.
+4. **A reader that would look at a face is refused at construction.**
+   `GatedRealReader.__init__` raises `NonVerbalEthicsGate`. The blocker is this
+   document, not a missing model, so it is not cleared by deleting the raise.
+5. **Nothing is retained.** Uploaded bytes live in a local variable for the
+   duration of one render. There is no store, no log, no cache and no temporary
+   file: OCR streams the bytes to the engine on stdin. The view built from an
+   upload is marked non-exportable by the publication guard, exactly as pasted
+   text is, so it cannot become a paper figure.
+
+### 13.3 Retention rule
+
+Uploaded media is **not retained at any stage**. Specifically: not written to
+disk, not written to `data/`, not logged, not included in any run log under
+`logs/`, and not cached between reruns. The only persistence boundary an upload
+crosses is the Streamlit upload buffer in the serving process's memory, which is
+released when the session ends.
+
+Should any future phase need to retain an uploaded file for any reason, that is a
+change to this section first, with a stated retention period, a deletion route,
+and a named owner, before any code is written.
+
+### 13.4 Consent route
+
+The dashboard cannot obtain consent from a person who appears in a file someone
+else uploads. That is a real and unclosed gap, and it is why the deployed page
+carries the statement that this is research and decision-support only and makes
+no individual-level claim about any identifiable person.
+
+For any use beyond a person uploading their own material:
+
+* Media depicting a third party requires that party's informed consent under the
+  `docs/consent_form.md` route, extended to cover image and voice.
+* Media of a public figure from a press conference is **not** exempt. Public
+  availability of a recording is not consent to psychological inference about
+  the person in it, and §1's prohibition on claims about a named athlete's
+  mental health applies unchanged and in full.
+* A study that collects media from participants requires ethics approval before
+  collection, not before analysis.
+
+### 13.5 What remains prohibited
+
+Unchanged from §1, and restated because uploads make each of them newly
+reachable:
+
+* No claim about the psychological state of any identifiable person, whether the
+  claim came from their words, their face or their voice.
+* No clinical or diagnostic framing.
+* No retention of biometric data.
+* No use of the non-verbal channel to produce a number reported in the paper.
+* No deployment of a real (non-simulated) non-verbal reader without: this
+  section extended with a biometric retention rule; `docs/model_card.md` §11
+  extended with the reader's measured error characteristics; ethics approval;
+  and the limitation in §13.1 stated wherever the output is shown.
+
+### 13.6 The relevance gate, and what it is not
+
+`src/media/relevance.py` judges whether recovered text reads as pre-competition
+athlete self-report. Two ethical points:
+
+* It judges **words, not pictures**. The project deliberately did not build a
+  classifier for "this photograph contains an athlete", because shipping one
+  would require a labelled image set and a reported error rate that do not
+  exist, and a gate whose failure rate is unknown is the failure mode this
+  repository exists to avoid.
+* It is **advisory and does not refuse**. Off-register text is scored and
+  flagged, on the owner's decision of 2026-09-15. The flag renders above the
+  score and outside any expander, so it survives a screenshot.
+
+Its measured behaviour — 0.85 recall on a held-out split, 1 of 20 authored
+negatives passing — is reported in `docs/model_card.md` §11 and in
+`tests/test_relevance.py`. The negative set was authored by the project, so the
+false-positive figure is a sanity check and not an estimate of behaviour on real
+uploads. That limitation is stated wherever the figure appears.
+
+### 13.7 Compliance checkpoint (extends §10)
+
+| Requirement | State |
+|---|---|
+| Retention rule for uploaded media | §13.3, above. Not retained. |
+| Consent route for media | §13.4, above. Gap for third parties named. |
+| Biometric data is a distinct privacy class | §13.1, stated. |
+| Non-verbal channel cannot silently move a number | Enforced by `context_weights={}` default + bit-equality test. |
+| Real face/voice reader blocked | `GatedRealReader` raises; test asserts it fires. |
+| Relevance gate reports a number | 0.85 held-out recall; `tests/test_relevance.py`. |
+| Model card updated | `docs/model_card.md` §11. |

@@ -1,0 +1,16 @@
+# Streamlit chrome, themed to the project's design language (DESIGNcohere.md).
+#
+# Presentation only: this file sets colours for the parts of the page Streamlit
+# paints before any of our CSS runs -- the sidebar, the header, the running
+# indicator, widget defaults. It changes no behaviour, and the app renders
+# correctly without it.
+[theme]
+base = "light"
+primaryColor = "#17171c"             # near-black primary, for CTAs and focus chrome
+backgroundColor = "#ffffff"          # canvas white
+secondaryBackgroundColor = "#eeece7" # soft stone, for the sidebar and secondary fills
+textColor = "#212121"                # ink
+font = "sans serif"
+
+[server]
+headless = true

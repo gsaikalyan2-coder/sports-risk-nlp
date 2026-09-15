@@ -115,3 +115,5 @@ logs/cost_ledger.csv
 .DS_Store
 donations_inbox*.jsonl
 consent_forms/
+
+Claude outputs/

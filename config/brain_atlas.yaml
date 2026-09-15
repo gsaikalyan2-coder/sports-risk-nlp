@@ -1,0 +1,198 @@
+# Construct -> brain network map. Phase 26 / V1.
+#
+# READ THIS BEFORE CHANGING A ROW
+# ==============================================================================
+# NOTHING IN THIS FILE IS EVIDENCE THAT A CONSTRUCT ENGAGES A BRAIN REGION.
+#
+# This project has never imaged anybody, never recorded anybody, and holds no
+# neuroimaging data of any kind. `paper/refs.bib` contains thirty references and
+# not one of them is a neuroimaging study -- checked 2026-09-13, and the owner's
+# standing instruction is that nothing is to be added to it. So this file cannot
+# carry a citation for a mapping, because no such citation exists here.
+#
+# It carries two fields instead, and `src/dashboard/atlas_map.py` refuses a row
+# that is missing either:
+#
+#   instrument_anchor  The key in paper/refs.bib that supports THE CONSTRUCT --
+#                      the questionnaire it was taken from. It says nothing
+#                      whatsoever about the brain. Raedeke2001 is the Athlete
+#                      Burnout Questionnaire; Raedeke did not write about the
+#                      cingulate cortex, and this file must never be read as
+#                      claiming he did.
+#
+#   network_evidence   What supports the REGION. Every value in this file is
+#                      `none_in_repository` or `outside_athlete_population`.
+#                      There is no third state today, and a future value that
+#                      names a real source has to arrive with that source.
+#
+# The loader renders `network_evidence` as text under the figure. It is not a
+# tooltip and not a footnote, for the same reason `ScoreSurface` refuses to
+# exist without its stamp: the picture travels into a slide and the caption does
+# not follow it unless the caption is part of the picture.
+#
+# A construct with no defensible region is `unmapped: true` with a reason. That
+# is a feature. Leaving three of ten dark is what stops this figure from being
+# the "brain on fire" the Phase 26 handover warned about -- a ten-node atlas in
+# which every node always lights is a decoration, not a decomposition.
+#
+# NO NUMBER APPEARS IN THIS FILE. Node size, colour and position are computed
+# from `DashboardView.bars` at render time; a value written here would be a
+# constant nobody could trace to a measurement. The loader refuses any numeric
+# field for exactly that reason.
+# ==============================================================================
+
+version: 1
+locked_on: 2026-09-13
+phase: 26
+
+# Plain-English names for the region keys used below. The anatomical name is
+# kept beside the plain one rather than replaced by it: a coach reads "alarm
+# and conflict hub", a reviewer reads "dorsal anterior cingulate", and neither
+# has to take the other's word for what is on screen.
+regions:
+  dorsal_acc:
+    anatomical: dorsal anterior cingulate
+    plain_name: conflict and alarm hub
+  insula:
+    anatomical: insula
+    plain_name: body-sense hub
+  amygdala:
+    anatomical: amygdala
+    plain_name: threat detector
+  dlpfc:
+    anatomical: dorsolateral prefrontal cortex
+    plain_name: deliberate-control hub
+  vmpfc:
+    anatomical: ventromedial prefrontal cortex
+    plain_name: calming and appraisal hub
+  posterior_parietal:
+    anatomical: posterior parietal cortex
+    plain_name: attention-steering hub
+  posterior_cingulate:
+    anatomical: posterior cingulate
+    plain_name: self-reflection hub
+  striatum:
+    anatomical: striatum
+    plain_name: wanting and reward hub
+
+# Network keys. Two constructs that share a network get an edge in the figure;
+# the edges are derived from this file rather than drawn by hand, so a mapping
+# change moves the picture and cannot leave a stale line behind.
+networks:
+  cingulo_opercular:
+    plain_name: effort and conflict network
+  interoceptive_salience:
+    plain_name: body-signal network
+  limbic_affective:
+    plain_name: threat network
+  dorsal_attention:
+    plain_name: attention-steering network
+  medial_prefrontal_regulatory:
+    plain_name: self-regulation network
+  default_mode:
+    plain_name: inward-reflection network
+  striatal_reward:
+    plain_name: reward network
+
+constructs:
+
+  cognitive_anxiety:
+    regions: [dorsal_acc]
+    networks: [cingulo_opercular]
+    instrument_anchor: Martens1990
+    network_evidence: none_in_repository
+    rationale: >-
+      Worry and self-doubt are conventionally discussed alongside conflict
+      monitoring in the dorsal cingulate. This project has no imaging data and
+      cites no imaging study; the association is stated here as a hypothesis so
+      that a reader has something to disagree with.
+
+  somatic_anxiety:
+    regions: [insula]
+    networks: [interoceptive_salience]
+    instrument_anchor: Martens1990
+    network_evidence: none_in_repository
+    rationale: >-
+      The somatic subscale asks about racing heart, shaking and tight muscles --
+      bodily sensation reported in words. The insula is the region conventionally
+      associated with reading the body's own state. No imaging supports this row.
+
+  perceived_stress:
+    regions: [amygdala, insula]
+    networks: [limbic_affective, interoceptive_salience]
+    instrument_anchor: Cohen1983
+    network_evidence: none_in_repository
+    rationale: >-
+      Demands exceeding resources is an appraisal, not a location. The threat and
+      body-signal hubs are named here because stress is usually discussed in
+      those terms, not because anything in this repository located it there.
+
+  attentional_focus:
+    regions: [dlpfc, posterior_parietal]
+    networks: [dorsal_attention]
+    instrument_anchor: Nideffer1976
+    network_evidence: none_in_repository
+    rationale: >-
+      Where attention sits -- on the task or on the crowd -- maps onto the
+      frontoparietal steering vocabulary more cleanly than any other construct
+      here. Still a vocabulary, still not a measurement.
+
+  coping_style:
+    regions: [vmpfc]
+    networks: [medial_prefrontal_regulatory]
+    instrument_anchor: Nicholls2007
+    network_evidence: none_in_repository
+    rationale: >-
+      Task-focused coping is usually framed as deliberate regulation of an
+      affective response, which is conventionally associated with medial
+      prefrontal regions. Association only; no source in this repository.
+
+  motivation_orientation:
+    regions: [striatum]
+    networks: [striatal_reward]
+    instrument_anchor: Elliot2001
+    network_evidence: none_in_repository
+    rationale: >-
+      Approach versus avoidance is the one construct whose two poles are
+      routinely described in reward-circuit language. The atlas shows one node
+      regardless of pole, because the detector reports presence, not direction.
+
+  resilience:
+    regions: [posterior_cingulate, vmpfc]
+    networks: [default_mode, medial_prefrontal_regulatory]
+    instrument_anchor: Connor2003
+    network_evidence: none_in_repository
+    rationale: >-
+      Recovery capacity is a trajectory over time, and a static figure cannot
+      show a trajectory. This row is the weakest mapping in the file and is kept
+      only because leaving it out would imply the others are stronger than it.
+
+  burnout_signal:
+    regions: [dorsal_acc, amygdala]
+    networks: [cingulo_opercular, limbic_affective]
+    instrument_anchor: Raedeke2001
+    network_evidence: outside_athlete_population
+    rationale: >-
+      Mapped on the owner's explicit instruction, and flagged rather than
+      quietly included. The imaging literature on burnout is about OCCUPATIONAL
+      burnout in workers, not athlete burnout, and none of it is cited in this
+      repository. Athlete burnout (ABQ) and occupational burnout are different
+      instruments measuring different populations; treating a finding about one
+      as a finding about the other is the exact move this file exists to make
+      visible. The panel prints this row's evidence status beside the node.
+
+  self_confidence:
+    unmapped: true
+    instrument_anchor: Martens1990
+    # Long form, kept out of the rendered panel: self-efficacy is a belief about
+    # a future performance, and inventing a region to avoid a gap in the picture
+    # would make the whole figure untrustworthy.
+    unmapped_reason: No region-level account defensible enough to draw.
+
+  appraisal_orientation:
+    unmapped: true
+    instrument_anchor: JonesMeijen2009
+    # Long form: the model is defined by cardiac output and vascular resistance,
+    # which is exactly why it is testable. Redrawing it as a brain region would
+    # discard the one thing that makes it a good theory.
+    unmapped_reason: Cardiovascular model, not a neural one.

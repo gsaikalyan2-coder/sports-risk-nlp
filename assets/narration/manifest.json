@@ -1,0 +1,440 @@
+{
+  "version": 1,
+  "clips": [
+    {
+      "record_id": "synth_precomp_v1-003481",
+      "file": "synth_precomp_v1-003481.mp3",
+      "duration_s": 7.208,
+      "text": "Honestly, I'm just drained. I don't even care how this one goes anymore \u2014 that's where my head is at.",
+      "voice": "espeak-ng en-gb",
+      "words": [
+        {
+          "word": "Honestly,",
+          "start_s": 0.0,
+          "end_s": 0.642
+        },
+        {
+          "word": "I'm",
+          "start_s": 0.714,
+          "end_s": 0.928
+        },
+        {
+          "word": "just",
+          "start_s": 0.999,
+          "end_s": 1.285
+        },
+        {
+          "word": "drained.",
+          "start_s": 1.356,
+          "end_s": 1.927
+        },
+        {
+          "word": "I",
+          "start_s": 1.998,
+          "end_s": 2.07
+        },
+        {
+          "word": "don't",
+          "start_s": 2.141,
+          "end_s": 2.498
+        },
+        {
+          "word": "even",
+          "start_s": 2.569,
+          "end_s": 2.855
+        },
+        {
+          "word": "care",
+          "start_s": 2.926,
+          "end_s": 3.211
+        },
+        {
+          "word": "how",
+          "start_s": 3.283,
+          "end_s": 3.497
+        },
+        {
+          "word": "this",
+          "start_s": 3.568,
+          "end_s": 3.854
+        },
+        {
+          "word": "one",
+          "start_s": 3.925,
+          "end_s": 4.139
+        },
+        {
+          "word": "goes",
+          "start_s": 4.21,
+          "end_s": 4.496
+        },
+        {
+          "word": "anymore",
+          "start_s": 4.567,
+          "end_s": 5.067
+        },
+        {
+          "word": "\u2014",
+          "start_s": 5.138,
+          "end_s": 5.209
+        },
+        {
+          "word": "that's",
+          "start_s": 5.281,
+          "end_s": 5.709
+        },
+        {
+          "word": "where",
+          "start_s": 5.78,
+          "end_s": 6.137
+        },
+        {
+          "word": "my",
+          "start_s": 6.209,
+          "end_s": 6.351
+        },
+        {
+          "word": "head",
+          "start_s": 6.423,
+          "end_s": 6.708
+        },
+        {
+          "word": "is",
+          "start_s": 6.779,
+          "end_s": 6.922
+        },
+        {
+          "word": "at.",
+          "start_s": 6.994,
+          "end_s": 7.208
+        }
+      ],
+      "provenance": "SYNTHETIC SPEECH over SYNTHETIC TEXT. No athlete was recorded and no microphone was involved. The words came from this project's own generator; the voice is a formant synthesiser."
+    },
+    {
+      "record_id": "synth_precomp_v1-002391",
+      "file": "synth_precomp_v1-002391.mp3",
+      "duration_s": 7.926,
+      "text": "Put it this way, I mean to go out and take this game on and see what I'm capable of \u2014 make of that what you will.",
+      "voice": "espeak-ng en-gb",
+      "words": [
+        {
+          "word": "Put",
+          "start_s": 0.0,
+          "end_s": 0.21
+        },
+        {
+          "word": "it",
+          "start_s": 0.281,
+          "end_s": 0.421
+        },
+        {
+          "word": "this",
+          "start_s": 0.491,
+          "end_s": 0.772
+        },
+        {
+          "word": "way,",
+          "start_s": 0.842,
+          "end_s": 1.122
+        },
+        {
+          "word": "I",
+          "start_s": 1.192,
+          "end_s": 1.262
+        },
+        {
+          "word": "mean",
+          "start_s": 1.333,
+          "end_s": 1.613
+        },
+        {
+          "word": "to",
+          "start_s": 1.683,
+          "end_s": 1.824
+        },
+        {
+          "word": "go",
+          "start_s": 1.894,
+          "end_s": 2.034
+        },
+        {
+          "word": "out",
+          "start_s": 2.104,
+          "end_s": 2.315
+        },
+        {
+          "word": "and",
+          "start_s": 2.385,
+          "end_s": 2.595
+        },
+        {
+          "word": "take",
+          "start_s": 2.665,
+          "end_s": 2.946
+        },
+        {
+          "word": "this",
+          "start_s": 3.016,
+          "end_s": 3.296
+        },
+        {
+          "word": "game",
+          "start_s": 3.367,
+          "end_s": 3.647
+        },
+        {
+          "word": "on",
+          "start_s": 3.717,
+          "end_s": 3.858
+        },
+        {
+          "word": "and",
+          "start_s": 3.928,
+          "end_s": 4.138
+        },
+        {
+          "word": "see",
+          "start_s": 4.208,
+          "end_s": 4.419
+        },
+        {
+          "word": "what",
+          "start_s": 4.489,
+          "end_s": 4.769
+        },
+        {
+          "word": "I'm",
+          "start_s": 4.839,
+          "end_s": 5.05
+        },
+        {
+          "word": "capable",
+          "start_s": 5.12,
+          "end_s": 5.611
+        },
+        {
+          "word": "of",
+          "start_s": 5.681,
+          "end_s": 5.821
+        },
+        {
+          "word": "\u2014",
+          "start_s": 5.892,
+          "end_s": 5.962
+        },
+        {
+          "word": "make",
+          "start_s": 6.032,
+          "end_s": 6.312
+        },
+        {
+          "word": "of",
+          "start_s": 6.383,
+          "end_s": 6.523
+        },
+        {
+          "word": "that",
+          "start_s": 6.593,
+          "end_s": 6.873
+        },
+        {
+          "word": "what",
+          "start_s": 6.944,
+          "end_s": 7.224
+        },
+        {
+          "word": "you",
+          "start_s": 7.294,
+          "end_s": 7.505
+        },
+        {
+          "word": "will.",
+          "start_s": 7.575,
+          "end_s": 7.926
+        }
+      ],
+      "provenance": "SYNTHETIC SPEECH over SYNTHETIC TEXT. No athlete was recorded and no microphone was involved. The words came from this project's own generator; the voice is a formant synthesiser."
+    },
+    {
+      "record_id": "synth_precomp_v1-001466",
+      "file": "synth_precomp_v1-001466.mp3",
+      "duration_s": 11.649,
+      "text": "We have been on the same food and rest routine all week. Put it this way, I have spent more time on the timeline this fortnight than on preparing \u2014 anyway, that's the reality.",
+      "voice": "espeak-ng en-gb",
+      "words": [
+        {
+          "word": "We",
+          "start_s": 0.0,
+          "end_s": 0.133
+        },
+        {
+          "word": "have",
+          "start_s": 0.2,
+          "end_s": 0.466
+        },
+        {
+          "word": "been",
+          "start_s": 0.533,
+          "end_s": 0.799
+        },
+        {
+          "word": "on",
+          "start_s": 0.865,
+          "end_s": 0.998
+        },
+        {
+          "word": "the",
+          "start_s": 1.065,
+          "end_s": 1.265
+        },
+        {
+          "word": "same",
+          "start_s": 1.331,
+          "end_s": 1.598
+        },
+        {
+          "word": "food",
+          "start_s": 1.664,
+          "end_s": 1.93
+        },
+        {
+          "word": "and",
+          "start_s": 1.997,
+          "end_s": 2.197
+        },
+        {
+          "word": "rest",
+          "start_s": 2.263,
+          "end_s": 2.53
+        },
+        {
+          "word": "routine",
+          "start_s": 2.596,
+          "end_s": 3.062
+        },
+        {
+          "word": "all",
+          "start_s": 3.129,
+          "end_s": 3.328
+        },
+        {
+          "word": "week.",
+          "start_s": 3.395,
+          "end_s": 3.728
+        },
+        {
+          "word": "Put",
+          "start_s": 3.794,
+          "end_s": 3.994
+        },
+        {
+          "word": "it",
+          "start_s": 4.061,
+          "end_s": 4.194
+        },
+        {
+          "word": "this",
+          "start_s": 4.26,
+          "end_s": 4.527
+        },
+        {
+          "word": "way,",
+          "start_s": 4.593,
+          "end_s": 4.859
+        },
+        {
+          "word": "I",
+          "start_s": 4.926,
+          "end_s": 4.992
+        },
+        {
+          "word": "have",
+          "start_s": 5.059,
+          "end_s": 5.325
+        },
+        {
+          "word": "spent",
+          "start_s": 5.392,
+          "end_s": 5.725
+        },
+        {
+          "word": "more",
+          "start_s": 5.791,
+          "end_s": 6.058
+        },
+        {
+          "word": "time",
+          "start_s": 6.124,
+          "end_s": 6.39
+        },
+        {
+          "word": "on",
+          "start_s": 6.457,
+          "end_s": 6.59
+        },
+        {
+          "word": "the",
+          "start_s": 6.657,
+          "end_s": 6.856
+        },
+        {
+          "word": "timeline",
+          "start_s": 6.923,
+          "end_s": 7.455
+        },
+        {
+          "word": "this",
+          "start_s": 7.522,
+          "end_s": 7.788
+        },
+        {
+          "word": "fortnight",
+          "start_s": 7.855,
+          "end_s": 8.454
+        },
+        {
+          "word": "than",
+          "start_s": 8.52,
+          "end_s": 8.787
+        },
+        {
+          "word": "on",
+          "start_s": 8.853,
+          "end_s": 8.986
+        },
+        {
+          "word": "preparing",
+          "start_s": 9.053,
+          "end_s": 9.652
+        },
+        {
+          "word": "\u2014",
+          "start_s": 9.719,
+          "end_s": 9.785
+        },
+        {
+          "word": "anyway,",
+          "start_s": 9.852,
+          "end_s": 10.318
+        },
+        {
+          "word": "that's",
+          "start_s": 10.384,
+          "end_s": 10.784
+        },
+        {
+          "word": "the",
+          "start_s": 10.85,
+          "end_s": 11.05
+        },
+        {
+          "word": "reality.",
+          "start_s": 11.117,
+          "end_s": 11.649
+        }
+      ],
+      "provenance": "SYNTHETIC SPEECH over SYNTHETIC TEXT. No athlete was recorded and no microphone was involved. The words came from this project's own generator; the voice is a formant synthesiser."
+    }
+  ]
+}

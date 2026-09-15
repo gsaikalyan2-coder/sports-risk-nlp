@@ -1,0 +1,319 @@
+================================================================================
+HANDOVER — Phase 26 COMPLETE: Cognitive layer V1 / V3 / V5
+Repository: C:\Users\saika\sports-risk-nlp
+Written: 2026-09-13
+================================================================================
+
+PART A — PROJECT SUMMARY
+--------------------------------------------------------------------------------
+Pre-Competition Psychological Risk Profiling of Athletes. NLP x sports psychology;
+ten validated constructs detected in athlete text, fused into an interpretable
+risk index with two-level explanations. Owner: Saikalyan, SRMIST. Target: IEEE
+conference full paper.
+
+Phases 1-15 and 17-25 are the core programme; Phase 16 was skipped by decision.
+Phase 26 was a stretch phase added 2026-09-13. IT IS NOW BUILT AND GREEN.
+
+The governing constraint is unchanged and was not weakened anywhere in this
+phase: data/gold/ is empty, no number in this repository is an accuracy, and
+every figure is agreement with labels this project's own generator planted in
+synthetic text. The cognitive layer adds nothing to that and measures nobody.
+
+PHASE ORDER NOTE — READ THIS
+--------------------------------------------------------------------------------
+PROJECT_PLAN.md line 513 and the risk register at line 570 both state that
+Phase 26 must not start before Phase 23 (IEEE draft assembly) ships, and name
+Phase 26 as the live instance of the scope-creep risk.
+
+PHASE 23 HAD NOT SHIPPED WHEN THIS WORK WAS DONE. The owner was asked, on
+2026-09-13, and chose to proceed anyway as an explicit override. This paragraph
+exists so that a future session does not read PROJECT_PLAN.md and conclude the
+gate was satisfied. It was not. Phase 23 is still outstanding and is still the
+critical path to the paper.
+
+PART B — WHAT THIS SESSION DID
+--------------------------------------------------------------------------------
+Built the whole layer, in four stop-and-confirm steps, as specified in
+.claude.md section 11.
+
+STEP 0 — shared layer
+  NEW  src/biosignals/__init__.py     public surface
+  NEW  src/biosignals/sources.py      BiosignalSource Protocol, BiosignalWindow,
+                                      SimulatedSource ABC, SimulatedEEGSource,
+                                      SIMULATED_STAMP, require_simulated()
+  NEW  src/biosignals/features.py     band_power, relative_band_power,
+                                      alpha_theta_ratio (pure stdlib, no numpy)
+  NEW  src/dashboard/neurovis.py      shared renderer scaffolding
+  NEW  tests/test_biosignals.py
+
+STEP 1 — V1 brain atlas
+  NEW  config/brain_atlas.yaml        construct -> region/network map
+  NEW  src/dashboard/atlas_map.py     loader + validation
+  NEW  dashboard/pages/3_Brain_atlas.py
+  MOD  src/dashboard/neurovis.py      atlas_panel(), atlas_height()
+  MOD  src/dashboard/copy.py          ATLAS_* strings
+  MOD  src/dashboard/theme.py         cognitive_layer_enabled(),
+                                      COGNITIVE_PAGES, _cognitive_nav_css()
+  MOD  src/dashboard/widgets.py       atlas_widget()
+  NEW  tests/test_neurovis.py
+  MOD  tests/test_dashboard_pages.py  (the only existing test file edited)
+  MOD  .env.example                   SRN_COGNITIVE_LAYER documented
+
+STEP 2 — V3 cognitive load
+  MOD  src/biosignals/sources.py      SimulatedCardioOculoSource
+  MOD  src/biosignals/features.py     hf_hrv, pupil_effort, blink_rate,
+                                      load_index, LOAD_WEIGHTS, HF_BAND
+  MOD  src/dashboard/neurovis.py      load_panel(), load_height(), _smooth()
+  NEW  src/dashboard/biosources.py    the import seam (see DECISIONS below)
+  NEW  dashboard/pages/4_Cognitive_load.py
+  MOD  src/dashboard/copy.py          LOAD_* strings
+  MOD  src/dashboard/widgets.py       load_widget()
+
+STEP 3 — V5 neurofeedback, DEMO MODE
+  NEW  src/biosignals/session.py      NeurofeedbackSession, SessionState
+  MOD  src/dashboard/neurovis.py      neurofeedback_panel(),
+                                      neurofeedback_height(), ring_radius()
+  NEW  dashboard/pages/5_Neurofeedback_demo.py
+  MOD  src/dashboard/copy.py          NF_* strings
+  MOD  src/dashboard/widgets.py       neurofeedback_widget()
+
+NOT TOUCHED, as instructed: reports/results.json, src/evaluation/ablations.py,
+data/gold/, paper/refs.bib, docs/ethics.md, docs/model_card.md, any model, any
+number the paper reports. No model was retrained or re-tuned. The text<->
+physiology concordance feature was not started.
+
+TEST RESULTS
+--------------------------------------------------------------------------------
+  Full suite:            233 passed, 1 skipped (the pre-existing slow marker)
+  New suites:            121 passed  (test_biosignals.py + test_neurovis.py)
+  Dashboard suites:      75 passed, 1 skipped, with the existing files unchanged
+                         except tests/test_dashboard_pages.py
+  ruff check src dashboard tests:   All checks passed
+  ruff format --check:              clean
+
+DECISIONS TAKEN THIS SESSION (all with the owner, all binding)
+--------------------------------------------------------------------------------
+1. DESIGN LANGUAGE. The session was invoked with /material-3 while the repo
+   already runs two locked languages (DESIGNcohere.md for the dashboard,
+   DESIGNclaude.md for Page 2) and a test asserts they do not leak into each
+   other. Owner chose: Cohere tokens for structure and colour, Material 3 for
+   shape and motion only. neurovis.SHAPE maps the MD3 corner scale onto the
+   radii theme.py already publishes; neurovis.EASING and DURATION_MS carry the
+   MD3 emphasized curves. NO NEW HEX VALUE was introduced anywhere, so
+   DESIGNcohere.md remains the dashboard's single specification and the leak
+   test passes unmodified.
+
+2. THE FEATURE FLAG, AND WHY GATE #1 IS NOT LITERALLY MET.
+   .claude.md section 11.3 says that with SRN_COGNITIVE_LAYER unset "the pages
+   are not registered". THIS IS NOT BUILDABLE. Streamlit registers every .py
+   under dashboard/pages/ unconditionally and offers no API for a conditional
+   page. The owner chose the in-page guard. What ships is a two-part rule, and
+   BOTH halves are asserted:
+     (a) theme._cognitive_nav_css() emits a rule hiding the three nav entries
+         when the flag is unset, and emits nothing when it is set;
+     (b) each of the three pages reads the env var and calls st.stop() BEFORE
+         its first `src.` import, so src/biosignals is genuinely never loaded.
+   Hiding alone would leave the pages reachable by URL. Stopping alone would
+   leave three dead links in the menu. Neither half is sufficient and neither is
+   allowed to be the only one; tests/test_dashboard_pages.py section (f) checks
+   both, and checks the guard's line number against the first src. import.
+   CONSEQUENCE: app_css() output is NOT byte-identical to Phase 24 — it carries
+   one extra CSS rule. That is unavoidable once the page files exist on disk.
+   Gate #1 as literally written cannot be met by any implementation.
+
+3. THE CITATION PROBLEM (V1). paper/refs.bib holds 30 references and NOT ONE is
+   a neuroimaging study — verified 2026-09-13. .claude.md section 11.4 requires
+   every mapped row to cite a key that resolves there, which as written would
+   leave all ten constructs unmapped and the atlas empty. Seven real, verified
+   neuroscience references were found and offered; THE OWNER DECLINED, with the
+   standing instruction "don't add any article anywhere". The owner separately
+   asked for burnout_signal to be mapped, which needs a citation. The two
+   answers conflict.
+   RESOLUTION, implemented in config/brain_atlas.yaml and enforced by
+   src/dashboard/atlas_map.py: every row carries TWO fields and AtlasRow refuses
+   to be constructed without both.
+     instrument_anchor  a key that already resolves in refs.bib, supporting THE
+                        CONSTRUCT (the questionnaire it came from). Raedeke2001
+                        is the Athlete Burnout Questionnaire; Raedeke wrote
+                        nothing about the cingulate cortex and this file must
+                        never be read as claiming he did.
+     network_evidence   what supports THE REGION. Only two values exist:
+                        none_in_repository (7 rows) and
+                        outside_athlete_population (burnout_signal — the imaging
+                        work is OCCUPATIONAL burnout in workers, not athletes).
+                        Both are admissions. A third value naming real evidence
+                        has to be added to EVIDENCE_STATES beside a test, not
+                        typed into the YAML.
+   The panel prints the evidence status as text under the figure.
+
+4. MAPPED / UNMAPPED. 8 of 10 mapped. self_confidence and appraisal_orientation
+   are unmapped with stated reasons (self-efficacy has no defensible region-level
+   account; the challenge/threat model is cardiovascular, not neural). This also
+   answers the open worry recorded in handover_phase_26_cognitive_layer.txt: the
+   figure does NOT look like "a brain on fire" — two constructs never light,
+   several sit at 0.000 on any given example, and one pulls the index downward.
+
+5. THE PANELS ARE PLAYABLE. The owner asked for something that can be tried, not
+   a static diagram. All three panels have Prev / Play / Next (V5: Start /
+   Reset). Every frame is a real state — a committed DashboardView for V1,
+   a real BiosignalWindow from a seeded source for V3, a real SessionState for
+   V5. The tween only fills the gap between states the fixture or the simulator
+   already produced; nothing is interpolated into existence.
+
+6. ON-PANEL COPY IS DELIBERATELY SHORT. An earlier draft carried full paragraphs
+   in the panels and the owner cut them. The panel is looked at, not read: long
+   copy was scrolled past, which made the caveats LESS visible, not more. The
+   gate wording is unaffected — it lives in the stamp and the caption, which are
+   the two places a crop cannot remove.
+
+THE HONESTY MECHANISMS, AND WHERE THEY LIVE
+--------------------------------------------------------------------------------
+Every one is enforced by construction and asserted by a test. None is a comment.
+
+  BiosignalWindow.__post_init__      refuses a stamp that does not say SIMULATED;
+                                     copies the channel and feature mappings into
+                                     MappingProxyType, because a frozen dataclass
+                                     holding a caller's live dict is frozen in
+                                     name only
+  SimulatedSource                    an abstract base class, NOT a flag.
+                                     BiosignalSource is a runtime-checkable
+                                     Protocol, so isinstance against it checks
+                                     only that attribute names exist — an object
+                                     with `simulated = True` glued on passes it.
+                                     require_simulated() checks the CLASS.
+                                     tests/test_biosignals.py builds exactly that
+                                     impostor, named "polar-h10", asserts the
+                                     Protocol is satisfied, and asserts the gate
+                                     refuses it anyway.
+  require_simulated()                the ethics gate. Returns the source rather
+                                     than a bool, so the call cannot be written
+                                     and then ignored. Its exception message
+                                     names docs/ethics.md, docs/model_card.md and
+                                     the clinician requirement, because a future
+                                     session meets the exception before it meets
+                                     .claude.md section 11.2.
+  AtlasRow.__post_init__             refuses a mapped row with no
+                                     network_evidence, no anchor, or no rationale
+  atlas_map._reject_numbers()        walks the parsed YAML recursively and
+                                     refuses ANY number anywhere — a field nobody
+                                     thought of is exactly the field a
+                                     key-by-key check lets through
+  neurovis.assert_no_activation_vocabulary()
+                                     word-bounded, not substring. This is the
+                                     OPPOSITE choice from
+                                     view.assert_no_forbidden_language, and the
+                                     difference is pinned by a test so nobody
+                                     "fixes" one to match the other: there a
+                                     loose match is the safe direction ("detection
+                                     accuracy" must be caught); here it is the
+                                     unsafe one, because a rule that fires on
+                                     "physical activity" gets relaxed rather than
+                                     obeyed.
+  Widget.__post_init__               all three new summary tiles carry the stamp
+                                     of the surface they came from
+  NeurofeedbackSession               a pure state machine. Every V5 counter is
+                                     computed by code that has never heard of a
+                                     ring or a browser, and is checked against a
+                                     hand-written ratio sequence.
+
+DEFINITION OF DONE — STATUS OF ALL FIVE
+--------------------------------------------------------------------------------
+1. Flag unset => dashboard byte-identical.
+   PARTIAL, AND UNAVOIDABLY SO. app_css() carries one extra rule (the nav-hiding
+   selector). src/biosignals is genuinely never imported — verified by AST on
+   all three page sources and by checking sys.modules. See DECISION 2.
+2. LinearRiskScorer.score() bit-identical with and without the context mapping.
+   MET. Asserted twice, with a real BiosignalWindow rather than a hand-written
+   dict: once for the EEG source and once for the cardio/oculo source, checking
+   index, raw_score, contributions and context_used. scorer.context_weights is
+   asserted empty in the same test.
+3. No simulated surface renders without its provenance stamp.
+   MET. The window cannot exist without one; the panel renders stamp_row() as
+   its first element; the ordering is asserted, not just the presence.
+4. The atlas states "hypothesised association, not imaging" and carries no
+   activation vocabulary. Inert constructs keep three channels.
+   MET. The caveat appears at least twice per render and survives stripping
+   every title/aria attribute (asserted). Inert nodes: hatched fill, dashed
+   outline, and the literal word in the row beside the figure.
+5. All existing tests green plus the new suites.
+   MET. 233 passed, 1 skipped. No existing test file edited except
+   tests/test_dashboard_pages.py, and only to add section (f) and to generalise
+   one rule (see below).
+
+THE ONE EXISTING RULE THAT WAS GENERALISED
+--------------------------------------------------------------------------------
+test_every_page_that_shows_a_number_shows_the_stamp_before_any_expander
+matched the literal string "risk.stamp". Pages 4 and 5 take their stamp off a
+BiosignalWindow or a source, so the rule silently stopped applying to them — the
+same defect shape as the filename-scoped import rule that Phase 20 recorded. It
+now matches any `.stamp` access. The rule is strictly stronger than before.
+
+DEFECTS FOUND BY RENDERING THE PAGE, NOT BY THE TESTS
+--------------------------------------------------------------------------------
+Recorded because the pattern keeps repeating and the next session should budget
+for it. All five passed every unit test at the moment they were found.
+
+  * Four legend swatches rendered as nothing. The CSS class was derived from the
+    caption's first word, producing `sw-hollow,`. Every string was present in
+    the document, so nothing failed. Now asserted by
+    test_every_legend_swatch_has_a_matching_rule, which checks the join the
+    renderer actually relies on.
+  * The evidence column wrapped to ten lines per row and pushed the figure off
+    the top of the panel. Split into a short cell form plus the full sentence
+    once below.
+  * The cerebellum floated detached from the cortex — twice, because its
+    coordinates came from a canvas of a different shape. Deleted rather than
+    nudged a third time, then reinstated only when the outline was rebuilt to
+    real proportions.
+  * atlas_height() was short by 1,049 pixels. In Streamlit that means the
+    evidence table and the unmapped list — the honesty material — are simply not
+    on the page. All three height functions are now MEASURED (headless render,
+    card bounding box read back) and a test asserts the declared height clears
+    the measured floor.
+  * The pupil trace rendered as a band of static, because it is a slow level
+    plus per-sample noise at 600 points. Smoothed for display only; a test
+    asserts pupil_effort is still computed from the RAW series, because if it
+    were ever computed from the smoothed one the panel would silently disagree
+    with its own caption.
+
+WHAT REMAINS OPEN
+--------------------------------------------------------------------------------
+  * PHASE 23 (IEEE draft assembly) is still outstanding and is the critical path.
+  * docs/ethics.md and docs/model_card.md are STILL NOT UPDATED, deliberately.
+    The blocking gate is unchanged: the moment any real physiological signal from
+    any person — INCLUDING THE OWNER'S OWN — reaches this code, both documents
+    must be updated FIRST, with a consent route, a retention rule, and a
+    statement that physiological data is a different privacy class from synthetic
+    text. V5 additionally needs ethics approval and a clinician in the loop
+    before it runs against a person, because a closed feedback loop is an
+    intervention, not an observation.
+  * Text <-> physiology concordance (concept panel 04) remains deferred. It was
+    the strongest scientific item and is the natural second paper; it reuses V3's
+    source layer entirely.
+  * Real hardware (Muse / OpenBCI / Polar H10) drops in behind BiosignalSource
+    with no page change, and is gated on the ethics work above.
+  * config/brain_atlas.yaml carries no neuroimaging citation for any region
+    because none exists in this repository. If refs.bib ever gains real imaging
+    references, add a third value to atlas_map.EVIDENCE_STATES beside a test —
+    do not loosen the field.
+  * neurokit2 is still NOT a dependency and should stay out until a real source
+    lands.
+
+HOW TO RUN IT
+--------------------------------------------------------------------------------
+  Tests:      pytest -q
+  Lint:       ruff check src dashboard tests  &&  ruff format --check src dashboard tests
+  App:        set SRN_COGNITIVE_LAYER=1
+              docker compose restart dashboard
+              http://localhost:8501
+              Nav: Dashboard -> Score my own text -> Brain atlas -> Cognitive
+              load -> Neurofeedback (demo)
+  With the flag unset the three pages are hidden from the nav and stop before
+  importing anything.
+
+  Known environment issue: a Windows update of 2026-09-08 breaks the Cowork
+  workspace folder mount ("no Plan9 drive shares mounted"). This session worked
+  around it by staging files into the cloud container, building and testing
+  there, and committing back. Verify the mount with one call before choosing an
+  approach.
+================================================================================

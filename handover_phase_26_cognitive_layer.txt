@@ -1,0 +1,130 @@
+================================================================================
+HANDOVER — Phase 26 (planned, not started): Cognitive layer V1 / V3 / V5
+Repository: C:\Users\saika\sports-risk-nlp
+Written: 2026-09-13
+================================================================================
+
+PART A — PROJECT SUMMARY
+--------------------------------------------------------------------------------
+Pre-Competition Psychological Risk Profiling of Athletes. NLP x sports psychology;
+ten validated constructs detected in athlete text, fused into an interpretable
+risk index with two-level explanations. Owner: Saikalyan, SRMIST. Target: IEEE
+conference full paper.
+
+Phases 1-15 and 17-25 are the core programme; Phase 16 was skipped by decision.
+Phase 26 is a NEW stretch phase added on 2026-09-13. It has not been started.
+It must not start before Phase 23 (IEEE draft assembly) ships.
+
+The governing constraint is unchanged: data/gold/ is empty, no number in this
+repository is an accuracy, and every figure is agreement with labels this
+project's own generator planted in synthetic text.
+
+PART B — WHAT THIS SESSION PRODUCED
+--------------------------------------------------------------------------------
+Planning only. No code was written and no existing behaviour changed.
+
+Decisions taken by the owner, 2026-09-13:
+  * V1 = construct -> brain network atlas
+  * V3 = cognitive load from HRV + webcam oculometrics
+  * V5 = closed-loop neurofeedback session, DEMO MODE ONLY (no human subject)
+  * Data source: simulated only, behind a hardware-ready seam. No headset, no
+    strap, no participant, no recording.
+  * Widgets are positioned after the Dashboard and Score pages, in the order
+    V1, V3, V5.
+  * Documents to update: .claude.md, PROJECT_PLAN.md, this handover.
+  * docs/ethics.md and docs/model_card.md deliberately NOT updated - see the
+    blocking gate below.
+
+Files written this session:
+  CLAUDE.md          - new section 11 (Cognitive Layer), ~290 lines. Sections 0-10
+                       unchanged except the file tree in section 7, which gained
+                       src/biosignals/ and config/brain_atlas.yaml.
+  PROJECT_PLAN.md    - new "WEEK 8+" band with Phase 26, its four-part gate, the
+                       ethics gate, a timeline row and a risk-register note.
+  handover_phase_26_cognitive_layer.txt - this file.
+
+Nothing under src/, dashboard/ or tests/ was touched. The 74 dashboard tests are
+unaffected because no code changed.
+
+THE ARCHITECTURAL FINDING THAT MAKES THIS PHASE CHEAP
+--------------------------------------------------------------------------------
+src/risk/fusion.py has carried an unused integration seam since Phase 15:
+LinearRiskScorer.score() accepts a `context` mapping and ignores it unless
+`context_weights` were configured, and RiskScore propagates `context_used` into
+the explanation. The docstring records the intent: "the text-only path is not
+merely the default; it is a separate, tested code path, so adding context cannot
+silently change the index."
+
+Phase 26 fills that slot at weight zero. The existing test proving the text-only
+path is numerically identical becomes the regression guard for the whole layer.
+
+BLOCKING GATE - READ BEFORE WRITING ANY CODE
+--------------------------------------------------------------------------------
+Nothing in Phase 26 touches a human being. The moment that changes - including
+the owner recording himself - docs/ethics.md and docs/model_card.md must be
+updated FIRST, with a consent route, a retention rule, and a statement that
+physiological data is a different privacy class from synthetic text.
+
+V5 is additionally an INTERVENTION, not an observation: a closed feedback loop
+changes the behaviour of the person in it. Before V5 runs against any person it
+needs ethics approval and a clinician in the loop. The plan specifies a guard in
+src/biosignals/sources.py that refuses any non-simulated source until then, and
+the V5 page refuses to render unless the configured source is a SimulatedSource.
+
+BUILD ORDER
+--------------------------------------------------------------------------------
+  shared (src/biosignals/{sources,features}.py + src/dashboard/neurovis.py)
+     |-- V1  brain atlas        (independent; needs no source; ship first)
+     |-- V3  cognitive load     (needs sources + features)
+            |-- V5  neurofeedback (needs V3's source + feature layer)
+
+V1 first: it is independent, it demos well, and it exercises neurovis.py before
+the biosignal layer is on the critical path.
+
+FILES THE NEXT SESSION WILL CREATE OR MODIFY
+--------------------------------------------------------------------------------
+New:
+  src/biosignals/__init__.py          public surface
+  src/biosignals/sources.py           Protocol, BiosignalWindow, simulated sources,
+                                      mandatory SIMULATED stamp, ethics guard
+  src/biosignals/features.py          band power, HF-HRV, pupil, blink, load index
+  src/biosignals/session.py           NeurofeedbackSession state machine (V5)
+  src/dashboard/neurovis.py           the three panel renderers
+  src/dashboard/atlas_map.py          loads + validates config/brain_atlas.yaml
+  config/brain_atlas.yaml             construct -> network, one citation per row
+  dashboard/pages/3_Brain_atlas.py
+  dashboard/pages/4_Cognitive_load.py
+  dashboard/pages/5_Neurofeedback_demo.py
+  tests/test_biosignals.py
+  tests/test_neurovis.py
+
+Modified:
+  src/dashboard/copy.py               plain-English copy (screened at import)
+  src/dashboard/theme.py              panel surfaces for the new modes
+  src/dashboard/__init__.py           exports
+  tests/test_dashboard_pages.py       shell rules must walk the three new pages
+  .env.example                        document SRN_COGNITIVE_LAYER
+
+DEFINITION OF DONE
+--------------------------------------------------------------------------------
+  1. SRN_COGNITIVE_LAYER unset  =>  dashboard byte-identical to Phase 24 output.
+  2. LinearRiskScorer.score() bit-identical with and without the context mapping.
+  3. No simulated surface renders without its provenance stamp - asserted.
+  4. The atlas states "hypothesised association, not imaging" and contains no
+     activation vocabulary ("activity", "activation", "fMRI", "measured").
+  5. All existing tests green (74 at time of writing) plus the new suites.
+
+OPEN / DEFERRED
+--------------------------------------------------------------------------------
+  * Text<->physiology concordance (concept panel 04) was the strongest scientific
+    item and was NOT selected for this phase. It is the natural second paper and
+    reuses V3's source layer entirely. Reconsider after submission.
+  * Real hardware (Muse / OpenBCI / Polar H10) and participant recruitment are
+    out of scope for Phase 26 and gated on the ethics work above.
+  * The atlas will usually look like "a brain on fire" because six of the ten
+    constructs only push upward under the conservative policy. Decide whether
+    that is the honest story or an artefact of the weighting before it goes in
+    front of a reviewer.
+  * Visual reference for all three panels, approved 2026-09-13:
+    reports/cognitive_concepts.html
+================================================================================

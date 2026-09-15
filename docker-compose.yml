@@ -61,6 +61,18 @@ services:
     # sys.path[0], so `import src.dashboard` fails without this. (Phase 22 fix.)
     environment:
       PYTHONPATH: /app
+      # Phase 26 cognitive layer, substituted from the shell or from .env.
+      #
+      # The layer now defaults to ON in code, so this line is a pass-through for
+      # anyone who wants to turn it OFF from outside the container, not the
+      # mechanism that turns it on. It is kept because the alternative -- an
+      # env var the container silently cannot see -- is what cost three rounds
+      # of debugging when the default was the other way round.
+      #
+      # NOTE: `docker compose restart` reuses the existing container and does
+      # NOT re-read this file. After changing anything here run
+      # `docker compose up -d dashboard`.
+      SRN_COGNITIVE_LAYER: ${SRN_COGNITIVE_LAYER:-1}
     command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"

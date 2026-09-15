@@ -210,6 +210,7 @@ sports-risk-nlp/
 ├── docker-compose.yml          # agent services + dashboard
 ├── config/
 │   ├── taxonomy.yaml           # construct schema (Sec. 3)
+│   ├── brain_atlas.yaml        # [Phase 26] construct → network map, one citation per row
 │   ├── model_routing.yaml      # cost-aware tiers (Sec. 5)
 │   └── settings.yaml
 ├── data/
@@ -225,11 +226,12 @@ sports-risk-nlp/
 │   ├── labeling/               # cost-aware LLM labeling
 │   ├── models/                 # baselines + transformer
 │   ├── risk/                   # construct → risk fusion + calibration
+│   ├── biosignals/             # [Phase 26] simulated EEG/cardio sources + pure features
 │   ├── explainability/
 │   ├── evaluation/
 │   └── agents/                 # CrewAI/AutoGen agent + crew definitions
 ├── notebooks/                  # EDA, error analysis (exploration only)
-├── dashboard/                  # Streamlit app
+├── dashboard/                  # Streamlit app (multipage: app.py + pages/)
 ├── reports/                    # metrics, figures, explanations
 ├── paper/                      # IEEE LaTeX, refs.bib, figures
 ├── tests/                      # pytest
@@ -301,3 +303,390 @@ sports-risk-nlp/
 Still using defaults from §6 (Python 3.11, Docker, HF transformers, DeBERTa/RoBERTa, scikit-learn,
 SHAP, W&B, Streamlit, LaTeX). Flag if you want to change any.
 ```
+
+---
+
+## 11. Cognitive Layer — V1 / V3 / V5 (planned, not built)
+
+> **Status: plan only.** Nothing in this section exists in the repository yet. It is written so a
+> fresh session can build it without re-deciding anything. Owner decisions of 2026-09-13 are
+> recorded in §11.1 and are binding on the sections below.
+
+### 11.1 Owner decisions (locked 2026-09-13)
+
+| Question | Decision |
+|---|---|
+| What V1 / V3 / V5 are | **V1** = construct→brain network atlas · **V3** = cognitive load from HRV + webcam oculometrics · **V5** = closed-loop neurofeedback session |
+| Data source | **Simulated only, behind a hardware-ready seam.** No headset, no strap, no participant. |
+| V5 scope | **Demo mode only, no human subject.** The loop closes against a simulated signal. |
+| Documents updated | This file, `PROJECT_PLAN.md` (new Phase 26), `handover_phase_26_cognitive_layer.txt` |
+| Documents deliberately *not* updated | `docs/ethics.md`, `docs/model_card.md` — see the gate in §11.2 |
+
+### 11.2 The constraint that governs this whole section
+
+`data/gold/` is empty and no number in this repository is an accuracy. The cognitive layer makes
+that problem **worse**, not better, because a brain graphic is the most over-read object in sports
+technology and a simulated one is indistinguishable from a measured one at a glance.
+
+Three rules, enforced by construction rather than by convention:
+
+1. **A simulated source cannot be constructed without stamping itself.** `SimulatedSource` raises on
+   an empty provenance string, exactly as `ScoreSurface` raises without `PROVISIONAL_STAMP` and
+   `Band` raises without its caveat. A panel renders the stamp or it does not render.
+2. **The risk index does not move.** All three features write into `LinearRiskScorer`'s existing
+   `context` mapping with `context_weights={}`. The text-only path is already a separate, tested code
+   path (`src/risk/fusion.py` §"score"), and the existing test that the index is numerically identical
+   with and without context becomes the regression guard for the entire layer.
+3. **The atlas is a hypothesis, not an image.** Every node carries "hypothesised association, not
+   imaging" in text, not in a tooltip. No node is ever labelled with an activation value.
+
+**Ethics gate (blocking).** `docs/ethics.md` and `docs/model_card.md` were deliberately left
+untouched because nothing here touches a human. **The moment any real physiological signal from any
+person enters this code — including the owner's own — both documents must be updated first**, with a
+consent route, a retention rule, and a statement that physiological data is a different privacy class
+from synthetic text. V5 additionally requires ethics approval and a clinician in the loop before it
+runs against a person, because a closed feedback loop is an intervention rather than an observation.
+A `# BLOCKED UNTIL ETHICS SIGN-OFF` guard in `src/biosignals/sources.py` refuses any non-simulated
+source until that happens.
+
+### 11.3 Shared architecture (built once, used by all three)
+
+The layer copies the architecture the dashboard already proved, rather than inventing one.
+
+- **`src/biosignals/` — a new pure-Python package.** No ML stack, no Streamlit import, fully unit
+  tested. Same shape as `src/dashboard/`: a `Protocol` with swappable backends, frozen dataclasses,
+  guards in `__post_init__`.
+- **`BiosignalSource` Protocol** mirroring `PredictionBackend`. `SimulatedEEGSource` and
+  `SimulatedCardioOculoSource` ship now; `MuseSource` / `OpenBCISource` / `PolarH10Source` drop in
+  later behind the same interface with no page change.
+- **Feature flag.** `SRN_COGNITIVE_LAYER=1`. When unset the pages are not registered and
+  `src/biosignals` is never imported, so the dashboard is byte-identical to today.
+- **Widget placement.** Navigation order becomes **Dashboard → Score my own text → Brain atlas →
+  Cognitive load → Neurofeedback (demo)**. Each feature is a page *and* exposes a compact summary
+  tile built through the existing `src/dashboard/widgets.py::Widget` contract, so the same three
+  features can appear as tiles appended after the existing grid on the dashboard.
+
+**Files created once, shared by all three features**
+
+| File | Change |
+|---|---|
+| `src/biosignals/__init__.py` | new — public surface, mirrors `src/dashboard/__init__.py` |
+| `src/biosignals/sources.py` | new — `BiosignalSource` Protocol, `BiosignalWindow` frozen dataclass, `SimulatedEEGSource`, `SimulatedCardioOculoSource`, mandatory `SIMULATED_STAMP`, ethics guard |
+| `src/biosignals/features.py` | new — pure functions: band power, RR→HF-HRV, pupil z-score, blink rate, load index. No I/O |
+| `src/dashboard/neurovis.py` | new — SVG/HTML renderers for all three panels, theme-token driven, light+dark |
+| `src/dashboard/copy.py` | modified — plain-English copy for the three features, screened at import by the existing `_screen()` walk |
+| `src/dashboard/theme.py` | modified — three extra panel surface entries in `motion._SURFACES` style; no new colour outside the documented palettes |
+| `src/dashboard/__init__.py` | modified — export the new renderers |
+| `tests/test_biosignals.py` | new — source, feature and stamp tests |
+| `tests/test_neurovis.py` | new — render-surface and honesty tests for all three panels |
+| `tests/test_dashboard_pages.py` | modified — the existing shell rules must walk the three new pages too |
+| `.env.example` | modified — document `SRN_COGNITIVE_LAYER` |
+
+---
+
+## 11.4 V1 — Construct → Brain Network Atlas
+
+### Feature overview
+Maps each of the ten detected constructs onto the brain network the sports-psychology and cognitive
+neuroscience literature associates with it, and lights that network in proportion to the construct's
+detection strength and its signed push on the risk index. It converts the existing text decomposition
+into an anatomical vocabulary a coach or a reviewer reads instantly — **without measuring anything
+new**. It is the project's highest-impact demo asset and its highest misreading risk.
+
+### Widget specification
+- **Page:** `dashboard/pages/3_Brain_atlas.py` — third in nav, after Dashboard and Score.
+- **Component:** `neurovis.atlas_panel(view, *, mode)` → one self-contained HTML document mounted
+  with `st.components.v1.html`, same pattern as `motion_panel`.
+- **State:** reads `st.session_state["mode"]` (appearance) and `["example_id"]` / `["policy_label"]`
+  so the atlas shows the same record the dashboard is showing. Writes nothing.
+- **Props:** a `DashboardView` and a mode string. No new numbers are computed in the page.
+- **UI behaviour:** node radius and glow ∝ `ConstructBar.probability`; node hue = sign of
+  `contribution` (coral raises, deep green lowers, hairline for inert); edge weight ∝ min of the two
+  endpoint probabilities; inert constructs keep the dashed ring and the literal word "inert". Hovering
+  a node reveals the construct, its two numbers, and the citation anchor. A persistent caption under
+  the figure reads *"hypothesised association, not imaging"*.
+- **Summary tile:** "Networks engaged — N of 10", appended after the existing dashboard grid.
+
+### Files affected
+| File | Change |
+|---|---|
+| `config/brain_atlas.yaml` | **new** — construct → network(s) map, one citation per row, mirroring the `instrument_anchor` convention already used in `config/taxonomy.yaml` |
+| `src/dashboard/neurovis.py` | **new** (shared) — `atlas_panel()`, `atlas_height()` |
+| `src/dashboard/atlas_map.py` | **new** — loads and validates `brain_atlas.yaml`; refuses a construct with no citation |
+| `dashboard/pages/3_Brain_atlas.py` | **new** — the page shell, renderer only |
+| `src/dashboard/copy.py` | **modified** — `ATLAS_PLAIN`, `ATLAS_CAVEAT`, per-network plain names |
+| `tests/test_neurovis.py` | **new** — atlas honesty tests |
+| `reports/cognitive_concepts.html` | **existing** — the approved visual reference for this panel |
+
+### Implementation steps
+1. Write `config/brain_atlas.yaml`: for each of the ten constructs, one or two networks with a short
+   rationale and a citation key that resolves in `paper/refs.bib`. **Do not invent a mapping for a
+   construct with no defensible source** — leave it unmapped and let the loader mark it "unmapped".
+2. Build `atlas_map.py` to load, validate and freeze that file. Validation refuses: a construct absent
+   from the taxonomy, a mapping with an empty citation, and any numeric field (there are none — this
+   file carries no values).
+3. Add `atlas_panel()` to `neurovis.py`: reads only `view.bars`, emits SVG, takes all colour from
+   `theme.palette(mode)`.
+4. Add the copy strings, which the existing import-time screen will check for forbidden vocabulary.
+5. Build the page shell — imports only from `src.dashboard`, constructs no view, renders the stamp
+   before any expander.
+6. Add the summary tile via `widgets.Widget` so the dashboard grid can carry it.
+7. Write the tests in §Testing below before wiring the flag on.
+
+### Dependencies & integration points
+- **Consumes:** `DashboardView.bars`, `plain.CONSTRUCTS`, `theme.palette`, `widgets.Widget`.
+- **Depends on nothing new at runtime** — no biosignal source, no hardware. V1 can ship alone.
+- **Cross-feature:** none. V3 and V5 do not read the atlas; the atlas does not read them.
+
+### Testing & validation
+- Every construct in the live taxonomy has a row in `brain_atlas.yaml`, or is explicitly `unmapped`.
+- Every mapped row carries a citation key that exists in `paper/refs.bib`.
+- The rendered panel contains the string "hypothesised association, not imaging".
+- The panel contains no activation-shaped vocabulary: assert absence of "activity", "activation",
+  "fMRI", "measured" in the rendered surface.
+- Inert constructs render the dashed ring, the muted hue **and** the word "inert" — three channels, as
+  `charts.py` already requires.
+- Node intensities equal `ConstructBar.probability` to 3 dp — the panel introduces no number the view
+  does not carry.
+- Renders identically with the webfont blocked (SVG carries no font file).
+
+---
+
+## 11.5 V3 — Cognitive Load (HRV + webcam oculometrics)
+
+### Feature overview
+A live load index from two cheap, non-invasive channels: heart-rate variability as a parasympathetic
+index and webcam-derived pupil and blink behaviour as an effort/attention proxy. Today it runs on a
+simulated source; the same panel accepts a Polar H10 and a webcam later without changing. It is the
+fastest route to a *real* athlete because nobody objects to a chest strap.
+
+### Widget specification
+- **Page:** `dashboard/pages/4_Cognitive_load.py` — fourth in nav.
+- **Component:** `neurovis.load_panel(window, *, mode)` where `window` is a frozen
+  `BiosignalWindow`.
+- **State:** `st.session_state["mode"]`; a session-scoped rolling buffer of the last N windows held in
+  a `deque` inside the source object, never in Streamlit state.
+- **Props:** a `BiosignalWindow` and a mode string.
+- **UI behaviour:** RR-interval tachogram and pupil trace on a shared time axis with blink ticks; one
+  load meter on the **same uncalibrated-ranking footing as the risk index** — no bands, no
+  thresholds, the caption states "ranking only, not calibrated". Three supporting rows: HF-HRV,
+  pupil effort, blink rate. A visible "SIMULATED" chip.
+- **Summary tile:** "Load index" with its stamp, appended after the grid.
+
+### Files affected
+| File | Change |
+|---|---|
+| `src/biosignals/sources.py` | **new** (shared) — `SimulatedCardioOculoSource` |
+| `src/biosignals/features.py` | **new** (shared) — `hf_hrv()`, `pupil_effort()`, `blink_rate()`, `load_index()` |
+| `src/dashboard/neurovis.py` | **modified** — `load_panel()`, `load_height()` |
+| `dashboard/pages/4_Cognitive_load.py` | **new** — page shell |
+| `src/dashboard/copy.py` | **modified** — `LOAD_PLAIN`, `LOAD_NOT_CALIBRATED` |
+| `tests/test_biosignals.py` | **new** — feature-function tests with known inputs |
+| `requirements-base.txt` | **modified** — `neurokit2` only when a real source lands; **not now** |
+
+### Implementation steps
+1. Define `BiosignalWindow` (frozen): timestamp, source name, provenance stamp, and a mapping of
+   named scalar features. Refuses construction without a stamp.
+2. Implement `SimulatedCardioOculoSource`: plausible RR series with a slow arousal drift, pupil
+   z-scores correlated to that drift, Poisson blinks. Seeded, so a screenshot is reproducible.
+3. Implement the four pure feature functions with hand-checked fixtures (a constant RR series must
+   give HF-HRV ≈ 0; a doubling of variance must raise it monotonically).
+4. Implement `load_index()` as an explicit weighted sum with the weights named in the docstring —
+   **no learned weights, nothing fitted**, because there is no outcome to fit against.
+5. Build `load_panel()` and the page shell.
+6. Wire the features into `LinearRiskScorer.context` at zero weight and assert the index is unchanged.
+
+### Dependencies & integration points
+- **Consumes:** `src/biosignals/*`, `theme`, `copy`.
+- **Feeds:** the `context` mapping of `LinearRiskScorer`, at weight 0.
+- **Cross-feature:** **V5 depends on V3's source and feature layer.** Build V3 first; V5 reuses
+  `BiosignalWindow` and the band-power path rather than defining its own.
+
+### Testing & validation
+- A `BiosignalWindow` without a stamp raises.
+- Feature functions match hand-computed values on fixed fixtures.
+- The load index is monotone in each input, holding the others fixed.
+- The panel renders "ranking only" and "not calibrated", and contains **no band label** — assert the
+  absence of "low", "moderate", "high", "elevated" as standalone labels.
+- With `context_weights={}`, `LinearRiskScorer.score()` returns bit-identical output with and without
+  the context mapping — reuses the existing Phase 15 test.
+- The source is seeded: two runs with the same seed produce identical windows.
+
+---
+
+## 11.6 V5 — Closed-Loop Neurofeedback (demo mode)
+
+### Feature overview
+An attention-training visual driven by a live alpha/theta ratio: a ring that expands while the
+athlete holds the target state and contracts when attention drifts, with time-in-target and
+longest-hold reported for the session. **In this phase the loop closes against a simulated signal and
+no human is being trained** — it is a demonstration of the mechanism, not an intervention.
+
+### Widget specification
+- **Page:** `dashboard/pages/5_Neurofeedback_demo.py` — fifth in nav. The filename carries `_demo`
+  deliberately; the nav label must read "Neurofeedback (demo)".
+- **Component:** `neurovis.neurofeedback_panel(session, *, mode)`.
+- **State:** a `NeurofeedbackSession` dataclass (elapsed, time-in-target, longest hold, target
+  threshold) held in `st.session_state["nf_session"]`; Start / Stop / Reset buttons.
+- **UI behaviour:** ring radius ∝ alpha/theta ratio; ring colour switches at the target threshold;
+  a dashed reference circle marks the target; a trace below shows the ratio against the threshold
+  line. Session stats update once per tick. A red banner states the demo-mode limitation at all times.
+- **Summary tile:** "Time in target" for the last demo session.
+
+### Files affected
+| File | Change |
+|---|---|
+| `src/biosignals/session.py` | **new** — `NeurofeedbackSession` state machine; pure, no Streamlit |
+| `src/biosignals/sources.py` | **modified** — `SimulatedEEGSource` gains the band-power path V5 needs |
+| `src/dashboard/neurovis.py` | **modified** — `neurofeedback_panel()` |
+| `dashboard/pages/5_Neurofeedback_demo.py` | **new** — page shell |
+| `src/dashboard/copy.py` | **modified** — `NF_PLAIN`, `NF_DEMO_ONLY`, `NF_ETHICS_GATE` |
+| `tests/test_biosignals.py` | **modified** — session state machine tests |
+| `docs/ethics.md` | **NOT modified now — blocking gate before any human use** (§11.2) |
+
+### Implementation steps
+1. Implement `NeurofeedbackSession` as a pure state machine: `tick(ratio) -> SessionState`. All
+   session arithmetic lives here so it is testable without a browser.
+2. Add the band-power path to `SimulatedEEGSource` (alpha and theta from the same simulated series).
+3. Build `neurofeedback_panel()`; the animation is CSS/JS inside the iframe, with the final state
+   painted by a classic script first so a blocked CDN costs the motion and nothing else — the defect
+   already found and fixed once in `motion.py`.
+4. Build the page shell with the demo-mode banner rendered **before** any control, not after.
+5. Add the ethics guard: the page refuses to render if the configured source is not a
+   `SimulatedSource`.
+
+### Dependencies & integration points
+- **Consumes:** `src/biosignals/sources.py` and `features.py` — **V5 cannot be built before V3's
+  source layer exists.** This is the only hard cross-feature dependency in the layer.
+- **Consumes:** `theme`, `copy`, the `motion.py` two-script pattern.
+- **Blocks on:** ethics approval and a clinician before any non-simulated use.
+
+### Testing & validation
+- The session state machine: time-in-target and longest-hold are correct on a hand-written ratio
+  sequence; a reset clears both.
+- The panel renders its demo-mode banner, and the banner text appears **before** the first control in
+  the page source (same ordering rule as the provenance stamp).
+- The page raises if handed a non-simulated source — assert the guard, not just its absence.
+- The panel renders fully with the animation module removed (classic-script fallback).
+- No band or threshold language leaks into the summary tile.
+
+---
+
+## 11.7 Build order and cross-feature dependencies
+
+```
+shared: src/biosignals/{sources,features}.py + src/dashboard/neurovis.py
+   │
+   ├── V1  Brain atlas          (independent — can ship alone, needs no source)
+   ├── V3  Cognitive load       (needs sources + features)
+   │      └── V5  Neurofeedback (needs V3's source + feature layer)
+```
+
+Recommended order: **shared → V1 → V3 → V5.** V1 first because it is independent, demos well, and
+exercises `neurovis.py` before the biosignal layer is on the critical path.
+
+### Definition of done for the layer
+- `SRN_COGNITIVE_LAYER` unset ⇒ the dashboard is byte-identical to Phase 24 output.
+- All existing tests green (74 at the time of writing), plus the new suites.
+- No number on any new surface is absent from a stamped source or a `DashboardView`.
+- Every new page passes the existing shell rules in `tests/test_dashboard_pages.py`.
+
+---
+
+## 12. Phase 27 — Media input, admission gates and the register test (built 2026-09-15)
+
+> **Status: built, tested and deployed.** Unlike §11, which was written as a plan
+> before any code existed, this section records what is in the repository.
+
+### 12.1 Owner decisions (locked 2026-09-15)
+
+| Question | Decision |
+|---|---|
+| Junk text on the live-scoring page | **Refuse.** No score, no band, no view constructed. |
+| Photo and video upload | **Yes.** Words are recovered and scored as typed words are. |
+| What the media engine reads | **Both** the words (OCR / speech) and a non-verbal channel. |
+| Non-verbal channel default | **Off** (`context_weights={}`). Visible toggle on the page. |
+| A reader that looks at a real face | **Blocked at construction** until `docs/ethics.md` §13 is satisfied. |
+| "Irrelevant" media | Judged on the **recovered words**, never on the picture. |
+| Off-register text | **Scored and flagged loudly**, not refused. |
+| OCR engine | Upstream Tesseract, invoked directly. No Python wrapper. |
+
+### 12.2 The four steps, and which of them is a gate
+
+```
+ upload ──▶ [1] admit the file ──▶ [2] recover words ──▶ [3] admit the words ──▶ [4] judge register
+            bytes, not extension     OCR / speech          is this language?       advisory only
+            REFUSES                  REFUSES if unreadable REFUSES                 FLAGS, never refuses
+                                                                                         │
+                                                                                         ▼
+                                                                          scored exactly as typed text
+```
+
+Steps 1–3 refuse, and a refusal means **no `DashboardView` is constructed**, so
+no number exists to screenshot. Step 4 decorates.
+
+### 12.3 The 0.50 problem — the defect this whole phase is shaped around
+
+`LexiconBackend` will score anything. Hand it keyboard mash, or an empty string
+from a missing OCR engine, or a car-park sign: nothing matches, all ten
+probabilities are 0.0, the weighted sum is 0.0, and the logistic squash returns
+an index of **exactly 0.50** — a psychological score of 50 out of 100, with a
+band, a stamp and ten tiles beneath it. Every step is arithmetically correct and
+the screen is a lie.
+
+Three components exist because of this one failure, arriving by three doors:
+
+* `gibberish.admit` — the paste box door.
+* `NullExtractor` returning `ok=False` rather than `""` — the missing-backend door.
+* `mediaio.read_upload` re-running the text gate on machine-read words — the
+  OCR-of-something-that-is-not-prose door.
+
+**Rule for any future input path: an input that cannot be read produces no
+number. Never a zero, never a default, never a midpoint.**
+
+### 12.4 New modules
+
+| File | Responsibility |
+|---|---|
+| `src/media/admission.py` | Is this a readable photo or video? Magic numbers and header parsing, pure Python, no image library. |
+| `src/media/extract.py` | Words out of a file. `TextExtractor` Protocol; `TesseractOCR`, `WhisperTranscriber`, `NullExtractor`. |
+| `src/media/relevance.py` | Register test. Measured on `gold_dev` / `gold_eval`. Advisory. |
+| `src/media/nonverbal.py` | Face/voice channel. Stamped, zero-weighted, ethics-gated. |
+| `src/dashboard/gibberish.py` | Is pasted or recovered text language at all? |
+| `src/dashboard/mediaio.py` | **The only door** between `dashboard/` and `src.media`. |
+
+`src/dashboard/mediaio.py` exists because `tests/test_dashboard_pages.py`
+enforces that a module under `dashboard/` imports from `src.dashboard` and
+nowhere else under `src.`. Routing the media layer through one bridge keeps that
+rule true rather than making an exception for one feature.
+
+### 12.5 Rules for this layer
+
+1. **The risk index is produced from words.** Anything read off a face or a voice
+   enters through `LinearRiskScorer.context`, whose weights default to empty.
+   `tests/test_media.py` asserts bit-identical output with and without context.
+   This is the Phase 15 text-only guarantee restated, and it is what lets the
+   paper stay text-only while the page offers uploads.
+2. **No gate may claim a capability the project has not measured.** The register
+   test judges words because a picture classifier would need a labelled image set
+   and a reported error rate that do not exist. If a future phase wants one, it
+   ships with a number or it does not ship.
+3. **Every recovered passage carries `MACHINE-READ`; every non-verbal reading
+   carries `NOT A MEASUREMENT`.** Both are enforced in `__post_init__`, in the
+   same way `ScoreSurface` requires `PROVISIONAL` and `BiosignalWindow` requires
+   `SIMULATED`.
+4. **Nothing is retained.** No disk, no log, no cache, no temp file — OCR streams
+   bytes on stdin. See `docs/ethics.md` §13.3.
+5. **Optional backends are genuinely optional.** A clean checkout has no OCR
+   engine and no speech model, and in that state the media path refuses honestly.
+   Deployment installs them via `packages.txt` (HF Space) and the `Dockerfile`.
+
+### 12.6 What is deliberately not built
+
+* A visual classifier for "this photograph contains an athlete". See rule 2.
+* Any real facial or vocal analysis. `GatedRealReader` raises.
+* Word-error-rate evaluation of OCR or speech recognition. Not measured here, so
+  not claimed here.
+* A relevance gate over *pasted* text. The register test runs on media only,
+  because that is what was asked for; extending it to the paste box is a
+  one-line change and a decision nobody has made.
