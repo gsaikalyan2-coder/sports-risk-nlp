@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
     Sync the dashboard subset from the private research repo into the public
-    deploy repo, then commit and push so the Hugging Face Space rebuilds.
+    deploy repo, then commit and push so Streamlit Community Cloud rebuilds.
 
 .DESCRIPTION
     Two repositories hold the same dashboard code:
 
       C:\Users\saika\sports-risk-nlp   private  -- the research repo, source of truth
-      C:\Users\saika\srn-dashboard     public   -- the deploy repo, feeds the HF Space
+      C:\Users\saika\srn-dashboard     public   -- the deploy repo, feeds Streamlit Cloud
 
     The research repo is authoritative for CODE. The deploy repo is authoritative
     for its own DEPLOYMENT FILES -- README.md, requirements.txt,
@@ -214,7 +214,7 @@ try {
     if ($LASTEXITCODE -ne 0) { Fail "git push failed" }
 
     Write-Host ""
-    Note "Pushed. The Space rebuilds automatically -- give it 2-3 minutes."
+    Note "Pushed. Streamlit Cloud rebuilds automatically -- give it 2-3 minutes."
     Note "Check the build log for tesseract-ocr in the apt step, or the photo path"
     Note "will refuse every upload while looking perfectly healthy."
 }
