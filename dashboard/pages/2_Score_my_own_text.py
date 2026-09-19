@@ -25,13 +25,14 @@ import streamlit.components.v1 as components  # noqa: E402
 
 from src.dashboard import (  # noqa: E402
     DEFAULT_POLICY_LABEL,
+    FACE_ONLY_STAMP,
     POLICY_LABELS,
     POLICY_TILE_NOTE,
     LexiconBackend,
     admit,
     build_view,
     evidence_height,
-    media_context_weights,
+    face_stack_status,
     motion_panel,
     panel_height,
     plain,
@@ -95,17 +96,23 @@ uploaded = st.file_uploader(
     help=plain.MEDIA_PLAIN,
 )
 
-# The non-verbal switch, and it is a switch rather than a setting because the
-# default has to be visible. Off means `media_context_weights()` returns {},
-# which is the text-only path in the fusion layer: the reading is still taken
-# and still shown, and it multiplies by nothing.
-nonverbal_on = st.toggle(
-    plain.NONVERBAL_SWITCH_LABEL,
+# Phase 28: consent, not a preference switch.
+#
+# Ticking this is what allows anything to look at a face, and it is phrased as a
+# statement of fact about the file rather than as a feature toggle, because that
+# is what it has to be: the uploader is asserting that the person shown agreed.
+# Unticked, `read_upload` never constructs a `FaceCueReader` and the simulated
+# reading is carried at zero weight exactly as in Phase 27.
+consent = st.checkbox(
+    plain.CONSENT_LABEL,
     value=False,
-    key="nonverbal_enabled",
-    help=plain.NONVERBAL_ON_PLAIN,
+    key="face_consent",
+    help=plain.CONSENT_PLAIN,
 )
-st.caption(plain.NONVERBAL_ON_PLAIN if nonverbal_on else plain.NONVERBAL_OFF_PLAIN)
+st.caption(plain.CONSENT_PLAIN)
+_stack = face_stack_status()
+if consent and not _stack:
+    st.warning(_stack.detail)
 
 # Reads and writes the same plain key the dashboard writes, so the setting a
 # reader chose over there is the setting their own text is scored under here,
@@ -123,14 +130,68 @@ submitted = st.button(plain.PAGE2_SUBMIT)
 # Where the words come from. A file wins when one is attached, because
 # attaching a file is the more deliberate act; the text box is left alone rather
 # than cleared, so switching back costs nothing.
-media = read_upload(uploaded.name, uploaded.getvalue()) if uploaded is not None else None
+media = (
+    read_upload(uploaded.name, uploaded.getvalue(), consent=consent)
+    if uploaded is not None
+    else None
+)
 media_context: dict[str, float] = dict(media.context) if media is not None else {}
+# The weights come from the RESULT, not from the page. A page that decided the
+# weights itself could weight a reading that was never taken; this way an empty
+# mapping is the direct consequence of no face having been read.
+media_weights: dict[str, float] = dict(media.context_weights) if media is not None else {}
+
+if media is not None and not media and media.face_only:
+    # A photograph of an athlete carrying no writing. There is no risk index
+    # here and there never can be -- the index is ten constructs found in words
+    # -- so this branch renders a different object entirely: two cues, one
+    # figure derived from them, its own stamp, and no tiles or spans beside it.
+    st.info(media.detail)
+    # The stamp goes above the figure, never only inside the expander below:
+    # tests/test_dashboard_pages.py enforces the ordering, and the reason it
+    # exists is that a stamp in a collapsed section is in the DOM and not on the
+    # screen, so a screenshot loses it.
+    st.caption(media.stamp)
+    st.error(f"**{plain.FACE_CUES_HEADLINE}.** {plain.FACE_CUES_LIMITATION}")
+    st.markdown(f"## {plain.FACE_ONLY_HEADLINE}")
+    st.markdown(theme.claude_lede(plain.FACE_ONLY_PLAIN), unsafe_allow_html=True)
+    figure, cues = st.columns([1, 2])
+    with figure:
+        st.markdown(
+            f'<div class="hero-figure"><span class="hl">Face-only figure</span>'
+            f'<span class="hv">{round(media.face_index * 100)}</span>'
+            f'<span class="hl">out of 100, ranking only</span></div>',
+            unsafe_allow_html=True,
+        )
+    with cues:
+        for column, (name, value) in zip(
+            st.columns(len(media_weights)),
+            sorted((k, v) for k, v in media_context.items() if k in media_weights),
+            strict=False,
+        ):
+            with column:
+                st.markdown(
+                    f'<div class="widget"><span class="wl">{name.replace("_", " ")}</span>'
+                    f'<span class="wv" style="font-size:32px">{value:.2f}</span>'
+                    f'<span class="wu">weight {media_weights[name]:+.2f}</span></div>',
+                    unsafe_allow_html=True,
+                )
+    st.caption(media.nonverbal_stamp)
+    st.error(FACE_ONLY_STAMP)
+    with st.expander("Provenance and limitations: read before quoting this figure"):
+        st.markdown(f"- {FACE_ONLY_STAMP}")
+        st.markdown(f"- {plain.FACE_CUES_LIMITATION}")
+        st.markdown(f"- Read from **{uploaded.name}** by {media.method or 'the face reader'}.")
+        st.markdown(f"- {media.stamp}")
+    st.stop()
 
 if media is not None and not media:
     # Refused by one of the four gates in mediaio.read_upload. No view has been
     # constructed, so there is no number to show and none is shown.
     st.error(f"**{plain.MEDIA_REJECTED}** {media.detail}")
     st.caption(plain.PAGE2_REJECTED_WHY)
+    if media.face_detail:
+        st.caption(media.face_detail)
     st.stop()
 
 source_text = media.text if media is not None else pasted
@@ -161,10 +222,22 @@ if not admission:
 view = build_view(
     text=source_text,
     backend=_lexicon(),
-    scorer=scorer_for(policy, context_weights=media_context_weights(enabled=nonverbal_on)),
+    scorer=scorer_for(policy, context_weights=media_weights),
     context=media_context,
 )
 score = score_from_view(view)
+
+# The text-only score, computed alongside whenever the face moved the index.
+#
+# Shown rather than described: "the face raised this by 4 points" is a claim the
+# reader can check only if both numbers are on the page, and the difference is
+# the single most important thing to be able to see on a page where a picture
+# now changes a psychological number.
+text_only_score = None
+if media_weights:
+    text_only_score = score_from_view(
+        build_view(text=source_text, backend=_lexicon(), scorer=scorer_for(policy))
+    )
 
 if media is not None:
     st.info(f"Read from **{uploaded.name}** by {media.method}. {plain.MEDIA_MACHINE_READ}")
@@ -181,6 +254,14 @@ st.markdown(f"> {source_text}")
 if media is not None and not media.on_topic:
     st.error(f"**{plain.OFF_TOPIC_HEADLINE}** {media.relevance_detail}")
     st.caption(plain.OFF_TOPIC_PLAIN)
+# The limitation docs/ethics.md sec.14 requires beside every face-derived number,
+# in the error style, above the score, outside any expander: the same position
+# and the same reason as the register flag.
+if media is not None and media.face_measured:
+    st.error(f"**{plain.FACE_CUES_HEADLINE}.** {plain.FACE_CUES_LIMITATION}")
+elif media is not None and media.face_detail:
+    st.warning(media.face_detail)
+
 st.caption(view.risk.stamp)
 st.warning(view.caveat)
 if not view.is_default_policy:
@@ -201,6 +282,12 @@ with headline:
         unsafe_allow_html=True,
     )
     st.caption(score.band.describe())
+    if text_only_score is not None:
+        st.caption(
+            f"{plain.FACE_COMBINED_LABEL}: {score.score_100}. "
+            f"{plain.FACE_TEXT_ONLY_LABEL}: {text_only_score.score_100}. "
+            "The difference is what the face contributed."
+        )
 with panel:
     components.html(
         motion_panel(view, mode=CLAUDE_MODE), height=panel_height(view), scrolling=False
@@ -246,17 +333,17 @@ if view.unevidenced_driver_count:
 
 if media is not None and media_context:
     st.markdown("## The non-verbal reading")
-    st.caption(plain.NONVERBAL_ON_PLAIN if nonverbal_on else plain.NONVERBAL_OFF_PLAIN)
+    st.caption(plain.FACE_CUES_MEASURED if media.face_measured else plain.FACE_CUES_NOT_MEASURED)
     for column, (name, value) in zip(
         st.columns(len(media_context)), sorted(media_context.items()), strict=False
     ):
         with column:
             st.markdown(
-                f'<div class="widget{"" if nonverbal_on else " is-inert"}">'
+                f'<div class="widget{"" if name in media_weights else " is-inert"}">'
                 f'<span class="wl">{name.replace("_", " ")}</span>'
                 f'<span class="wv" style="font-size:32px">{value:.2f}</span>'
                 f'<span class="wu">'
-                f"{'moved the score' if nonverbal_on else 'shown, weighted as zero'}"
+                f"{'moved the score' if name in media_weights else 'shown, weighted as zero'}"
                 f"</span></div>",
                 unsafe_allow_html=True,
             )
@@ -270,6 +357,12 @@ with st.expander("Provenance and limitations: read before quoting any number"):
     if media is not None:
         st.markdown(f"- {media.stamp}")
         st.markdown(f"- {media.nonverbal_stamp}")
+        if media.face_measured:
+            st.markdown(f"- {plain.FACE_CUES_LIMITATION}")
+            st.markdown(
+                "- Facial cue weights, declared and not learned: "
+                + ", ".join(f"{k} {v:+.2f}" for k, v in sorted(media_weights.items()))
+            )
         st.markdown(f"- {plain.RELEVANCE_MEASURED}")
         st.markdown(
             f"- Register score for this text: {media.relevance:.2f} "

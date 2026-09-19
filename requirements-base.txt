@@ -36,3 +36,38 @@ pytest>=8.0
 ruff>=0.5
 pre-commit>=3.7
 detect-secrets>=1.5
+
+# Facial cues (Phase 28). Optional at runtime: src/media/facecues.py checks
+# whether both import and, when either is missing, reads no face and says so on
+# the page rather than failing. Kept in the BASE layer deliberately -- these are
+# what the deployed Streamlit Community Cloud app installs, and neither pulls
+# torch, which is what keeps the app inside its 2.7 GB memory ceiling.
+#
+# headless, not opencv-python: the full wheel links libGL, which is absent from
+# the Community Cloud image and fails at import with a shared-object error that
+# looks like a broken app rather than a missing system library.
+hsemotion-onnx>=0.3
+onnxruntime>=1.17
+# <5 is load-bearing, not caution: OpenCV 5.0 removed cv2.CascadeClassifier and
+# the bundled Haar cascade data, which is how the face is located here. With a
+# 5.x wheel the import succeeds and the attribute does not exist, so the failure
+# arrives at the point of use rather than at install time.
+opencv-python-headless>=4.9,<5
+# hsemotion-onnx declares a dependency on the NON-headless opencv-python with no
+# upper bound. Both wheels install into the same `cv2` namespace, so an
+# unconstrained 5.x pulled in as its dependency wins over a pinned 4.x headless
+# and takes the cascade API away again. Pinning both is what actually holds.
+opencv-python<5
+
+# Press-conference transcripts (Phase 29). Reads the caption track a video
+# already publishes: no video download, no audio, no pixels. Optional at
+# runtime -- src/media/pressroom.py probes for it and refuses honestly when it
+# is absent -- but listed here because the deployed app needs it.
+youtube-transcript-api>=1.0
+
+# The second, optional route: audio plus speech recognition, for videos that
+# publish no captions. NOT listed as a dependency on purpose: faster-whisper
+# pulls a multi-hundred-megabyte runtime and downloads weights on first use,
+# which a free Community Cloud app cannot carry, and yt-dlp downloading from
+# YouTube is frequently blocked from cloud IP ranges. Install locally with:
+#     pip install yt-dlp faster-whisper

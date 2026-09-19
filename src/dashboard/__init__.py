@@ -57,7 +57,17 @@ from .charts import (
     risk_waterfall,
 )
 from .gibberish import TextAdmission, admit
+from .matchday import (
+    PRESS_STAMP,
+    MatchDayProfile,
+    build_profile,
+    face_stack_status,
+    transcript_stack_status,
+)
 from .mediaio import (
+    FACE_ONLY_STAMP,
+    FACE_STAMP,
+    FACE_WEIGHTS,
     NONVERBAL_STAMP,
     MediaResult,
     media_context_weights,
@@ -87,6 +97,14 @@ __all__ = [
     "MediaResult",
     "media_context_weights",
     "NONVERBAL_STAMP",
+    "FACE_STAMP",
+    "FACE_ONLY_STAMP",
+    "FACE_WEIGHTS",
+    "face_stack_status",
+    "transcript_stack_status",
+    "build_profile",
+    "MatchDayProfile",
+    "PRESS_STAMP",
     "TextAdmission",
     "widget_for",
     "theme",

@@ -1,0 +1,97 @@
+================================================================================
+HANDOVER - PHASE 29: MATCH-DAY PROFILE, BUILT AND BLOCKED
+Pre-Competition Psychological Risk Profiling of Athletes
+Completed 2026-09-19 - Owner: Saikalyan (SRMIST) - Prepared for a fresh session
+================================================================================
+
+Self-contained. Read CLAUDE.md sec.14 and docs/ethics.md sec.15 alongside it.
+Those two sections are the actual record; this file is a pointer to them.
+
+================================================================================
+PART A - WHAT HAPPENED THIS SESSION
+================================================================================
+
+The owner asked (2026-09-19) for one more feature on top of Phase 28: given a
+link to a press conference and a photograph of the athlete in it, produce the
+ten-construct metrics and one final score for that specific person.
+
+It was built. src/media/pressroom.py fetches the video's caption track (or,
+with yt-dlp + faster-whisper installed locally, transcribes its audio).
+src/dashboard/matchday.py de-identifies the transcript, scores it through the
+same pipeline as pasted text, adds the Phase 28 facial-cue channel from the
+photo, and reports one combined score plus the words-only score beside it.
+dashboard/pages/6_Match_day_profile.py renders it. tests/test_pressroom.py
+covers the transcript layer and the profile layer with no network and no
+optional packages required.
+
+On review, before any of this was committed, a second Claude Code session (this
+one) found that the feature as built is the exact act docs/ethics.md sec.2.3.3
+and sec.13.4 already prohibit in writing: a claim about a named, identifiable
+public figure's psychological state, from their own public material.
+De-identifying the transcript's *words* does not de-identify *who the reader is
+looking up* -- the link and the photo both name the person before any text
+processing runs. Unlike Phase 28's face-cue reader, there is no consent
+checkbox that fixes this, because the athlete in someone else's press-conference
+recording never agreed to anything, and docs/ethics.md sec.13.4 had already
+anticipated and rejected the "it's public, so it's fine" argument.
+
+Nothing was deleted or reverted. Instead, src/media/pressroom.py::fetch_transcript
+now refuses unconditionally -- before any network call -- unless the environment
+variable SRN_MATCHDAY_REAL_ATHLETES is set. No code path in this repository,
+the .env.example template, the deploy repo, or Streamlit Community Cloud's
+configuration sets it. The feature is fully built, fully tested, and inert
+everywhere by default, the same shape Phase 27 used for GatedRealReader before
+Phase 28 discharged it for facial cues -- except this document does NOT
+discharge the block. See docs/ethics.md sec.15.4 for the four conditions that
+would have to be true before it ever could.
+
+================================================================================
+PART B - FILES TOUCHED
+================================================================================
+
+  src/media/pressroom.py              added ETHICS_GATE_ENV + the gate in
+                                       fetch_transcript(); docstring updated
+  tests/test_pressroom.py             two new tests: gate closed by default
+                                       (no network attempted), gate opens only
+                                       when the flag is set
+  CLAUDE.md                           sec.14 - Phase 29, built and blocked
+  docs/ethics.md                      sec.15 - the blocking gate and the four
+                                       conditions for revisiting it
+  PROJECT_PLAN.md                     Phase 28 (complete) and Phase 29
+                                       (blocked) rows added
+  .env.example                        SRN_MATCHDAY_REAL_ATHLETES documented,
+                                       commented out, with a warning to read
+                                       docs/ethics.md sec.15 before setting it
+
+Not touched, and not needing to be: src/dashboard/matchday.py,
+dashboard/pages/6_Match_day_profile.py, src/dashboard/__init__.py. The gate
+lives at the one real choke point (fetch_transcript), so the page and the
+profile builder need no changes -- a closed gate there already means the page
+can never obtain a transcript to score.
+
+================================================================================
+PART C - WHAT A FRESH SESSION SHOULD KNOW
+================================================================================
+
+1. The feature is NOT ethics-cleared. Do not remove the gate, add a UI toggle
+   for it, or set SRN_MATCHDAY_REAL_ATHLETES anywhere without first reading
+   docs/ethics.md sec.15 and getting an explicit, dated owner decision that
+   reverses sec.2.3.3 and sec.13.4 -- not a narrower carve-out under them.
+
+2. yt-dlp and faster-whisper are installed in the LOCAL venv only (owner
+   request, 2026-09-19), for the optional speech-recognition route. They are
+   deliberately absent from requirements-base.txt and the deploy repo, per the
+   existing Phase 29 rationale already in requirements-base.txt: too heavy for
+   Streamlit Community Cloud, and yt-dlp is frequently blocked from cloud IP
+   ranges. This is unchanged by the ethics gate -- it would be true even if the
+   feature were unblocked.
+
+3. youtube-transcript-api WAS already in requirements-base.txt before this
+   session (committed alongside the rest of Phase 29's dependency declarations
+   in the working tree). It ships to Streamlit Community Cloud. This is fine on
+   its own: installing a library is not the same act as calling it against a
+   real person, and the gate is what stops the latter.
+
+================================================================================
+END OF HANDOVER
+================================================================================

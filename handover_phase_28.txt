@@ -1,0 +1,172 @@
+================================================================================
+HANDOVER - PHASE 28: FACIAL CUES, UNDER CONSENT, INSIDE THE RISK INDEX
+Pre-Competition Psychological Risk Profiling of Athletes
+Completed 2026-09-19 - Owner: Saikalyan (SRMIST) - Prepared for a fresh session
+================================================================================
+
+Self-contained. Read CLAUDE.md sec.13 and docs/ethics.md sec.14 alongside it.
+
+================================================================================
+PART A - PROJECT SUMMARY
+================================================================================
+
+GOAL
+Detect ten sports-psychology constructs in athlete text and fuse them into an
+interpretable 0-1 pre-competition risk index with span-level evidence. Target
+venue: IEEE conference, full paper.
+
+STATUS BEFORE THIS PHASE
+Phases 1-27 complete. Phase 27 shipped the media path (admission, OCR, the text
+gate, the register test) with the non-verbal channel BUILT BUT BOLTED SHUT:
+GatedRealReader raised on construction and the only reader derived three numbers
+from a SHA-256 of the file bytes, at weight zero.
+
+PHASE JUST COMPLETED
+Phase 28. The owner asked, on 2026-09-16, for facial cues to be read from
+uploaded photographs and to MOVE the risk index. Built, with the ethics gate
+discharged in writing first.
+
+THE CONSTRAINT THAT STILL GOVERNS EVERYTHING
+data/gold/ is empty. No number in this repository is an accuracy (OPEN-025), and
+no real athlete text has entered the pipeline (OPEN-011). Phase 28 adds a channel
+with NO measured error rate of its own, which is stated in docs/model_card.md
+sec.12.2 rather than papered over.
+
+================================================================================
+PART B - WHAT THIS SESSION DID
+================================================================================
+
+B1. THE TWO CONSEQUENCES THE OWNER ACCEPTED IN WRITING, BEFORE ANY CODE
+  1. The deployed page is no longer text-only. The paper may still report
+     text-only numbers (it does; nothing face-derived enters a table), but where
+     it describes the dashboard it must say uploads are scored from text plus two
+     facial cues under an uploader consent attestation.
+  2. An expression is weak evidence about a state of mind. A competitor
+     mid-effort looks strained for reasons unrelated to coping.
+
+B2. ENGINE SELECTION, AND WHY NOT THE OBVIOUS ONES
+  CHOSEN: hsemotion-onnx 0.3.1, model enet_b0_8_va_mtl (Apache-2.0).
+    - Runs on onnxruntime. No PyTorch. Streamlit Community Cloud caps an app at
+      2.7 GB of memory and a torch wheel spends most of it before a model loads.
+    - Emits continuous valence and arousal, not a categorical emotion label. A
+      bounded continuous cue can carry a declared weight; "fear: 0.8" about an
+      athlete cannot be defended.
+    - Published: Savchenko et al., IEEE Trans. Affective Computing 2022; ABAW.
+  REJECTED: Py-Feat (MIT, peer-reviewed, action units) and LibreFace (WACV 2024).
+    Both pull PyTorch. Better science, will not fit the deployment target.
+  REJECTED: MediaPipe blendshapes - light, but the weakest psychology grounding.
+
+B3. THE THREE PROPERTIES THAT HOLD THE CHANNEL DOWN, ENFORCED IN CODE
+  1. CONSENT IS A CONSTRUCTION PRECONDITION.
+     FaceCueReader(consent=False) raises NonVerbalEthicsGate. There is no object
+     to call read() on, so no path leads from an unticked box to a face being
+     read. The page passes consent=True only when the checkbox is ticked.
+  2. ONLY A MEASURED READING CARRIES WEIGHT.
+     FACE_WEIGHTS is keyed on {negative_valence, arousal} ONLY. The simulated
+     reader emits {expressivity, vocal_strain, steadiness}, and fusion.score adds
+     a term only for a name present in BOTH the weights and the context mapping.
+     So a missing library, a missing face, a face under 64 px, or a missing
+     consent tick can never become a number. Asserted by disjointness in
+     tests/test_facecues.py.
+     >>> BUG FOUND AND FIXED DURING THIS PHASE: SimulatedNonVerbalReader
+     iterated FEATURES, which now includes the two face names, so a hash of the
+     file bytes would have moved the index the moment consent was ticked on a
+     machine with no engine. It now iterates SIMULATED_FEATURES. If anyone
+     re-widens that loop, the whole safety property goes with it.
+  3. BOTH NUMBERS ARE ON THE PAGE.
+     The text-only score renders beside the combined score whenever the face
+     moved the index, so the contribution is visible rather than described.
+
+B4. FILES CREATED AND MODIFIED
+  CREATED
+    src/media/facecues.py            the reader, the status probe, the weights
+    tests/test_facecues.py           18 tests, all green without the vision stack
+    handover_phase_28.txt            this file
+  MODIFIED
+    src/media/nonverbal.py           FEATURES split into SIMULATED_FEATURES +
+                                     FACE_FEATURES; GatedRealReader now takes
+                                     consent=; simulated loop narrowed (B3.2)
+    src/media/__init__.py            exports
+    src/dashboard/mediaio.py         read_upload(..., consent=False); MediaResult
+                                     gains face_measured, face_detail,
+                                     context_weights; _read_face fallback path
+    src/dashboard/__init__.py        exports FACE_STAMP, FACE_WEIGHTS,
+                                     face_stack_status
+    src/dashboard/copy.py            CONSENT_LABEL, CONSENT_PLAIN,
+                                     FACE_CUES_HEADLINE, FACE_CUES_LIMITATION,
+                                     FACE_CUES_MEASURED, FACE_CUES_NOT_MEASURED,
+                                     FACE_TEXT_ONLY_LABEL, FACE_COMBINED_LABEL
+    dashboard/pages/2_Score_my_own_text.py
+                                     consent checkbox replaces the Phase 27
+                                     toggle; weights come from the RESULT, not
+                                     from the page; limitation banner above the
+                                     score; both scores rendered
+    requirements-base.txt            hsemotion-onnx, onnxruntime,
+                                     opencv-python<5, opencv-python-headless<5
+    docs/ethics.md                   NEW sec.14 (discharges the sec.13.5 blocker)
+    docs/model_card.md               NEW sec.12 (supersedes sec.11.5)
+    CLAUDE.md                        NEW sec.13
+
+B5. THREE PACKAGING TRAPS FOUND BY RUNNING IT, NOT BY READING ABOUT IT
+  1. OPENCV 5.0 REMOVED cv2.CascadeClassifier AND THE BUNDLED HAAR XML.
+     The import still succeeds; the attribute does not exist. face_stack_status()
+     therefore checks hasattr, not import, and both opencv wheels are pinned <5.
+  2. BOTH OPENCV WHEELS MUST BE PINNED. hsemotion-onnx depends on the
+     NON-headless opencv-python with no upper bound. Both install into the same
+     cv2 namespace, so an unpinned 5.x arriving as its dependency wins over a
+     pinned 4.x headless. Pinning only the headless one does nothing.
+  3. hsemotion-onnx 0.3.1 CALLS urllib.request.urlretrieve HAVING IMPORTED ONLY
+     urllib, so first use raises AttributeError. facecues._model() imports
+     urllib.request first. One line; harmless once upstream fixes it.
+  ALSO: the model weights download from the upstream repo on FIRST USE. First
+  photo after a deploy is slow; a machine with no outbound network reads no face
+  and says so.
+
+B6. VERIFICATION DONE, AND NOT DONE
+  DONE in the assistant's container, against a partial checkout:
+    - tests/test_facecues.py: 18 passed.
+    - tests/test_media.py, tests/test_relevance.py: pass except three tests that
+      need reports/ fixtures absent from the partial copy (known_examples()).
+    - Face DETECTION verified end-to-end on a real photograph: the Haar cascade
+      found the face and the crop reached the model.
+    - Model INFERENCE not verified: the container's proxy returns 403 for the
+      weight download. The first real inference happens on the owner's machine.
+  NOT DONE (owner's machine): pytest -q in full, pip install, a live upload,
+  git commit, the public-repo copy, redeploy.
+
+================================================================================
+PART C - STATE AND OPEN ITEMS
+================================================================================
+
+C1. OPEN ITEMS CARRIED FORWARD
+  OPEN-011  no real athlete text. Unchanged.
+  OPEN-025  data/gold/ empty; no accuracy anywhere. Unchanged.
+  OPEN-027  the default known example triggers none of the two-sided constructs.
+  OPEN-028  the register test's negative set is authored by the project.
+  OPEN-029  STATE_WORDS overlaps the construct lexicon.
+  OPEN-030  NEW. The facial-cue channel has NO measured error rate in this
+            project: no labelled image set, no held-out split, no outcome. The
+            upstream engine's AffectNet/ABAW numbers are provenance for the
+            engine, not a claim about this system. Stated in model_card sec.12.2.
+  OPEN-031  NEW. Demographic performance of the engine is unmeasured here. The
+            channel must never be described as fair or unbiased.
+  OPEN-032  NEW. "Largest face" is a heuristic. In a crowd scene a reading can be
+            attributed to the wrong person; the page disclaims individual use.
+  OPEN-033  NEW. The consent checkbox is an ATTESTATION and cannot be verified.
+            The third-party gap named in ethics sec.13.4 is not closed.
+
+C2. WHAT REMAINS PROHIBITED (unchanged, and newly reachable)
+  - Any claim about the psychological state of an identifiable person, from
+    words, face or voice. A press photograph of a named athlete is the case
+    ethics sec.13.5 bullet 1 forbids; ticking the consent box does not permit it.
+  - Any identification, matching, embedding or storage of a face.
+  - Any face-derived number in a paper table, figure or claim.
+
+C3. NEXT PHASE IS UNDECIDED
+  Candidates: voice/prosody (currently not built at all), a measured evaluation
+  of the cue channel if any labelled data can be obtained, or paper text - which
+  is the item the project's own plan says comes next.
+
+================================================================================
+END OF HANDOVER - PHASE 28
+================================================================================

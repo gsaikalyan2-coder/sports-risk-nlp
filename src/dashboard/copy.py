@@ -302,6 +302,10 @@ MEDIA_MACHINE_READ = (
 
 NONVERBAL_SWITCH_LABEL = "Let the face and voice channel move the score"
 
+#: Phase 28 replaced the switch with the consent box above: facial cues now
+#: always count when a face was actually read. The string stays because the
+#: simulated three-value reading still appears when no face could be read.
+
 NONVERBAL_OFF_PLAIN = (
     "Off. A non-verbal reading is taken from the file and shown, at a weight of "
     "exactly zero: the score comes from the words alone and is identical to the score "
@@ -313,6 +317,94 @@ NONVERBAL_ON_PLAIN = (
     "face is not something the research supports doing reliably, the values here are "
     "generated rather than measured, and the weighting is a choice rather than a "
     "finding. Nothing produced this way belongs in the paper."
+)
+
+# ---------------------------------------------------------------------------
+# Phase 28: facial cues, under consent, in the score
+# ---------------------------------------------------------------------------
+
+CONSENT_LABEL = "The face in this file is mine, or the person shown agreed to this"
+
+CONSENT_PLAIN = (
+    "Tick this only if it is true. With it ticked, the largest face in an uploaded "
+    "photo is read for two things: how negative the expression looks and how "
+    "activated it looks. Both go into the score. Nothing is stored, and the picture "
+    "is dropped as soon as the page has finished drawing. Leave it unticked and "
+    "nothing looks at the face at all."
+)
+
+FACE_CUES_HEADLINE = "What the face in the picture looks like"
+
+#: The limitation `docs/ethics.md` sec.14 requires beside every face number. It is
+#: rendered above the score and outside any expander, like the register flag, so
+#: that it survives being screenshotted with the figure it qualifies.
+FACE_CUES_LIMITATION = (
+    "An expression is not a feeling. Research does not support reading a person's "
+    "state of mind reliably from their face, and a competitor mid-effort looks "
+    "strained for reasons that have nothing to do with how they are coping. These "
+    "two values describe the picture, they carry a small weight that was chosen by "
+    "hand rather than learned from outcomes, and nothing produced this way belongs "
+    "in a conversation about a person."
+)
+
+FACE_CUES_MEASURED = (
+    "A face was found and read. The two values below moved the score; the "
+    "text-only score is shown beside it so you can see by how much."
+)
+
+FACE_CUES_NOT_MEASURED = (
+    "No face was read, so the score below comes from the words alone. The three "
+    "values shown are generated from the file's bytes to demonstrate the interface "
+    "and are weighted as zero."
+)
+
+FACE_ONLY_HEADLINE = "Read from the face alone"
+
+FACE_ONLY_PLAIN = (
+    "There was nothing written in this picture, so the ten psychological signals could "
+    "not be looked for and there are no words to point at. The figure below comes only "
+    "from how the photographed expression looks, under weights chosen by hand. It is "
+    "not the risk index and it is not a reading of the person."
+)
+
+FACE_ONLY_FIGURE_LABEL = "Face-only figure, out of 100"
+
+FACE_TEXT_ONLY_LABEL = "Words only"
+
+FACE_COMBINED_LABEL = "Words and face"
+
+# ---------------------------------------------------------------------------
+# Phase 29: the match-day profile (photograph + press conference)
+# ---------------------------------------------------------------------------
+
+MATCHDAY_TITLE = "One profile from a picture and a press conference"
+
+MATCHDAY_LEDE = (
+    "Paste a link to a press conference and, if you have one, add a photograph. The "
+    "words are taken from the video's own captions, names are replaced with "
+    "placeholders, and then they are scored exactly as typed words are. The picture "
+    "adds two values describing how the expression looks. Nothing is stored."
+)
+
+MATCHDAY_LINK_LABEL = "Link to a press conference"
+
+MATCHDAY_PHOTO_LABEL = "A photograph of the athlete (optional)"
+
+MATCHDAY_SUBMIT = "Build the profile"
+
+MATCHDAY_EMPTY = "Add a link, a photograph, or both, then press the button."
+
+MATCHDAY_WORKING = "Reading the press conference, this can take a moment."
+
+MATCHDAY_NOTHING = "Nothing was scored."
+
+MATCHDAY_READ_BY = "by {route}"
+
+MATCHDAY_NO_FACE = "No photograph was read, so this score comes from the words alone."
+
+MATCHDAY_DEID_NOTE = (
+    "Names and other identifying items were replaced before scoring: {count} "
+    "replacement(s). What was scored is the de-identified text, not the original."
 )
 
 #: Shown instead of a score when `gibberish.admit` refuses the input.

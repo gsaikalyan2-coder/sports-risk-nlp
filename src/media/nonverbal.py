@@ -83,7 +83,16 @@ NONVERBAL_STAMP = (
 #: The feature names this channel may emit. Fixed, because `context_weights` is
 #: keyed by name and a typo in one of the two places would silently weight
 #: nothing -- the failure that looks exactly like a feature being switched off.
-FEATURES: tuple[str, ...] = ("expressivity", "vocal_strain", "steadiness")
+SIMULATED_FEATURES: tuple[str, ...] = ("expressivity", "vocal_strain", "steadiness")
+
+#: Phase 28. What a real detected face yields, through `src/media/facecues.py`.
+#: Both describe how an expression LOOKS. Neither names an emotion and neither
+#: is a state of a person: "negative_valence 0.8" is a claim about a picture,
+#: "anxious 0.8" would be a claim about somebody, and only the first is one this
+#: project can defend. See docs/ethics.md sec.14.
+FACE_FEATURES: tuple[str, ...] = ("negative_valence", "arousal")
+
+FEATURES: tuple[str, ...] = SIMULATED_FEATURES + FACE_FEATURES
 
 
 class NonVerbalEthicsGate(RuntimeError):
@@ -149,7 +158,14 @@ class SimulatedNonVerbalReader:
 
     def read(self, data: bytes) -> NonVerbalReading:
         digest = hashlib.sha256(data).digest()
-        features = {name: digest[index * 4] / 255.0 for index, name in enumerate(FEATURES)}
+        # SIMULATED_FEATURES, never FEATURES. The two face names in FEATURES are
+        # the keys `facecues.FACE_WEIGHTS` is defined over, so emitting them here
+        # would let a hash of the file bytes move the risk index the moment
+        # consent was ticked and the engine was absent -- which is precisely the
+        # substitution this module exists to make impossible.
+        features = {
+            name: digest[index * 4] / 255.0 for index, name in enumerate(SIMULATED_FEATURES)
+        }
         return NonVerbalReading(source=self.name, stamp=NONVERBAL_STAMP, features=features)
 
 
@@ -166,7 +182,16 @@ class GatedRealReader:
     name = "real-nonverbal"
     simulated = False
 
-    def __init__(self) -> None:
+    def __init__(self, *, consent: bool = False) -> None:
+        # Phase 28 (2026-09-16): the blocker named below was discharged for
+        # facial cues. `docs/ethics.md` sec.14 now carries the consent route, the
+        # biometric retention rule and the mandatory limitation, and
+        # `src/media/facecues.py::FaceCueReader` is the reader that runs under
+        # them. This base class still refuses without an explicit affirmative
+        # consent flag, because the gate that matters is no longer "has anyone
+        # written the document" but "did this uploader say yes about this file".
+        if consent:
+            return
         raise NonVerbalEthicsGate(
             f"{type(self).__name__} would infer a psychological state from a real "
             "person's face or voice, and is refused. Before any such reader runs: "
@@ -174,8 +199,10 @@ class GatedRealReader:
             "route, a retention rule for biometric data, and a statement that "
             "biometric inference is a different privacy class from synthetic text; "
             "and the limitation that facial configuration does not map reliably to "
-            "internal state must be stated wherever the output is shown. The risk "
-            "index is produced from words; this channel is context, and it is off."
+            "internal state must be stated wherever the output is shown. Those are "
+            "now in place (docs/ethics.md sec.14), so pass consent=True to proceed -- "
+            "which the page does only when the uploader has affirmed it for this "
+            "file. Without that affirmation nothing looks at the face."
         )
 
 

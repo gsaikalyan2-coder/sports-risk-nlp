@@ -1,4 +1,6 @@
-# apt packages installed by the Hugging Face Space before requirements.txt.
+# apt packages installed by Streamlit Community Cloud before requirements.txt.
+# (Community Cloud reads this file from the repository root and apt-installs
+# each line on its Debian image.)
 #
 # The OCR engine for the photo path (src/media/extract.py). Two packages, not
 # one: tesseract-ocr is the binary, tesseract-ocr-eng is the English language
@@ -7,12 +9,12 @@
 #
 # Their absence is a SILENT feature loss, not a crash. The extractor checks
 # whether the engine runs, finds it does not, and selects the honest floor -- so
-# the Space starts, the uploader appears, and every photo is refused with "this
+# the app starts, the uploader appears, and every photo is refused with "this
 # build cannot read photos". Correct, and indistinguishable from broken.
 #
 # Not listed here, deliberately: a speech model for the video path.
 # faster-whisper pulls a multi-hundred-megabyte runtime and downloads weights on
-# first use, which a free Space cannot carry. The video path therefore refuses
+# first use, which a free Community Cloud app cannot carry. The video path therefore refuses
 # honestly in deployment, and says which package is missing.
 tesseract-ocr
 tesseract-ocr-eng

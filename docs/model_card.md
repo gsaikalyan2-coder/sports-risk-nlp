@@ -508,3 +508,52 @@ itself a claim.
   raises on construction. See `docs/ethics.md` §13.5 for what must be true first.
 * **No number in this card, in any table, or in the paper was produced with this
   channel switched on.**
+
+## 12. Phase 28 — the facial-cue channel (added 2026-09-16)
+
+Supersedes §11.5. The channel described there was off by default and simulated;
+it is now on, under consent, when a real face is found.
+
+### 12.1 What it is
+
+| | |
+|---|---|
+| Engine | `hsemotion-onnx`, model `enet_b0_8_va_mtl` (Apache-2.0) |
+| Reference | Savchenko et al., *IEEE Trans. Affective Computing*, 2022; HSEmotion / EmotiEffLib |
+| Face location | OpenCV Haar cascade `haarcascade_frontalface_default.xml`, largest face |
+| Outputs used | `negative_valence`, `arousal`, each rescaled to [0, 1] |
+| Weights into the index | `negative_valence` +0.20, `arousal` +0.10 — **declared, not fitted** |
+| Runs when | The uploader affirms consent AND a face of at least 64 px is found |
+| Otherwise | Simulated reading shown at weight 0; the reason is stated on the page |
+
+### 12.2 Measured behaviour — none, and that is the claim
+
+**No error rate for this channel has been measured by this project.** There is no
+labelled image set here, no held-out split, and no outcome to validate against,
+so nothing in this card reports how often the engine's cues are right about
+anything. The upstream engine's published benchmarks are on AffectNet and the
+ABAW challenge data, which are not athletes, not pre-competition, and not this
+pipeline; they are cited as provenance for the engine and are not transferred
+here as a claim about this system.
+
+Consequently: every face-derived number on the page is qualified by the
+limitation in `docs/ethics.md` §14.3, and no face-derived number appears in any
+table or figure in this card or in the paper.
+
+### 12.3 Known limitations
+
+* **An expression is not a state of mind.** The affective-science literature does
+  not support a reliable configuration-to-state mapping across people, contexts
+  and cultures. A competitor mid-effort looks strained for reasons unrelated to
+  coping.
+* **The face detector is old and frontal.** A Haar cascade misses profiles,
+  heavy occlusion and unusual lighting, and its miss rate here is unmeasured. A
+  miss produces no number, which is the safe direction.
+* **"Largest face" is a heuristic.** In a crowd scene the subject is assumed to
+  be the nearest face. A wrong face yields a reading attributed to the wrong
+  person, which is why the limitation text disclaims individual-level use.
+* **Demographic performance is unknown.** Face analysis models are documented to
+  vary across skin tone, age and sex. This project has measured none of that for
+  this engine, and the channel must not be described as fair or unbiased.
+* **The weights are a prior.** +0.20 and +0.10 were chosen by hand to be small.
+  They are not learned, not tuned, and not validated.

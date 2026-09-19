@@ -225,7 +225,7 @@ CREATED
   tests/test_text_admission.py        (20 tests)
   tests/test_media.py                 (43 tests)
   tests/test_relevance.py             (30 tests, 3 skip without the corpus)
-  packages.txt                        (HF Space apt layer)
+  packages.txt                        (Streamlit Community Cloud apt layer)
   handover_phase_27.txt               (this file)
 
 MODIFIED
@@ -283,13 +283,13 @@ C2. DEPLOYMENT
              The full project. Everything above lands here.
     PUBLIC   C:\Users\saika\srn-dashboard
              origin = github.com/gsaikalyan2-coder/Pre-Competition-Construct-Profiling
-             A deploy-only SUBSET for the Hugging Face Space: .devcontainer,
+             A deploy-only SUBSET for the Streamlit Community Cloud app: .devcontainer,
              .streamlit, assets/narration, config, dashboard, paper, src, tests,
              README.md, requirements.txt. NO data/, NO docs/, NO .env.
   The public repo is a separate checkout, NOT a second remote. Changed files are
   copied across by hand.
   packages.txt is REQUIRED in the public repo: without tesseract-ocr and
-  tesseract-ocr-eng the Space starts, shows the uploader, and refuses every
+  tesseract-ocr-eng the app starts, shows the uploader, and refuses every
   photo. Correct behaviour, indistinguishable from broken.
   requirements.txt needed NO change — this phase removed Python dependencies
   (pytesseract, Pillow) rather than adding any.
@@ -321,7 +321,7 @@ C5. NOT DONE
   - Full-suite verification on the owner's machine (C1).
   - Git commits and pushes to either repository (the assistant could not run
     git; see C1).
-  - Redeployment of the HF Space.
+  - Redeployment of the Streamlit Community Cloud app.
   - Any paper text. §13 of ethics.md and §11 of the model card are written to be
     quotable, but nothing has been pasted into paper/.
   - Word-error-rate evaluation of OCR or speech recognition. Not measured, so

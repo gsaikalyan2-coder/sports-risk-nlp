@@ -11,6 +11,9 @@ Three modules, in the order a file passes through them:
   speech from a video. Protocol plus swappable backends, with a backend that
   honestly reports it cannot read anything when the optional tools are absent,
   rather than returning an empty string that the scorer would treat as silence.
+* `facecues`  -- Phase 28. Two bounded cues read from a real detected face, under
+  consent, carrying declared weight into the index. See its docstring for the
+  engine, the three conditions, and what it refuses to claim.
 * `nonverbal` -- the face-and-voice channel. Separate module, separate stamp,
   separate weight, and off by default. See its docstring for why it is the most
   dangerous file in this repository and what holds it down.
@@ -41,7 +44,17 @@ from .extract import (
     WhisperTranscriber,
     extractor_for,
 )
+from .facecues import (
+    FACE_STAMP,
+    FACE_WEIGHTS,
+    FaceCueReader,
+    FaceCueUnavailable,
+    face_context_weights,
+    face_cue_reader,
+    face_stack_status,
+)
 from .nonverbal import (
+    FACE_FEATURES,
     NONVERBAL_STAMP,
     NonVerbalReader,
     NonVerbalReading,
@@ -55,6 +68,14 @@ from .relevance import (
 )
 
 __all__ = [
+    "FACE_FEATURES",
+    "FACE_STAMP",
+    "FACE_WEIGHTS",
+    "FaceCueReader",
+    "FaceCueUnavailable",
+    "face_context_weights",
+    "face_cue_reader",
+    "face_stack_status",
     "MAX_BYTES",
     "MediaAdmission",
     "MediaKind",

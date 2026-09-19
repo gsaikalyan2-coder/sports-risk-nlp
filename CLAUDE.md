@@ -679,7 +679,7 @@ rule true rather than making an exception for one feature.
    bytes on stdin. See `docs/ethics.md` §13.3.
 5. **Optional backends are genuinely optional.** A clean checkout has no OCR
    engine and no speech model, and in that state the media path refuses honestly.
-   Deployment installs them via `packages.txt` (HF Space) and the `Dockerfile`.
+   Deployment installs them via `packages.txt` (Streamlit Community Cloud) and the `Dockerfile`.
 
 ### 12.6 What is deliberately not built
 
@@ -690,3 +690,134 @@ rule true rather than making an exception for one feature.
 * A relevance gate over *pasted* text. The register test runs on media only,
   because that is what was asked for; extending it to the paste box is a
   one-line change and a decision nobody has made.
+
+
+## 13. Phase 28 — facial cues in the index (built 2026-09-16)
+
+> **Status: built.** Supersedes §12.5 rule 1 and §12.6 bullet 2.
+
+### 13.1 Owner decisions (locked 2026-09-16)
+
+| Question | Decision |
+|---|---|
+| Read facial cues from uploaded photos | **Yes**, under an uploader consent attestation |
+| Do they move the risk index | **Yes, always**, when a face was actually read |
+| Engine | `hsemotion-onnx` (Apache-2.0), chosen for Streamlit Community Cloud: no PyTorch |
+| Face location | OpenCV Haar cascade, `opencv-python-headless` |
+| Features | `negative_valence`, `arousal` — named for the picture, never for a person |
+| Weights | Declared: +0.20, +0.10. Not fitted; there is no outcome to fit against |
+| Ethics gate | Discharged for facial cues in `docs/ethics.md` §14, before the code landed |
+
+### 13.2 The rules this layer adds
+
+1. **Consent is a construction precondition.** `FaceCueReader(consent=False)`
+   raises `NonVerbalEthicsGate`. There is no object to call, so no path leads
+   from an unticked box to a face being read.
+2. **Only a measured reading carries weight.** `FACE_WEIGHTS` is keyed on the two
+   face features only. The simulated reader's three features are not keys, and
+   `fusion.score` adds a term only for a name in both mappings, so a missing
+   library, a missing face or a missing consent tick can never become a number.
+   This is the Phase 27 0.50 rule applied to a new door: an input that cannot be
+   read produces no number, never a zero and never a default.
+3. **Both scores are on the page.** Text-only beside combined, whenever the face
+   moved the index.
+4. **The §14.3 limitation renders above the score, outside any expander,** in the
+   error style, so it survives a screenshot.
+5. **The paper stays text-only in its numbers.** No face-derived figure appears in
+   any table, figure or claim; where the paper describes the deployed page it
+   must say that uploads are scored from text plus two facial cues under consent.
+
+### 13.3 What is deliberately still not built
+
+* Voice or prosody analysis. The video path still yields words only.
+* Any identification, matching, embedding or storage of a face.
+* A measured error rate for the cues. None exists, so none is claimed.
+
+## 14. Phase 29 — match-day profile: built, blocked by default (2026-09-19)
+
+> **Status: code and tests exist; the feature is inert in every checkout and
+> every deployment until an explicit environment flag is set. It was found on
+> review, before the code was committed, to be the exact case this project's own
+> written ethics policy already prohibits. This section documents the finding
+> and the gate, not an owner decision to ship the feature.**
+
+### 14.1 What was requested and what was built
+
+Owner request, 2026-09-19: given a link to a press conference and a photograph
+of the athlete in it, produce the ten-construct metrics and one final score for
+that specific person. `src/media/pressroom.py` fetches the video's published
+caption track (or, if installed locally, transcribes the audio with
+`faster-whisper`) and `src/dashboard/matchday.py` combines that transcript with
+the Phase 28 facial-cue channel into one profile, rendered by
+`dashboard/pages/6_Match_day_profile.py`. Every step de-identifies the
+transcript, stamps every number `MACHINE-READ` or `NOT A MEASUREMENT`, and
+refuses rather than defaulting when a channel is missing — the same discipline
+as every other phase in this document.
+
+### 14.2 Why it is blocked, in the project's own words
+
+This is not a new judgment call. `docs/ethics.md` already says, in writing,
+before this phase existed:
+
+* §2.3.3 (binding, since the policy's first version): the system must never be
+  used to "generate claims about a **named** athlete's psychological state,
+  publicly or privately."
+* §13.4: "Media of a public figure from a press conference is **not** exempt.
+  Public availability of a recording is not consent to psychological inference
+  about the person in it."
+* §14.2 (Phase 28, 2026-09-16): "Third-party and public-figure material remains
+  prohibited... A press photograph of a named athlete is exactly the case the
+  first bullet of §13.5 forbids, and ticking the box does not make it
+  permitted."
+
+A match-day profile is, by construction, a specific real person's press
+conference plus their photograph, reduced to "one final score." That is the
+prohibited act, not a nearby one, regardless of de-identification inside the
+text pipeline — de-identifying the transcript's *content* does not de-identify
+*who the reader is looking up*. Unlike Phase 28's face-cue reader, there is no
+consent checkbox that fixes this: the athlete in someone else's press-conference
+recording never agreed to anything, and §13.4 already anticipated and rejected
+the "it's public, so it's fine" argument before this phase made it.
+
+### 14.3 The gate
+
+`src/media/pressroom.py::fetch_transcript` refuses unconditionally — before any
+network call — unless the environment variable `SRN_MATCHDAY_REAL_ATHLETES` is
+set. This is the same shape as `GatedRealReader` in `src/media/nonverbal.py`
+before Phase 28 discharged it for facial cues, applied to a case that (unlike
+Phase 28) this document does not currently discharge. `docs/ethics.md` §15
+carries the full compliance record and the condition for ever unblocking it.
+The flag is **off by default** everywhere, including the deployed Streamlit
+Community Cloud app, and is documented in `.env.example` rather than set there.
+
+### 14.4 What would have to be true before this is ever turned on
+
+None of these exist yet, and none is created by this section:
+
+1. A deliberate, dated owner decision that public-figure inference is in scope
+   for this project at all — a reversal of §2.3.3 and §13.4, not a carve-out
+   squeezed under them, argued in writing with the reviewer-facing consequence
+   stated (a paper claiming "research and decision-support only" while its
+   deployed dashboard names a specific athlete and scores them is not a
+   position a reviewer will let pass unchallenged).
+2. If that reversal is made: a real consent or notice route for the athlete
+   named in the link, not an attestation by the person pasting the URL about
+   somebody else.
+3. A retention and takedown route matching `docs/ethics.md` §7 for a specific,
+   identifiable person who did not submit anything.
+4. The §14.3 (Phase 28) facial-cue limitation, restated for a photograph the
+   uploader may not have taken themselves.
+
+Until all four exist and are written into `docs/ethics.md`, the flag stays
+unset in every environment this project controls.
+
+### 14.5 What is deliberately still not built
+
+* Any UI path that sets `SRN_MATCHDAY_REAL_ATHLETES` from inside the app. It is
+  an environment variable an operator sets outside the running process,
+  deliberately, once, matching how `SRN_COGNITIVE_LAYER` works.
+* A consent checkbox for the press-conference link. §14.2 above is why: no
+  checkbox available to the page's reader can supply the athlete's consent.
+* Any use of the speech-recognition fallback (`yt-dlp` + `faster-whisper`) in
+  the deployed Streamlit Community Cloud app. Both are installed locally only
+  (§6 below); the caption route is the only one `requirements-base.txt` ships.

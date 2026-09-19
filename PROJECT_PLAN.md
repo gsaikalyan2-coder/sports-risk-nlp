@@ -607,7 +607,7 @@ own row in a plan.
 | 27.9 | OCR direct to the upstream Tesseract engine | ✅ two dependencies removed |
 | 27.10 | `docs/ethics.md` §13 — the blocking gate, discharged | ✅ |
 | 27.11 | `docs/model_card.md` §11 | ✅ |
-| 27.12 | Deployment: `packages.txt` (HF Space) and `Dockerfile` apt layer | ✅ |
+| 27.12 | Deployment: `packages.txt` (Streamlit Community Cloud) and `Dockerfile` apt layer | ✅ |
 
 ### Merge gates (all met)
 
@@ -636,3 +636,72 @@ two-sided constructs, so the policy selector correctly changes nothing on it.
 Both pages now report how many two-sided signals the text triggered, so a no-op
 switch explains itself rather than looking broken. **OPEN-027:** consider
 ordering the example list so the default selection demonstrates the control.
+
+---
+
+## PHASE 28 — Facial cues, under consent, inside the index ✅ COMPLETE (2026-09-16)
+
+**Goal.** Read `negative_valence` and `arousal` from the largest face in an
+uploaded photograph, under an uploader consent attestation, and let those two
+cues move the risk index at small, declared (not fitted) weights — closing the
+seam Phase 27 built and then bolted shut (`GatedRealReader`).
+
+### Work items
+
+| # | Item | State |
+|---|---|---|
+| 28.1 | `src/media/facecues.py` — `hsemotion-onnx` + OpenCV Haar cascade reader | ✅ |
+| 28.2 | Consent as a construction precondition (`FaceCueReader(consent=...)`) | ✅ |
+| 28.3 | Only a measured reading carries weight; simulated reading stays at zero | ✅ |
+| 28.4 | Mandatory limitation rendered above every face-derived score | ✅ `copy.FACE_CUES_LIMITATION` |
+| 28.5 | `docs/ethics.md` §14 — the blocking gate, discharged for facial cues only | ✅ |
+| 28.6 | `docs/model_card.md` §12 | ✅ |
+| 28.7 | `tests/test_facecues.py` | ✅ |
+
+### Merge gates (all met)
+
+* Consent-refused construction asserted (`NonVerbalEthicsGate` fires).
+* Simulated-reading feature names disjoint from `FACE_WEIGHTS` keys, so a
+  missing library or absent consent can never move the index.
+* Text-only score remains visible beside the combined score.
+* `docs/ethics.md` updated **before** `facecues.py` was allowed to remain.
+
+---
+
+## PHASE 29 — Match-day profile: built, blocked by default (2026-09-19)
+
+**Status: ⚠ CODE AND TESTS COMPLETE. FEATURE INERT.** Not a merge gate in the
+usual sense — the gate this phase must clear is an owner ethics decision, not a
+test suite, and that decision has not been made. See `CLAUDE.md` §14 and
+`docs/ethics.md` §15 for the full record.
+
+**Goal as requested.** Given a press-conference link and a photograph, produce
+one final score for that specific athlete.
+
+**What was found on review.** The feature as requested is the exact act
+`docs/ethics.md` §2.3.3 and §13.4 already prohibit in writing: a claim about a
+named, identifiable public figure's psychological state, from their own public
+material. De-identifying the transcript text does not de-identify who the
+reader is looking up. This was found and gated **before** the code was
+committed, not after a report.
+
+### Work items
+
+| # | Item | State |
+|---|---|---|
+| 29.1 | `src/media/pressroom.py` — captions via `youtube-transcript-api`, speech via `yt-dlp` + `faster-whisper` (local only) | ✅ built |
+| 29.2 | `src/dashboard/matchday.py` — de-identify, fuse text + face, one score | ✅ built |
+| 29.3 | `dashboard/pages/6_Match_day_profile.py` | ✅ built |
+| 29.4 | Ethics gate: `fetch_transcript` refuses unless `SRN_MATCHDAY_REAL_ATHLETES` is set | ✅ blocks by default |
+| 29.5 | `docs/ethics.md` §15 — the blocking gate, NOT discharged | ✅ documents the block |
+| 29.6 | `tests/test_pressroom.py` — gate-closed and gate-open behaviour both asserted | ✅ |
+| 29.7 | Owner decision to ever unblock `SRN_MATCHDAY_REAL_ATHLETES` | ❌ not made; see `docs/ethics.md` §15.4 |
+
+### Merge gates
+
+* All existing tests remain green with the gate added.
+* The gate fires before any network call — asserted, not just documented.
+* No code path in the repository, the deploy repo, or `.env.example` sets the
+  flag. The deployed Streamlit Community Cloud app ships the feature inert.
+* `CLAUDE.md` and `docs/ethics.md` updated **before** this phase's code was
+  committed, recording the block rather than a discharge.

@@ -658,3 +658,175 @@ uploads. That limitation is stated wherever the figure appears.
 | Real face/voice reader blocked | `GatedRealReader` raises; test asserts it fires. |
 | Relevance gate reports a number | 0.85 held-out recall; `tests/test_relevance.py`. |
 | Model card updated | `docs/model_card.md` §11. |
+
+## 14. Phase 28 — facial cues, read under consent, inside the index (added 2026-09-16)
+
+**Status: this section discharges the blocker §13.5 named, for facial cues only.
+It was written before `src/media/facecues.py` was allowed into the repository,
+not after. It supersedes §13.2 points 2 and 4, and the fourth and fifth bullets
+of §13.5. Everything else in §13 stands unchanged.**
+
+### 14.1 What changed, and the owner decision behind it
+
+Owner decision, 2026-09-16: uploaded photographs should have their facial cues
+read, and those cues should move the risk index rather than sit beside it at zero
+weight. The owner accepted, in writing and before any code was changed, the two
+consequences:
+
+1. The index produced from an upload is no longer a text-only number, so the
+   paper may no longer describe the deployed page as text-only without
+   qualification. §14.5 fixes the wording.
+2. An expression is weak evidence about a state of mind, and a competitor
+   mid-effort looks strained for reasons unrelated to how they are coping.
+
+### 14.2 The consent route, and what it can and cannot do
+
+The page carries a checkbox stating, in the first person, that the face in the
+file is the uploader's own or that the person shown agreed. Three properties:
+
+* **It is a precondition of construction, not a preference.**
+  `FaceCueReader.__init__` takes `consent` as a required keyword and raises
+  `NonVerbalEthicsGate` when it is false. There is no object to call, so there is
+  no path from an unticked box to a face being read.
+* **It is an attestation, not verification.** The dashboard cannot check whether
+  the person in a photograph agreed. This is the same unclosed gap §13.4 names
+  and it is not closed here. It is why the page states, beside every face-derived
+  number, that nothing produced this way belongs in a conversation about a
+  person, and why the prohibition on claims about identifiable people in §1 and
+  §13.5 is unchanged and binding.
+* **Third-party and public-figure material remains prohibited** under §3.3 and
+  §13.5. A press photograph of a named athlete is exactly the case the first
+  bullet of §13.5 forbids, and ticking the box does not make it permitted.
+
+### 14.3 The mandatory limitation
+
+Wherever a number derived from a face is shown, this must be shown with it,
+above the score and outside any collapsible element, in the error style:
+
+> An expression is not a feeling. Research does not support reading a person's
+> state of mind reliably from their face, and a competitor mid-effort looks
+> strained for reasons that have nothing to do with how they are coping. These
+> two values describe the picture, they carry a small weight that was chosen by
+> hand rather than learned from outcomes, and nothing produced this way belongs
+> in a conversation about a person.
+
+It lives in `src/dashboard/copy.py::FACE_CUES_LIMITATION`, is rendered by
+`dashboard/pages/2_Score_my_own_text.py` whenever `MediaResult.face_measured` is
+true, and `tests/test_facecues.py` asserts its presence.
+
+### 14.4 Retention of biometric data — required by §13.5
+
+Unchanged from §13.3 and restated because a face now enters the code path: the
+uploaded bytes are decoded into a local array, reduced to two floats, and
+dropped when the render ends. Nothing is written to disk, to `data/`, to
+`logs/`, or to a cache; no face embedding, crop, landmark set or identifier is
+produced, stored or transmitted; and no face is matched against any gallery.
+There is no identification capability in this code and none may be added under
+this section.
+
+### 14.5 What the system now does, stated precisely
+
+1. **Words still produce the ten constructs, the explanation and the
+   decomposition.** The face contributes two numbers and nothing else.
+2. **Two features, named for the picture**: `negative_valence` and `arousal`,
+   each in [0, 1], from `hsemotion-onnx` (Apache-2.0; Savchenko et al., *IEEE
+   Transactions on Affective Computing*, 2022), with OpenCV's Haar cascade
+   locating the largest face.
+3. **The weights are declared, not fitted**: `negative_valence` +0.20, `arousal`
+   +0.10. There is no observed outcome in this project to fit against
+   (OPEN-025), and the page says the weights were chosen by hand.
+4. **Only a measured reading carries weight.** When consent is absent, the
+   libraries are missing, no face is found, or the face is under 64 pixels, the
+   simulated reading is shown at zero weight and the page states which of those
+   happened. A missing library can never become a number.
+5. **Both numbers are on the page.** The text-only score is rendered beside the
+   combined score whenever the face moved the index, so the contribution is
+   visible rather than described.
+6. **The paper.** No face-derived number appears in any table, figure or claim.
+   Where the paper describes the deployed dashboard it must state that uploaded
+   photographs are scored from text plus two facial cues under an uploader
+   consent attestation, with the §14.3 limitation attached. The corpus results,
+   the ablations and the fusion analysis are unaffected: they run on text.
+
+### 14.6 Compliance checkpoint (extends §13.7)
+
+| Requirement | State |
+|---|---|
+| Consent precondition enforced in code | `FaceCueReader(consent=...)` raises; `tests/test_facecues.py`. |
+| Biometric retention rule | §14.4. Nothing retained, no embedding, no identification. |
+| Limitation shown with every face number | §14.3; asserted in tests. |
+| Unmeasured reading cannot move a number | Weight keys disjoint from simulated feature names; asserted. |
+| Text-only score remains visible | Rendered beside the combined score. |
+| Model card updated | `docs/model_card.md` §12. |
+| Third-party / public-figure prohibition | Unchanged, §3.3 and §13.5 bullet 1. |
+
+## 15. Phase 29 — match-day profile: blocked pending owner sign-off (added 2026-09-19)
+
+**Status: this section is the blocking gate `src/media/pressroom.py` names in its
+own docstring. It was written after the code was found, on review, to conflict
+with §2.3.3, §13.4 and §14.2 above, and before the code was committed. It
+discharges nothing. Nothing here permits the feature to run against a real
+person; it records why the code exists in the repository in a state where it
+cannot.**
+
+### 15.1 What was built
+
+`src/media/pressroom.py` fetches a YouTube video's caption track (or, with
+`yt-dlp` and `faster-whisper` installed locally, transcribes its audio) given a
+pasted link. `src/dashboard/matchday.py` de-identifies the transcript, scores it
+through the same pipeline as pasted text, adds the Phase 28 facial-cue channel
+from an uploaded photograph, and reports one combined score. Everything about
+*how* it is built matches this project's standards: de-identification is not
+skippable, every number carries a `MACHINE-READ` or `NOT A MEASUREMENT` stamp,
+nothing is retained, and a missing channel produces no number rather than a
+default. None of that is in question.
+
+### 15.2 What is in question, and why the answer is currently "no"
+
+The feature's entire purpose is to answer "what is this specific athlete's
+score" from a link the reader chose because it names someone. That is §2.3.3's
+prohibited act — "generate claims about a named athlete's psychological state,
+publicly or privately" — performed by design, not by accident. §13.4 already
+considered and rejected the argument that public availability changes this:
+
+> "Media of a public figure from a press conference is not exempt. Public
+> availability of a recording is not consent to psychological inference about
+> the person in it, and §1's prohibition on claims about a named athlete's
+> mental health applies unchanged and in full."
+
+De-identifying the transcript text removes names *from the words being scored*.
+It does not remove the fact that the reader who pasted the link, and the
+photograph they uploaded alongside it, both identify who the score is about.
+Those are different acts of de-identification and only the first is what
+`src/preprocessing/deidentify.py` does.
+
+### 15.3 The gate
+
+`fetch_transcript` refuses with `TranscriptUnavailable` — before contacting
+YouTube — unless the environment variable `SRN_MATCHDAY_REAL_ATHLETES` is set.
+No code path in this repository sets it. It is not exposed in the Streamlit UI,
+not set in `packages.txt`, `requirements-base.txt`, the `Dockerfile`, or the
+Streamlit Community Cloud deploy repo's configuration, and `.env.example`
+documents it as commented-out. `tests/test_pressroom.py` asserts the gate fires
+by default and that no network route is attempted while it is closed.
+
+### 15.4 Conditions for revisiting this section
+
+Unblocking `SRN_MATCHDAY_REAL_ATHLETES` in any environment this project
+controls requires, first, a dated owner decision reversing (not narrowing
+around) §2.3.3 and §13.4 — written here, with the reviewer-facing consequence
+named — and then, before any code changes: a real consent or notice route for
+the person named in the link (not an attestation by whoever pasted the URL), a
+retention and takedown route under §7 naming that person, and the §14.3
+facial-cue limitation restated for a photograph the uploader may not have taken.
+Absent all four, this section's answer stays "no" and the flag stays unset.
+
+### 15.5 Compliance checkpoint (extends §14.6)
+
+| Requirement | State |
+|---|---|
+| Feature refuses by default, every environment | `ETHICS_GATE_ENV` unset everywhere; `tests/test_pressroom.py`. |
+| De-identification still applied when the flag is set | `matchday._deidentify`, unchanged from §13.4/§3. |
+| No UI path sets the flag | Confirmed by reading `dashboard/pages/6_Match_day_profile.py`; no `os.environ` write in the page. |
+| Public-figure prohibition | Unchanged, §2.3.3, §13.4, §14.2. Not discharged by this section. |
+| Model card updated | Not required while the feature is blocked; revisit at unblock time. |
