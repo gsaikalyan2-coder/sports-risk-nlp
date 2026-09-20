@@ -373,26 +373,36 @@ FACE_TEXT_ONLY_LABEL = "Words only"
 
 FACE_COMBINED_LABEL = "Words and face"
 
+FACE_EXPRESSION_HEADLINE = "What the model's eight categories scored"
+
+FACE_EXPRESSION_PLAIN = (
+    "These eight numbers are the same model's own per-category scores for this "
+    "photo, shown so the two weighted numbers above are not the only thing "
+    "visible. None of the eight moved the score -- only negative-looking and "
+    "activated-looking do, at the weights stated above. They are listed in a "
+    "fixed order, not ranked by score, and no single category is named as "
+    "the photo's 'emotion' anywhere on this page."
+)
+
 # ---------------------------------------------------------------------------
-# Phase 29: the match-day profile (photograph + press conference)
+# Phase 29: the match-day profile (press conference; photo upload lives on the
+# "Score my own text" page only -- see dashboard/pages/6_Match_day_profile.py's
+# docstring for why the two were split apart)
 # ---------------------------------------------------------------------------
 
-MATCHDAY_TITLE = "One profile from a picture and a press conference"
+MATCHDAY_TITLE = "One profile from a press conference"
 
 MATCHDAY_LEDE = (
-    "Paste a link to a press conference and, if you have one, add a photograph. The "
-    "words are taken from the video's own captions, names are replaced with "
-    "placeholders, and then they are scored exactly as typed words are. The picture "
-    "adds two values describing how the expression looks. Nothing is stored."
+    "Paste a link to a press conference. The words are taken from the video's own "
+    "captions, names are replaced with placeholders, and then they are scored "
+    "exactly as typed words are. Nothing is stored."
 )
 
 MATCHDAY_LINK_LABEL = "Link to a press conference"
 
-MATCHDAY_PHOTO_LABEL = "A photograph of the athlete (optional)"
-
 MATCHDAY_SUBMIT = "Build the profile"
 
-MATCHDAY_EMPTY = "Add a link, a photograph, or both, then press the button."
+MATCHDAY_EMPTY = "Add a link, then press the button."
 
 MATCHDAY_WORKING = "Reading the press conference, this can take a moment."
 
@@ -400,12 +410,24 @@ MATCHDAY_NOTHING = "Nothing was scored."
 
 MATCHDAY_READ_BY = "by {route}"
 
-MATCHDAY_NO_FACE = "No photograph was read, so this score comes from the words alone."
-
 MATCHDAY_DEID_NOTE = (
     "Names and other identifying items were replaced before scoring: {count} "
     "replacement(s). What was scored is the de-identified text, not the original."
 )
+
+SCENARIO_TITLE = "Or: generate a synthetic scenario"
+
+SCENARIO_LEDE = (
+    "No real press conference required. Pick a sport, a point before the "
+    "competition, and a life context -- the same template grammar that built "
+    "this project's synthetic corpus writes a fictional athlete's words and "
+    "scores them the same way. A different life context plants a different "
+    "set of psychological constructs, so the score moves for a real reason."
+)
+
+SCENARIO_SUBMIT = "Generate & score"
+
+SCENARIO_SEED_LABEL = "Seed (same seed + scenario = identical text)"
 
 #: Shown instead of a score when `gibberish.admit` refuses the input.
 #:
