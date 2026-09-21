@@ -429,6 +429,8 @@ SCENARIO_SUBMIT = "Generate & score"
 
 SCENARIO_SEED_LABEL = "Seed (same seed + scenario = identical text)"
 
+SCENARIO_EMPTY = "Pick a sport, timing and life context, then press the button."
+
 #: Shown instead of a score when `gibberish.admit` refuses the input.
 #:
 #: A heading, not the whole message: the specific reason comes from the

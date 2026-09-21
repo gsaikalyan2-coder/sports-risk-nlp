@@ -44,6 +44,8 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 
+from src.evaluation.baselines import CONSTRUCT_CUES
+
 from .records import RawRecord
 from .synthetic import (
     CATEGORICAL_REALISATIONS,
@@ -60,6 +62,37 @@ from .synthetic import (
     _realise,
     _vary,
 )
+
+
+#: `LexiconBackend` (`src/dashboard/backend.py`) only lights a construct up
+#: when its rendered text contains one of `CONSTRUCT_CUES`' hand-picked
+#: phrases -- a deliberately narrow baseline, by its own docstring, not a
+#: general-purpose detector. A realisation-bank template can be a perfectly
+#: legible statement of a construct in the same way a human annotator would
+#: read it, and still miss every one of that construct's cue phrases: verified
+#: directly against the real backend during Phase 30, e.g. "I am running on
+#: empty and the demands have not stopped coming" (a bank entry written FOR
+#: perceived_stress) contains none of that construct's cues ("too much", "a
+#: lot on", ...). A generated scenario whose whole point is showing
+#: construct contributions must not silently draw one of these templates.
+def _cue_hit(text: str, construct: str) -> bool:
+    low = text.lower()
+    return any(cue in low for cue in CONSTRUCT_CUES.get(construct, ()))
+
+
+#: (construct, intensity) -> the bank indices at that intensity whose raw
+#: template text already contains a cue phrase for that construct. Computed
+#: once at import; used to prefer a template `_realise_graded_at` knows the
+#: real backend will detect, over one that merely reads like the construct.
+_CUE_MATCHING_INDICES: dict[tuple[str, int], tuple[int, ...]] = {
+    (construct, intensity): tuple(
+        i
+        for i, template in enumerate(GRADED_REALISATIONS[construct][intensity])
+        if _cue_hit(template, construct)
+    )
+    for construct in GRADED_REALISATIONS
+    for intensity in (1, 2, 3)
+}
 
 __all__ = [
     "LIFE_CONTEXT_LABELS",
@@ -94,6 +127,10 @@ LIFE_CONTEXTS: tuple[str, ...] = (
     "recent_loss",
     "strong_season",
     "personal_disruption",
+    "team_conflict",
+    "high_expectations",
+    "coach_change",
+    "peaking_well",
 )
 
 LIFE_CONTEXT_LABELS: dict[str, str] = {
@@ -102,6 +139,10 @@ LIFE_CONTEXT_LABELS: dict[str, str] = {
     "recent_loss": "Coming off a loss",
     "strong_season": "Coming off a strong season",
     "personal_disruption": "A difficult personal patch (e.g. a breakup, a bereavement)",
+    "team_conflict": "Friction with a coach or teammates",
+    "high_expectations": "Everyone expects them to win this one",
+    "coach_change": "New coach, new plan, still settling in",
+    "peaking_well": "Training has gone better than ever this block",
 }
 
 
@@ -172,6 +213,38 @@ SCENARIO_BIAS: dict[str, tuple[_Directive, ...]] = {
         # Attentional width/direction model and TAIS [Nideffer1976]
         _Directive("attentional_focus", label="distracted", label_weight=0.6),
     ),
+    "team_conflict": (
+        # Perceived Stress Scale [Cohen1983]
+        _Directive("perceived_stress", intensity_band=(1, 2)),
+        # Coping in sport systematic review [Nicholls2007]
+        _Directive("coping_style", label="avoidance", label_weight=0.65),
+        # Attentional width/direction model and TAIS [Nideffer1976]
+        _Directive("attentional_focus", label="distracted", label_weight=0.55),
+    ),
+    "high_expectations": (
+        # CSAI-2 cognitive-anxiety subscale [Martens1990; Cox2003]
+        _Directive("cognitive_anxiety", intensity_band=(2, 3)),
+        # Perceived Stress Scale [Cohen1983]
+        _Directive("perceived_stress", intensity_band=(1, 2)),
+        # Theory of Challenge and Threat States in Athletes [JonesMeijen2009]
+        _Directive("appraisal_orientation", label="threat", label_weight=0.55),
+    ),
+    "coach_change": (
+        # Attentional width/direction model and TAIS [Nideffer1976]
+        _Directive("attentional_focus", label="distracted", label_weight=0.55),
+        # Coping in sport systematic review [Nicholls2007]
+        _Directive("coping_style", label="mixed", label_weight=0.5),
+        # Athlete Burnout Questionnaire [Raedeke2001]
+        _Directive("burnout_signal", intensity_band=(1, 2)),
+    ),
+    "peaking_well": (
+        # CSAI-2 self-confidence subscale [Martens1990; Cox2003]
+        _Directive("self_confidence", intensity_band=(2, 3)),
+        # Attentional width/direction model and TAIS [Nideffer1976]
+        _Directive("attentional_focus", label="focused", label_weight=0.7),
+        # 2x2 achievement-goal framework [Elliot2001]; SDT [Deci2000]
+        _Directive("motivation_orientation", label="approach", label_weight=0.6),
+    ),
 }
 
 
@@ -179,7 +252,18 @@ def _realise_graded_at(construct: str, rng: random.Random, sport: str, band: tup
     lo, hi = band
     intensity = rng.randint(lo, hi)
     bank = GRADED_REALISATIONS[construct][intensity]
-    index = rng.randrange(len(bank))
+    # Prefer a cue-matching template at the drawn intensity; failing that, the
+    # other intensity in `band`; failing that (rare -- most (construct,
+    # intensity) pairs have at least one match), accept any template rather
+    # than raising, since a legible-but-undetected scenario is still better
+    # than a crashed one.
+    matching = _CUE_MATCHING_INDICES.get((construct, intensity), ())
+    if not matching and hi != lo:
+        other = hi if intensity == lo else lo
+        alt = _CUE_MATCHING_INDICES.get((construct, other), ())
+        if alt:
+            intensity, bank, matching = other, GRADED_REALISATIONS[construct][other], alt
+    index = rng.choice(matching) if matching else rng.randrange(len(bank))
     spec = {
         "construct": construct,
         "intensity": intensity,
@@ -241,11 +325,55 @@ def generate_scenario_record(
             planted.append(spec)
     else:
         # "none": the ordinary unbiased draw, so the baseline scenario reads
-        # like a generic corpus record rather than a fifth invented context.
-        for construct in _draw_constructs(rng):
-            sentence, spec = _realise(construct, rng, scenario.sport)
+        # like a generic corpus record rather than an invented context. Two
+        # problems with the plain unbiased draw, found by hand-testing this
+        # feature against the real LexiconBackend rather than trusting the
+        # generator's own bookkeeping:
+        #
+        # (1) `_draw_constructs` can legitimately return zero constructs (~8%
+        #     of the time), landing the index on exactly 0.50 with every tile
+        #     reading "+0.000" -- correct for genuinely neutral text
+        #     (CLAUDE.md sec.12.3's "0.50 problem"), but wrong for a demo
+        #     scenario whose whole point is showing construct contributions.
+        # (2) The four CATEGORICAL constructs (motivation_orientation,
+        #     attentional_focus, coping_style, appraisal_orientation) are
+        #     exactly the dashboard's "two-sided signals," which the default
+        #     Conservative policy renders INERT -- zero contribution by
+        #     design (`src/dashboard/view.py::scorer_for`), same as every
+        #     other page. A draw of categorical constructs only is therefore
+        #     just as flat on screen as an empty draw, even though the
+        #     generator "planted" something.
+        # (3) Even a GRADED construct can land on `_realise`'s level-1
+        #     weight (35% of draws) -- mild, hedged language ("a bit more
+        #     going on than usual") that often contains none of
+        #     `LexiconBackend`'s cue words for that construct. Verified
+        #     directly against the real backend, not assumed.
+        #
+        # All three are fixed the same way the nine biased scenarios already
+        # work reliably: require at least one GRADED construct in the draw,
+        # floored at intensity 2-3 -- the same band `SCENARIO_BIAS` uses
+        # throughout, where the bank's language is strong enough to contain
+        # cue-word matches and to move a non-inert tile.
+        def _has_graded(constructs: list[str]) -> bool:
+            return any(c in GRADED_REALISATIONS for c in constructs)
+
+        drawn = _draw_constructs(rng)
+        _retries = 0
+        while not _has_graded(drawn) and _retries < 20:
+            drawn = _draw_constructs(rng)
+            _retries += 1
+        if not _has_graded(drawn):
+            # Exhausted retries (astronomically unlikely, but never silently
+            # flat): add one graded construct rather than leaving the draw
+            # categorical-only.
+            drawn = [*drawn, rng.choice(list(GRADED_REALISATIONS))]
+        for construct in drawn:
+            if construct in GRADED_REALISATIONS:
+                sentence, spec = _realise_graded_at(construct, rng, scenario.sport, (2, 3))
+            else:
+                sentence, spec = _realise(construct, rng, scenario.sport)
             if _contradicts(spec, planted):
-                sentence, spec = _realise(construct, rng, scenario.sport, cap_intensity=2)
+                sentence, spec = _realise_graded_at(construct, rng, scenario.sport, (2, 2))
             sentences.append(_vary(_frame(sentence, rng), rng))
             planted.append(spec)
 

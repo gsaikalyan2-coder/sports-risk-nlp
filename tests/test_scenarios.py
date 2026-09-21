@@ -107,6 +107,14 @@ def test_none_life_context_falls_back_to_unbiased_draw() -> None:
     assert SCENARIO_BIAS["none"] == ()
 
 
+def test_none_life_context_never_plants_zero_constructs() -> None:
+    """A demo scenario whose point is showing contributions must show at least one."""
+    scenario = MatchDayScenario(sport="athletics", timing="week_before", life_context="none")
+    for seed in range(100):
+        record = generate_scenario_record(scenario, seed=seed)
+        assert _constructs(record), f"seed {seed} planted zero constructs"
+
+
 def test_generated_record_is_a_valid_raw_record() -> None:
     scenario = MatchDayScenario(
         sport="swimming", timing="immediately_before", life_context="personal_disruption"
@@ -116,3 +124,46 @@ def test_generated_record_is_a_valid_raw_record() -> None:
     assert record.sport == "swimming"
     assert record.time_to_competition_days == 0
     assert record.text.strip()
+
+
+# ---------------------------------------------------------------------------
+# Containment: this module may never reach a corpus artefact
+# ---------------------------------------------------------------------------
+
+
+def test_no_corpus_writing_module_imports_scenarios() -> None:
+    """`scenarios` selects templates the lexicon baseline is known to detect.
+
+    `_CUE_MATCHING_INDICES` biases `_realise_graded_at` toward realisations
+    containing one of `src.evaluation.baselines.CONSTRUCT_CUES`' phrases, so
+    that the Match-day demo shows contributions rather than ten empty bars.
+    That is legitimate for a demo and fatal for a corpus: text chosen because
+    the lexicon detects it inflates the lexicon's own score, which is
+    **OPEN-021** ("the lexicon baseline is not independent of the corpus")
+    made strictly worse -- and this time by construction rather than by
+    shared ancestry.
+
+    Nothing today routes it into a corpus (only `src.dashboard.matchday`
+    imports it). This test is what keeps that true, because the failure is
+    silent: a corpus built through this path produces a *better* lexicon
+    number and no error anywhere.
+    """
+    import re
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[1]
+    corpus_writers = [
+        *(p for p in (repo / "src" / "ingestion").glob("*.py") if p.name != "scenarios.py"),
+        repo / "scripts" / "run_ingestion.py",
+    ]
+    pattern = re.compile(r"^\s*(from\s+\S*scenarios\s+import|import\s+\S*scenarios)", re.M)
+
+    offenders = [
+        p.relative_to(repo).as_posix()
+        for p in corpus_writers
+        if p.exists() and pattern.search(p.read_text(encoding="utf-8"))
+    ]
+    assert not offenders, (
+        f"{offenders} imports src.ingestion.scenarios. Cue-biased template "
+        "selection must not reach data/raw/ -- see OPEN-021."
+    )

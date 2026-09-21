@@ -140,9 +140,197 @@ def _cue_matches(text: str, cues: Sequence[str]) -> list[tuple[int, int]]:
     return sorted(set(found))
 
 
+#: Broadens detection for the LIVE dashboard demo only -- `CONSTRUCT_CUES` above
+#: stays untouched because it also drives `src.evaluation.baselines.LexiconBaseline`,
+#: whose macro-F1 0.462 is already committed in `reports/`. `LexiconBackend` is
+#: already documented as "not the paper's model" (module docstring), so giving
+#: its live copy a wider net is a difference this backend already has, not a new
+#: one. The point raised on 2026-09-20: detection should reflect a stronger, more
+#: robust sense of each construct -- more of the ways it is actually said -- not
+#: a handful of exact phrases a generator can be tuned to reproduce. Drawn from
+#: the same `taxonomy.yaml`-grounded realisation vocabulary every construct's
+#: bank already uses in `src/ingestion/synthetic.py`, so nothing here is invented
+#: outside the instruments already anchoring each construct.
+DASHBOARD_EXTRA_CUES: dict[str, tuple[str, ...]] = {
+    "cognitive_anxiety": (
+        "nervous",
+        "afraid",
+        "scared",
+        "second thoughts",
+        "keep thinking",
+        "turning over",
+        "hundred times",
+        "lost this in my head",
+        "convinced myself",
+        "wonder whether",
+        # Phase 31 -- see the note below this dict.
+        "thinking about the result",
+        "crosses my mind",
+        "coming up short",
+        "the bad version",
+        "see myself failing",
+        "what everyone will say",
+    ),
+    "somatic_anxiety": (
+        "butterflies",
+        "wired",
+        "flutter",
+        "unsettled",
+        "shaking",
+        "trembling",
+        "quivering",
+        "racing",
+        "woke at",
+        "breathing quicken",
+        "lighter than usual",
+    ),
+    "self_confidence": (
+        "trust my preparation",
+        "handled this before",
+        "expect to win",
+        "best prepared",
+        "nothing to fear",
+        "know what i'm capable",
+        "fair chance",
+        "done the work",
+        "can be competitive",
+        "decent account",
+        "handled this level",
+    ),
+    "perceived_stress": (
+        "on right now",
+        "no clear day",
+        "running on empty",
+        "not stopped coming",
+        "fuller than",
+        "piled up",
+        "juggling",
+        "demands",
+        "busier week",
+        "more going on",
+        "more noise around",
+        "want something from me",
+        "clear day",
+        "could not say no",
+    ),
+    "burnout_signal": (
+        "just drained",
+        "going through the motions",
+        "stopped mattering",
+        "nothing left to give",
+        "not what it was",
+        "spark is not",
+        "duty than a choice",
+        "job i want to finish",
+        "enthusiasm",
+        "rest day",
+        "stopped looking forward",
+        "tiredness",
+        "slightest difference",
+    ),
+    "resilience": (
+        "find my way",
+        "recovered from",
+        "hold on to",
+        "not the end of it",
+        "proved that to myself",
+        "get through them",
+        "another plan",
+        "find a way back",
+        "rough patches",
+        "would not be the end",
+        "build another one",
+        "finished strongly",
+    ),
+    "motivation_orientation": (
+        "find out how good",
+        "push it from",
+        "chasing something",
+        "not embarrass myself",
+        "not to mess",
+        "settle for",
+        "attack it",
+        "going badly wrong",
+        "not fall apart",
+        "not falling apart",
+        "bracing for it",
+    ),
+    "attentional_focus": (
+        "narrowed it down",
+        "on the process",
+        "nothing past that",
+        "on my phone",
+        "checking what everyone",
+        "everywhere except",
+        "pulls me straight back",
+        "scoreline",
+        "on the timeline",
+        "is the plan and",
+    ),
+    "coping_style": (
+        "go back to",
+        "have a plan for",
+        "three things i control",
+        "same warm-up",
+        "break it into",
+        "avoiding the video",
+        "switching the subject",
+        "keep myself busy",
+        "hide from the rest",
+        "dodging the video",
+    ),
+    "appraisal_orientation": (
+        "chance to meet it",
+        "tools for it",
+        "reason i train",
+        "out of my depth",
+        "too big a step",
+        "chance i wanted",
+        "making of me",
+        "undoing of me",
+        "i have the tools",
+        "put the work in",
+        "anywhere near enough",
+        "part of me thinks i can handle",
+    ),
+}
+
+#: **Phase 31 extension (2026-09-21), and how the additions were chosen.**
+#:
+#: `reports/abstention.md` measured the cost of the narrow list: 58.6% of the
+#: corpus reaches the scorer, matches no cue at all, and is handed back an index
+#: of exactly 0.50 -- the `no_detection` route, which no gate addresses because
+#: the text is perfectly good. Widening the demo list is the cheapest honest
+#: lever on that number, and the owner chose it on 2026-09-21 over the three
+#: alternatives (a different polarity policy, both, or removing the sec.12.3
+#: refusal rule -- measured at +0.2% and declined).
+#:
+#: **The additions were not invented and were not mined from the corpus.** Every
+#: phrase above came from a realisation template in
+#: `src.ingestion.synthetic.GRADED_REALISATIONS` or `CATEGORICAL_REALISATIONS`
+#: that states its own construct plainly and that the previous list still
+#: missed -- e.g. burnout's "I'm tired in a way that a rest day doesn't seem to
+#: fix" matched nothing at all. Those banks are anchored to
+#: `config/taxonomy.yaml` instruments, so provenance is unchanged from the
+#: original additions.
+#:
+#: Mining the *corpus text* would have been the wrong source: it fits the
+#: detector to the evaluation set, which is OPEN-021 arriving by another route.
+#: Mining the *templates* fits it to the taxonomy's own vocabulary, which is
+#: what a lexicon is supposed to encode.
+#:
+#: **This list still has no measured score**, and widening it does not give it
+#: one. `LexiconBaseline` is untouched, so macro-F1 0.462 and every figure
+#: derived from it stand. `tests/test_abstention.py` holds the two lists apart.
+
+
 @dataclass
 class LexiconBackend:
-    """The Phase 13 lexicon baseline, wired for one piece of text at a time."""
+    """The Phase 13 lexicon baseline, wired for one piece of text at a time.
+
+    Detection uses `CONSTRUCT_CUES` widened with `DASHBOARD_EXTRA_CUES` (live
+    demo only -- see that dict's docstring for why the two lists are separate).
+    """
 
     name: str = "lexicon"
 
@@ -150,7 +338,8 @@ class LexiconBackend:
         probabilities: dict[str, float] = {}
         explanations: list[ConstructExplanation] = []
         for construct in CONSTRUCTS:
-            spans = _cue_matches(text, CONSTRUCT_CUES.get(construct, ()))
+            cues = CONSTRUCT_CUES.get(construct, ()) + DASHBOARD_EXTRA_CUES.get(construct, ())
+            spans = _cue_matches(text, cues)
             probabilities[construct] = 1.0 if spans else 0.0
             if spans:
                 explanations.append(

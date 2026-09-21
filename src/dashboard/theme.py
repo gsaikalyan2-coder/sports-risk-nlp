@@ -298,7 +298,9 @@ def app_css(mode: str = DEFAULT_MODE) -> str:
       [data-testid="stColumn"] > div{{height:100%}}
       .widget{{background:var(--stone); border-radius:{RADIUS_SM};
         padding:{SPACE_XL}; min-height:232px; height:100%;
-        display:flex; flex-direction:column; justify-content:space-between}}
+        display:flex; flex-direction:column; justify-content:space-between;
+        transition:box-shadow .15s ease, border-color .15s ease}}
+      .widget:hover{{box-shadow:inset 0 0 0 1px var(--hairline)}}
       .widget .wl{{min-height:34px}}
       .stButton{{margin:{SPACE_MD} 0 {SPACE_XL} 0}}
 
@@ -318,42 +320,54 @@ def app_css(mode: str = DEFAULT_MODE) -> str:
       .widget .wrule{{border:0; border-top:1px solid var(--hairline);
         margin:{SPACE_LG} 0 {SPACE_MD} 0}}
 
-      /* The single hero number on the dashboard. */
+      /* The single hero number on the dashboard. Given more visual weight than
+         a flat fill: a soft layered shadow and a hairline top edge so the card
+         reads as raised rather than merely coloured-in. */
       .hero-figure{{background:var(--deep-green); color:{p["on-band"]};
-        border-radius:{RADIUS_LG}; padding:{SPACE_XXL}}}
+        border-radius:{RADIUS_LG}; padding:{SPACE_XXL};
+        box-shadow:0 1px 0 rgba(255,255,255,.08) inset, 0 12px 28px -16px rgba(0,0,0,.35);
+        border:1px solid rgba(255,255,255,.06)}}
       .hero-figure .hv{{font-family:{FONT_DISPLAY}; font-size:72px; font-weight:400;
         line-height:1; letter-spacing:-1.44px; display:block; margin:8px 0}}
       .hero-figure .hl{{font-family:{FONT_MONO}; font-size:14px; letter-spacing:.28px;
         text-transform:uppercase; opacity:.8}}
 
-      /* Band chip -- taxonomy-chip geometry, never a verdict on its own. */
+      /* Band chip: filled rather than outlined, for more presence at a glance.
+         Still taxonomy-chip geometry and still never a verdict on its own --
+         only the fill treatment changed, not the meaning or the colour token. */
       .band{{display:inline-block; border:1px solid var(--coral);
-        color:var(--coral); background:transparent; border-radius:{RADIUS_XL};
-        padding:6px 12px; font-size:14px; font-weight:500; line-height:1.71}}
+        color:{ON_DARK}; background:var(--coral); border-radius:{RADIUS_XL};
+        padding:6px 14px; font-size:14px; font-weight:500; line-height:1.71}}
 
-      /* Buttons: near-black pill for the single primary action per surface. */
+      /* Buttons: near-black pill for the single primary action per surface,
+         with a lift on hover so the primary action feels responsive. */
       .stButton > button{{background:var(--primary); color:{p["on-button"]};
         border:0; border-radius:{RADIUS_PILL}; padding:12px 24px; font-size:14px;
-        font-weight:500; line-height:1.71; width:100%}}
+        font-weight:500; line-height:1.71; width:100%;
+        transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease}}
       /* Streamlit nests the label in its own <p>/<div>, which carries the theme's
          text colour and wins over the button rule. Without these two selectors the
          pill renders near-black on near-black -- invisible, and invisible only on
          the rendered page: the markup is correct either way. */
       .stButton > button p, .stButton > button div, .stButton > button span{{
         color:{p["on-button"]}!important; font-size:14px; font-weight:500}}
-      .stButton > button:hover{{background:var(--primary); opacity:.88; color:{p["on-button"]}}}
+      .stButton > button:hover{{background:var(--primary); opacity:.88; color:{p["on-button"]};
+        transform:translateY(-1px); box-shadow:0 6px 16px -8px rgba(0,0,0,.35)}}
       .stButton > button:hover p{{color:{p["on-button"]}!important}}
+      .stButton > button:active{{transform:translateY(0)}}
       .stButton > button:focus{{box-shadow:0 0 0 3px {FOCUS_BLUE}55}}
 
-      /* Inputs: rectangular, thin grey rule, violet focus border. */
+      /* Inputs: rectangular, thin grey rule, violet focus border. Radius
+         raised from 4px to match the tile/card radius elsewhere on the page
+         instead of reading as a separate, sharper-edged system. */
       .stTextArea textarea, .stTextInput input{{background:var(--canvas);
         color:var(--ink); border:1px solid var(--hairline)!important;
-        border-radius:{RADIUS_XS}!important; font-size:16px!important;
-        padding:{SPACE_MD}!important}}
+        border-radius:{RADIUS_SM}!important; font-size:16px!important;
+        padding:{SPACE_MD}!important; transition:border-color .12s ease}}
       .stTextArea textarea:focus, .stTextInput input:focus{{
         border-color:{FORM_FOCUS}!important; box-shadow:none!important}}
       div[data-baseweb="select"] > div{{background:var(--canvas)!important;
-        border:1px solid var(--hairline)!important; border-radius:{RADIUS_XS}!important;
+        border:1px solid var(--hairline)!important; border-radius:{RADIUS_SM}!important;
         color:var(--ink)!important; font-size:16px!important}}
       /* The select's fill sits on an emotion-classed div with no stable
          attribute of its own, painted from the static theme config -- so it is
