@@ -25,6 +25,8 @@ from src.dashboard.copy import (
     ATLAS_TILE_CAPTION,
     ATLAS_TILE_LABEL,
     CONSTRUCTS,
+    COVERAGE_TILE_CAPTION,
+    COVERAGE_TILE_LABEL,
     DIRECTION_PLAIN,
     LOAD_TILE_CAPTION,
     LOAD_TILE_LABEL,
@@ -179,6 +181,42 @@ def atlas_widget(view: DashboardView) -> Widget:
         secondary_caption="the rest have a place on the sketch and nothing in the words",
         inert=False,
         detected=detected > 0,
+        stamp=view.risk.stamp,
+    )
+
+
+def coverage_widget(view: DashboardView) -> Widget:
+    """The Phase 32 summary tile: how many instruments this text speaks to.
+
+    Built through the same `Widget` contract as the ten construct tiles, so it
+    carries the view's stamp and cannot be constructed without one. That matters
+    more here than on most tiles: "2 of 8" is the single most quotable figure
+    this feature produces, and unstamped it reads as a coverage measurement
+    against something real rather than a property of a synthetic corpus scored
+    by an unevaluated cue list.
+
+    `detected` is False when nothing was evidenced, so the grid's existing
+    treatment does the work: a text that spoke to no instrument at all looks
+    different from one that spoke to two, which is the one case a bare "0 of 8"
+    in ordinary type would let a reader skim past.
+
+    Imported inside the function, not at module scope, for the reason
+    `atlas_widget` gives: the tile helpers pull in a config loader that the ten
+    construct tiles do not need, and `widgets.py` is imported by every page.
+    """
+    from src.dashboard.coverage import CoverageState, coverage_for
+
+    ledger = coverage_for(view)
+    silent = ledger.count(CoverageState.SILENT)
+    return Widget(
+        construct="evidence_coverage",
+        title=COVERAGE_TILE_LABEL,
+        value=f"{ledger.spoken_to} of {ledger.total}",
+        value_caption=COVERAGE_TILE_CAPTION,
+        secondary=f"{silent} of {len(ledger.subscales)} subscales silent",
+        secondary_caption="no evidence either way, not an absence",
+        inert=False,
+        detected=ledger.spoken_to > 0,
         stamp=view.risk.stamp,
     )
 

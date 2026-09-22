@@ -567,3 +567,41 @@ table or figure in this card or in the paper.
   this engine, and the channel must not be described as fair or unbiased.
 * **The weights are a prior.** +0.20 and +0.10 were chosen by hand to be small.
   They are not learned, not tuned, and not validated.
+
+## 13. Phase 32 — evidence coverage (added 2026-09-22)
+
+A reporting surface, not a model change. Nothing in §1, §3, §5 or §6 is
+affected: no weight, threshold, cue list or checkpoint moved, and the risk index
+is bit-identical with and without it (`tests/test_coverage.py`).
+
+**What it reports.** For one already-scored text, which of the eight validated
+instruments behind the taxonomy that text gave any evidence about. Each
+construct is a subscale of exactly one instrument
+(`config/instruments.yaml`, every citation resolving in `paper/refs.bib`), and
+each is reported as *evidenced* (a cue fired), *inert* (detected, then weighted
+zero by the polarity policy) or *silent* (no evidence either way). The states
+are read off `ConstructBar.detected` and `.inert`; no new number is computed.
+
+**Coverage is not correctness.** Evidenced means a cue fired, **not that it
+fired correctly**. Precision per construct is unmeasured and remains so until
+`data/gold/` is annotated (OPEN-025). A coverage count is therefore a statement
+about what the *input* contained, never about how well the detector performed,
+and never about the person who produced the text.
+
+**Silent is not absence.** It covers three cases — the construct genuinely
+absent, the athlete not raising it, or the detector missing it — and Phase 31
+measured a 20.2% no-detection rate over the corpus, so the third is common. No
+surface may render silent as "no X", "free of" or "does not have"; asserted.
+
+**What the numbers rest on.** The corpus is synthetic (OPEN-011) and the live
+dashboard path uses `CONSTRUCT_CUES` widened with `DASHBOARD_EXTRA_CUES`, which
+is not the frozen list the evaluation in §4–§5 uses. Over `gold_dev` a passage
+speaks to fewer than two of eight instruments on average and none reaches all
+eight. **No coverage figure may appear in the paper without naming the cue list
+that produced it.**
+
+**Instrument items are not reproduced.** CSAI-2, the ABQ, CD-RISC and TAIS are
+copyrighted. This project maps to them and does not implement them; the
+reader-facing prompts are derived from this project's own `definition` field in
+`config/taxonomy.yaml`, and `config/instruments.yaml` has a closed field set so
+it cannot acquire item text.

@@ -56,6 +56,8 @@ from .charts import (
     risk_meter,
     risk_waterfall,
 )
+from .coverage import CoverageLedger, CoverageState, coverage_for
+from .coverage_panel import coverage_height, coverage_panel
 from .gibberish import TextAdmission, admit
 from .matchday import (
     LIFE_CONTEXT_LABELS,
@@ -95,10 +97,16 @@ from .view import (
     known_examples,
     scorer_for,
 )
-from .widgets import Widget, widget_for, widgets_for
+from .widgets import Widget, coverage_widget, widget_for, widgets_for
 
 __all__ = [
     "widgets_for",
+    "CoverageLedger",
+    "CoverageState",
+    "coverage_for",
+    "coverage_height",
+    "coverage_panel",
+    "coverage_widget",
     "admit",
     "read_upload",
     "MediaResult",
