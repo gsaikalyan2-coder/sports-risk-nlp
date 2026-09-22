@@ -1,0 +1,352 @@
+================================================================================
+PHASE 32 -- EVIDENCE COVERAGE WIDGET
+"What this text cannot tell you"
+
+Status:   PLAN ONLY. No code written. Approved by the owner 2026-09-21/22
+          after reviewing reports/evidence_coverage_mockup.html.
+Written:  2026-09-22
+For:      A cold-start session picking this up with no prior context, and the
+          owner reviewing what it will do before it runs.
+Prereq:   commit 3099931 (abstention-aware evaluation + cue widening).
+================================================================================
+
+
+0. READ THESE FIRST
+--------------------------------------------------------------------------------
+  CLAUDE.md sec.11.3   the shared architecture every dashboard feature copies
+  CLAUDE.md sec.12.3   the 0.50 problem -- the defect this feature exposes
+  reports/abstention.md            yesterday's measurement; the empirical basis
+  reports/evidence_coverage_mockup.html   the APPROVED visual reference
+  config/taxonomy.yaml             instrument_anchor -- the grounding
+  src/dashboard/widgets.py         the Widget contract (already has inert/detected)
+  docs/dashboard.md                what the dashboard may never do
+
+The mockup was generated from real build_view() output, not drawn. Treat it as
+the design contract. The generator was throwaway and is gone; do not look for it.
+
+
+1. THE FEATURE IN ONE PARAGRAPH
+--------------------------------------------------------------------------------
+Every construct in this project is anchored to a validated sports-psychology
+instrument. Ten constructs map to eight instruments. This widget projects one
+scored text back onto those instruments and reports, per subscale, whether the
+text gave evidence at all -- and, where it did not, says so plainly. Its output
+IS the limitation. There is no reading of "somatic anxiety: SILENT" in which it
+becomes a finding about a person.
+
+
+2. WHY IT IS NOVEL (and what is merely reused)
+--------------------------------------------------------------------------------
+NEW TO THIS PROJECT AND, AS FAR AS THE OWNER AND THIS PLAN CAN TELL, TO THE
+LITERATURE:
+
+  N1  Instrument-space projection. `instrument_anchor` has sat in
+      config/taxonomy.yaml since Phase 4 and has never been used as an analysis
+      or display axis. Nothing in src/ reads it today.
+
+  N2  Negative-space reporting. Every existing surface -- bars, atlas, risk
+      index, explanation cards -- reports what was FOUND. Nothing reports what
+      the input could not speak to.
+
+  N3  Coverage-conditioned index. The risk index is currently rendered with no
+      statement of how much evidence it rests on. This widget pairs it with its
+      evidential denominator: "this index rests on 2 of 8 instruments."
+
+  N4  Silent subscales as next questions. Each unevidenced subscale is rendered
+      as a topic the reader could ask about. This converts a limitations display
+      into something a coach can act on, and is the feature's product
+      justification rather than only its honesty justification.
+
+REUSED, NOT NEW -- do not claim these as contributions:
+
+  -   The four-state ledger (evidenced / inert / silent / refused) is yesterday's
+      src/evaluation/abstention.py::CAUSES. New here only in that it is surfaced
+      per input, on screen, instead of aggregated in a report.
+  -   ConstructBar.inert and .detected already exist and already carry the
+      distinction. No new detection logic is required or permitted.
+  -   Widget, theme.palette, the page-shell pattern, the stamp discipline.
+
+THE ARGUMENT FOR THE PAPER (one sentence, and the thing worth writing up):
+A questionnaire is administered -- every item gets answered. Text is volunteered
+-- the athlete says what they say. A text-derived profile is therefore
+structurally incomparable to a questionnaire profile, and text-based
+psychological inference work elides this universally.
+
+NOVELTY IS NOT YET VERIFIED. No literature search was run. Before any "first" or
+"no prior work" claim reaches paper/, run the Phase 3 Literature Agent over:
+selective prediction / abstention in ML; psychometric coverage and construct
+under-representation; construct validity of text-derived measures; missing-data
+reporting in psychological assessment. If prior work exists, the feature is still
+worth shipping -- the claim just changes from "novel" to "first in this setting".
+
+
+3. WHAT THE MOCKUP REVEALED (read before building -- it is the point)
+--------------------------------------------------------------------------------
+Real numbers from build_view() over gold_dev.jsonl and one Match-day scenario:
+
+  Match-day scenario passage    3 constructs detected   2 of 8 instruments
+  Richest single utterance      2 constructs detected   2 of 8 instruments
+  Sparse utterance              1 construct  detected   1 of 8 instruments
+
+A realistic passage speaks to a QUARTER of the instrument set. That is the
+finding, and the widget's whole value is that it is undeniable on screen.
+
+Consequence the owner has accepted: a reviewer seeing "2 of 8" beside a
+confident risk index will ask why the index is shown at all. The answer is that
+the index is a ranking over what WAS detected, and the widget is what makes that
+scope explicit rather than implied. Do not soften the panel to dodge the
+question.
+
+
+4. ARCHITECTURE
+--------------------------------------------------------------------------------
+Copies the dashboard architecture exactly. Pure modules under src/dashboard/,
+rendering separated from computation, page shell with zero business logic.
+
+  config/instruments.yaml           NEW  instrument -> subscale -> construct,
+                                         one citation per row. Mirrors the
+                                         config/brain_atlas.yaml convention.
+  src/dashboard/instruments.py      NEW  loads + validates + freezes that file
+  src/dashboard/coverage.py         NEW  the ledger. Pure. No I/O, no Streamlit
+  src/dashboard/coverage_panel.py   NEW  renderer. Theme-token driven, light+dark
+  dashboard/pages/7_Evidence_coverage.py  NEW  page shell, renderer only
+  src/dashboard/widgets.py          MOD  coverage_widget(view) -> Widget tile
+  src/dashboard/copy.py             MOD  COVERAGE_PLAIN, COVERAGE_CAVEATS
+  tests/test_coverage.py            NEW  the suite in sec.7
+  docs/dashboard.md                 MOD  a section, as every feature gets
+  docs/model_card.md                MOD  one paragraph under the Phase 11 pattern
+
+A NEW RENDERER FILE, NOT neurovis.py. neurovis.py is 1364 lines. Adding to it
+breaks the 800-line ceiling in the coding rules.
+
+STATE DERIVATION -- this is the one design decision that matters:
+
+  bar.detected == False              -> SILENT
+  bar.detected and bar.inert         -> INERT
+  bar.detected and not bar.inert     -> EVIDENCED
+  no view was built (gate refused)   -> REFUSED (page shows the refusal, no table)
+
+Derive from DashboardView.bars ONLY. Do NOT import src.evaluation.abstention.
+The dependency direction would invert -- src.evaluation already depends on
+src.dashboard, and yesterday an eager import in src/evaluation/__init__.py
+tripped the OPEN-036 cycle and broke the suite. The two modules agree on the
+four states by construction; sec.7 has the test that keeps them agreeing.
+
+DOES NOT MOVE THE RISK INDEX. Read-only projection over an existing view. No
+context mapping, no weights, no committed figure touched. Assert it.
+
+
+5. BUILD ORDER
+--------------------------------------------------------------------------------
+Each step is independently provable. Do not start a step before its predecessor
+passes.
+
+  STEP 1 -- config/instruments.yaml + src/dashboard/instruments.py
+    Eight instruments. The mapping, confirmed against config/taxonomy.yaml:
+
+      CSAI-2                  [Martens1990; Cox2003]
+                              cognitive_anxiety, somatic_anxiety, self_confidence
+      Perceived Stress Scale  [Cohen1983]            perceived_stress
+      ABQ                     [Raedeke2001]          burnout_signal
+      TAIS                    [Nideffer1976]         attentional_focus
+      CD-RISC                 [Connor2003]           resilience
+      Achievement-goal / SDT  [Elliot2001; Deci2000] motivation_orientation
+      Challenge-threat        [JonesMeijen2009]      appraisal_orientation
+      Coping in sport         [Nicholls2007]         coping_style
+
+    The loader REFUSES: a construct not in taxonomy.yaml; a row with an empty
+    citation; a citation key absent from paper/refs.bib; any construct in
+    taxonomy.yaml with no instrument row (no construct may be silently dropped);
+    any numeric field (this file carries no values).
+    ACCEPTANCE: loader tests pass. No UI yet.
+
+  STEP 2 -- src/dashboard/coverage.py
+    CoverageState (enum: EVIDENCED, INERT, SILENT, REFUSED)
+    SubscaleCoverage (frozen: construct, plain_name, state, prompt)
+    InstrumentCoverage (frozen: name, citation, subscales, evidenced_count)
+    CoverageLedger (frozen: instruments, spoken_to, total, stamp)
+      __post_init__ raises without a PROVISIONAL stamp -- same shape as
+      ScoreSurface and BiosignalWindow.
+    coverage_for(view) -> CoverageLedger
+    ACCEPTANCE: ledger tests pass. Still no UI.
+
+  STEP 3 -- src/dashboard/coverage_panel.py
+    coverage_panel(ledger, *, mode) -> one self-contained HTML document,
+    mounted with st.components.v1.html, same pattern as motion_panel.
+    All colour from theme.palette(mode). Three channels per state -- glyph,
+    hue AND the literal word -- as charts.py already requires. Never hue alone.
+    Match reports/evidence_coverage_mockup.html.
+    ACCEPTANCE: render tests in sec.7 pass.
+
+  STEP 4 -- the page and the tile
+    dashboard/pages/7_Evidence_coverage.py -- imports only from src.dashboard,
+    constructs no view of its own, renders the stamp and the caveats BEFORE any
+    table or expander.
+    widgets.coverage_widget(view) -> Widget, for the main grid: title
+    "Evidence coverage", value "2 of 8", value_caption "instruments this text
+    speaks to".
+    ACCEPTANCE: tests/test_dashboard_pages.py shell rules pass on the new page.
+
+  STEP 5 -- docs
+    docs/dashboard.md section; docs/model_card.md paragraph. Both must state
+    that coverage is not correctness.
+
+
+6. RISKS AND THE GUARD FOR EACH
+--------------------------------------------------------------------------------
+  R1  COPYRIGHT -- do not reproduce instrument items.
+      CSAI-2, ABQ, CD-RISC and TAIS are copyrighted instruments. Reproducing
+      their item text is a licensing violation and it is the single most
+      damaging mistake available in this phase.
+      GUARD: the N4 "what to ask next" prompt is NOT an instrument item. Use the
+      `definition` field already in config/taxonomy.yaml, which the project
+      authored. A test asserts every prompt string is derived from taxonomy.yaml
+      and that config/instruments.yaml contains no free-text item-like field.
+
+  R2  READ AS ITEM-LEVEL COVERAGE.
+      CSAI-2 has 27 items; this project carries one construct per subscale.
+      "2 of 3" must never imply two thirds of a questionnaire was completed.
+      GUARD: the string "subscales, not items" renders adjacent to every count,
+      outside any expander. A test asserts its presence and asserts no item
+      count is ever displayed.
+
+  R3  SILENT READ AS ABSENT.
+      Silent means one of: the construct is absent; the athlete did not mention
+      it; the detector missed it. At a 20.2% silent rate the third is common.
+      GUARD: copy is fixed at "this text gives no evidence either way", screened
+      at import by the existing copy.py _screen() walk. A test asserts the panel
+      never renders "no X", "free of X", "does not have".
+
+  R4  COVERAGE MISTAKEN FOR CORRECTNESS.
+      Evidenced means a cue fired, not that it fired correctly. Precision is
+      unmeasured and needs the gold set (OPEN-025).
+      GUARD: the caveat renders above the table, in the error style, outside any
+      expander -- so it survives a screenshot. Same rule as CLAUDE.md sec.13.2.
+
+  R5  DRIFT FROM abstention.py.
+      Two modules defining the same four states will diverge.
+      GUARD: the agreement test in sec.7. They must not import each other.
+
+  R6  THE DEMO LEXICON IS UNEVALUATED.
+      The live path runs the widened DASHBOARD_EXTRA_CUES, not the frozen
+      evaluated list. Coverage shown to a visitor is coverage of an unevaluated
+      detector.
+      GUARD: carry the same disclosure docs/dashboard.md already makes. Do not
+      quote a coverage percentage in the paper without saying which cue list
+      produced it.
+
+
+7. TESTS REQUIRED (write these before wiring the page on)
+--------------------------------------------------------------------------------
+  config / loader
+    - every construct in taxonomy.yaml appears in exactly one instrument row
+    - a row with an empty citation raises
+    - a citation key absent from paper/refs.bib raises
+    - a construct absent from taxonomy.yaml raises
+
+  ledger
+    - a CoverageLedger without a PROVISIONAL stamp raises
+    - the three states are each reachable over the real corpus
+    - state counts sum to the number of constructs -- exhaustive, no gaps
+    - a bar with detected=True, inert=True yields INERT, never EVIDENCED
+    - coverage_for() introduces no number absent from the view: evidenced counts
+      equal the count of non-inert detected bars, to the integer
+
+  agreement with yesterday's measurement
+    - for a sample of corpus texts, coverage_for()'s per-construct state matches
+      abstention.Outcome.cause's decomposition (silent<->no_detection,
+      inert<->all_inert). The test imports both; the modules do not.
+
+  honesty / render
+    - the panel contains "subscales, not items"
+    - the panel contains "no evidence either way"
+    - the panel contains the PROVISIONAL stamp
+    - the panel contains none of: "no somatic anxiety", "free of", "does not
+      have", "healthy", "at risk", "diagnos"
+    - the caveats appear BEFORE the first table row in the page source
+    - every state renders three channels: glyph, hue AND the word
+    - renders identically with the webfont blocked
+    - light and dark both render; no colour outside theme.palette(mode)
+
+  non-interference
+    - building a ledger does not alter view.risk.index -- bit-identical before
+      and after
+    - the existing full suite (1095 at handover) stays green
+
+  page shell
+    - tests/test_dashboard_pages.py rules apply to page 7 unchanged: imports
+      only from src.dashboard, no src.media / src.evaluation import
+
+
+8. EXPLICITLY OUT OF SCOPE
+--------------------------------------------------------------------------------
+  -   Coverage aggregated across MULTIPLE texts from one athlete over time
+      ("across 5 texts, ABQ has never been evidenced"). This is the natural
+      next step and it is the temporal hook already in the project's Future
+      Work. It is a second phase, not this one.
+  -   Any attempt to SCORE a subscale rather than report its coverage state.
+      The moment a subscale gets a number, this stops being a limitations
+      display and becomes an unvalidated psychometric instrument.
+  -   Reproducing, paraphrasing closely, or linking to instrument items. R1.
+  -   Any change to detection, fusion, weights or the cue lists. The widget is a
+      projection of an existing view and nothing else.
+
+
+9. DEFINITION OF DONE
+--------------------------------------------------------------------------------
+  [ ] Every construct in taxonomy.yaml maps to exactly one instrument, each with
+      a citation resolving in paper/refs.bib
+  [ ] The panel matches reports/evidence_coverage_mockup.html in both modes
+  [ ] No number on the panel is absent from the DashboardView it was built from
+  [ ] The risk index is bit-identical with and without the ledger
+  [ ] All sec.7 tests pass, plus the pre-existing suite (1095 + 2 skipped)
+  [ ] docs/dashboard.md and docs/model_card.md updated
+  [ ] Conventional commit; pre-commit hooks green (note: detect-secrets wants
+      `# pragma: allowlist secret` INLINE on the offending line, not above it)
+
+
+10. OWNER DECISIONS (locked 2026-09-22)
+--------------------------------------------------------------------------------
+  Q1  DECIDED: SHIP UNFLAGGED. No SRN_* environment variable, no conditional
+      page registration. The page and the tile are always present.
+
+      This is a deliberate departure from pages 3-5, which sit behind
+      SRN_COGNITIVE_LAYER, and the reason the departure is safe is worth
+      stating because a future reader will otherwise assume an oversight: the
+      cognitive layer is flagged because it introduces SIMULATED signals a
+      reader could mistake for measurements, and because a real physiological
+      source behind that seam would be a different privacy class entirely
+      (CLAUDE.md sec.11.2). This widget introduces no source, no signal, no
+      sensor, no new dependency and no new number. It is a projection of a view
+      the dashboard has already built and already shows. There is nothing for a
+      flag to protect.
+
+      Consequence to accept: every visitor sees "2 of 8" from the first load.
+      That is intended. Do not add a flag later to hide it on a demo day.
+
+  Q2  DECIDED: COMMITTED as the approved visual reference, the same role
+      reports/cognitive_concepts.html plays for the brain atlas. It is the
+      design contract for sec.5 STEP 3. Do not delete it when the real panel
+      lands -- a later session needs to see what was approved, not infer it
+      from the implementation it is supposed to be checking.
+
+  Q3  STILL OPEN. Does the coverage tile go on the main dashboard grid by
+      default, or only on its own page? Recommendation stands: BOTH, matching
+      atlas_widget. Not blocking -- STEP 4 can build the page first and add the
+      grid tile in the same commit once the owner confirms.
+
+
+11. THE THING THIS PHASE DOES NOT FIX
+--------------------------------------------------------------------------------
+paper/ contains refs.bib and an empty figures/ directory. Phase 23 -- the IEEE
+draft -- was due the first week of September 2026 and has not been started.
+Phase 26 was gated in PROJECT_PLAN.md on "starts only after Phase 23 ships", and
+phases 26 through 32 have now all run ahead of it.
+
+Both headline contributions remain blocked on two human acts, neither of which
+any amount of code will perform:
+  -   A2 annotating 100 gold_dev items (~3h, agreed 2026-08-12, not started)
+  -   2 sports-familiar raters, ~45 min each (deadline was set at 2026-09-28)
+
+This widget is one paper section. It is not the paper.
+================================================================================
