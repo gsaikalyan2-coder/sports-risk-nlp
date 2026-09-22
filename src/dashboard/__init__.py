@@ -58,9 +58,16 @@ from .charts import (
 )
 from .gibberish import TextAdmission, admit
 from .matchday import (
+    LIFE_CONTEXT_LABELS,
+    LIFE_CONTEXTS,
     PRESS_STAMP,
+    SCENARIO_SPORTS,
+    SCENARIO_STAMP,
+    TIMING_LABELS,
+    TIMINGS,
     MatchDayProfile,
     build_profile,
+    build_scenario_profile,
     face_stack_status,
     transcript_stack_status,
 )
@@ -103,8 +110,15 @@ __all__ = [
     "face_stack_status",
     "transcript_stack_status",
     "build_profile",
+    "build_scenario_profile",
     "MatchDayProfile",
     "PRESS_STAMP",
+    "SCENARIO_STAMP",
+    "SCENARIO_SPORTS",
+    "TIMINGS",
+    "TIMING_LABELS",
+    "LIFE_CONTEXTS",
+    "LIFE_CONTEXT_LABELS",
     "TextAdmission",
     "widget_for",
     "theme",

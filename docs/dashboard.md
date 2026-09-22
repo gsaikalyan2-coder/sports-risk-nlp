@@ -48,6 +48,40 @@ like a model score on a bar chart — the live path reports 1.0/0.0 and labels t
 axis accordingly. The bars look blocky. A made-up magnitude on a screening tool
 is the kind of number that gets quoted back without its formula.
 
+### The live detector is wider than the evaluated one (added 2026-09-21)
+
+`LexiconBackend` scores pasted text with `CONSTRUCT_CUES` **widened by
+`DASHBOARD_EXTRA_CUES`** (`src/dashboard/backend.py`). `LexiconBaseline` in
+`src/evaluation/baselines.py`, whose macro-F1 **0.462** is the number quoted
+above and committed in `reports/`, uses `CONSTRUCT_CUES` alone and is
+untouched by that widening.
+
+So the two differ, deliberately: the evaluated baseline is a narrow, frozen
+instrument, and re-fitting it would invalidate every committed figure measured
+against it. The demo's job is different — a visitor pasting their own sentence
+should see the constructs a human reader would see, not a blank chart because
+they wrote "nervous" where the frozen cue list expects "on edge".
+
+**What this costs, stated plainly: a reviewer who opens the deployed app is not
+running the system whose 0.462 this document reports, and the widened list has
+no measured score of its own.** It is not evaluated, it is not in the paper, and
+no figure anywhere derives from it.
+
+**Its *coverage* is measured; its *correctness* is not, and the two are not the
+same thing.** `reports/abstention.md` reports how often each list fires at all:
+the frozen list is silent on **58.8%** of the corpus, the widened list on
+**20.2%** (Phase 31, 2026-09-21). Silence matters, because a silent detector
+hands back an index of exactly 0.50 with a band underneath it. But firing more
+often is not the same as firing correctly -- every one of those extra matches
+could be wrong and nothing here shows otherwise, because measuring precision
+needs the gold set OPEN-025 is waiting on. Coverage is the honest claim;
+precision is not available. The extra cues are drawn from the same
+`config/taxonomy.yaml`-anchored realisation vocabulary as the generator's own
+banks, so nothing in them is invented outside the instruments, but provenance is
+not measurement and this paragraph is not a number.
+
+The paper must describe the demo as the widened lexicon, never as the baseline.
+
 ## Architecture
 
 Predicting and rendering are separate programs, as in `src/risk/` (15),

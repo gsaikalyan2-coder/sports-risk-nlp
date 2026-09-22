@@ -811,6 +811,69 @@ None of these exist yet, and none is created by this section:
 Until all four exist and are written into `docs/ethics.md`, the flag stays
 unset in every environment this project controls.
 
+### 14.6 Owner decision recorded (2026-09-20)
+
+The question was put to the owner via `docs/phase29_decision_draft.md`, worked
+through against all four §14.4 conditions. **Decision: Declined.** §2.3.3 and
+§13.4 stand unchanged; `SRN_MATCHDAY_REAL_ATHLETES` stays permanently unset.
+See §15 below for what was built instead.
+
+## 15. Phase 30 — Scenario-driven match-day profile (synthetic, built 2026-09-20)
+
+> **Status: built.** With Phase 29's real-athlete path declined (§14.6), the
+> Match-day profile page needed something honest to score. This phase adds a
+> scenario the reader picks from dropdowns instead of a real link.
+
+### 15.1 What was requested and what was built
+
+Owner request, 2026-09-20: more sports, more competition-timing options, and
+pressure/life-context scenarios (injury, breakup, a strong past season, etc.)
+in the Match-day page's dropdowns, such that a different combination produces
+a meaningfully different score rather than a different label on the same
+generic text.
+
+`src/ingestion/scenarios.py` adds a `life_context -> construct bias` table
+(`SCENARIO_BIAS`) that decides which of the ten constructs a scenario plants
+and at what intensity or label, then reuses `src/ingestion/synthetic.py`'s own
+realisation banks and framing/variation helpers UNCHANGED to render the text.
+`src/dashboard/matchday.py::build_scenario_profile` scores the result through
+the ordinary `build_view`/`LexiconBackend` pipeline — no change to scoring
+itself. `dashboard/pages/6_Match_day_profile.py` renders the three dropdowns
+and a "Generate & score" button, placed before the real-link path's gate so it
+always renders regardless of §14's block.
+
+### 15.2 Why "timing," not "during or after the event"
+
+`synthetic.py`'s own docstring records that the Phase 7 source survey
+deliberately excluded post-match text: it expresses relief, disappointment and
+attribution, constructs outside this project's taxonomy. Offering a
+during/after option here would need new taxonomy work this feature does not
+do. `TIMINGS` (`week_before` / `morning_of` / `immediately_before`) therefore
+stays entirely on the pre-competition side, varying only the distance from the
+event — the owner-approved resolution to this scope conflict.
+
+### 15.3 Grounding, and what stayed untouched
+
+Every construct named in `SCENARIO_BIAS` cites the same `config/taxonomy.yaml`
+instrument anchor that construct already carries in `synthetic.py`'s own
+realisation bank (e.g. `injury_comeback`'s `resilience` entry cites CD-RISC
+[Connor2003], the same anchor `taxonomy.yaml` gives that construct generally)
+— the mapping is grounded in the same instruments, not invented fresh.
+`src/ingestion/synthetic.py` has zero diff: its version-history comments warn
+that changing its construct-drawing or realisation internals reshuffles the
+RNG stream for every existing seeded corpus artefact, so the bias table lives
+in a new module that imports those internals rather than editing them.
+
+### 15.4 Verification
+
+`tests/test_scenarios.py` (14 tests): input validation, determinism (same
+scenario + seed → identical text), and a statistical check over 30 seeds that
+a different `life_context` at the same sport/timing changes the planted
+construct set at least 90% of the time. An end-to-end check through the real
+`LexiconBackend` (same sport, same timing, five life contexts) produced scores
+of 50 / 62 / 27 / 82 / 73 — confirming the score moves for a real, auditable
+reason rather than a cosmetic one.
+
 ### 14.5 What is deliberately still not built
 
 * Any UI path that sets `SRN_MATCHDAY_REAL_ATHLETES` from inside the app. It is

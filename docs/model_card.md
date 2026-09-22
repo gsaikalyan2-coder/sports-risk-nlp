@@ -416,6 +416,16 @@ it already works on the day that stops being true.
 | Register gate | Reports whether recovered text reads as athlete self-report | `src/media/relevance.py` |
 | Non-verbal channel | Three bounded scalars from the file; **weight 0 by default** | `src/media/nonverbal.py` |
 
+**The deployed demo's detector is not the evaluated baseline.** The live
+"Score your own text" path runs `LexiconBackend` with `CONSTRUCT_CUES` widened
+by `DASHBOARD_EXTRA_CUES` (`src/dashboard/backend.py`). Every lexicon figure in
+this card — including the **0.462** template-disjoint macro-F1 the transformer's
+0.588 is measured against — comes from `LexiconBaseline`
+(`src/evaluation/baselines.py`), which uses the unwidened list and is unchanged.
+The widened list has **no measured score**: it is a demo affordance so that a
+visitor's own phrasing lights up a bar, and it contributes to no figure, table
+or claim here. See `docs/dashboard.md` for why the two are kept apart.
+
 **The scoring model is unchanged.** The construct layer, the fusion layer, the
 polarity policies and the explanation layer are byte-for-byte the same as
 Phase 26. Media contributes words, and words are scored exactly as typed words

@@ -44,6 +44,17 @@ from dataclasses import dataclass, field
 
 from src.dashboard.gibberish import admit as admit_text
 from src.dashboard.view import build_view, scorer_for
+from src.ingestion.scenarios import (
+    LIFE_CONTEXT_LABELS,
+    LIFE_CONTEXTS,
+    TIMING_LABELS,
+    TIMINGS,
+    MatchDayScenario,
+    generate_scenario_record,
+)
+from src.ingestion.scenarios import (
+    SPORTS as SCENARIO_SPORTS,
+)
 from src.media.facecues import (
     FACE_ONLY_STAMP,
     face_context_weights,
@@ -62,12 +73,29 @@ from src.media.relevance import judge
 
 __all__ = [
     "FACE_ONLY_STAMP",
+    "LIFE_CONTEXT_LABELS",
+    "LIFE_CONTEXTS",
     "PRESS_STAMP",
+    "SCENARIO_SPORTS",
+    "SCENARIO_STAMP",
+    "TIMING_LABELS",
+    "TIMINGS",
     "MatchDayProfile",
     "build_profile",
+    "build_scenario_profile",
     "face_stack_status",
     "transcript_stack_status",
 ]
+
+#: Shown on every scenario result, the same shape as `PRESS_STAMP`: a stamp a
+#: screenshot cannot lose. Distinct wording on purpose, so a reader can never
+#: mistake a generated scenario for a real, fetched transcript.
+SCENARIO_STAMP = (
+    "SYNTHETIC SCENARIO: template-generated text about a fictional athlete, produced "
+    "by the same seeded grammar as every other synthetic example in this project "
+    "(src/ingestion/synthetic.py). Not a transcript of anyone real. No claim is made "
+    "about any identifiable person."
+)
 
 
 @dataclass(frozen=True)
@@ -160,6 +188,22 @@ def _read_face(data: bytes | None, *, consent: bool):
     except Exception as exc:  # noqa: BLE001 - every failure falls back, loudly
         return {}, False, "", str(exc)
     return dict(reading.features), True, reading.stamp, ""
+
+
+def build_scenario_profile(
+    *, policy: str, backend, sport: str, timing: str, life_context: str, seed: int
+):
+    """A synthetic scenario, generated and scored through the ordinary text pipeline.
+
+    No fetch, no ethics gate, no de-identification -- there is no real person to
+    de-identify. This is the same kind of text `synth_precomp_v1-*` already is,
+    just shaped by a scenario the reader picked instead of drawn purely at
+    random. Returns `(record, view)`; the page renders both.
+    """
+    scenario = MatchDayScenario(sport=sport, timing=timing, life_context=life_context)
+    record = generate_scenario_record(scenario, seed=seed)
+    view = build_view(text=record.text, backend=backend, scorer=scorer_for(policy))
+    return record, view
 
 
 def build_profile(
