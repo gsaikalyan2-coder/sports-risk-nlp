@@ -590,7 +590,9 @@ and never about the person who produced the text.
 
 **Silent is not absence.** It covers three cases — the construct genuinely
 absent, the athlete not raising it, or the detector missing it — and Phase 31
-measured a 20.2% no-detection rate over the corpus, so the third is common. No
+measured a no-detection rate of 58.6% for the frozen cue list this card
+evaluates in SS4-SS5, and 20.2% for the widened list the dashboard runs
+(`reports/abstention.md`), so the third is common either way. No
 surface may render silent as "no X", "free of" or "does not have"; asserted.
 
 **What the numbers rest on.** The corpus is synthetic (OPEN-011) and the live

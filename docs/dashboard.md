@@ -232,8 +232,9 @@ Two further readings the panel is built to prevent:
   constructs for it. "1 of 3" is never a share of a questionnaire completed.
 * **Silent is not absent.** It covers three cases — the construct is absent, the
   athlete did not raise it, or the detector missed it — and Phase 31 measured
-  the third at a 20.2% silent rate over the corpus, so it is common rather than
-  theoretical.
+  the third at a 20.2% silent rate over the corpus for the widened list this
+  page runs (58.6% for the frozen list the paper evaluates, `reports/abstention.md`),
+  so it is common rather than theoretical.
 
 ### Not behind a feature flag
 
