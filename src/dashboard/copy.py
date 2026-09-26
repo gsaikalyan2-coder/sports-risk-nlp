@@ -373,26 +373,36 @@ FACE_TEXT_ONLY_LABEL = "Words only"
 
 FACE_COMBINED_LABEL = "Words and face"
 
+FACE_EXPRESSION_HEADLINE = "What the model's eight categories scored"
+
+FACE_EXPRESSION_PLAIN = (
+    "These eight numbers are the same model's own per-category scores for this "
+    "photo, shown so the two weighted numbers above are not the only thing "
+    "visible. None of the eight moved the score -- only negative-looking and "
+    "activated-looking do, at the weights stated above. They are listed in a "
+    "fixed order, not ranked by score, and no single category is named as "
+    "the photo's 'emotion' anywhere on this page."
+)
+
 # ---------------------------------------------------------------------------
-# Phase 29: the match-day profile (photograph + press conference)
+# Phase 29: the match-day profile (press conference; photo upload lives on the
+# "Score my own text" page only -- see dashboard/pages/6_Match_day_profile.py's
+# docstring for why the two were split apart)
 # ---------------------------------------------------------------------------
 
-MATCHDAY_TITLE = "One profile from a picture and a press conference"
+MATCHDAY_TITLE = "One profile from a press conference"
 
 MATCHDAY_LEDE = (
-    "Paste a link to a press conference and, if you have one, add a photograph. The "
-    "words are taken from the video's own captions, names are replaced with "
-    "placeholders, and then they are scored exactly as typed words are. The picture "
-    "adds two values describing how the expression looks. Nothing is stored."
+    "Paste a link to a press conference. The words are taken from the video's own "
+    "captions, names are replaced with placeholders, and then they are scored "
+    "exactly as typed words are. Nothing is stored."
 )
 
 MATCHDAY_LINK_LABEL = "Link to a press conference"
 
-MATCHDAY_PHOTO_LABEL = "A photograph of the athlete (optional)"
-
 MATCHDAY_SUBMIT = "Build the profile"
 
-MATCHDAY_EMPTY = "Add a link, a photograph, or both, then press the button."
+MATCHDAY_EMPTY = "Add a link, then press the button."
 
 MATCHDAY_WORKING = "Reading the press conference, this can take a moment."
 
@@ -400,12 +410,26 @@ MATCHDAY_NOTHING = "Nothing was scored."
 
 MATCHDAY_READ_BY = "by {route}"
 
-MATCHDAY_NO_FACE = "No photograph was read, so this score comes from the words alone."
-
 MATCHDAY_DEID_NOTE = (
     "Names and other identifying items were replaced before scoring: {count} "
     "replacement(s). What was scored is the de-identified text, not the original."
 )
+
+SCENARIO_TITLE = "Or: generate a synthetic scenario"
+
+SCENARIO_LEDE = (
+    "No real press conference required. Pick a sport, a point before the "
+    "competition, and a life context -- the same template grammar that built "
+    "this project's synthetic corpus writes a fictional athlete's words and "
+    "scores them the same way. A different life context plants a different "
+    "set of psychological constructs, so the score moves for a real reason."
+)
+
+SCENARIO_SUBMIT = "Generate & score"
+
+SCENARIO_SEED_LABEL = "Seed (same seed + scenario = identical text)"
+
+SCENARIO_EMPTY = "Pick a sport, timing and life context, then press the button."
 
 #: Shown instead of a score when `gibberish.admit` refuses the input.
 #:
@@ -738,6 +762,96 @@ COMPARE_NO_NUMBER_WHY = (
     "reading for keyboard mash -- nothing matches, every signal comes back as zero, and "
     "the arithmetic hands you a confident middle-of-the-scale figure for a string that "
     "contained no words. Refusing here is the only way that figure never exists."
+# Phase 32 -- evidence coverage
+# ---------------------------------------------------------------------------
+#
+# The only surface in this package whose output IS the limitation. Every string
+# below is load-bearing rather than decorative, and three of them are fixed
+# wording in the same sense `PILOT_STUDY_WORDING` is fixed: they are the guards
+# against three specific misreadings, and rephrasing one is a change to what the
+# panel claims, not a change to how it reads.
+
+COVERAGE_TITLE = "Evidence coverage"
+
+COVERAGE_SUBTITLE = "Which validated instruments this text can and cannot speak to."
+
+COVERAGE_PLAIN = (
+    "Each of the ten signals this system looks for was taken from a published "
+    "questionnaire that sport psychologists already use. This page turns the "
+    "reading around: instead of listing what the words set off, it lists every "
+    "one of those questionnaires and says, for each, whether these words gave "
+    "anything to go on at all. Most of the time most of them get nothing, "
+    "because a person talking says what they feel like saying, while a "
+    "questionnaire asks every question and gets every answer."
+)
+
+#: R2. Renders adjacent to every count, outside any expander. CSAI-2 has 27
+#: items and this project carries three constructs for it; a reader who takes
+#: "1 of 3" as a share of a questionnaire has read a completion rate off a
+#: panel that never measured one.
+COVERAGE_ITEMS_CAVEAT = (
+    "Subscales, not items. CSAI-2 has 27 items; this system carries one construct "
+    "per subscale. A count here is never a share of a questionnaire completed."
+)
+
+#: R3, and the most important string on the page. Silent covers three cases --
+#: the construct is absent, the athlete did not raise it, or the detector missed
+#: it -- and Phase 31 measured the third at a 20.2% silence rate over the corpus
+#: for the widened cue list this page runs, 58.8% for the frozen one
+#: (`reports/abstention.md` sec.4), so it is common rather than theoretical on
+#: either. "No evidence either way" is the only
+#: phrasing that covers all three; anything shorter collapses into "absent".
+COVERAGE_SILENT_CAVEAT = (
+    "Silent does not mean absent. It means this text gives no evidence either way "
+    "- the athlete may not have raised it, or the detector may have missed it."
+)
+
+#: R4. Renders above the table, in the error style, outside any expander, so it
+#: survives a screenshot -- the same rule Phase 28 sec.13.2 applies to the
+#: facial-cue limitation.
+COVERAGE_CORRECTNESS_CAVEAT = (
+    "Coverage is not correctness. Evidenced means a cue fired, not that it fired "
+    "correctly. How often it fires correctly is unmeasured (OPEN-025)."
+)
+
+#: The three, in render order. A tuple so the panel cannot render two of them
+#: and a test cannot pass by checking the one that happens to be first.
+COVERAGE_CAVEATS: tuple[str, ...] = (
+    COVERAGE_ITEMS_CAVEAT,
+    COVERAGE_SILENT_CAVEAT,
+    COVERAGE_CORRECTNESS_CAVEAT,
+)
+
+#: N4: an unevidenced subscale rendered as a topic somebody could raise. The
+#: heading says what the words gave nothing on, never what a coach should do --
+#: this panel has no basis for the second, and the difference is what keeps it
+#: a limitations display rather than an unearned recommendation.
+COVERAGE_PROMPTS_HEADING = "Topics these words gave nothing on"
+
+COVERAGE_PROMPTS_NOTE = (
+    "Each line below is this project's own description of the signal, taken from "
+    "config/taxonomy.yaml. None of them is a question from the questionnaire "
+    "named beside it: those questionnaires are copyrighted and their wording "
+    "appears nowhere in this repository."
+)
+
+#: Three channels per state -- glyph, hue and the literal word. The words here
+#: are the third channel, and they are the same strings `coverage.STATE_WORDS`
+#: holds, rendered as a legend so a reader meets them before the table.
+COVERAGE_LEGEND: tuple[tuple[str, str], ...] = (
+    ("evidenced", "a cue for this signal fired in these words"),
+    ("inert", "picked up, then given a weight of zero by the current setting"),
+    ("silent", "these words give no evidence either way"),
+)
+
+COVERAGE_TILE_LABEL = "Evidence coverage"
+COVERAGE_TILE_CAPTION = "instruments this text speaks to"
+
+COVERAGE_WHAT_IT_IS_NOT = (
+    "A low count is not a finding about a person. It is a fact about a passage of "
+    "text: short, on one topic, or simply not about the things the other seven "
+    "questionnaires ask about. The same athlete on the same day would produce a "
+    "different count from a different paragraph."
 )
 
 

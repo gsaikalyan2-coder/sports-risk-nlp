@@ -48,6 +48,41 @@ like a model score on a bar chart — the live path reports 1.0/0.0 and labels t
 axis accordingly. The bars look blocky. A made-up magnitude on a screening tool
 is the kind of number that gets quoted back without its formula.
 
+### The live detector is wider than the evaluated one (added 2026-09-21)
+
+`LexiconBackend` scores pasted text with `CONSTRUCT_CUES` **widened by
+`DASHBOARD_EXTRA_CUES`** (`src/dashboard/backend.py`). `LexiconBaseline` in
+`src/evaluation/baselines.py`, whose macro-F1 **0.462** is the number quoted
+above and committed in `reports/`, uses `CONSTRUCT_CUES` alone and is
+untouched by that widening.
+
+So the two differ, deliberately: the evaluated baseline is a narrow, frozen
+instrument, and re-fitting it would invalidate every committed figure measured
+against it. The demo's job is different — a visitor pasting their own sentence
+should see the constructs a human reader would see, not a blank chart because
+they wrote "nervous" where the frozen cue list expects "on edge".
+
+**What this costs, stated plainly: a reviewer who opens the deployed app is not
+running the system whose 0.462 this document reports, and the widened list has
+no measured score of its own.** It is not evaluated, it is not in the paper, and
+no figure anywhere derives from it.
+
+**Its *coverage* is measured; its *correctness* is not, and the two are not the
+same thing.** `reports/abstention.md` §4 reports how often each list fires at all,
+over the same corpus and in the same table: the frozen list is silent on
+**58.8%** of it, the widened list on **20.2%**. Silence matters, because a silent
+detector
+hands back an index of exactly 0.50 with a band underneath it. But firing more
+often is not the same as firing correctly -- every one of those extra matches
+could be wrong and nothing here shows otherwise, because measuring precision
+needs the gold set OPEN-025 is waiting on. Coverage is the honest claim;
+precision is not available. The extra cues are drawn from the same
+`config/taxonomy.yaml`-anchored realisation vocabulary as the generator's own
+banks, so nothing in them is invented outside the instruments, but provenance is
+not measurement and this paragraph is not a number.
+
+The paper must describe the demo as the widened lexicon, never as the baseline.
+
 ## Architecture
 
 Predicting and rendering are separate programs, as in `src/risk/` (15),
@@ -148,3 +183,82 @@ for the verification step, not against the tests.
    pilot study is referenced, the `docs/findings.md` §2.4 wording is used verbatim.
 5. Call the decomposition ten-construct without the §3.3 qualification.
 6. Re-derive the Phase 17 highlighting, retrain, or re-tune thresholds.
+
+## Phase 32 — Evidence coverage (added 2026-09-22)
+
+Page 7 and the tile under the widget grid answer a question no other surface
+answers: **how much of the validated instrument set could this text speak to at
+all?**
+
+Each of the ten constructs carries an `instrument_anchor` in
+`config/taxonomy.yaml`, and has done since Phase 4; nothing in `src/` read it
+until now. `config/instruments.yaml` turns those anchors into a map — eight
+instruments, ten subscales, every construct in exactly one row, every citation
+resolving in `paper/refs.bib` — and `src/dashboard/coverage.py` projects one
+already-scored `DashboardView` onto it.
+
+Four states per subscale, read off `ConstructBar` and nothing else:
+
+| Bar | State | What it means |
+|---|---|---|
+| `detected=False` | **silent** | this text gives no evidence either way |
+| `detected=True, inert=True` | **inert** | picked up, then weighted zero by the policy |
+| `detected=True, inert=False` | **evidenced** | a cue fired |
+| no view built (a gate refused) | **refused** | never returned by `coverage_for` |
+
+Note the middle row. `ConstructBar.inert` is true for all four polar constructs
+whatever the text said, because it is derived from direction and weight alone.
+Reporting that as four inert subscales would claim four detections that did not
+happen, so **inert here means detected *and* discarded**; a polar construct the
+text never raised is silent.
+
+### It computes nothing
+
+No detection logic, no threshold, no weight, no score, and no entry in
+`LinearRiskScorer`'s context mapping. `coverage_for` takes a finished view and
+returns a reading of it, and
+`tests/test_coverage.py::test_building_a_ledger_does_not_move_the_risk_index`
+asserts the index and every bar are bit-identical with and without the ledger.
+
+### Coverage is not correctness
+
+**Evidenced means a cue fired, not that it fired correctly.** How often it fires
+correctly is unmeasured and stays unmeasured until the gold set exists
+(OPEN-025). The panel renders that sentence above the table, outside any
+expander, in the error style, so it survives a screenshot.
+
+Two further readings the panel is built to prevent:
+
+* **Subscales, not items.** CSAI-2 has 27 items; this project carries three
+  constructs for it. "1 of 3" is never a share of a questionnaire completed.
+* **Silent is not absent.** It covers three cases — the construct is absent, the
+  athlete did not raise it, or the detector missed it — and Phase 31 measured
+  the third at a 20.2% silent rate over the corpus for the widened list this
+  page runs, against 58.8% for the frozen list the paper evaluates
+  (`reports/abstention.md` §4, which measures both), so it is common rather
+  than theoretical.
+
+### Not behind a feature flag
+
+Deliberately, decided 2026-09-22. Pages 3–5 sit behind `SRN_COGNITIVE_LAYER`
+because they introduce simulated signals a reader could mistake for
+measurements. This page introduces no source, no signal, no dependency and no
+new number, so there is nothing for a flag to protect. Every visitor sees a low
+count from first load, and **a flag must not be added later to hide it on a demo
+day.**
+
+### The cue-list disclosure applies here too
+
+The live path runs `CONSTRUCT_CUES` widened with `DASHBOARD_EXTRA_CUES`, not the
+frozen list the evaluation uses. Over `gold_dev` the mean is under two
+instruments of eight and no text reaches all eight — but **no coverage figure
+may be quoted in the paper without saying which cue list produced it.**
+
+### Instrument items are never reproduced
+
+CSAI-2, the ABQ, CD-RISC and TAIS are copyrighted. The "topics these words gave
+nothing on" list is derived at load time from this project's own `definition`
+field in `config/taxonomy.yaml`; `instruments.yaml` has a closed field set so it
+cannot grow a `prompt:` or `item_text:`, and a test asserts both that every
+prompt is a prefix of its taxonomy definition and that the committed file
+contains no question mark outside its commentary.

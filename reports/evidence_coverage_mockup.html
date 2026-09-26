@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<meta charset="utf-8"><title>Evidence Coverage</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:28px 16px;background:#eceae6;
+ font:15px/1.55 Georgia,'Times New Roman',serif;color:#1a1a1a}
+.wrap{max-width:780px;margin:0 auto}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+.lede{color:#5c5c5c;margin:0 0 28px;font-size:14px}
+.case{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:#6b6b6b;
+ margin:32px 0 10px;font-family:system-ui,sans-serif}
+.panel{background:var(--surface);color:var(--body);border:1px solid var(--border);
+ padding:22px 24px;margin:0 0 14px}
+.mode{font:11px/1 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.12em;
+ color:var(--muted);margin:0 0 14px}
+h2{font-size:20px;margin:0 0 2px;color:var(--ink)}
+.sub{margin:0 0 16px;color:var(--muted);font-size:13px}
+blockquote{margin:0 0 18px;padding:10px 14px;border-left:3px solid var(--accent);
+ background:var(--canvas);font-style:italic;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font:11px/1 system-ui,sans-serif;text-transform:uppercase;
+ letter-spacing:.09em;color:var(--muted);padding:0 0 8px;
+ border-bottom:1px solid var(--hairline)}
+td{padding:10px 8px 10px 0;border-bottom:1px solid var(--hairline);vertical-align:top}
+.name{width:34%;color:var(--ink)}
+.cite{font-size:11px;color:var(--muted)}
+.bars{width:24%;white-space:nowrap}
+.g{font-size:17px;letter-spacing:2px}
+.count{display:block;font-size:11px;color:var(--muted);
+ font-family:system-ui,sans-serif;margin-top:3px}
+.detail{font-size:12px;color:var(--muted)}
+.inert{color:var(--body)} .ok{opacity:.45}
+.summary{margin:16px 0 0;font-size:15px;color:var(--ink)}
+.caveat{margin:10px 0 0;font-size:12px;color:var(--muted);
+ padding-left:11px;border-left:2px solid var(--hairline)}
+.stamp{margin:16px 0 0;font:10px/1.45 system-ui,sans-serif;text-transform:uppercase;
+ letter-spacing:.06em;color:var(--muted);
+ border-top:1px solid var(--hairline);padding-top:10px}
+</style>
+<div class="wrap">
+<h1>Evidence coverage &mdash; design preview</h1>
+<p class="lede">Phase 32 proposal. Rendered from real <code>build_view()</code> output over
+<code>gold_dev.jsonl</code> &mdash; no number or state below is invented. Light and dark
+shown for each case, using <code>theme.palette()</code>.</p>
+<p class="lede"><strong>This preview predates the shipped panel's state legend and its
+&ldquo;next questions&rdquo; prompts block (plan &sect;4 N4).</strong> The panel is a superset of
+what is shown here: same table, summary, caveats and stamp, plus those two blocks. Kept
+unregenerated on purpose &mdash; it is the design contract as approved on 2026-09-22, and
+plan &sect;12 records the divergence rather than hiding it.</p>
+<h3 class="case">A Match-day scenario passage &mdash; 3 constructs detected</h3><section class="panel" style="--canvas:#ffffff;--surface:#ffffff;--ink:#212121;--body:#616161;--muted:#93939f;--hairline:#d9d9dd;--border:#e5e7eb;--accent:#ff7759">
+<p class="mode">light</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>The start line is scheduled for the evening session. I&#x27;ve been replaying last season&#x27;s race more than I should — that&#x27;s me being honest about it. If I&#x27;m being straight, I am out of my depth here and everyone is going to see it. I&#x27;ve been behind in a race before and come back — that doesn&#x27;t scare me — it is what it is. Once that feeling starts I know the contest is already slipping away.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">1 of 3</span></td><td class="detail"><span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">perceived stress: silent</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">attentional focus: silent</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#93939f">&#9618;</span><span class="count">0 of 1</span></td><td class="detail"><span class="inert">appraisal orientation: inert</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>2 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section><section class="panel" style="--canvas:#0b1420;--surface:#071829;--ink:#f4f4f2;--body:#c6c8cd;--muted:#9aa1ab;--hairline:#20364a;--border:#20364a;--accent:#ff7759">
+<p class="mode">dark</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>The start line is scheduled for the evening session. I&#x27;ve been replaying last season&#x27;s race more than I should — that&#x27;s me being honest about it. If I&#x27;m being straight, I am out of my depth here and everyone is going to see it. I&#x27;ve been behind in a race before and come back — that doesn&#x27;t scare me — it is what it is. Once that feeling starts I know the contest is already slipping away.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="g" style="color:#20364a">&#9617;</span><span class="g" style="color:#20364a">&#9617;</span><span class="count">1 of 3</span></td><td class="detail"><span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">perceived stress: silent</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">attentional focus: silent</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#9aa1ab">&#9618;</span><span class="count">0 of 1</span></td><td class="detail"><span class="inert">appraisal orientation: inert</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>2 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section><h3 class="case">The richest single corpus utterance &mdash; 2 constructs detected</h3><section class="panel" style="--canvas:#ffffff;--surface:#ffffff;--ink:#212121;--body:#616161;--muted:#93939f;--hairline:#d9d9dd;--border:#e5e7eb;--accent:#ff7759">
+<p class="mode">light</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>In all honesty, there is a little more noise around me than I would choose — make of that what you will.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 3</span></td><td class="detail"><span class="silent">cognitive anxiety: silent</span> &middot; <span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#93939f">&#9618;</span><span class="count">0 of 1</span></td><td class="detail"><span class="inert">attentional focus: inert</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">resilience: silent</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">appraisal orientation: silent</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>1 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section><section class="panel" style="--canvas:#0b1420;--surface:#071829;--ink:#f4f4f2;--body:#c6c8cd;--muted:#9aa1ab;--hairline:#20364a;--border:#20364a;--accent:#ff7759">
+<p class="mode">dark</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>In all honesty, there is a little more noise around me than I would choose — make of that what you will.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="g" style="color:#20364a">&#9617;</span><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 3</span></td><td class="detail"><span class="silent">cognitive anxiety: silent</span> &middot; <span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#9aa1ab">&#9618;</span><span class="count">0 of 1</span></td><td class="detail"><span class="inert">attentional focus: inert</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">resilience: silent</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">appraisal orientation: silent</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>1 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section><h3 class="case">A sparse utterance &mdash; 1 constructs detected</h3><section class="panel" style="--canvas:#ffffff;--surface:#ffffff;--ink:#212121;--body:#616161;--muted:#93939f;--hairline:#d9d9dd;--border:#e5e7eb;--accent:#ff7759">
+<p class="mode">light</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>Honestly, there&#x27;s just a lot on right now — studies, selection, and now this game.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 3</span></td><td class="detail"><span class="silent">cognitive anxiety: silent</span> &middot; <span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">attentional focus: silent</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">resilience: silent</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">appraisal orientation: silent</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#d9d9dd">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>1 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section><section class="panel" style="--canvas:#0b1420;--surface:#071829;--ink:#f4f4f2;--body:#c6c8cd;--muted:#9aa1ab;--hairline:#20364a;--border:#20364a;--accent:#ff7759">
+<p class="mode">dark</p>
+<h2>Evidence coverage</h2>
+<p class="sub">Which validated instruments this text can and cannot speak to.</p>
+<blockquote>Honestly, there&#x27;s just a lot on right now — studies, selection, and now this game.</blockquote>
+<table>
+<tr><th>Instrument</th><th>Subscales</th><th>Detail</th></tr>
+<tr><td class="name">CSAI-2<br><span class="cite">[Martens1990; Cox2003]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="g" style="color:#20364a">&#9617;</span><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 3</span></td><td class="detail"><span class="silent">cognitive anxiety: silent</span> &middot; <span class="silent">somatic anxiety: silent</span> &middot; <span class="silent">self-confidence: silent</span></td></tr>
+<tr><td class="name">PSS<br><span class="cite">[Cohen1983]</span></td><td class="bars"><span class="g" style="color:#ff7759">&#9608;</span><span class="count">1 of 1</span></td><td class="detail"><span class="ok">all evidenced</span></td></tr>
+<tr><td class="name">ABQ<br><span class="cite">[Raedeke2001]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">burnout: silent</span></td></tr>
+<tr><td class="name">TAIS<br><span class="cite">[Nideffer1976]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">attentional focus: silent</span></td></tr>
+<tr><td class="name">CD-RISC<br><span class="cite">[Connor2003]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">resilience: silent</span></td></tr>
+<tr><td class="name">Achievement-goal / SDT<br><span class="cite">[Elliot2001; Deci2000]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">motivation orientation: silent</span></td></tr>
+<tr><td class="name">Challenge-threat<br><span class="cite">[JonesMeijen2009]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">appraisal orientation: silent</span></td></tr>
+<tr><td class="name">Coping in sport<br><span class="cite">[Nicholls2007]</span></td><td class="bars"><span class="g" style="color:#20364a">&#9617;</span><span class="count">0 of 1</span></td><td class="detail"><span class="silent">coping style: silent</span></td></tr>
+</table>
+<p class="summary">This text speaks to <strong>1 of 8</strong> instruments.</p>
+<p class="caveat"><strong>Subscales, not items.</strong> CSAI-2 has 27 items; this system carries one construct per subscale. A count here is never a share of a questionnaire completed.</p>
+<p class="caveat"><strong>Silent does not mean absent.</strong> It means this text gives no evidence either way — the athlete may not have mentioned it, or the detector may have missed it.</p>
+<p class="caveat"><strong>Coverage is not correctness.</strong> Evidenced means a cue fired, not that it fired correctly. Precision is unmeasured (OPEN-025).</p>
+<p class="stamp">PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. Synthetic text (OPEN-011); describes no real person.</p>
+</section>
+</div>

@@ -83,7 +83,7 @@ default for an unlisted source is **deny**.
 | # | Category | Conditions |
 |---|---|---|
 | **A1** | **Existing public research datasets** with an explicit licence permitting research use | Licence recorded in `provenance.json`; attribution preserved; redistribution only if the licence allows |
-| **A2** | **Synthetic text** generated for this project | Marked `synthetic: true` in every record; never presented as real athlete speech; generation prompts version-controlled |
+| **A2** | **Synthetic text** generated for this project | Marked `synthetic: true` in every record; never presented as real athlete speech; generation prompts version-controlled. The match-day scenario dropdowns (Phase 30, `src/ingestion/scenarios.py::SCENARIO_BIAS`) bias which constructs a scenario plants, each citing the same `config/taxonomy.yaml` instrument anchor its construct already carries — a reviewer can audit which constructs each scenario is designed to express directly from that table. |
 | **A3** | **Explicitly consented text** donated for this research | Written informed consent naming this project and its purpose; withdrawal right honoured (§7) |
 | **A4** | **Officially published press-conference and post/pre-match interview transcripts** | Public, professional-capacity speech, published by the org or outlet; de-identified per §5; subject to §3.3 |
 

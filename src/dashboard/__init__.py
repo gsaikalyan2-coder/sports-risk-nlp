@@ -58,11 +58,20 @@ from .charts import (
     risk_meter,
     risk_waterfall,
 )
+from .coverage import CoverageLedger, CoverageState, coverage_for
+from .coverage_panel import coverage_height, coverage_panel
 from .gibberish import TextAdmission, admit
 from .matchday import (
+    LIFE_CONTEXT_LABELS,
+    LIFE_CONTEXTS,
     PRESS_STAMP,
+    SCENARIO_SPORTS,
+    SCENARIO_STAMP,
+    TIMING_LABELS,
+    TIMINGS,
     MatchDayProfile,
     build_profile,
+    build_scenario_profile,
     face_stack_status,
     transcript_stack_status,
 )
@@ -90,10 +99,16 @@ from .view import (
     known_examples,
     scorer_for,
 )
-from .widgets import Widget, widget_for, widgets_for
+from .widgets import Widget, coverage_widget, widget_for, widgets_for
 
 __all__ = [
     "widgets_for",
+    "CoverageLedger",
+    "CoverageState",
+    "coverage_for",
+    "coverage_height",
+    "coverage_panel",
+    "coverage_widget",
     "admit",
     "read_upload",
     "MediaResult",
@@ -105,8 +120,15 @@ __all__ = [
     "face_stack_status",
     "transcript_stack_status",
     "build_profile",
+    "build_scenario_profile",
     "MatchDayProfile",
     "PRESS_STAMP",
+    "SCENARIO_STAMP",
+    "SCENARIO_SPORTS",
+    "TIMINGS",
+    "TIMING_LABELS",
+    "LIFE_CONTEXTS",
+    "LIFE_CONTEXT_LABELS",
     "TextAdmission",
     "widget_for",
     "theme",

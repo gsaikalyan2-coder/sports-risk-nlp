@@ -39,11 +39,13 @@ if _ROOT not in sys.path:
 import streamlit as st  # noqa: E402
 import streamlit.components.v1 as components  # noqa: E402
 
+# pyrefly: ignore [missing-import]
 from src.dashboard import (  # noqa: E402
     DEFAULT_POLICY_LABEL,
     POLICY_LABELS,
     POLICY_TILE_NOTE,
     build_view,
+    coverage_widget,
     known_examples,
     motion_panel,
     panel_height,
@@ -271,6 +273,29 @@ for row_start in range(0, len(tiles), 3):
                 on_click=_open_detail,
                 args=(widget.construct,),
             )
+
+# The Phase 32 tile, appended after the grid rather than placed in it.
+#
+# Two reasons it is not an eleventh cell. It is not a construct, so it has no
+# detail page and must not carry the "open" button the ten tiles carry --
+# `widget_for` would raise on its key, which is the right failure and the wrong
+# place to discover it. And it is a statement ABOUT the ten above it: how much
+# of the instrument set those ten could speak to at all. A tile that qualifies a
+# grid belongs under the grid, not inside it.
+coverage_tile = coverage_widget(view)
+coverage_col, _coverage_spacer = st.columns([1, 2])
+with coverage_col:
+    st.markdown(
+        f'<div class="widget"><span class="wl">{coverage_tile.title}</span>'
+        f'<span class="wv">{coverage_tile.value}</span>'
+        f'<span class="wu">{coverage_tile.value_caption}</span>'
+        f'<hr class="wrule">'
+        f'<span class="wv" style="font-size:24px">{coverage_tile.secondary}</span>'
+        f'<span class="wu">{coverage_tile.secondary_caption}</span>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    st.caption(plain.COVERAGE_ITEMS_CAVEAT)
 
 if st.session_state.get("detail_construct"):
     st.switch_page(DETAIL_PAGE)

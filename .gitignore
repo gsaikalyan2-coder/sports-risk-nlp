@@ -113,6 +113,9 @@ logs/cost_ledger.csv
 
 # OS / IDE
 .DS_Store
+# FUSE leaves these behind when an open file is deleted; 21 stale copies of
+# live docs were committed before this line existed (Phase 33).
+.fuse_hidden*
 donations_inbox*.jsonl
 consent_forms/
 

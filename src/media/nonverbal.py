@@ -92,7 +92,22 @@ SIMULATED_FEATURES: tuple[str, ...] = ("expressivity", "vocal_strain", "steadine
 #: project can defend. See docs/ethics.md sec.14.
 FACE_FEATURES: tuple[str, ...] = ("negative_valence", "arousal")
 
-FEATURES: tuple[str, ...] = SIMULATED_FEATURES + FACE_FEATURES
+#: The model's own eight expression-category scores, carried for transparency.
+#: Never a key in FACE_WEIGHTS -- see facecues.py's docstring on why a discrete
+#: category is not a defensible thing to weight, even though a bounded
+#: valence/arousal pair is. Order matches facecues.EXPRESSIONS positionally.
+FACE_EXPRESSION_FEATURES: tuple[str, ...] = (
+    "expr_anger",
+    "expr_contempt",
+    "expr_disgust",
+    "expr_fear",
+    "expr_happiness",
+    "expr_neutral",
+    "expr_sadness",
+    "expr_surprise",
+)
+
+FEATURES: tuple[str, ...] = SIMULATED_FEATURES + FACE_FEATURES + FACE_EXPRESSION_FEATURES
 
 
 class NonVerbalEthicsGate(RuntimeError):
