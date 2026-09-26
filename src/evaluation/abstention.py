@@ -69,6 +69,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from src.dashboard.backend import DASHBOARD_EXTRA_CUES
 from src.dashboard.gibberish import admit
 from src.evaluation.baselines import CONSTRUCT_CUES
 from src.media.relevance import judge
@@ -277,6 +278,88 @@ def summarise(outcomes: Sequence[Outcome], name: str) -> ClassResult:
     )
 
 
+#: The two cue lists that exist, and what each one is for. The frozen list is
+#: the instrument every committed figure was measured with; the widened one is
+#: what a visitor to the deployed page is actually scored by
+#: (`docs/dashboard.md`). Named together here because the silence rate below is
+#: the one number that differs between them by a factor of three, and a quote of
+#: it without its list is the mis-citation this section exists to prevent.
+CUE_LISTS: tuple[tuple[str, str, Mapping[str, tuple[str, ...]]], ...] = (
+    (
+        "CONSTRUCT_CUES",
+        "frozen; the list every committed figure was measured with",
+        CONSTRUCT_CUES,
+    ),
+    (
+        "CONSTRUCT_CUES + DASHBOARD_EXTRA_CUES",
+        "widened; demo only, no measured score of its own",
+        {
+            construct: CONSTRUCT_CUES.get(construct, ()) + DASHBOARD_EXTRA_CUES.get(construct, ())
+            for construct in set(CONSTRUCT_CUES) | set(DASHBOARD_EXTRA_CUES)
+        },
+    ),
+)
+
+
+@dataclass(frozen=True)
+class SilenceResult:
+    """How often one cue list fires on nothing at all.
+
+    **This is coverage, not correctness**, and the distinction is the whole
+    reason the widened list may appear in a measurement at all. Firing more
+    often is not firing more correctly: every extra match could be wrong and
+    nothing here shows otherwise, because precision needs the gold set OPEN-025
+    is waiting on. `test_the_evaluated_cue_list_is_pinned` and
+    `test_counterfactual_uses_the_evaluated_cue_list_not_the_dashboard_one` keep
+    the widened list out of every *scored* number in this module; it is admitted
+    to this one because a silence count is a property of the list itself.
+    """
+
+    name: str
+    description: str
+    n: int
+    silent: int
+
+    @property
+    def rate(self) -> float:
+        return self.silent / self.n if self.n else 0.0
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "n": self.n,
+            "silent": self.silent,
+            "rate": round(self.rate, 4),
+        }
+
+
+def is_silent(text: str, cues: Mapping[str, tuple[str, ...]]) -> bool:
+    """Whether `cues` matches nothing in `text` -- the `no_detection` route's cause."""
+    lowered = text.lower()
+    return not any(any(cue in lowered for cue in group) for group in cues.values())
+
+
+def silence_rates(corpus: Sequence[str]) -> tuple[SilenceResult, ...]:
+    """The silence rate of each cue list over the same corpus.
+
+    Counts the *detector's* silence, so it includes the text the admission gate
+    refuses -- which is why the frozen list's figure here is one text higher
+    than section 3's `no_detection` count, where `refused` wins the cause
+    ordering. The two are both right and they answer different questions: this
+    one is a property of the cue list, that one is a property of the pipeline.
+    """
+    return tuple(
+        SilenceResult(
+            name=name,
+            description=description,
+            n=len(corpus),
+            silent=sum(1 for text in corpus if is_silent(text, cues)),
+        )
+        for name, description, cues in CUE_LISTS
+    )
+
+
 def load_corpus(directory: Path) -> tuple[str, ...]:
     """The project's own pre-competition text, both gold-candidate splits."""
     texts: list[str] = []
@@ -295,6 +378,7 @@ class AbstentionReport:
 
     corpus: ClassResult
     junk: tuple[ClassResult, ...]
+    silence: tuple[SilenceResult, ...]
     provenance: str
 
     @property
@@ -310,6 +394,7 @@ class AbstentionReport:
             "provenance": self.provenance,
             "corpus": self.corpus.to_dict(),
             "junk": [c.to_dict() for c in self.junk],
+            "silence": [s.to_dict() for s in self.silence],
         }
 
 
@@ -324,6 +409,7 @@ def build_report(corpus: Sequence[str], provenance: str) -> AbstentionReport:
     return AbstentionReport(
         corpus=summarise(corpus_outcomes, "corpus"),
         junk=junk,
+        silence=silence_rates(corpus),
         provenance=provenance,
     )
 
@@ -345,7 +431,8 @@ def render_markdown(report: AbstentionReport, *, generated: str) -> str:
         f"- Generated: {generated}",
         f"- Provenance: {report.provenance}",
         "- Detector: `CONSTRUCT_CUES` (the evaluated cue list, **not** the widened",
-        "  dashboard one -- see `docs/dashboard.md`)",
+        "  dashboard one -- see `docs/dashboard.md`). Section 4 is the one place",
+        "  the widened list is measured, and it measures coverage, never accuracy.",
         "- Pure Python, no checkpoint, no network. Reproduce with",
         "  `python scripts/run_abstention_report.py`.",
         "",
@@ -414,7 +501,39 @@ def render_markdown(report: AbstentionReport, *, generated: str) -> str:
         f"{_pct(corpus.refusal_rate)} of corpus traffic. The class that makes up",
         f"{_pct(corpus.ungated_midpoint_rate)} is untouched by them.",
         "",
-        "## 4. True refusals, by junk class",
+        "## 4. Which cue list is in force, and what silence costs each one",
+        "",
+        "The `no_detection` route above is a property of the detector, and this",
+        "project runs two of them: the frozen `CONSTRUCT_CUES` that every",
+        "committed figure was measured with, and the same list widened by",
+        "`DASHBOARD_EXTRA_CUES` for the deployed page only (`docs/dashboard.md`).",
+        "A silence rate quoted without naming its list is the most misleading",
+        "number this report can produce, because the two differ by a factor of",
+        "three. Both are therefore measured here, over the same corpus.",
+        "",
+        "| cue list | what it is | n | silent | silence rate |",
+        "|---|---|---|---|---|",
+    ]
+    for silence in report.silence:
+        lines.append(
+            f"| `{silence.name}` | {silence.description} | {silence.n} | "
+            f"{silence.silent} | **{_pct(silence.rate)}** |"
+        )
+    lines += [
+        "",
+        "**This is coverage, not correctness.** Firing more often is not firing",
+        "more correctly: every extra match the widened list makes could be wrong",
+        "and nothing here shows otherwise, because precision needs the gold set",
+        "OPEN-025 is waiting on. The widened list still has no measured score, it",
+        "is in no committed figure, and no macro-F1 anywhere derives from it.",
+        "",
+        "These counts are the *detector's* silence, so they include text the",
+        "admission gate refused; section 3's `no_detection` count excludes it,",
+        "because `refused` wins the cause ordering there. That is the whole of",
+        f"the difference between the two frozen-list figures "
+        f"({report.silence[0].silent} here, {corpus.cause('no_detection')} there).",
+        "",
+        "## 5. True refusals, by junk class",
         "",
         "**Authored by this project, and weak in a stated way**: these are shapes the",
         "project imagined a paste box or a camera catching, not a sample of user",
@@ -445,11 +564,11 @@ def render_markdown(report: AbstentionReport, *, generated: str) -> str:
         "`judge` flags them, and they are scored. Every one lands on the midpoint --",
         "which is the `no_detection` route again, arriving from a different door.",
         "",
-        "## 5. What this does not establish",
+        "## 6. What this does not establish",
         "",
         "1. **The positives are synthetic** (OPEN-011). The false-refusal rate is",
         "   measured against the register this project's own generator writes.",
-        "2. **The junk is authored** by this project (sec.4 above).",
+        "2. **The junk is authored** by this project (sec.5 above).",
         "3. **The counterfactual uses the lexicon**, not the transformer. The 0.50",
         "   result is a property of the fusion layer given all-zero probabilities; a",
         "   transformer emits small non-zero probabilities on junk and would cluster",

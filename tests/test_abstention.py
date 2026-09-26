@@ -18,13 +18,16 @@ import pytest
 
 from src.evaluation.abstention import (
     CAUSES,
+    CUE_LISTS,
     JUNK_CLASSES,
     MIDPOINT,
     build_report,
     counterfactual_index,
     evaluate,
+    is_silent,
     load_corpus,
     render_markdown,
+    silence_rates,
     summarise,
 )
 
@@ -218,3 +221,56 @@ def test_report_reports_the_ungated_routes_rather_than_only_the_refusal_rate() -
     assert "no_detection" in markdown
     assert "all_inert" in markdown
     assert str(report.corpus.ungated_midpoint) in markdown
+
+
+def test_every_silence_rate_is_printed_beside_the_cue_list_that_produced_it() -> None:
+    """The mis-citation this section exists to prevent.
+
+    A silence rate is the one figure in this report that changes by a factor of
+    three depending on which cue list is in force, so the list's own name has to
+    travel with the number. Quoting "20.2%" bare -- as five files in Phase 32
+    did before this section existed -- attributes the demo detector's behaviour
+    to the evaluated one. See OPEN-037.
+    """
+    report = build_report(_corpus(), "PROVISIONAL -- test")
+    markdown = render_markdown(report, generated="2026-01-01")
+
+    assert len(report.silence) == len(CUE_LISTS) == 2
+    for result in report.silence:
+        assert result.name in markdown, f"{result.name} silence rate printed without its list"
+        assert str(result.silent) in markdown
+    assert "coverage, not correctness" in markdown
+
+
+def test_the_widened_list_is_silent_less_often_and_that_buys_no_accuracy() -> None:
+    """Coverage moves; correctness does not follow, and the report must say so.
+
+    `DASHBOARD_EXTRA_CUES` was added to lower the silence rate and it does. The
+    assertion pairs that with the disclaimer, because a coverage gain read as a
+    quality gain is exactly the misreading `docs/dashboard.md` warns about.
+    """
+    frozen, widened = silence_rates(_corpus())
+    assert widened.silent < frozen.silent
+    assert "no measured score" in render_markdown(
+        build_report(_corpus(), "PROVISIONAL -- test"), generated="2026-01-01"
+    )
+
+
+def test_the_frozen_lists_two_silence_figures_differ_only_by_the_refused() -> None:
+    """Section 4 counts the detector; section 3 counts the pipeline.
+
+    58.8% and 58.6% are both the frozen list and both correct. The gap is the
+    text the admission gate refused, which section 3 files under `refused`
+    because that cause outranks the rest. Pinned as an identity, not as a pair
+    of percentages.
+    """
+    corpus = _corpus()
+    frozen, _ = silence_rates(corpus)
+    outcomes = [evaluate(text, "corpus") for text in corpus]
+    result = summarise(outcomes, "corpus")
+    refused_and_silent = sum(
+        1
+        for text, o in zip(corpus, outcomes, strict=True)
+        if not o.admitted and is_silent(text, CUE_LISTS[0][2])
+    )
+    assert frozen.silent == result.cause("no_detection") + refused_and_silent

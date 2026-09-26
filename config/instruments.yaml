@@ -1,0 +1,104 @@
+# Construct -> validated instrument -> subscale. Phase 32.
+#
+# READ THIS BEFORE CHANGING A ROW
+# ==============================================================================
+# THIS FILE MAPS CONSTRUCTS TO THE INSTRUMENTS THEY WERE TAKEN FROM. IT DOES NOT
+# IMPLEMENT THOSE INSTRUMENTS, AND NOTHING HERE IS A QUESTIONNAIRE.
+#
+# CSAI-2, the ABQ, CD-RISC and TAIS are copyrighted instruments. Reproducing
+# their item text -- or paraphrasing it closely enough to substitute for it --
+# is a licensing violation and is the single most damaging mistake available in
+# this phase. So:
+#
+#   * NO ITEM TEXT APPEARS IN THIS FILE, in any form, in any field.
+#   * The "next question" prompt a reader sees is NOT an instrument item. It is
+#     derived at load time from the `definition` field in config/taxonomy.yaml,
+#     which this project authored. src/dashboard/instruments.py enforces that
+#     derivation and tests/test_coverage.py asserts it.
+#   * Every free-text field here is a NAME or a CITATION, never a question.
+#
+# What each field is for
+# ------------------------------------------------------------------------------
+#   instrument     The published instrument, by its usual short name.
+#   citation       Keys in paper/refs.bib, in the bracketed form taxonomy.yaml
+#                  already uses. The loader refuses a key that does not resolve.
+#   subscales      The taxonomy constructs this instrument covers. This project
+#                  carries ONE CONSTRUCT PER SUBSCALE. CSAI-2 has 27 items; the
+#                  three rows below are its three subscales, not 27 items, and
+#                  a count taken from this file is never a share of a
+#                  questionnaire completed. The panel says so beside every
+#                  count, outside any expander.
+#
+# NO NUMBER APPEARS IN THIS FILE. Coverage state comes from DashboardView.bars
+# at render time or it does not come at all; a constant written here would be a
+# value on screen with no provenance, which is what ScoreSurface exists to
+# prevent. The loader refuses any numeric field, the same walk atlas_map.py uses.
+#
+# Every construct in the taxonomy appears in EXACTLY ONE instrument row. Not
+# zero -- a construct with no row would vanish from a table nobody counts rows
+# in. Not two -- a construct counted under two instruments would make the
+# denominator a fiction.
+# ==============================================================================
+
+version: 1
+locked_on: 2026-09-22
+phase: 32
+
+instruments:
+  csai2:
+    instrument: CSAI-2
+    full_name: Competitive State Anxiety Inventory-2
+    citation: "[Martens1990; Cox2003]"
+    subscales:
+      - cognitive_anxiety
+      - somatic_anxiety
+      - self_confidence
+
+  pss:
+    instrument: PSS
+    full_name: Perceived Stress Scale
+    citation: "[Cohen1983]"
+    subscales:
+      - perceived_stress
+
+  abq:
+    instrument: ABQ
+    full_name: Athlete Burnout Questionnaire
+    citation: "[Raedeke2001]"
+    subscales:
+      - burnout_signal
+
+  tais:
+    instrument: TAIS
+    full_name: Test of Attentional and Interpersonal Style
+    citation: "[Nideffer1976]"
+    subscales:
+      - attentional_focus
+
+  cdrisc:
+    instrument: CD-RISC
+    full_name: Connor-Davidson Resilience Scale
+    citation: "[Connor2003]"
+    subscales:
+      - resilience
+
+  achievement_goal:
+    instrument: Achievement-goal / SDT
+    full_name: 2x2 achievement-goal framework and Self-Determination Theory
+    citation: "[Elliot2001; Deci2000]"
+    subscales:
+      - motivation_orientation
+
+  challenge_threat:
+    instrument: Challenge-threat
+    full_name: Theory of Challenge and Threat States in Athletes
+    citation: "[JonesMeijen2009]"
+    subscales:
+      - appraisal_orientation
+
+  coping:
+    instrument: Coping in sport
+    full_name: Coping in sport, systematic review
+    citation: "[Nicholls2007]"
+    subscales:
+      - coping_style
