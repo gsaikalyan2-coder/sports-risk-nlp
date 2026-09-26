@@ -1,7 +1,10 @@
 # Phase 32 — Evidence Coverage widget: implementation plan
 
 > **Status:** plan only, no code written. Approved by the owner 2026-09-21/22.
-> **Baseline:** `main` at `e1f9787` (PR #1 merged). Clean tree, 1095 tests passing.
+> **Baseline:** `main` at `e1f9787` (PR #1 merged). Clean tree, **1095 passed, 2 skipped,
+> 2 deselected** — measured on 2026-09-23 by running the suite in a worktree at that
+> commit, not inferred. (It had been asserted here before it was ever run; it happened
+> to be right, which is not the same as having been checked.)
 > **Written for:** a session starting cold with no prior context. This file is
 > self-contained — you do not need the conversation that produced it.
 
@@ -32,7 +35,7 @@ dashboard has already built.
 
 | File | Why |
 |---|---|
-| `reports/evidence_coverage_mockup.html` | **The approved visual contract.** Generated from real `build_view()` output, not drawn |
+| `reports/evidence_coverage_mockup.html` | **The approved visual contract.** Generated from real `build_view()` output, not drawn. Predates the N4 prompts block — §12 |
 | `reports/abstention.md` | The measurement that motivates this feature |
 | `CLAUDE.md` §11.3 | The shared architecture every dashboard feature copies |
 | `CLAUDE.md` §12.3 | The 0.50 problem this feature exposes |
@@ -77,7 +80,8 @@ flag later to hide it on a demo day.**
   denominator.
 - **N4 — Silent subscales as next questions.** Each unevidenced subscale renders
   as a topic the reader could ask about — turning a limitations display into
-  something a coach can act on.
+  something a coach can act on. **Not in the mockup**, which predates it; §12
+  records the panel as a superset of the mockup for exactly this reason.
 
 **Reused. Do NOT claim these as contributions:**
 
@@ -101,7 +105,7 @@ text-based psychological inference work elides this universally.
 
 ---
 
-## 5. What the mockup already revealed
+## 5. What the mockup already revealed — and what the corpus revealed after it
 
 Real output, not projection:
 
@@ -111,9 +115,24 @@ Real output, not projection:
 | Richest single corpus utterance | 2 | **2 of 8** |
 | Sparse utterance | 1 | **1 of 8** |
 
-A realistic passage speaks to a **quarter** of the instrument set.
+**Those three passages were hand-picked, and 2 of 8 is the best case, not the
+typical one.** Corrected 2026-09-23 after measuring every text rather than three:
 
-A reviewer seeing "2 of 8" beside a confident risk index will ask why the index
+| set | n | mean instruments spoken to | distribution | max |
+|---|---|---|---|---|
+| `gold_dev` | 100 | **0.62 of 8** | 0: 40 · 1: 58 · 2: 2 | 2 |
+| `gold_eval` | 400 | **0.56 of 8** | 0: 177 · 1: 223 | 1 |
+
+Reproduce with `LexiconBackend` + `build_view` + `coverage_for` over
+`data/processed/gold_candidates/`; `tests/test_coverage.py` pins the shape.
+
+So a typical corpus text speaks to **zero or one** instrument, 40% of `gold_dev`
+speaks to **none**, and the "quarter of the instrument set" reading the
+hand-picked cases suggested is reached by 2 texts in 100. The real finding is
+starker than the one this plan originally claimed, and it is the better finding:
+it is the honest version, and softening it would defeat the feature.
+
+A reviewer seeing "1 of 8" beside a confident risk index will ask why the index
 is shown at all. The answer: the index is a ranking over what *was* detected, and
 this widget is what makes that scope explicit rather than implied. **Do not
 soften the panel to dodge the question.**
@@ -303,7 +322,9 @@ Write these **before** wiring the page on.
 
 **Non-interference**
 - building a ledger does not alter `view.risk.index` — bit-identical
-- the pre-existing suite stays green (1095 passed, 2 skipped at baseline)
+- the pre-existing suite stays green. Measured 2026-09-23: **1095 passed, 2 skipped** at
+  `e1f9787`; **1136 passed, 2 skipped** with Phase 32's 38 tests and the 3 added with
+  `reports/abstention.md` §4. Zero regressions.
 
 **Page shell**
 - `tests/test_dashboard_pages.py` rules apply to page 7 unchanged: imports only
@@ -317,7 +338,8 @@ Write these **before** wiring the page on.
 |---|---|---|
 | **R1** | **Copyright.** CSAI-2, ABQ, CD-RISC and TAIS are copyrighted instruments. Reproducing item text is a licensing violation and the most damaging mistake available in this phase | The N4 prompt is **not** an instrument item. Use the `definition` field already in `config/taxonomy.yaml`, authored by this project. A test asserts every prompt derives from `taxonomy.yaml` and that `instruments.yaml` carries no item-like free text |
 | **R2** | Read as **item-level** coverage. CSAI-2 has 27 items; this project carries one construct per subscale | "subscales, not items" renders adjacent to every count, outside any expander. Test asserts presence, and that no item count is ever displayed |
-| **R3** | **Silent read as absent.** Silent means: construct absent, athlete didn't mention it, *or* detector missed it. At a 20.2% silent rate the third is common | Copy fixed at "this text gives no evidence either way", screened at import by `copy.py::_screen()`. Test asserts the panel never renders "no X" / "free of" / "does not have" |
+| **R3** | **Silent read as absent.** Silent means: construct absent, athlete didn't mention it, *or* detector missed it. At the widened list's measured 20.2% silence rate --
+58.8% on the frozen list, `reports/abstention.md` §4 -- the third is common | Copy fixed at "this text gives no evidence either way", screened at import by `copy.py::_screen()`. Test asserts the panel never renders "no X" / "free of" / "does not have" |
 | **R4** | **Coverage mistaken for correctness.** Evidenced means a cue fired, not that it fired correctly. Precision needs the gold set (OPEN-025) | Caveat renders above the table, in the error style, outside any expander — so it survives a screenshot. Same rule as `CLAUDE.md` §13.2 |
 | **R5** | **Drift from `abstention.py`** — two modules defining the same four states | The agreement test in §9. They must not import each other |
 | **R6** | **The demo lexicon is unevaluated.** The live path runs the widened `DASHBOARD_EXTRA_CUES`, not the frozen list | Carry the disclosure `docs/dashboard.md` already makes. Never quote a coverage percentage in the paper without saying which cue list produced it |
@@ -343,6 +365,11 @@ Write these **before** wiring the page on.
 - [ ] Every construct in `taxonomy.yaml` maps to exactly one instrument, each
       with a citation resolving in `paper/refs.bib`
 - [ ] The panel matches `reports/evidence_coverage_mockup.html` in both modes
+      for the table, summary, caveats and stamp, and **adds** the state legend
+      and the §4 N4 prompts block, which the mockup predates. The mockup is the
+      contract for what it shows, not a ceiling on what the panel may show —
+      the two disagreed until this was written down on 2026-09-23, and the
+      superset reading is the one that keeps N4
 - [ ] No number on the panel is absent from the `DashboardView` it was built from
 - [ ] The risk index is bit-identical with and without the ledger
 - [ ] All §9 tests pass, plus the pre-existing suite
@@ -361,7 +388,9 @@ Write these **before** wiring the page on.
 ```bash
 # baseline check before starting
 git status --porcelain            # expect empty
-python -m pytest -q --no-header   # expect 1095 passed, 2 skipped
+python -m pytest --no-header      # expect 1136 passed, 2 skipped (1095 at e1f9787)
+#   NB: pyproject already sets `-q` in addopts. Adding another `-q` makes it `-qq`,
+#   which suppresses the summary line entirely -- you get dots and no count.
 
 # during: run the focused suite
 python -m pytest tests/test_coverage.py -q --no-header

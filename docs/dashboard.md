@@ -68,9 +68,10 @@ no measured score of its own.** It is not evaluated, it is not in the paper, and
 no figure anywhere derives from it.
 
 **Its *coverage* is measured; its *correctness* is not, and the two are not the
-same thing.** `reports/abstention.md` reports how often each list fires at all:
-the frozen list is silent on **58.8%** of the corpus, the widened list on
-**20.2%** (Phase 31, 2026-09-21). Silence matters, because a silent detector
+same thing.** `reports/abstention.md` §4 reports how often each list fires at all,
+over the same corpus and in the same table: the frozen list is silent on
+**58.8%** of it, the widened list on **20.2%**. Silence matters, because a silent
+detector
 hands back an index of exactly 0.50 with a band underneath it. But firing more
 often is not the same as firing correctly -- every one of those extra matches
 could be wrong and nothing here shows otherwise, because measuring precision
@@ -233,8 +234,9 @@ Two further readings the panel is built to prevent:
 * **Silent is not absent.** It covers three cases — the construct is absent, the
   athlete did not raise it, or the detector missed it — and Phase 31 measured
   the third at a 20.2% silent rate over the corpus for the widened list this
-  page runs (58.6% for the frozen list the paper evaluates, `reports/abstention.md`),
-  so it is common rather than theoretical.
+  page runs, against 58.8% for the frozen list the paper evaluates
+  (`reports/abstention.md` §4, which measures both), so it is common rather
+  than theoretical.
 
 ### Not behind a feature flag
 

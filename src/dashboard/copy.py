@@ -736,8 +736,10 @@ COVERAGE_ITEMS_CAVEAT = (
 
 #: R3, and the most important string on the page. Silent covers three cases --
 #: the construct is absent, the athlete did not raise it, or the detector missed
-#: it -- and Phase 31 measured the third at a 20.2% rate over the corpus, so it
-#: is common rather than theoretical. "No evidence either way" is the only
+#: it -- and Phase 31 measured the third at a 20.2% silence rate over the corpus
+#: for the widened cue list this page runs, 58.8% for the frozen one
+#: (`reports/abstention.md` sec.4), so it is common rather than theoretical on
+#: either. "No evidence either way" is the only
 #: phrasing that covers all three; anything shorter collapses into "absent".
 COVERAGE_SILENT_CAVEAT = (
     "Silent does not mean absent. It means this text gives no evidence either way "

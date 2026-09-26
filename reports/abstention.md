@@ -4,10 +4,11 @@
 > the gates and the fusion layer over synthetic text (OPEN-011) with an
 > empty `data/gold/` (OPEN-025). Nothing here describes any real person.
 
-- Generated: 2026-09-21
+- Generated: 2026-09-23
 - Provenance: PROVISIONAL -- planted-label corpus-property measurement, NOT accuracy. data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011).
 - Detector: `CONSTRUCT_CUES` (the evaluated cue list, **not** the widened
-  dashboard one -- see `docs/dashboard.md`)
+  dashboard one -- see `docs/dashboard.md`). Section 4 is the one place
+  the widened list is measured, and it measures coverage, never accuracy.
 - Pure Python, no checkpoint, no network. Reproduce with
   `python scripts/run_abstention_report.py`.
 
@@ -71,7 +72,33 @@ built to stop a vacuous 0.50 and they do -- for the input class that makes up
 0.2% of corpus traffic. The class that makes up
 71.0% is untouched by them.
 
-## 4. True refusals, by junk class
+## 4. Which cue list is in force, and what silence costs each one
+
+The `no_detection` route above is a property of the detector, and this
+project runs two of them: the frozen `CONSTRUCT_CUES` that every
+committed figure was measured with, and the same list widened by
+`DASHBOARD_EXTRA_CUES` for the deployed page only (`docs/dashboard.md`).
+A silence rate quoted without naming its list is the most misleading
+number this report can produce, because the two differ by a factor of
+three. Both are therefore measured here, over the same corpus.
+
+| cue list | what it is | n | silent | silence rate |
+|---|---|---|---|---|
+| `CONSTRUCT_CUES` | frozen; the list every committed figure was measured with | 500 | 294 | **58.8%** |
+| `CONSTRUCT_CUES + DASHBOARD_EXTRA_CUES` | widened; demo only, no measured score of its own | 500 | 101 | **20.2%** |
+
+**This is coverage, not correctness.** Firing more often is not firing
+more correctly: every extra match the widened list makes could be wrong
+and nothing here shows otherwise, because precision needs the gold set
+OPEN-025 is waiting on. The widened list still has no measured score, it
+is in no committed figure, and no macro-F1 anywhere derives from it.
+
+These counts are the *detector's* silence, so they include text the
+admission gate refused; section 3's `no_detection` count excludes it,
+because `refused` wins the cause ordering there. That is the whole of
+the difference between the two frozen-list figures (294 here, 293 there).
+
+## 5. True refusals, by junk class
 
 **Authored by this project, and weak in a stated way**: these are shapes the
 project imagined a paste box or a camera catching, not a sample of user
@@ -93,11 +120,11 @@ texts are real English about the wrong subject, so `admit` passes them,
 `judge` flags them, and they are scored. Every one lands on the midpoint --
 which is the `no_detection` route again, arriving from a different door.
 
-## 5. What this does not establish
+## 6. What this does not establish
 
 1. **The positives are synthetic** (OPEN-011). The false-refusal rate is
    measured against the register this project's own generator writes.
-2. **The junk is authored** by this project (sec.4 above).
+2. **The junk is authored** by this project (sec.5 above).
 3. **The counterfactual uses the lexicon**, not the transformer. The 0.50
    result is a property of the fusion layer given all-zero probabilities; a
    transformer emits small non-zero probabilities on junk and would cluster

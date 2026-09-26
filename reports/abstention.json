@@ -127,5 +127,21 @@
         "moved": 0
       }
     }
+  ],
+  "silence": [
+    {
+      "name": "CONSTRUCT_CUES",
+      "description": "frozen; the list every committed figure was measured with",
+      "n": 500,
+      "silent": 294,
+      "rate": 0.588
+    },
+    {
+      "name": "CONSTRUCT_CUES + DASHBOARD_EXTRA_CUES",
+      "description": "widened; demo only, no measured score of its own",
+      "n": 500,
+      "silent": 101,
+      "rate": 0.202
+    }
   ]
 }
