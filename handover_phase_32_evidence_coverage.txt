@@ -8,6 +8,19 @@ Written:  2026-09-22
 For:      A cold-start session picking this up with no prior context, and the
           owner reviewing what it will do before it runs.
 Prereq:   commit 3099931 (abstention-aware evaluation + cue widening).
+
+SUPERSEDED 2026-09-23. Phase 32 is built. docs/phase32_implementation_plan.md
+wins wherever the two disagree, and they now do, in three places:
+  * the suite count below ("1095 at handover") was inferred, never run -- the
+    plan carries the measured figures;
+  * the shipped panel is a SUPERSET of reports/evidence_coverage_mockup.html:
+    it adds the state legend and the N4 "next questions" prompts block;
+  * every bare "20.2%" below is the WIDENED demo cue list's silence rate; the
+    frozen list the paper evaluates is silent on 58.8% (reports/abstention.md
+    section 4, which measures both). OPEN-037 has the full record;
+  * "a quarter of the instrument set" came from three hand-picked passages.
+    Measured over all 100 gold_dev texts: mean 0.62 of 8, {0:40, 1:58, 2:2}.
+Kept as the record of what was approved on 2026-09-22, not as instructions.
 ================================================================================
 
 

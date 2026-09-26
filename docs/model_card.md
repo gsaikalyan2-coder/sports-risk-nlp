@@ -590,17 +590,23 @@ and never about the person who produced the text.
 
 **Silent is not absence.** It covers three cases — the construct genuinely
 absent, the athlete not raising it, or the detector missing it — and Phase 31
-measured a no-detection rate of 58.6% for the frozen cue list this card
-evaluates in SS4-SS5, and 20.2% for the widened list the dashboard runs
-(`reports/abstention.md`), so the third is common either way. No
+measured the detector's silence rate at 58.8% for the frozen cue list this
+card evaluates in SS4-SS5 and 20.2% for the widened list the dashboard runs
+(`reports/abstention.md` SS4, which measures both lists over one corpus; that
+report's SS3 `no_detection` route reads 58.6% for the frozen list because it
+files the one refused text under `refused` instead), so the third is common
+either way. No
 surface may render silent as "no X", "free of" or "does not have"; asserted.
 
 **What the numbers rest on.** The corpus is synthetic (OPEN-011) and the live
 dashboard path uses `CONSTRUCT_CUES` widened with `DASHBOARD_EXTRA_CUES`, which
-is not the frozen list the evaluation in §4–§5 uses. Over `gold_dev` a passage
-speaks to fewer than two of eight instruments on average and none reaches all
-eight. **No coverage figure may appear in the paper without naming the cue list
-that produced it.**
+is not the frozen list the evaluation in §4–§5 uses. Over `gold_dev` (n=100),
+**on that widened list**, a passage speaks to a mean of **0.62 of eight**
+instruments — 40 texts speak to none, 58 to one, 2 to two, and none reaches
+three. An earlier version of this paragraph said "fewer than two on average",
+which is true and flatters the system by a factor of three; the measured shape
+replaced it on 2026-09-23. **No coverage figure may appear in the paper without
+naming the cue list that produced it.**
 
 **Instrument items are not reproduced.** CSAI-2, the ABQ, CD-RISC and TAIS are
 copyrighted. This project maps to them and does not implement them; the

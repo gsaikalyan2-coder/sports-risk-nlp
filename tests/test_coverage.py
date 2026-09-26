@@ -343,11 +343,28 @@ def test_a_realistic_passage_speaks_to_a_minority_of_the_instrument_set():
     Not a threshold on quality -- it is the measurement `reports/abstention.md`
     motivates, asserted so that a change making coverage look comfortable fails
     loudly instead of quietly flattering the system.
+
+    The bound is the *measured* shape, not a comfortable one. An earlier version
+    asserted a mean below 2.0, which the real mean of 0.62 clears by a factor of
+    three -- a test that passes however much the finding softens is not a guard.
+    Measured over `gold_dev` (n=100) on 2026-09-23: mean 0.62 of 8, distribution
+    {0: 40, 1: 58, 2: 2}. The assertions below allow drift in both directions and
+    fail if the headline changes character: if the typical text starts speaking
+    to more than one instrument, or if the "speaks to nothing at all" share stops
+    being a large minority, this stops being the feature `docs/dashboard.md`
+    describes and the docs must be rewritten with it.
     """
     backend = LexiconBackend()
     counts = [coverage_for(build_view(text=t, backend=backend)).spoken_to for t in _corpus()]
+    mean = sum(counts) / len(counts)
+    silent_entirely = sum(1 for c in counts if c == 0) / len(counts)
+
     assert max(counts) < 8, "a corpus text now speaks to every instrument; verify the cue list"
-    assert sum(counts) / len(counts) < 2.0
+    assert mean < 1.0, f"the typical text now speaks to more than one instrument (mean {mean:.2f})"
+    assert silent_entirely > 0.2, (
+        f"only {silent_entirely:.0%} of texts speak to no instrument at all; the plan's "
+        "headline finding (40% on gold_dev) no longer holds and the docs quoting it are stale"
+    )
 
 
 # ---------------------------------------------------------------------------

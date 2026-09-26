@@ -10,12 +10,15 @@ with no statement of how much evidence it rests on.
 
 Phase 31 measured why that matters. Over the corpus, the widened cue list this
 page actually runs is silent on 20.2% of texts, and the frozen list the paper
-evaluates is silent on 58.6% -- and a silent detector reaches the fusion layer
+evaluates is silent on 58.8% -- and a silent detector reaches the fusion layer
 with nothing detected and lands on the exact midpoint `CLAUDE.md` sec.12.3 is
-written about. Both figures are from `reports/abstention.md`; which list is in
-force changes the number by a factor of three, so neither is quoted here
-without it. A reader looking at a confident index has no way to see any of
-this. This module supplies the denominator.
+written about. Both figures are from `reports/abstention.md` sec.4, which
+measures the two lists side by side over one corpus; which list is in force
+changes the number by a factor of three, so neither is quoted here without it.
+(That report's sec.3 `no_detection` route reads 58.6% for the frozen list,
+one text lower, because it files the single refused text under `refused`.) A
+reader looking at a confident index has no way to see any of this. This module
+supplies the denominator.
 
 It computes no new number
 --------------------------
@@ -81,7 +84,8 @@ class CoverageState(Enum):
 #: `SILENT` is the dangerous one and its wording is fixed rather than phrased at
 #: the call site. Silent means the construct is absent, OR the athlete did not
 #: mention it, OR the detector missed it -- and at Phase 31's measured silent
-#: rate (20.2% on the widened list this page runs, 58.6% on the frozen one) the
+#: rate (20.2% on the widened list this page runs, 58.8% on the frozen one --
+#: `reports/abstention.md` sec.4, which names the list beside each figure) the
 #: third is common on either. "No evidence either way" is the only reading that
 #: covers all three, so it is the only one written.
 STATE_WORDS: dict[CoverageState, str] = {
