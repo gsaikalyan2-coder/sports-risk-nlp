@@ -702,6 +702,66 @@ NARRATED_MISSING = (
 
 
 # ---------------------------------------------------------------------------
+# Page 7 -- two texts, side by side
+# ---------------------------------------------------------------------------
+#
+# The page invites one sentence above all others: "this athlete is 12 points
+# worse than that one". Every string below exists to keep that sentence from
+# being the one a reader leaves with, because the page cannot support it: two
+# uncalibrated rankings subtracted leave an uncalibrated ranking.
+
+COMPARE_TITLE = "Two pieces of writing, side by side"
+
+COMPARE_LEDE = (
+    "Paste two short pieces of writing and see which of the ten signals separate them. "
+    "Both are read the same way, by the same word list, under the same setting, so the "
+    "only thing that differs between the two columns is the writing itself."
+)
+
+#: Rendered in the error style, above the numbers, outside any expander. Same
+#: position and the same reason as the register flag on page 2: a qualification
+#: that a screenshot can crop off is a qualification that does not exist.
+COMPARE_CAVEAT = (
+    "A gap between these two numbers is not a measured difference. Neither number is "
+    "calibrated against anything an athlete actually reported, so the distance between "
+    "them has no interval and no threshold. Read it as an ordering of two pieces of "
+    "writing, and never as one person being worse off than another."
+)
+
+COMPARE_HOW_TO_READ = (
+    "Each row is one of the ten signals. A bar to the right means the second piece of "
+    "writing carried that signal more strongly; a bar to the left means the first one "
+    "did. The number on the row is the size of that gap. Rows marked inert were counted "
+    "as zero in both texts, so a long bar there changed nothing about either score."
+)
+
+COMPARE_EMPTY = "Paste something into both boxes, then press Compare."
+
+COMPARE_ONE_SETTING = (
+    "Both texts are scored under the one setting chosen above. Comparing two texts read "
+    "under different settings would put the difference between the settings into the "
+    "gap, where it would be indistinguishable from a difference between the texts."
+)
+
+COMPARE_IDENTICAL = (
+    "These two texts produced the same ten readings, so every bar below is zero. That is "
+    "the tool working, not the tool failing."
+)
+
+COMPARE_NOTHING_DETECTED = (
+    "matched none of the ten signals at all. Its figure is therefore not a reading of "
+    "that writing -- it is where the scale sits when nothing whatsoever is found, which "
+    "is the middle. The gap shown here is a gap between a reading and a blank, and it is "
+    "not a difference between two people."
+)
+
+COMPARE_REJECTED = "One of the two texts could not be read, so neither was scored."
+
+COMPARE_NO_NUMBER_WHY = (
+    "Nothing was scored and no number was produced. A word list will happily return a "
+    "reading for keyboard mash -- nothing matches, every signal comes back as zero, and "
+    "the arithmetic hands you a confident middle-of-the-scale figure for a string that "
+    "contained no words. Refusing here is the only way that figure never exists."
 # Phase 32 -- evidence coverage
 # ---------------------------------------------------------------------------
 #

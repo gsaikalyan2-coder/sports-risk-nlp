@@ -48,8 +48,10 @@ from .benchmarks import (
     load_per_construct,
 )
 from .charts import (
+    DELTA_CAPTION,
     benchmark_chart,
     construct_contribution_chart,
+    construct_delta_chart,
     construct_probability_chart,
     evidence_coverage_chart,
     per_construct_chart,
@@ -158,6 +160,8 @@ __all__ = [
     "assert_no_forbidden_language",
     "build_view",
     "construct_contribution_chart",
+    "construct_delta_chart",
+    "DELTA_CAPTION",
     "construct_probability_chart",
     "evidence_coverage_chart",
     "evidence_height",

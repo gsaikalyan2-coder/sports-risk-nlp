@@ -434,6 +434,26 @@ class DashboardView:
         return len(self.card.drivers) - len(self.card.unevidenced_drivers)
 
     @property
+    def detected_nothing(self) -> bool:
+        """No construct was detected at all, so the index is the scale's midpoint.
+
+        The Phase 27 0.50 problem arriving through a door the gates do not cover.
+        `gibberish.admit` asks "is this language?"; a paragraph of ordinary English
+        the lexicon happens to have no entries for passes that question and still
+        produces ten probabilities of 0.0, a weighted sum of 0.0, and a logistic
+        squash of exactly 0.50 -- a psychological score of 50 out of 100 for
+        writing in which nothing whatsoever was found.
+
+        Not a refusal, because it is not an error: a genuinely settled athlete
+        writing plainly may trip this, and refusing them would be worse than
+        scoring them. It is a fact about the reading that any surface showing the
+        number has to be able to state, and it is worst on a surface that puts
+        two numbers beside each other, where the midpoint silently becomes a
+        baseline the other text is measured against.
+        """
+        return not any(bar.probability for bar in self.bars)
+
+    @property
     def unevidenced_driver_count(self) -> int:
         """Constructs that moved the index while pointing at nothing.
 
