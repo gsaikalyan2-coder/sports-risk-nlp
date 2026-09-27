@@ -762,6 +762,10 @@ COMPARE_NO_NUMBER_WHY = (
     "reading for keyboard mash -- nothing matches, every signal comes back as zero, and "
     "the arithmetic hands you a confident middle-of-the-scale figure for a string that "
     "contained no words. Refusing here is the only way that figure never exists."
+)
+
+
+# ---------------------------------------------------------------------------
 # Phase 32 -- evidence coverage
 # ---------------------------------------------------------------------------
 #
@@ -852,6 +856,176 @@ COVERAGE_WHAT_IT_IS_NOT = (
     "text: short, on one topic, or simply not about the things the other seven "
     "questionnaires ask about. The same athlete on the same day would produce a "
     "different count from a different paragraph."
+)
+
+
+# ---------------------------------------------------------------------------
+# Phase 34 -- the sentence ribbon, the corpus constellation, the taxonomy deck
+# ---------------------------------------------------------------------------
+#
+# Screened by `_screen()` below like everything else in this module. Two of the
+# three carry numbers and therefore carry the same disclaimers the rest of the
+# page does; the third carries none at all, and says so rather than borrowing a
+# stamp it does not need.
+
+RIBBON_TITLE = "The shape of one passage"
+
+RIBBON_PLAIN = (
+    "The rest of this app gives a passage one number. This page cuts the passage into "
+    "sentences, scores each one on its own, and draws them side by side -- so you can "
+    "see where in the text the strain is, instead of only how much there is."
+)
+
+RIBBON_HOW_TO_READ: tuple[tuple[str, str], ...] = (
+    (
+        "A tall column",
+        "That sentence, scored by itself, came out high. Column width is just how long "
+        "the sentence is.",
+    ),
+    (
+        "No column at all",
+        "The word list found nothing in that sentence. It gets no number rather than a "
+        "middling one -- a sentence nothing was found in is not a calm sentence, it is "
+        "a sentence we cannot speak about.",
+    ),
+    (
+        "A hatched column",
+        "Signals were found, but all of them were the kind whose direction is left "
+        "open, so together they moved the number by nothing.",
+    ),
+    (
+        "The dotted line",
+        "The whole passage's own number. It is not the average of the columns, and it "
+        "is not meant to be.",
+    ),
+)
+
+RIBBON_NOT_AVERAGE = (
+    "The whole-passage number is worked out from the whole passage, not by averaging the "
+    "sentences. Averaging would be wrong twice over: the final step that squeezes the "
+    "total into 0-to-1 is not a straight line, and a sentence with no number has nothing "
+    "to average in."
+)
+
+RIBBON_WHAT_IT_IS_NOT = (
+    "This is not a timeline of an athlete's state. It is the order the sentences were "
+    "written in, and nothing here knows when any of them were written or whether the "
+    "order means anything. Time-aware modelling is future work, not this page."
+)
+
+RIBBON_FLOOR_NOTE = (
+    "Sentence-by-sentence scoring needs something that can read new text, and the only "
+    "such reader in this app is the plain word list -- the honest floor, with a known "
+    "tendency to over-report on this corpus. The paper's trained model is not loaded "
+    "here and cannot be, so read every column as a floor rather than a verdict."
+)
+
+RIBBON_PROMPT = "A few sentences written before a competition"
+
+#: Written for this page as an illustration, not drawn from the corpus and not
+#: anybody's real words. Chosen because it exercises every marking the figure has:
+#: two sentences with nothing detected, three that push the number up, and one
+#: that pulls it down.
+RIBBON_SAMPLE = (
+    "Taper week has gone to plan and the times are where we wanted them. "
+    "I keep replaying last year's final and wondering if it happens again. "
+    "My hands were shaking in the warm-up pool this morning. "
+    "Honestly some days I am just drained and I stop caring how it goes. "
+    "But I have come back from worse than this before. "
+    "I know the race plan and I trust it."
+)
+
+RIBBON_SAMPLE_NOTE = (
+    "The passage above was written as an illustration for this page. It is not from the "
+    "corpus and it is not anybody's real words."
+)
+
+CLOUD_TITLE = "The whole corpus, one dot per record"
+
+CLOUD_PLAIN = (
+    "Four thousand synthetic records, each scored and placed left to right by its number. "
+    "Every row is one of the ten signals, and a record sits in the row for whatever the "
+    "text generator was told to write into it -- so a row shows how the number ranks "
+    "passages that were all built to contain the same thing."
+)
+
+CLOUD_HOW_TO_READ: tuple[tuple[str, str], ...] = (
+    (
+        "A row",
+        "Records the generator was told to write one particular signal into. Not what "
+        "the detector thinks is in them -- that would be the detector marking its own "
+        "work.",
+    ),
+    (
+        "Left and right",
+        "Lower and higher numbers. The scale is an ordering only; the far right is not a "
+        "crisis and the far left is not a clean bill of health.",
+    ),
+    (
+        "The vertical tick",
+        "The middle of that row, worked out over every scored record in it, not just the "
+        "dots drawn.",
+    ),
+    (
+        "A dash instead of a tick",
+        "Nothing in that row was detected anywhere, so the row has no middle to report.",
+    ),
+)
+
+CLOUD_MIDPOINT_NOTE = (
+    "Four rows sit on the midpoint. That is the conservative default doing exactly what "
+    "it was built to do: those four signals can point either way, the system is not "
+    "allowed to decide which, so a record containing only those signals has nothing "
+    "pushing its number in either direction. Those dots are real readings, not failures."
+)
+
+CLOUD_SILENT_NOTE = (
+    "Records the word list matched nothing in are absent from the figure rather than "
+    "drawn in the middle. A record we found nothing in has no number, and putting it at "
+    "the midpoint would invent one."
+)
+
+CLOUD_WHAT_IT_IS_NOT = (
+    "Every dot is synthetic text this project generated. The rows are what the generator "
+    "planted, so this figure shows whether the number separates texts we built to differ "
+    "-- not whether it would separate real athletes, which nothing here can show."
+)
+
+CLOUD_SOURCE_NOTE = (
+    "Built once and committed, because scoring four thousand records takes about three "
+    "minutes and that is not a page load. Nothing on this page is computed while you "
+    "look at it."
+)
+
+DECK_TITLE = "The ten signals, and where they come from"
+
+DECK_PLAIN = (
+    "Every signal this project looks for is defined in one file, with the questionnaire "
+    "or theory it comes from, what counts, what does not, and the awkward cases. This "
+    "page is that file, readable."
+)
+
+DECK_NO_NUMBERS = (
+    "There is no number anywhere on this page, and so nothing here to misread. Nothing "
+    "has been scored, detected or ranked: a card is a definition and its sources."
+)
+
+DECK_POLAR_NOTE = (
+    "The four cards with a dashed border are the ones that can point either way. The "
+    "system detects them, shows them, and counts them as zero, because deciding which "
+    "way they point is a judgement it is not allowed to make on its own."
+)
+
+DECK_SOURCE_NOTE = (
+    "Straight from config/taxonomy.yaml, which has been locked since Phase 4. Each "
+    "reference at the foot of a card resolves in the paper's bibliography; a card whose "
+    "reference did not resolve would refuse to load rather than appear uncited."
+)
+
+DECK_GUIDELINES_NOTE = (
+    "The full labelling rubric -- span rules, intensity anchors, decision order, worked "
+    "examples -- is docs/annotation_guidelines.md. These cards are its summary, not a "
+    "replacement for it."
 )
 
 

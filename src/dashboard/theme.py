@@ -398,6 +398,54 @@ def app_css(mode: str = DEFAULT_MODE) -> str:
       .stMarkdown svg{{border-radius:{RADIUS_LG}; background:{p["figure-surface"]};
         border:1px solid var(--card-border)}}
 
+      /* Phase 34 taxonomy deck. A host-page fragment rather than an iframe (see
+         src/dashboard/deck.py), so its type comes from the rules above and only
+         the card geometry is new. auto-fit rather than a fixed column count:
+         three cards at 1180px, one at phone width, no media query. */
+      .deck{{display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+        gap:{SPACE_XL}; margin:{SPACE_XL} 0 0 0}}
+      .tcard{{background:var(--canvas); border:1px solid var(--hairline);
+        border-radius:{RADIUS_MD}; padding:{SPACE_XL}; display:flex;
+        flex-direction:column; gap:{SPACE_MD}}}
+      /* The four directionally unresolved constructs: dashed border, muted chip
+         and the literal words "counted as zero" -- the same three channels
+         charts.py uses for an inert bar, because a reader who takes all ten cards
+         as equally load-bearing has been misled by the deck. */
+      .tcard.is-polar{{border-style:dashed}}
+      .tcard .tkey{{font-family:{FONT_MONO}; font-size:12px; letter-spacing:.28px;
+        text-transform:uppercase; color:var(--slate)}}
+      .tcard .tname{{font-family:{FONT_DISPLAY}; font-size:28px!important;
+        line-height:1.15!important; letter-spacing:-.28px!important;
+        margin:0!important; color:var(--ink)}}
+      .tcard .tplain{{font-size:16px; line-height:1.45; color:var(--body-muted);
+        margin:0}}
+      .tcard .tchips{{display:flex; flex-wrap:wrap; gap:{SPACE_SM}}}
+      .tchip{{display:inline-block; border:1px solid var(--coral); color:var(--coral);
+        border-radius:{RADIUS_XL}; padding:3px 10px; font-size:12px; line-height:1.5}}
+      .tchip.is-muted{{border-color:var(--hairline); color:var(--slate)}}
+      /* Washes come from the mode-aware tokens, never from the fixed pale-blue and
+         pale-green constants in :root. Those two do not flip, so a card painted
+         with them keeps a near-white fill under dark mode's near-white ink -- the
+         classic half-filled-palette failure, visible only in a browser. */
+      .tcard .tdef{{font-size:14px; line-height:1.5; color:var(--ink);
+        background:var(--stone); border-radius:{RADIUS_SM};
+        padding:{SPACE_MD}; margin:0}}
+      .tex{{border-left:2px solid var(--hairline); padding-left:{SPACE_MD}}}
+      .tex.is-yes{{border-left-color:var(--deep-green)}}
+      .tex .texl{{font-family:{FONT_MONO}; font-size:12px; letter-spacing:.28px;
+        text-transform:uppercase; color:var(--slate)}}
+      .tex ul{{margin:{SPACE_XS} 0 0 0; padding-left:{SPACE_LG}}}
+      .tex li{{font-size:14px!important; line-height:1.45; color:var(--ink)}}
+      .tex.is-no li{{color:var(--body-muted)}}
+      .tcard .tedge{{font-size:12px; line-height:1.45; color:var(--muted); margin:0}}
+      .tcard .tfoot{{margin-top:auto; padding-top:{SPACE_MD};
+        border-top:1px solid var(--hairline); display:flex; flex-wrap:wrap;
+        gap:{SPACE_SM}; align-items:baseline}}
+      .tcard .tinst{{font-size:12px; line-height:1.45; color:var(--slate);
+        flex:1 1 100%}}
+      .tanchor{{font-family:{FONT_MONO}; font-size:12px; background:var(--stone);
+        color:var(--ink); border-radius:{RADIUS_XS}; padding:2px 6px}}
+
       .stTabs [data-baseweb="tab-list"]{{gap:{SPACE_XL};
         border-bottom:1px solid var(--hairline)}}
       .stTabs [data-baseweb="tab"]{{font-size:16px; padding:{SPACE_MD} 0;

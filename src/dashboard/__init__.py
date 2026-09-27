@@ -53,13 +53,23 @@ from .charts import (
     construct_contribution_chart,
     construct_delta_chart,
     construct_probability_chart,
+    corpus_cloud_chart,
     evidence_coverage_chart,
     per_construct_chart,
     risk_meter,
     risk_waterfall,
+    sentence_ribbon,
+)
+from .corpus_cloud import (
+    CloudLane,
+    CorpusCloud,
+    CorpusCloudError,
+    CorpusCloudMissing,
+    load_cloud,
 )
 from .coverage import CoverageLedger, CoverageState, coverage_for
 from .coverage_panel import coverage_height, coverage_panel
+from .deck import card_deck
 from .gibberish import TextAdmission, admit
 from .matchday import (
     LIFE_CONTEXT_LABELS,
@@ -85,6 +95,8 @@ from .mediaio import (
     read_upload,
 )
 from .motion import evidence_height, motion_panel, panel_height, spans_panel
+from .ribbon import Ribbon, RibbonRefused, SentenceBand, build_ribbon
+from .taxonomy_cards import TaxonomyCard, TaxonomyCardError, load_cards
 from .view import (
     DEFAULT_POLICY_LABEL,
     FORBIDDEN_SUBSTRINGS,
@@ -102,6 +114,22 @@ from .view import (
 from .widgets import Widget, coverage_widget, widget_for, widgets_for
 
 __all__ = [
+    # Phase 34: the sentence ribbon, the corpus constellation, the taxonomy deck.
+    "build_ribbon",
+    "Ribbon",
+    "SentenceBand",
+    "RibbonRefused",
+    "sentence_ribbon",
+    "load_cloud",
+    "CorpusCloud",
+    "CloudLane",
+    "CorpusCloudError",
+    "CorpusCloudMissing",
+    "corpus_cloud_chart",
+    "load_cards",
+    "TaxonomyCard",
+    "TaxonomyCardError",
+    "card_deck",
     "widgets_for",
     "CoverageLedger",
     "CoverageState",

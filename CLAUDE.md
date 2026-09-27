@@ -954,3 +954,94 @@ one and it is the better one for the paper.
   limitations display and becomes an unvalidated psychometric instrument.
 * Any reproduction or paraphrase of an instrument item. CSAI-2, ABQ, CD-RISC and TAIS are
   copyrighted; every prompt derives from this project's own `config/taxonomy.yaml` definitions.
+
+## 17. Phase 34 — three read-only surfaces (built 2026-09-26)
+
+> **Status: built and tested.** Three pages that show what the project already
+> computes, from angles it had no surface for. None adds a model, a weight, a
+> channel or a claim, and none touches a person — which is why none of them needed
+> an ethics decision and why `docs/ethics.md` is untouched.
+
+### 17.1 What was asked for and what was built
+
+Owner request, 2026-09-26: visually appealing features, unrelated to the
+compare-two-texts page. Three were proposed and all three built:
+
+| Feature | Page | What it shows |
+|---|---|---|
+| **Sentence ribbon** | `dashboard/pages/7_Sentence_ribbon.py` | One passage cut into sentences, each scored on its own, drawn as a contour |
+| **Corpus constellation** | `dashboard/pages/8_Corpus_constellation.py` | All 4,000 synthetic records as dots, in lanes by the construct the generator planted |
+| **Taxonomy card deck** | `dashboard/pages/9_Taxonomy_cards.py` | `config/taxonomy.yaml` as ten designed cards: definition, anchor, examples, edge cases |
+
+### 17.2 The one rule all three are shaped around
+
+§12.3 again, three new doors. `LexiconBackend` scores anything, and an all-zero
+decomposition squashes to **exactly 0.50** — a number that is arithmetically
+correct and, drawn, is a lie. Each surface meets it differently and each refuses
+it structurally rather than by convention:
+
+* **`ribbon.SentenceBand` cannot hold a number it did not earn.** `detected` and
+  `surface` must agree at construction. A sentence the detector said nothing about
+  gets no column — just a hatched footing and the words "nothing detected".
+* **`scripts/build_corpus_cloud.py` never writes an index for an undetected
+  record.** 1,486 of 4,000 records match no cue; they are counted, excluded and
+  reported on the figure instead of stacking into a false spike at the midpoint.
+* **`corpus_cloud.CloudLane` refuses a median without scored records**, and the
+  reverse. The same rule one level up.
+* **The deck carries no number at all**, and therefore no stamp. A test asserts the
+  absence of any score-shaped value in the rendered HTML.
+
+A *real* 0.50 still exists and is marked rather than hidden: a sentence whose only
+detected constructs are inert genuinely sums to zero, and is drawn hatched with
+"counted as zero". Two different facts, two different markings.
+
+### 17.3 New modules
+
+| File | Responsibility |
+|---|---|
+| `src/dashboard/ribbon.py` | Segment a passage, score each sentence, refuse rather than degrade |
+| `src/dashboard/corpus_cloud.py` | Load, validate and freeze `reports/corpus_cloud.json` |
+| `src/dashboard/taxonomy_cards.py` | Load, validate and freeze `config/taxonomy.yaml` as cards |
+| `src/dashboard/deck.py` | The deck as a host-page fragment; no iframe, no numbers |
+| `scripts/build_corpus_cloud.py` | Builds the committed artifact. ~3 minutes, offline, no record text, no timestamp |
+| `reports/corpus_cloud.json` | Committed. Per-lane counts, medians and sampled dots over 4,000 records |
+
+`charts.py` gains `sentence_ribbon` and `corpus_cloud_chart`; `theme.app_css` gains
+the deck's card geometry; `copy.py` gains the `RIBBON_*`, `CLOUD_*` and `DECK_*`
+strings, screened at import as usual.
+
+### 17.4 Rules this layer adds
+
+1. **No new arithmetic anywhere.** Every number comes from `build_view` — the ribbon
+   calls it per sentence, the builder called it per record. Nothing here fits a
+   weight, invents a scale or averages an index.
+2. **The lexicon floor is named on the ribbon page.** Per-sentence scoring needs a
+   backend that can read new text, `ReplayBackend.predict` refuses by design, so
+   every column is the floor and the page says so rather than implying otherwise.
+3. **A lane is what the generator planted, never what the detector picked.** A lane
+   chosen by the detector would be the detector marking its own work.
+4. **The deck page has no `st.expander`, deliberately.** It shows no reading, so it
+   has no provenance to hide behind one and no stamp to put above one.
+5. **The four midpoint lanes are explained on the figure**, not only in prose: they
+   are the conservative default working as designed, and an unexplained flat row
+   reads as a broken detector.
+
+### 17.5 One existing test was changed, and why
+
+`tests/test_dashboard_pages.py::test_every_page_that_shows_a_number_shows_the_stamp_before_any_expander`
+matched `st.expander` as a **substring of the page source**, so page 9's docstring —
+which explains why that page deliberately has no expander — failed the rule for
+mentioning it. The check now reads the syntax tree for a real call, which is
+strictly more precise and leaves every existing page passing. The `app.py`
+exemption in `STAMP_ABOVE_FOLD_EXEMPT` is untouched.
+
+### 17.6 What is deliberately not built
+
+* **No interaction.** Streamlit renders these figures as static SVG in markdown, so
+  a clickable dot cannot route back to a page. Dropped rather than faked.
+* **No density estimate on the constellation.** A kernel bandwidth is an invented
+  constant; dots need no parameter to justify.
+* **No radar or spider chart of the ten constructs.** It implies a calibrated
+  profile that does not exist.
+* **No re-scoring of the corpus on page load.** Three minutes is not a page load,
+  and a cached three-minute computation is a stale cache nobody can date.
