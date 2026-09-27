@@ -42,9 +42,10 @@ from src.dashboard import (  # noqa: E402
 )
 
 st.set_page_config(page_title="Signal detail", layout="wide")
-# The mode the reader chose on the dashboard, not a second control: this page is
-# opened by clicking a tile, so it must look like the page the tile was on.
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+# The same control every page carries. It defaults to the mode the reader chose
+# on the dashboard, because this page is opened by clicking a tile there and must
+# look like the page the tile was on, and it can still be changed from here.
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 HOME = "app.py"
@@ -78,8 +79,6 @@ def _replay():
 def _per_construct():
     return load_per_construct()
 
-
-st.markdown(f'<div class="announcement">{plain.ANNOUNCEMENT}</div>', unsafe_allow_html=True)
 
 construct = st.session_state.get("detail_construct")
 if not construct:

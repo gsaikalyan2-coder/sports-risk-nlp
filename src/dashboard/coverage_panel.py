@@ -45,11 +45,18 @@ from src.dashboard.coverage import STATE_GLYPHS, CoverageLedger, CoverageState
 #: `coverage.py` because it is presentation: the ledger knows a subscale is
 #: silent, it does not know what silent looks like. Same separation
 #: `atlas_map.py` keeps by leaving geometry out of the YAML.
+#: `hairline` used to paint the silent and refused glyphs, and it is a *border*
+#: token: measured in the running app it gave 1.41:1 against the light canvas and
+#: 1.44:1 against the dark one, so the weakest state was not faint, it was gone.
+#: Both now take `muted`, and the three states stay apart the way this project
+#: separates everything else, by a channel that is not colour: the glyphs are
+#: three different characters (`STATE_GLYPHS`), the row text carries its own
+#: class, and the count is written out beside it.
 STATE_TOKENS: dict[CoverageState, str] = {
     CoverageState.EVIDENCED: "accent",
     CoverageState.INERT: "muted",
-    CoverageState.SILENT: "hairline",
-    CoverageState.REFUSED: "hairline",
+    CoverageState.SILENT: "muted",
+    CoverageState.REFUSED: "muted",
 }
 
 #: Rows of table, plus the fixed furniture above and below it. Measured the way
@@ -109,7 +116,7 @@ def coverage_panel(ledger: CoverageLedger, *, mode: str = theme.DEFAULT_MODE) ->
         )
 
     prompts = "".join(
-        f"<li><b>{escape(s.plain_name)}</b> &mdash; {escape(s.prompt)}</li>"
+        f"<li><b>{escape(s.plain_name)}</b> - {escape(s.prompt)}</li>"
         for row in ledger.instruments
         for s in row.unevidenced
     )
@@ -152,8 +159,8 @@ def coverage_panel(ledger: CoverageLedger, *, mode: str = theme.DEFAULT_MODE) ->
   .g{{font-size:17px;letter-spacing:2px}}
   .s-evidenced{{color:var(--accent)}}
   .s-inert{{color:var(--muted)}}
-  .s-silent{{color:var(--hairline)}}
-  .s-refused{{color:var(--hairline)}}
+  .s-silent{{color:var(--muted)}}
+  .s-refused{{color:var(--muted)}}
   .s-inert-t{{color:var(--body)}}
   .s-silent-t{{color:var(--muted)}}
   .count{{display:block;font-size:11px;color:var(--muted);

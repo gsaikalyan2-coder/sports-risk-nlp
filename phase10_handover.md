@@ -1,11 +1,11 @@
-# Handover — Phase 10: Weak / LLM Labelling Pipeline
+# Handover - Phase 10: Weak / LLM Labelling Pipeline
 
 Self-contained. A new AI session can start from this file plus the repo; no chat history
 needed.
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes.
 Construct-grounded NLP that detects validated sports-psychology constructs in an athlete's
@@ -35,22 +35,22 @@ of truth for open items.
 
 | Phase | Status | Commit |
 |---|---|---|
-| 1 — Repo reset & scaffold | Complete | `fb87925` |
-| 2 — Dev environment & tooling | Complete | `07d77ab` + `b28873f` |
-| 3 — Related work & novelty | Complete | `b104b8d` |
-| 4 — Construct taxonomy | Complete (v2, locked; frozen at Phase 12) | `d238721` |
-| 5 — Ethics, data governance & risk plan | Complete | `a28b7ba` |
-| 6 — Confirm decisions & wire agent framework | Complete | `b28873f` (+ `ccba023`) |
-| 7 — Data ingestion pipeline | Complete | `6f9561a` |
-| 8 — Preprocessing & de-identification | Complete | see Phase 9 commits |
-| **9 — EDA & quality profiling** | **Complete** | see Part B9 |
-| **9b — Corpus hardening** | **Complete** | see Part B12 |
-| **10 — Weak / LLM labelling** | **NEXT** — blocked on OPEN-008 | — |
+| 1 - Repo reset & scaffold | Complete | `fb87925` |
+| 2 - Dev environment & tooling | Complete | `07d77ab` + `b28873f` |
+| 3 - Related work & novelty | Complete | `b104b8d` |
+| 4 - Construct taxonomy | Complete (v2, locked; frozen at Phase 12) | `d238721` |
+| 5 - Ethics, data governance & risk plan | Complete | `a28b7ba` |
+| 6 - Confirm decisions & wire agent framework | Complete | `b28873f` (+ `ccba023`) |
+| 7 - Data ingestion pipeline | Complete | `6f9561a` |
+| 8 - Preprocessing & de-identification | Complete | see Phase 9 commits |
+| **9 - EDA & quality profiling** | **Complete** | see Part B9 |
+| **9b - Corpus hardening** | **Complete** | see Part B12 |
+| **10 - Weak / LLM labelling** | **NEXT** - blocked on OPEN-008 | - |
 
 **Carried-forward caveats:**
 
 - **Phase 1 deviation:** no `legacy-backup` branch; the previous codebase was permanently
-  deleted at the owner's instruction. **OPEN-003 is now closed** — the repo was pushed to a
+  deleted at the owner's instruction. **OPEN-003 is now closed** - the repo was pushed to a
   private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`) on 2026-08-10, the first
   off-machine backup this project has had. Push at the end of every phase from now on.
 - **Phase 3:** the BibTeX key `Toth2025` is historical. László Tóth was the **handling
@@ -58,20 +58,20 @@ of truth for open items.
 - **Sandbox caveat:** the agent sandbox runs Python 3.10; the project pins 3.11.
   `datetime.UTC` (3.11+) is used in `src/agents/ledger.py` and `src/ingestion/allowlist.py`.
   Tests were run here with a `sitecustomize` shim backfilling that alias (not committed).
-  **Re-run `pytest` on the 3.11 machine to confirm natively** — expect **253/253**.
+  **Re-run `pytest` on the 3.11 machine to confirm natively** - expect **253/253**.
 - **OPEN-002** (broken pixeltable plugin hook) fired on every file write throughout Phase 9.
   Still cosmetic, still unfixed.
 
 ---
 
-## PART B — Current Session Summary (Phase 9)
+## PART B - Current Session Summary (Phase 9)
 
 ### B1. What Phase 9 was asked to do
 
-From `PROJECT_PLAN.md`: *Objective — understand the corpus before labelling. Tasks —
+From `PROJECT_PLAN.md`: *Objective - understand the corpus before labelling. Tasks -
 notebook EDA covering length distributions, vocabulary, class-of-interest prevalence,
-duplicates, junk; decide the sampling strategy for the gold set. Deliverable —
-`reports/eda.md` plus figures. Gate — documented data-quality issues and a stratified
+duplicates, junk; decide the sampling strategy for the gold set. Deliverable -
+`reports/eda.md` plus figures. Gate - documented data-quality issues and a stratified
 sampling plan.*
 
 All delivered. The phase also found three defects large enough that the sampling plan had to
@@ -82,7 +82,7 @@ be designed around them.
 The owner approved option (a): delete the offending synonym group, regenerate, re-gate.
 
 - `("part", "portion", "corner", "piece")` **deleted** from `SYNONYM_GROUPS`. A version
-  history block was added to `synthetic.py` and `GENERATOR_VERSION` bumped to **1.2** —
+  history block was added to `synthetic.py` and `GENERATOR_VERSION` bumped to **1.2** -
   which also records that v1.1 never bumped the constant, so artefacts from that run are
   stamped `@1.0` and mean 1.1.
 - Corpus regenerated at seed 42. `corner of me`, `portion of me`, `piece of me`: **0, 0, 0**.
@@ -92,16 +92,16 @@ The owner approved option (a): delete the offending synonym group, regenerate, r
 **Two published numbers were found to be wrong and were corrected, not glossed:**
 
 1. The `synthetic.py` comment written when the group was removed said `corner of me` occurred
-   in **11** records. True v1.1 count is **9** — verified by reconstructing the committed
+   in **11** records. True v1.1 count is **9** - verified by reconstructing the committed
    v1.1 generator via `git show 6f9561a:src/ingestion/synthetic.py` and regenerating at seed
    42. The other two counts in that comment (10, 14) are correct.
 2. `docs/data_sources.md` reported the v1.1 corpus as **638** types / **1,163** distinct texts
    / **40,169** tokens / **106** construct-free records. The committed v1.1 generator produces
-   **635 / 1,161 / 40,251 / 92**. Small, changes no conclusion — but `CLAUDE.md` §9 claims a
+   **635 / 1,161 / 40,251 / 92**. Small, changes no conclusion - but `CLAUDE.md` §9 claims a
    reviewer can reproduce these numbers exactly, so a figure that does not reproduce is a
    defect regardless of size. Corrected, with the discrepancy recorded in the table's note.
 
-### B3. The sweep — OPEN-015 was not an isolated defect (**OPEN-016**, new)
+### B3. The sweep - OPEN-015 was not an isolated defect (**OPEN-016**, new)
 
 `src/ingestion/synonym_audit.py` (written by the prior session, executed and reported here)
 replaces "a human read twenty records" with an **exhaustive** enumeration: 221 filled
@@ -120,26 +120,26 @@ article agreement, number agreement, particle/argument structure, inflected form
 Examples: *"when I **figure about** the first ball"*, *"my **insides is** in knots"*,
 *"we've got **a approach** for the first bell"*, *"I'm **on edge I'll** let everyone down"*.
 
-**Removing the `part` group fixed 0.8% of records and left the other 15%.** The remedy —
-repairing ~15 more synonym groups — shrinks the vocabulary OPEN-012's mitigation rests on and
+**Removing the `part` group fixed 0.8% of records and left the other 15%.** The remedy -
+repairing ~15 more synonym groups - shrinks the vocabulary OPEN-012's mitigation rests on and
 regenerates the corpus a second time. **That is an owner trade-off, not an implementation
 detail**, so it was raised as **OPEN-016** with four costed options rather than actioned. This
 is the same reasoning under which Phase 8 declined to fix OPEN-015 mid-phase.
 
 ### B4. Three more findings, all new issues
 
-**OPEN-018 — 73.6% of utterances are exact duplicates.** 4,141 utterances, **1,528 distinct
+**OPEN-018 - 73.6% of utterances are exact duplicates.** 4,141 utterances, **1,528 distinct
 texts**. At record level the same corpus is 5.0% duplicated, so it is a *segmentation*
 artefact invisible in every Phase 7 statistic: `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES`
 are appended whole, are rendered **without** `_vary`, and Phase 8 cuts each into its own
 utterance. `"It is what it is."` appears **268** times. Two annotators agreeing on that string
-268 times is one agreement counted 268 times — this would have inflated Phase 11's kappa
+268 times is one agreement counted 268 times - this would have inflated Phase 11's kappa
 invisibly. Mitigated in the sampling plan (deduplication before drawing, asserted by a test);
 the corpus itself is unchanged.
 
-**OPEN-017 — the gold pool is too small for a per-construct kappa.** See B6.
+**OPEN-017 - the gold pool is too small for a per-construct kappa.** See B6.
 
-**OPEN-019 — `generation_spec` is replicated, not distributed.** Phase 8 copies the parent
+**OPEN-019 - `generation_spec` is replicated, not distributed.** Phase 8 copies the parent
 record's spec onto every utterance byte-identically (verified, and now asserted by a test).
 A record averaging 3.45 utterances and planting 2 constructs reports both on all 3.45,
 including the neutral logistics sentence. **Any per-utterance count derived from
@@ -151,13 +151,13 @@ to the schema and in `GeneratorMetadataProfile`; every downstream calculation us
 
 | Gate | Result |
 |---|---|
-| `scripts/run_ingestion.py --verify-only` | **Phase 7 gate: PASSED** — **4,000** records, coverage 100% on all five required fields |
-| `scripts/run_preprocessing.py` | **Phase 8 gate: PASSED** — 34/34 exact, precision/recall 100%, leak 0%, held-out probe 10/10; 4,000 → **13,651** utterances, 0 dropped |
-| `scripts/run_benchmark_audit.py` | **PASSED** — see below |
+| `scripts/run_ingestion.py --verify-only` | **Phase 7 gate: PASSED** - **4,000** records, coverage 100% on all five required fields |
+| `scripts/run_preprocessing.py` | **Phase 8 gate: PASSED** - 34/34 exact, precision/recall 100%, leak 0%, held-out probe 10/10; 4,000 → **13,651** utterances, 0 dropped |
+| `scripts/run_benchmark_audit.py` | **PASSED** - see below |
 | `scripts/run_eda.py` | **Phase 9 gate: PASSED** |
 | `ruff check src/ scripts/ tests/` | All checks passed |
 | `ruff format --check` | 54 files formatted |
-| `pytest` | **250/251** — the one failure is `test_python_version_is_311` under the sandbox's 3.10, i.e. the test working correctly |
+| `pytest` | **250/251** - the one failure is `test_python_version_is_311` under the sandbox's 3.10, i.e. the test working correctly |
 | Determinism | `run_eda.py` twice → byte-identical report, figures and candidates (md5) |
 
 Benchmark audit, v1.3 at n=4,000 (v1.1 was 0.732 → 0.198; v1.2 0.738 → 0.146):
@@ -170,13 +170,13 @@ Benchmark audit, v1.3 at n=4,000 (v1.1 was 0.732 → 0.198; v1.2 0.738 → 0.146
 Conclusion unchanged and slightly stronger: **Phases 13, 14 and 18 MUST use
 `template_disjoint_split()`.**
 
-### B6. The gold-set sampling plan — the actual deliverable
+### B6. The gold-set sampling plan - the actual deliverable
 
 **The obvious plan fails, and it was measured rather than assumed.** Drawing the gold set from
 the test side of `template_disjoint_split` gives 98 records / 228 utterances and **zero
-records planting `appraisal_orientation`** — one of the ten locked constructs would have an
+records planting `appraisal_orientation`** - one of the ten locked constructs would have an
 undefined kappa. Cause: that function shuffles all 85 templates as one pool, and with 7–12
-templates per construct a global 20% holdout can miss one entirely. **It was not changed** —
+templates per construct a global 20% holdout can miss one entirely. **It was not changed** -
 it is the right tool for the leakage comparison it was built for. A stricter partitioner was
 added beside it.
 
@@ -185,16 +185,16 @@ added beside it.
 1. `construct_stratified_template_partition` holds out **35% of each construct's templates**
    independently, floor of one. Still a partition, so disjointness holds; coverage is now
    guaranteed by construction, not by luck.
-2. Assign **records**, not utterances — a record joins the gold pool only if *every* template
+2. Assign **records**, not utterances - a record joins the gold pool only if *every* template
    it uses is held out. Two utterances of one record share its templates, so drawing
    utterances independently would put siblings on both sides and reintroduce the leakage.
 3. Filter: straddling/template-free, `too_short`, exact and near-duplicate (Jaccard ≥ 0.9).
 4. Draw: construct quotas round-robin to a 40-positive floor, then greedy context balance on
-   `time_band` → `sport` → `competition_level` → `region`. **Marginal** balance, not joint —
+   `time_band` → `sport` → `competition_level` → `region`. **Marginal** balance, not joint -
    1,250 cells and 400 items makes joint balance arithmetically impossible.
 5. **100% double-annotated** by two annotators, so Cohen's kappa is computable per construct
    on the whole set. `generation_spec` is **stripped** from every written candidate.
-6. Calibrate on `gold_dev` **first** — drawn from *training-side* templates, so arguing over
+6. Calibrate on `gold_dev` **first** - drawn from *training-side* templates, so arguing over
    the rubric on it costs zero evaluation power.
 
 **What it yields today, and this is the blocker:**
@@ -207,7 +207,7 @@ added beside it.
 
 Only 235 of 4,141 utterances survive (3,649 straddle or are template-free, 251 duplicates,
 6 junk). And those counts are an **upper bound**: by the lexicon-baseline proxy, **97 of 235
-(41.3%) `gold_eval` items carry no construct cue at all** — the first drawn item is *"Kit
+(41.3%) `gold_eval` items carry no construct cue at all** - the first drawn item is *"Kit
 arrived yesterday, so that's one thing sorted."*, selected because its *parent record* plants
 a construct (OPEN-019). Corrected at ~0.6×, **no construct meets the floor.**
 
@@ -237,7 +237,7 @@ kappa generalises over.**
    tomorrow morning **again**"* and *"... tomorrow morning **too**"* are Jaccard 0.8 and land
    in different buckets. A test caught it. Replaced with the standard **prefix filter**
    (index under the first `|A| − ceil(t·|A|) + 1` tokens in rarest-first order), which *is*
-   exact. **The test was not weakened to match the code** — that is the failure mode
+   exact. **The test was not weakened to match the code** - that is the failure mode
    `phase9_handover.md` §B5 warns about, and it was the specific temptation here.
 3. **MATTR was returning 40.08.** Missing `/ window` in the accumulator. Caught by writing
    `test_mattr_is_a_ratio` before trusting the number.
@@ -256,7 +256,7 @@ kappa generalises over.**
    diffs meaningfully in git and goes into the LaTeX build at any column width.
 3. **MATTR is the headline, raw TTR is never quoted alone.** TTR falls mechanically as a
    corpus grows, so the TTR over 4,141 utterances is not comparable with Phase 7's over
-   1,200 records even though the text is identical — and that is exactly the comparison a
+   1,200 records even though the text is identical - and that is exactly the comparison a
    reader will make.
 4. **Every headline rate carries a bootstrap CI**, including coverage rates at 100%.
    `[1.000, 1.000]` is a different statement from a bare "100%", and the first A3 donation
@@ -271,30 +271,30 @@ kappa generalises over.**
 
 | File | Change |
 |---|---|
-| `src/evaluation/profile.py` | **new** — corpus profiling (~700 lines) |
-| `src/evaluation/sampling.py` | **new** — gold-set sampling plan (~470 lines) |
-| `src/evaluation/figures.py` | **new** — pure-Python SVG charts |
+| `src/evaluation/profile.py` | **new** - corpus profiling (~700 lines) |
+| `src/evaluation/sampling.py` | **new** - gold-set sampling plan (~470 lines) |
+| `src/evaluation/figures.py` | **new** - pure-Python SVG charts |
 | `src/evaluation/__init__.py` | public API extended to 47 exports |
 | `src/evaluation/metrics.py` | `bootstrap_statistic`, `proportion_ci`, `_percentile_interval` (prior session); missing `TypeVar` fixed |
 | `src/ingestion/synthetic.py` | **v1.3**: synonym group removed (v1.2), `_vary` guarded, version history, `corner of me` count corrected 11→9 |
-| `src/ingestion/substitution_verdicts.py` | **new** — the verdict table as a generation-time guard, plus `RETIRED_DEFECTS` |
+| `src/ingestion/substitution_verdicts.py` | **new** - the verdict table as a generation-time guard, plus `RETIRED_DEFECTS` |
 | `scripts/run_ingestion.py` | `DEFAULT_COUNT` 1,200 → **4,000** (OPEN-017) |
 | `PROJECT_PLAN.md` | status board, live-risk table, **Phase 9b inserted**, Phases 7–11 rewritten against what was measured |
-| `src/ingestion/synonym_audit.py` | **new** (prior session) — exhaustive substitution sweep + verdict ratchet |
-| `scripts/run_eda.py` | **new** — the Phase 9 gate |
-| `tests/test_profile.py` | **new** — 61 tests; three fixed-corpus assertions updated after regeneration |
-| `tests/test_synonym_audit.py` | **new** (prior session) — 18 tests |
-| `notebooks/01_eda.ipynb` | **new** — viewer |
-| `reports/eda.md` | **new** — 550 lines, 9 sections |
-| `reports/figures/*.svg` | **new** — 9 figures |
-| `data/processed/gold_candidates/` | **new** — `gold_eval.jsonl` (235), `gold_dev.jsonl` (100), `sampling_plan.json` |
+| `src/ingestion/synonym_audit.py` | **new** (prior session) - exhaustive substitution sweep + verdict ratchet |
+| `scripts/run_eda.py` | **new** - the Phase 9 gate |
+| `tests/test_profile.py` | **new** - 61 tests; three fixed-corpus assertions updated after regeneration |
+| `tests/test_synonym_audit.py` | **new** (prior session) - 18 tests |
+| `notebooks/01_eda.ipynb` | **new** - viewer |
+| `reports/eda.md` | **new** - 550 lines, 9 sections |
+| `reports/figures/*.svg` | **new** - 9 figures |
+| `data/processed/gold_candidates/` | **new** - `gold_eval.jsonl` (235), `gold_dev.jsonl` (100), `sampling_plan.json` |
 | `data/raw/`, `data/interim/` | regenerated at **v1.3, n=4,000** (4,000 records → 13,651 utterances) |
 | `docs/open_issues.md` | OPEN-015/016/017 **closed**; OPEN-018/019 raised; **OPEN-020 raised**; change log |
 | `docs/data_sources.md` | v1.2 statistics column; three v1.1 figures corrected; unit warning |
 | `docs/preprocessing.md` | OPEN-019 replication note next to the schema |
 | `.gitignore` | gold-candidate JSONL ignored, `sampling_plan.json` **kept** (it is the method) |
 
-### B11. Phase 9 follow-up — OPEN-016 and OPEN-017 both resolved
+### B11. Phase 9 follow-up - OPEN-016 and OPEN-017 both resolved
 
 The owner instructed both be actioned together in one regenerate-and-re-gate cycle, on the
 reasoning that labelling a corpus about to be replaced spends tokens twice.
@@ -315,11 +315,11 @@ Both remedies were measured before choosing, at n=4,000 seed 42:
 |---|---|---|---|
 | v1.2, unguarded | 64 groups | 643 types | 630 (15.75%) |
 | Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |
-| **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |
+| **Option (c): guard - chosen** | **64, unchanged** | **625 types** | **0** |
 
 Deleting costs 49 realised types, the guard costs 18. I had written "the guard costs zero
-vocabulary" in the first draft of the docstrings; measuring showed that was wrong — a word
-whose only frames in the bank were defective now never appears — and the claim was corrected
+vocabulary" in the first draft of the docstrings; measuring showed that was wrong - a word
+whose only frames in the bank were defective now never appears - and the claim was corrected
 rather than left standing. The guard still keeps 31 more types than deletion and removes
 nothing from the bank, so a future template using one of those words in a good frame gets it
 back automatically.
@@ -342,7 +342,7 @@ reshuffle the whole corpus.
 
 **A test caught me breaking an invariant, and I fixed the code rather than the test.** I first
 added the three OPEN-015 regression signatures straight into `VERDICTS`, which broke
-`test_no_orphan_verdicts` — that test asserts every verdict corresponds to a frame the audit
+`test_no_orphan_verdicts` - that test asserts every verdict corresponds to a frame the audit
 can still produce, and the deleted group produces none of them. The invariant is correct: a
 stale ruling is dead weight the ratchet cannot validate. A *guard* entry is deliberately for a
 frame nothing currently produces, which is the opposite property. Two purposes, so two tables:
@@ -351,11 +351,11 @@ the guard entries moved to `RETIRED_DEFECTS`.
 **The three fixed-corpus assertions did their job.** All three failed on regeneration, which is
 exactly what they exist for, and were updated together with the report in the same change.
 
-**What did NOT get fixed, and it is now the most important corpus item — OPEN-020.**
+**What did NOT get fixed, and it is now the most important corpus item - OPEN-020.**
 
 The stated 40-positive floor is met. The correction behind it is not. The lexicon proxy still
 finds **153 of 400 (38.2%)** drawn `gold_eval` items carrying no construct cue, because that
-fraction is a property of *records* — a record is ~3.4 utterances of which ~2 realise a
+fraction is a property of *records* - a record is ~3.4 utterances of which ~2 realise a
 construct. Corrected at 0.62×, **7 of 10 constructs fall back below 40**.
 
 Swept, correcting each draw by its own measured cue fraction:
@@ -378,10 +378,10 @@ detectability builds the lexicon baseline's strengths into the evaluation set, s
 would then beat the transformer on a test set chosen to suit it. That is not a gold set.
 
 **`TARGET_GOLD_EVAL` was left at 400**, not raised to the full 559-item pool. That would take
-the shortfall from 7 constructs to 3 at the cost of ~40% more annotation — the owner's time
+the shortfall from 7 constructs to 3 at the cost of ~40% more annotation - the owner's time
 budget, not a code decision. One-constant change in `src/evaluation/sampling.py`.
 
-### B11. Phase 9 follow-up — OPEN-016 and OPEN-017 both resolved
+### B11. Phase 9 follow-up - OPEN-016 and OPEN-017 both resolved
 
 The owner instructed both be actioned together in one regenerate-and-re-gate cycle, on the
 reasoning that labelling a corpus about to be replaced spends tokens twice.
@@ -402,11 +402,11 @@ Both remedies were measured before choosing, at n=4,000 seed 42:
 |---|---|---|---|
 | v1.2, unguarded | 64 groups | 643 types | 630 (15.75%) |
 | Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |
-| **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |
+| **Option (c): guard - chosen** | **64, unchanged** | **625 types** | **0** |
 
 Deleting costs 49 realised types, the guard costs 18. I had written "the guard costs zero
-vocabulary" in the first draft of the docstrings; measuring showed that was wrong — a word
-whose only frames in the bank were defective now never appears — and the claim was corrected
+vocabulary" in the first draft of the docstrings; measuring showed that was wrong - a word
+whose only frames in the bank were defective now never appears - and the claim was corrected
 rather than left standing. The guard still keeps 31 more types than deletion and removes
 nothing from the bank, so a future template using one of those words in a good frame gets it
 back automatically.
@@ -429,7 +429,7 @@ reshuffle the whole corpus.
 
 **A test caught me breaking an invariant, and I fixed the code rather than the test.** I first
 added the three OPEN-015 regression signatures straight into `VERDICTS`, which broke
-`test_no_orphan_verdicts` — that test asserts every verdict corresponds to a frame the audit
+`test_no_orphan_verdicts` - that test asserts every verdict corresponds to a frame the audit
 can still produce, and the deleted group produces none of them. The invariant is correct: a
 stale ruling is dead weight the ratchet cannot validate. A *guard* entry is deliberately for a
 frame nothing currently produces, which is the opposite property. Two purposes, so two tables:
@@ -438,11 +438,11 @@ the guard entries moved to `RETIRED_DEFECTS`.
 **The three fixed-corpus assertions did their job.** All three failed on regeneration, which is
 exactly what they exist for, and were updated together with the report in the same change.
 
-**What did NOT get fixed, and it is now the most important corpus item — OPEN-020.**
+**What did NOT get fixed, and it is now the most important corpus item - OPEN-020.**
 
 The stated 40-positive floor is met. The correction behind it is not. The lexicon proxy still
 finds **153 of 400 (38.2%)** drawn `gold_eval` items carrying no construct cue, because that
-fraction is a property of *records* — a record is ~3.4 utterances of which ~2 realise a
+fraction is a property of *records* - a record is ~3.4 utterances of which ~2 realise a
 construct. Corrected at 0.62×, **7 of 10 constructs fall back below 40**.
 
 Swept, correcting each draw by its own measured cue fraction:
@@ -465,7 +465,7 @@ detectability builds the lexicon baseline's strengths into the evaluation set, s
 would then beat the transformer on a test set chosen to suit it. That is not a gold set.
 
 **`TARGET_GOLD_EVAL` was left at 400**, not raised to the full 559-item pool. That would take
-the shortfall from 7 constructs to 3 at the cost of ~40% more annotation — the owner's time
+the shortfall from 7 constructs to 3 at the cost of ~40% more annotation - the owner's time
 budget, not a code decision. One-constant change in `src/evaluation/sampling.py`.
 
 ### B10. Commit commands
@@ -482,7 +482,7 @@ python scripts\run_preprocessing.py
 python scripts\run_benchmark_audit.py
 python scripts\run_eda.py
 
-# 1 — Phase 8, still uncommitted from the previous session
+# 1 - Phase 8, still uncommitted from the previous session
 git add src/preprocessing/ scripts/run_preprocessing.py tests/test_preprocessing.py `
         docs/preprocessing.md tests/fixtures/deid_cases.jsonl reports/deid_audit_sample.md
 git commit -m "Phase 8: preprocessing and de-identification pipeline
@@ -497,7 +497,7 @@ git commit -m "Phase 8: preprocessing and de-identification pipeline
 - language filter bug found by running it: unequal stopword profiles dropped
   two English records as Portuguese"
 
-# 2 — OPEN-015 fix and the regeneration it forces
+# 2 - OPEN-015 fix and the regeneration it forces
 git add src/ingestion/synthetic.py src/ingestion/synonym_audit.py `
         tests/test_synonym_audit.py data/raw/synth_precomp_v1/provenance.json `
         data/interim/synth_precomp_v1/
@@ -515,7 +515,7 @@ git commit -m "Phase 9: close OPEN-015; generator v1.2; exhaustive synonym sweep
 - correct the 'corner of me (11 records)' comment to 9, verified by
   reconstructing v1.1 from git show 6f9561a"
 
-# 3 — the Phase 9 deliverable
+# 3 - the Phase 9 deliverable
 git add src/evaluation/ scripts/run_eda.py tests/test_profile.py `
         notebooks/01_eda.ipynb reports/eda.md reports/figures/ `
         data/processed/gold_candidates/sampling_plan.json .gitignore
@@ -535,7 +535,7 @@ git commit -m "Phase 9: corpus profile, gold-set sampling plan, EDA report
   weakened to match the code
 - 60 new tests; three fixed-corpus assertions are MEANT to fail on regeneration"
 
-# 4 — issues and docs
+# 4 - issues and docs
 git add docs/ phase10_handover.md
 git commit -m "Phase 9: OPEN-015 closed; OPEN-016/017/018/019 raised
 
@@ -556,12 +556,12 @@ sessions. Environment quirk, not a repo problem, but it costs time every session
 
 ---
 
-### B12. Phase 9b — corpus hardening (OPEN-018, OPEN-020), and a Phase 7 claim falsified
+### B12. Phase 9b - corpus hardening (OPEN-018, OPEN-020), and a Phase 7 claim falsified
 
 **Generator v1.4.** Two changes, one measured consequence each, plus one unplanned finding
 that matters more than either.
 
-**OPEN-020 — template bank 7–12 → 15 realisations per construct.** 150 templates against 85:
+**OPEN-020 - template bank 7–12 → 15 realisations per construct.** 150 templates against 85:
 five per intensity level for the six graded constructs, five per label for the four
 categorical ones, written against `taxonomy.yaml`'s definitions and edge cases.
 
@@ -572,14 +572,14 @@ categorical ones, written against `taxonomy.yaml`'s definitions and edge cases.
 | Realised vocabulary (raw records) | 625 | **860** (+38%) |
 | Distinct record texts | 94.9% | **97.2%** |
 
-**OPEN-018 — and the first fix did nothing, which is the part worth keeping.** The entry
+**OPEN-018 - and the first fix did nothing, which is the part worth keeping.** The entry
 recommended applying `_vary` to the discourse suffixes and expanding the bank. I did that
 first: 8 entries → 17. Duplication barely moved. Every construct sentence still drew a suffix,
 Phase 8 still segmented each suffix into its own standalone utterance, and 38.6% of all
 utterances still sat in twenty strings. **Bank size was never the lever; sentence-hood was.**
 
 A suffix is now a **clause** joined with an em dash, with the parent's full stop stripped:
-`"I'm nervous. That's where my head is at."` → `"I'm nervous — that's where my head is at."`
+`"I'm nervous. That's where my head is at."` → `"I'm nervous - that's where my head is at."`
 
 | | v1.3 | v1.4 |
 |---|---|---|
@@ -599,22 +599,22 @@ Asserted now by `test_utterances_are_long_enough_to_annotate`.
 
 **Two tests caught real defects, and neither was weakened.**
 
-1. A template I wrote — *"after Tuesday's session"* — tripped the Phase 7 guard
+1. A template I wrote - *"after Tuesday's session"* - tripped the Phase 7 guard
    `test_generated_text_contains_no_personal_names`. I reworded the template. I did **not**
    add possessive weekday forms to the name allow-list; that accretion is how a real name
    eventually gets through.
 2. `test_the_holdout_fraction_moves_the_pool_size` failed because both holdout fractions now
    saturate the 400-item target, so drawn sizes are equal. The assertion moved from `.size` to
-   `eligibility.eligible` — which is literally the pool size the test name has always claimed
+   `eligibility.eligible` - which is literally the pool size the test name has always claimed
    to measure. The old assertion had stopped testing anything.
 
-### B12b. OPEN-021 — the lexicon baseline is not independent of the corpus
+### B12b. OPEN-021 - the lexicon baseline is not independent of the corpus
 
 **This was not on the Phase 9b task list. It is the most consequential thing in this session.**
 
 `baselines.py` documented `LexiconBaseline` as *"immune to the template leakage that inflates
 the others"*, because its cues were hand-written from `taxonomy.yaml` rather than induced from
-labels. That prevents **direct** inheritance. It does not prevent **shared ancestry** — the
+labels. That prevents **direct** inheritance. It does not prevent **shared ancestry** - the
 Phase 7 template bank was written from the same `positive_examples`, and several templates
 reproduce them near-verbatim.
 
@@ -652,10 +652,10 @@ Check it rather than assume it away.
 
 | Gate | Result |
 |---|---|
-| Phase 7 | **PASSED** — 4,000 records, generator v1.4 |
-| Phase 8 | **PASSED** — 9,302 utterances, 0 dropped, fixture 34/34 exact, leak 0% |
-| Benchmark | **PASSED** — probe 0.721 → **0.200** disjoint (drop +0.520); lexicon 0.570 → 0.461 |
-| Phase 9 | **PASSED** — 0 defective records, 0 unruled signatures, gold_eval 400, 0/10 below floor |
+| Phase 7 | **PASSED** - 4,000 records, generator v1.4 |
+| Phase 8 | **PASSED** - 9,302 utterances, 0 dropped, fixture 34/34 exact, leak 0% |
+| Benchmark | **PASSED** - probe 0.721 → **0.200** disjoint (drop +0.520); lexicon 0.570 → 0.461 |
+| Phase 9 | **PASSED** - 0 defective records, 0 unruled signatures, gold_eval 400, 0/10 below floor |
 | `ruff check` / `format` | clean, 55 files |
 | `pytest` | **252/253** (the failure is the 3.11 check under the sandbox's 3.10) |
 | Determinism | `run_eda.py` twice → byte-identical report, figures, candidates |
@@ -665,26 +665,26 @@ trailing-whitespace hook stops rewriting `reports/eda.md` on every regeneration.
 
 ---
 
-## PART C — Phase 10 Brief
+## PART C - Phase 10 Brief
 
-**Objective:** weak / LLM labelling — a cheap model proposes construct labels plus a rationale
+**Objective:** weak / LLM labelling - a cheap model proposes construct labels plus a rationale
 per utterance (silver labels), under cost-aware routing.
 
 **Owning agent:** Labelling Agent (cheap→mid, routed), `src/agents/roster.py::LABELING`, with
 the Annotation-QA Agent flagging low-confidence and conflicting labels.
 
-**Output:** `data/processed/silver/`. **Never** `data/gold/` — human-owned, guards refuse it.
+**Output:** `data/processed/silver/`. **Never** `data/gold/` - human-owned, guards refuse it.
 
 ### Read first
 
 - `reports/eda.md` §3 (duplication), §5 (the guard), §7 (the sampling plan).
-- `config/model_routing.yaml`, `src/agents/{config,llm,ledger,roster}.py` — the cost-aware
+- `config/model_routing.yaml`, `src/agents/{config,llm,ledger,roster}.py` - the cost-aware
   routing layer exists and was built at Phase 6. **Reuse it; do not build a second one.**
-- `docs/annotation_guidelines.md` and `config/taxonomy.yaml` — the rubric the LLM gets.
+- `docs/annotation_guidelines.md` and `config/taxonomy.yaml` - the rubric the LLM gets.
 
 ### Four things Phase 9 measured that change how this is built
 
-1. **Deduplicate before the API call.** 37.6% of utterances are exact duplicates — 6,444
+1. **Deduplicate before the API call.** 37.6% of utterances are exact duplicates - 6,444
    distinct strings, not 9,302. Label the distinct set and fan results back out. That is a
    **saving on the phase's entire budget** and it costs one `dict`. **Re-measured after 9b:
    9,302 utterances over 6,444 distinct texts, so the saving is now ~31%, not the ~77% Phase 9
@@ -693,7 +693,7 @@ the Annotation-QA Agent flagging low-confidence and conflicting labels.
 2. **Abstention must be a first-class answer.** Construct-free records are 8.6% of the corpus
    by construction, and many utterances inside construct-bearing records realise nothing. A
    labeller that never returns "none" is broken, not thorough. **Do not use the lexicon to
-   estimate how many — see OPEN-021.**
+   estimate how many - see OPEN-021.**
 3. **Pass the parent record as context.** Median utterance is now 17 tokens (was 9), which is
    workable but still short for `appraisal_orientation`. `parent_record_id` is on every interim record for this.
 4. **Placeholders must survive the prompt intact.** Tell the model what `[ATHLETE]` and
@@ -702,7 +702,7 @@ the Annotation-QA Agent flagging low-confidence and conflicting labels.
 ### The circularity trap
 
 This phase produces something that *is* a label, stored beside records carrying
-`generation_spec`, which is not one. **Never evaluate silver against `generation_spec`** — that
+`generation_spec`, which is not one. **Never evaluate silver against `generation_spec`** - that
 measures whether an LLM can recover this project's own template choices. Silver is evaluated
 against the Phase 11 human gold set and nothing else.
 
@@ -719,7 +719,7 @@ against the Phase 11 human gold set and nothing else.
 - Every agent writes a run log to `logs/`; cost to `logs/cost_ledger.csv`.
 
 **Gate:** silver labels for the corpus, with a confidence and rationale per label, a routing
-decision logged per call, and a cost ledger entry — plus the Annotation-QA review queue.
+decision logged per call, and a cost ledger entry - plus the Annotation-QA review queue.
 
 **Do not start Phase 11.**
 
@@ -735,23 +735,23 @@ decision logged per call, and a cost ledger entry — plus the Annotation-QA rev
 | **OPEN-004** | **Expert-rater recruitment not started.** Week 1–2 per the risk register; it is now Week 3. Headline contribution, longest lead time, least control. | **Phase 17** |
 | **OPEN-008** | No `OPENROUTER_API_KEY` in `.env`. **Now the only thing blocking forward progress.** | **Phase 10 (next)** |
 | **OPEN-021** | **New.** The lexicon baseline is not independent of the corpus; macro-F1 0.780 → 0.461 once the templates stopped reusing `taxonomy.yaml` phrasings. A paper obligation, and a check to repeat for silver labels at Phase 14. | Phase 18 |
-| OPEN-020 | ~~Template bank too small~~ — **CLOSED at Phase 9b.** 15 templates/construct, 5 phrasings held out, vocab 625→860. | closed |
-| OPEN-018 | ~~87.4% duplication~~ — **CLOSED at Phase 9b.** 37.6%; suffixes are clauses, not sentences. | closed |
-| OPEN-017 | ~~Gold pool too small~~ — **CLOSED at Phase 9** against its stated criterion (235→400 items, 7/10→0/10 below floor). Residual is OPEN-020. | closed |
-| OPEN-016 | ~~15.8% broken substitutions~~ — **CLOSED at Phase 9** by a generation-time guard. 0/4,000 records. | closed |
+| OPEN-020 | ~~Template bank too small~~ - **CLOSED at Phase 9b.** 15 templates/construct, 5 phrasings held out, vocab 625→860. | closed |
+| OPEN-018 | ~~87.4% duplication~~ - **CLOSED at Phase 9b.** 37.6%; suffixes are clauses, not sentences. | closed |
+| OPEN-017 | ~~Gold pool too small~~ - **CLOSED at Phase 9** against its stated criterion (235→400 items, 7/10→0/10 below floor). Residual is OPEN-020. | closed |
+| OPEN-016 | ~~15.8% broken substitutions~~ - **CLOSED at Phase 9** by a generation-time guard. 0/4,000 records. | closed |
 | OPEN-019 | **New.** `generation_spec` replicated per utterance. Documentation only. | monitored |
 | OPEN-007 | CrewAI backend written but never executed. | Phase 10 if chosen |
 | OPEN-012 | Vocabulary bounded by the template bank; 625 types. Phase 9b's template work is the real remedy. | Phase 14 (monitored) |
-| OPEN-015 | ~~"corner of me"~~ — **CLOSED at Phase 9.** | closed |
-| OPEN-013 | ~~De-identification unvalidatable~~ — **CLOSED at Phase 8.** | closed |
+| OPEN-015 | ~~"corner of me"~~ - **CLOSED at Phase 9.** | closed |
+| OPEN-013 | ~~De-identification unvalidatable~~ - **CLOSED at Phase 8.** | closed |
 | OPEN-005 | Ethics exemption not in writing. | Submission |
 | OPEN-006 | Withdrawal contact is a personal address. | Public release |
-| OPEN-003 | ~~No off-machine backup~~ — **CLOSED 2026-08-10**, private GitHub remote. Keep pushing per phase. | closed |
+| OPEN-003 | ~~No off-machine backup~~ - **CLOSED 2026-08-10**, private GitHub remote. Keep pushing per phase. | closed |
 | OPEN-009 | Model/price drift. | Any large batch |
-| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. Confirmed still firing throughout Phase 9. | — |
+| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. Confirmed still firing throughout Phase 9. | - |
 
 **The two highest-value non-code actions available today are still OPEN-011 and OPEN-004, and
-they are still the same conversation** — recruiting an SRMIST coach or sport-psychology
+they are still the same conversation** - recruiting an SRMIST coach or sport-psychology
 practitioner who could both broker pre-competition text under A3 consent *and* serve as the
 Phase 17 expert rater. It was Week 3 at the start of Phase 8 and it is still Week 3. That
 conversation has now been deferred across three phases and has the longest lead time of

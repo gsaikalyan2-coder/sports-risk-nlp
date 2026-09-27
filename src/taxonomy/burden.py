@@ -1,4 +1,4 @@
-"""Annotation burden — the second half of the Phase 12 freeze criterion (OPEN-026).
+"""Annotation burden - the second half of the Phase 12 freeze criterion (OPEN-026).
 
 `config/taxonomy.yaml` freezes the construct set at Phase 12 *"after checking
 annotation burden and inter-annotator agreement."* Phase 11 made agreement
@@ -8,9 +8,9 @@ freeze decision has two inputs and the project only had one.
 ## What this is, and what it is emphatically not
 
 This is a **decision model**, not a measurement. It counts the decisions
-`src/annotation/potato_project.py` actually puts in front of an annotator —
+`src/annotation/potato_project.py` actually puts in front of an annotator -
 derived from the same `taxonomy.yaml` that generates the Potato schemes, so the
-two cannot drift — and converts that count into time using per-decision
+two cannot drift - and converts that count into time using per-decision
 constants.
 
 **Those constants are an assumption until someone holds a stopwatch.** That is
@@ -25,7 +25,7 @@ OPEN-026 and no amount of arithmetic closes it. So:
 
 The distinction is load-bearing because of the failure OPEN-026 names: an
 annotator who rushes the last 200 items produces a worse dataset than one who
-carefully does 200, **and the damage is invisible in the kappa** — two tired
+carefully does 200, **and the damage is invisible in the kappa** - two tired
 annotators drift toward the same defaults and agree *more*. Burden is therefore
 not a comfort metric. It is the only guard against a kappa that looks good
 because both people gave up.
@@ -34,8 +34,8 @@ because both people gave up.
 
 The useful question at Phase 12 is never "how long does the batch take" but
 "what does dropping this construct buy". So `ConstructBurden` reports each
-construct's **marginal** cost — the time that disappears from the whole batch if
-it is removed — which is what gets weighed against its kappa. A construct with
+construct's **marginal** cost - the time that disappears from the whole batch if
+it is removed - which is what gets weighed against its kappa. A construct with
 poor agreement and high marginal cost is a drop candidate; the same poor
 agreement on a cheap construct is an argument for fixing the rubric instead.
 
@@ -114,8 +114,8 @@ class TimingModel:
     ) -> TimingModel:
         """Rescale the model so it reproduces a real observation.
 
-        The *shape* of the model — that intensity scales with the construct
-        count and the read does not — survives; only the level is corrected.
+        The *shape* of the model - that intensity scales with the construct
+        count and the read does not - survives; only the level is corrected.
         That is the honest use of one stopwatch reading: it cannot tell you how
         the time split across steps, so it is not allowed to claim it did.
         """

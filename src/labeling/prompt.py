@@ -101,7 +101,7 @@ RESPONSE_SCHEMA = """\
 
 RESPONSE_EXAMPLE = """\
 Target utterance:
-  "I keep thinking about the ways this could go wrong — my hands won't stop shaking."
+  "I keep thinking about the ways this could go wrong - my hands won't stop shaking."
 
 {
   "abstain": false,

@@ -1,6 +1,6 @@
-# docs/dashboard.md — Phase 20: the demo, and what it is allowed to say
+# docs/dashboard.md - Phase 20: the demo, and what it is allowed to say
 
-> **PROVISIONAL — planted-label corpus-property measurement, NOT accuracy.**
+> **PROVISIONAL - planted-label corpus-property measurement, NOT accuracy.**
 > `data/gold/` is empty (OPEN-025); no real athlete text exists (OPEN-011).
 > Nothing the dashboard displays is evidence that the model detects
 > psychological constructs in real athlete language.
@@ -11,7 +11,7 @@
 # Local
 streamlit run dashboard/app.py
 
-# Docker (light image — no torch; the `dashboard` service already existed
+# Docker (light image - no torch; the `dashboard` service already existed
 # from Phase 2 and needed no change, because streamlit is in requirements-base.txt)
 docker compose build app
 docker compose up dashboard      # http://localhost:8501
@@ -29,13 +29,13 @@ pytest tests/test_dashboard.py -q
 
 | tab | backend | what the bars mean | exportable |
 |---|---|---|---|
-| **Known examples** | `ReplayBackend` — a committed fixture derived from `reports/explain/cards.md` | `P(construct present)` from the Phase 14 checkpoint, cached | yes |
-| **Score your own text** | `LexiconBackend` — the Phase 13 lexicon baseline, pure Python | cue match: 1 matched / 0 not. **Not a probability** | no |
+| **Known examples** | `ReplayBackend` - a committed fixture derived from `reports/explain/cards.md` | `P(construct present)` from the Phase 14 checkpoint, cached | yes |
+| **Score your own text** | `LexiconBackend` - the Phase 13 lexicon baseline, pure Python | cue match: 1 matched / 0 not. **Not a probability** | no |
 
 **The live tab is not the paper's model.** The `dashboard` compose service runs
 the light image, which has no torch by design. Loading the checkpoint would mean
 the multi-GB train image and a Docker gate that no longer runs in the image the
-rest of the project uses — and C2.7 binds: the paper's model must not silently
+rest of the project uses - and C2.7 binds: the paper's model must not silently
 change, and the surest guarantee is that the demo does not hold it. The lexicon
 scores macro-F1 **0.462** template-disjoint (the honest floor the transformer's
 0.588 is measured against) and carries a known upward bias (OPEN-021). The app
@@ -43,8 +43,8 @@ says so on screen, every time.
 
 **The lexicon emits presence, not probability, and that is left visible.**
 `LexiconBaseline.predict` returns a set of matched constructs. Rather than invent
-a magnitude from cue-hit counts — an arbitrary formula that would look exactly
-like a model score on a bar chart — the live path reports 1.0/0.0 and labels the
+a magnitude from cue-hit counts - an arbitrary formula that would look exactly
+like a model score on a bar chart - the live path reports 1.0/0.0 and labels the
 axis accordingly. The bars look blocky. A made-up magnitude on a screening tool
 is the kind of number that gets quoted back without its formula.
 
@@ -58,7 +58,7 @@ untouched by that widening.
 
 So the two differ, deliberately: the evaluated baseline is a narrow, frozen
 instrument, and re-fitting it would invalidate every committed figure measured
-against it. The demo's job is different — a visitor pasting their own sentence
+against it. The demo's job is different - a visitor pasting their own sentence
 should see the constructs a human reader would see, not a blank chart because
 they wrote "nervous" where the frozen cue list expects "on edge".
 
@@ -104,7 +104,7 @@ no ML stack installed, in about 1.5 seconds.
 
 `PROJECT_PLAN.md` gates Phase 20 on "app runs in Docker and reproduces a known
 example". That checks *rendering* and *reproducibility* and says nothing about
-whether what is rendered is claim-safe — which is the fourth instance of the
+whether what is rendered is claim-safe - which is the fourth instance of the
 defect `docs/findings.md` §6 traces through Phases 9b, 17 and 18. Four honesty
 checks were therefore written **before** the app:
 
@@ -117,7 +117,7 @@ checks were therefore written **before** the app:
 
 Plus the original: the fixture's rendered card must equal its block of
 `reports/explain/cards.md` **character for character**. That is what makes C2.6
-binding rather than aspirational — if the dashboard ever grows its own
+binding rather than aspirational - if the dashboard ever grows its own
 highlighting, the demo and the paper figure drift and this test says so.
 
 ### The one deliberate exception, and why it is narrow
@@ -125,7 +125,7 @@ highlighting, the demo and the paper figure drift and this test says so.
 `PROVISIONAL_STAMP` reads "… corpus-property measurement, **NOT accuracy**". A
 flat ban on the substring makes the mandated stamp unshippable, so the two rules
 contradicted each other on the guard's first run. The resolution allows the
-literal denial `not accuracy` and nothing else — matched literally rather than by
+literal denial `not accuracy` and nothing else - matched literally rather than by
 detecting negation in general, because a cleverer rule would let "no reason to
 doubt the accuracy" through, which is a claim wearing a negation.
 `test_the_only_permitted_use_of_accuracy_is_the_stamps_own_denial` pins four such
@@ -145,7 +145,7 @@ thresholds nothing in this project supports.
 
 **A ten-hue categorical chart is the wrong mark for the decomposition.** The
 constructs are rows of one comparison, not series, so the encoding is position
-down a shared axis — a **diverging bar chart**, left of the rule lowers risk and
+down a shared axis - a **diverging bar chart**, left of the rule lowers risk and
 right raises it.
 
 **Sign is position, not colour**, so it survives grayscale, print, any colour
@@ -163,7 +163,7 @@ Both passed every unit test and were caught in the verification step.
    chart's hatch silently rendered empty. Pattern ids are now derived
    deterministically from the chart's own data.
 2. **A stamp inside a collapsed expander.** Present in the DOM, absent from the
-   screen — and from every screenshot that becomes a paper figure. The stamp is
+   screen - and from every screenshot that becomes a paper figure. The stamp is
    now rendered above the fold, and a test asserts it appears before the first
    `st.expander` call.
 
@@ -184,7 +184,7 @@ for the verification step, not against the tests.
 5. Call the decomposition ten-construct without the §3.3 qualification.
 6. Re-derive the Phase 17 highlighting, retrain, or re-tune thresholds.
 
-## Phase 32 — Evidence coverage (added 2026-09-22)
+## Phase 32 - Evidence coverage (added 2026-09-22)
 
 Page 7 and the tile under the widget grid answer a question no other surface
 answers: **how much of the validated instrument set could this text speak to at
@@ -192,9 +192,9 @@ all?**
 
 Each of the ten constructs carries an `instrument_anchor` in
 `config/taxonomy.yaml`, and has done since Phase 4; nothing in `src/` read it
-until now. `config/instruments.yaml` turns those anchors into a map — eight
+until now. `config/instruments.yaml` turns those anchors into a map - eight
 instruments, ten subscales, every construct in exactly one row, every citation
-resolving in `paper/refs.bib` — and `src/dashboard/coverage.py` projects one
+resolving in `paper/refs.bib` - and `src/dashboard/coverage.py` projects one
 already-scored `DashboardView` onto it.
 
 Four states per subscale, read off `ConstructBar` and nothing else:
@@ -231,8 +231,8 @@ Two further readings the panel is built to prevent:
 
 * **Subscales, not items.** CSAI-2 has 27 items; this project carries three
   constructs for it. "1 of 3" is never a share of a questionnaire completed.
-* **Silent is not absent.** It covers three cases — the construct is absent, the
-  athlete did not raise it, or the detector missed it — and Phase 31 measured
+* **Silent is not absent.** It covers three cases - the construct is absent, the
+  athlete did not raise it, or the detector missed it - and Phase 31 measured
   the third at a 20.2% silent rate over the corpus for the widened list this
   page runs, against 58.8% for the frozen list the paper evaluates
   (`reports/abstention.md` §4, which measures both), so it is common rather
@@ -251,7 +251,7 @@ day.**
 
 The live path runs `CONSTRUCT_CUES` widened with `DASHBOARD_EXTRA_CUES`, not the
 frozen list the evaluation uses. Over `gold_dev` the mean is under two
-instruments of eight and no text reaches all eight — but **no coverage figure
+instruments of eight and no text reaches all eight - but **no coverage figure
 may be quoted in the paper without saying which cue list produced it.**
 
 ### Instrument items are never reproduced

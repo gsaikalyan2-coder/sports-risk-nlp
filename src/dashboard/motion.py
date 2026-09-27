@@ -318,14 +318,14 @@ _DOCUMENT = """<!doctype html><html><head><meta charset="utf-8">__STYLE__</head>
     <h2>Risk index</h2>
     <div class="big" id="big">0.00</div>
   </div>
-  <div class="sub">how strained the words sound overall &mdash; an ordering, not a probability</div>
+  <div class="sub">how strained the words sound overall - an ordering, not a probability</div>
   <div class="track"><div class="fill" id="fill"></div></div>
-  <div class="ends"><span>0 &mdash; nothing flagged</span><span>1 &mdash; everything flagged</span></div>
+  <div class="ends"><span>0 - nothing flagged</span><span>1 - everything flagged</span></div>
   <ul class="rows" id="rows"></ul>
   <div class="legend">
     <span><i class="swatch" style="background:var(--raise)"></i>pushes the number up</span>
     <span><i class="swatch" style="background:var(--lower)"></i>pulls the number down</span>
-    <span><i class="swatch" style="border:1.5px dashed var(--muted);background:none"></i>inert &mdash; shown, counted as zero</span>
+    <span><i class="swatch" style="border:1.5px dashed var(--muted);background:none"></i>inert - shown, counted as zero</span>
   </div>
 </div>
 <script>
@@ -342,7 +342,7 @@ document.getElementById("fill").style.transform = `scaleX(${data.risk})`;
 document.getElementById("rows").innerHTML = data.rows.map(r => {
   const w = (Math.abs(r.contribution) / span) * 40;
   const plot = r.inert
-    ? `<div class="rule"></div><div class="inertbox"></div><div class="inertlab">inert &mdash; counted as zero</div>`
+    ? `<div class="rule"></div><div class="inertbox"></div><div class="inertlab">inert - counted as zero</div>`
     : `<div class="rule"></div>
        <div class="bar ${r.contribution >= 0 ? "up" : "dn"}" style="width:${w}%"></div>
        <div class="val" style="${r.contribution >= 0

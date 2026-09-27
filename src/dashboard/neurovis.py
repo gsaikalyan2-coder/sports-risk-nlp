@@ -909,13 +909,13 @@ def load_panel(window, *, mode: str = motion.DEFAULT_MODE, frames: Sequence = ()
         "<span class='simlab' id='simlab'></span>"
         "</div>"
         + "<div class='fig'>"
-        + "<p class='tlab'>RR interval &mdash; beat to beat</p>"
+        + "<p class='tlab'>RR interval - beat to beat</p>"
         + f'<svg viewBox="0 0 {TRACE_W} {TRACE_H}" width="100%" '
         'xmlns="http://www.w3.org/2000/svg">'
         + f'<polyline id="rr" fill="none" stroke="{t["raise"]}" stroke-width="2" '
         f'points="{_polyline(rr, 0, 6, TRACE_W, TRACE_H - 12)}"/>'
         + "</svg>"
-        + "<p class='tlab'>Pupil &mdash; against its own baseline, smoothed for the eye</p>"
+        + "<p class='tlab'>Pupil - against its own baseline, smoothed for the eye</p>"
         + f'<svg viewBox="0 0 {TRACE_W} {TRACE_H}" width="100%" '
         'xmlns="http://www.w3.org/2000/svg">'
         + f'<polyline id="pu" fill="none" stroke="{t["lower"]}" stroke-width="2" '
@@ -1282,7 +1282,7 @@ def narrated_panel(session, clip, *, mode: str = motion.DEFAULT_MODE) -> str:
         + f'<audio id="clip" controls preload="auto" src="{clip.data_uri()}"></audio>'
         + f'<p class="spoken" id="spoken">{words}</p>'
         + "<div class='fig'>"
-        + "<p class='tlab'>Heart rate &mdash; beat to beat</p>"
+        + "<p class='tlab'>Heart rate - beat to beat</p>"
         + f'<svg viewBox="0 0 {TRACE_W} {NARRATED_TRACE_H}" width="100%" '
         'xmlns="http://www.w3.org/2000/svg">'
         + f'<polyline fill="none" stroke="{t["raise"]}" stroke-width="2" '
@@ -1290,7 +1290,7 @@ def narrated_panel(session, clip, *, mode: str = motion.DEFAULT_MODE) -> str:
         + f'<line class="ph" id="ph1" x1="0" y1="0" x2="0" y2="{NARRATED_TRACE_H}" '
         f'stroke="{t["ink"]}" stroke-width="1.5"/>'
         + "</svg>"
-        + "<p class='tlab'>Pupil &mdash; against its own baseline, smoothed for the eye</p>"
+        + "<p class='tlab'>Pupil - against its own baseline, smoothed for the eye</p>"
         + f'<svg viewBox="0 0 {TRACE_W} {NARRATED_TRACE_H}" width="100%" '
         'xmlns="http://www.w3.org/2000/svg">'
         + f'<polyline fill="none" stroke="{t["lower"]}" stroke-width="2" '

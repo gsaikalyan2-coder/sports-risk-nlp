@@ -1,4 +1,4 @@
-"""Phase 21 runner — a thin shell over `src/security/`.
+"""Phase 21 runner - a thin shell over `src/security/`.
 
     python scripts/run_security_audit.py                # offline; no advisory lookup
     python scripts/run_security_audit.py --online       # query the PyPI advisory service

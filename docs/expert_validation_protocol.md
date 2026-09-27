@@ -15,11 +15,11 @@ validated with practitioners.
 > length-matched random spans of the same text?
 
 The comparison clause is the whole question. An approval rate on its own is
-uninterpretable — raters are agreeable, and nobody knows whether 78% is good.
+uninterpretable - raters are agreeable, and nobody knows whether 78% is good.
 
 ## 2. What raters are asked, and what they are explicitly not asked
 
-**Asked:** given a highlighted phrase, its sentence, and a construct name — is
+**Asked:** given a highlighted phrase, its sentence, and a construct name - is
 the phrase a plausible textual cue for that construct? `yes` / `partly` / `no`.
 
 **Not asked:** anything about a person's psychological state. Three reasons, and
@@ -33,7 +33,7 @@ all three must survive review:
    misuse the paper warns against.
 3. **Cue plausibility is the quantity the contribution claims.** The claim is
    "our explanations are sensible to informed readers", not "our model is
-   clinically accurate" — which this project cannot claim and must not imply.
+   clinically accurate" - which this project cannot claim and must not imply.
 
 This framing is also what makes OPEN-004 survivable. Judging whether *"my hands
 won't stop shaking"* is a plausible cue for somatic arousal needs sports
@@ -67,7 +67,7 @@ Three design choices worth defending:
 separate file from `rating_sheet.md`. `RatingSheet.render()` cannot emit them
 and a test asserts it. **Never send the KEY file to a rater.**
 
-## 4. Raters — the honest position (OPEN-004)
+## 4. Raters - the honest position (OPEN-004)
 
 At the time of writing **no coach or sport-psychology practitioner has been
 recruited.** A2 is a sports-familiar teammate, not a practitioner.
@@ -81,7 +81,7 @@ look good.
 |---|---|
 | ≥1 coach / sport-psych practitioner, ≥2 raters total | Expert validation. The full contribution #2 claim. |
 | 2 sports-familiar students (current default) | **Pilot expert-review with sports-familiar student raters.** Report as preliminary; name the absence of practitioner raters as a limitation. |
-| 1 rater only | Approval rates and control margin only. **No kappa** — inter-rater agreement needs two raters, and reporting a single rater's self-consistency as agreement would be misleading. |
+| 1 rater only | Approval rates and control margin only. **No kappa** - inter-rater agreement needs two raters, and reporting a single rater's self-consistency as agreement would be misleading. |
 | Owner only | Self-audit. Last resort. State it plainly; it is a materially weaker claim because the author rating their own system's explanations is not independent. |
 
 Two raters minimum, working **independently and without discussion** before
@@ -89,7 +89,7 @@ submission. The kappa is meaningless if they confer.
 
 **Recruitment, still to do.** Contact SRMIST sports department coaches and any
 sport-psychology staff. The ask is 25 minutes and one Markdown file. Pair it
-with the A3 consented-donation recruitment (`docs/recruitment.md`) — same
+with the A3 consented-donation recruitment (`docs/recruitment.md`) - same
 population, one conversation.
 
 ## 5. Procedure
@@ -111,7 +111,7 @@ Fixed here, before data collection, so they cannot be chosen to fit the result.
 
 | Quantity | Reported as | Pre-registered expectation |
 |---|---|---|
-| Approval rate, model items | Both lenient (`yes`+`partly`) **and** strict (`yes` only) | — |
+| Approval rate, model items | Both lenient (`yes`+`partly`) **and** strict (`yes` only) | - |
 | **Control margin** (model − random) | The headline number | **> 0**, or the explanations have demonstrated nothing |
 | Mismatch approval | Attention check | **≤ 0.30**; above this, raters are not discriminating between constructs and the sheet is suspect |
 | Cohen's κ (model items, 2 raters) | Unweighted, three categories | Reported whatever it is |
@@ -121,7 +121,7 @@ Fixed here, before data collection, so they cannot be chosen to fit the result.
 an unstated `partly` policy is the easiest number in this study to quietly
 optimise.
 
-**κ is unweighted** — the conservative choice. Weighted κ credits a
+**κ is unweighted** - the conservative choice. Weighted κ credits a
 `yes`/`partly` disagreement partially and returns a higher number on an ordered
 scale. Erring low and saying so is the defensible direction.
 
@@ -130,12 +130,12 @@ it is. If both raters use a single category throughout, expected agreement is
 1.0; reporting κ=0 ("no agreement beyond chance") about raters who agreed on
 every item would be flatly wrong. Report the raw agreement rate with a note.
 
-## 7. Interpreting the outcomes — including the ones we would rather not get
+## 7. Interpreting the outcomes - including the ones we would rather not get
 
 | Faithfulness | Expert plausibility | What it means |
 |---|---|---|
 | High | High | The explanations describe the model *and* make sense. The contribution stands. |
-| **High** | **Low** | **The model learned the generator, not the construct.** The explanations honestly describe a system keying on template giveaways. This is a real finding and strong evidence for the OPEN-011 limitation — report it, do not bury it. |
+| **High** | **Low** | **The model learned the generator, not the construct.** The explanations honestly describe a system keying on template giveaways. This is a real finding and strong evidence for the OPEN-011 limitation - report it, do not bury it. |
 | Low | High | The most dangerous cell. The explanations look sensible and do not describe the model. This is what a coach-facing dashboard would ship if only the expert study were run, and it is why `faithfulness.py` exists. |
 | Low | Low | The attribution method is not working on this model. Report and investigate before claiming anything. |
 

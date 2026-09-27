@@ -167,7 +167,7 @@ def render_report(
     lines: list[str] = []
     add = lines.append
 
-    add("# Phase 9 — Exploratory Data Analysis & Quality Profiling")
+    add("# Phase 9 - Exploratory Data Analysis & Quality Profiling")
     add("")
     add(
         f"Source: `{profile.source_id}` · generator "
@@ -198,7 +198,7 @@ def render_report(
     add("## 0. What changed, and every number it superseded")
     add("")
     add("Phase 9 and Phase 9b closed five corpus defects in sequence. Each regeneration")
-    add("moves the RNG stream, so **every** downstream count changed each time — not only")
+    add("moves the RNG stream, so **every** downstream count changed each time - not only")
     add("the sentences the fix touched. Superseded figures are listed rather than quietly")
     add("overwritten.")
     add("")
@@ -217,14 +217,14 @@ def render_report(
     add("| Records | 1,200 | 1,200 | 4,000 | **4,000** |")
     add("| Utterances | 4,110 | 4,141 | 13,651 | **9,302** |")
     add("| Templates per construct | 7–12 | 7–12 | 7–12 | **15** |")
-    add("| Records with a broken substitution | — | 190 (15.8%) | 0 | **0** |")
+    add("| Records with a broken substitution | - | 190 (15.8%) | 0 | **0** |")
     add("| Realised vocabulary (raw records) | 635 | 636 | 625 | **860** |")
-    add("| Utterance exact-duplicate rate | — | 73.6% | 87.4% | **37.6%** |")
-    add("| `gold_eval` drawn / target 400 | — | 235 | 400 | **400** |")
-    add("| Constructs below the 40-positive floor | — | 7 / 10 | 0 / 10 | **0 / 10** |")
-    add("| Lexicon macro-F1, template-disjoint | — | 0.706 | 0.780 | **0.461** |")
+    add("| Utterance exact-duplicate rate | - | 73.6% | 87.4% | **37.6%** |")
+    add("| `gold_eval` drawn / target 400 | - | 235 | 400 | **400** |")
+    add("| Constructs below the 40-positive floor | - | 7 / 10 | 0 / 10 | **0 / 10** |")
+    add("| Lexicon macro-F1, template-disjoint | - | 0.706 | 0.780 | **0.461** |")
     add("")
-    add("**Read the last two rows together — this is the most important thing on the page.**")
+    add("**Read the last two rows together - this is the most important thing on the page.**")
     add("Utterance count *fell* from 13,651 to 9,302 while the corpus grew, because the")
     add("discourse suffixes stopped being separate sentences. And the lexicon baseline lost")
     add("0.32 macro-F1 without the corpus becoming harder in any real sense. Both are")
@@ -237,12 +237,12 @@ def render_report(
     add("   generator from `git show 6f9561a:` and regenerating at seed 42.")
     add("2. `docs/data_sources.md` reported v1.1 as **638** types / **1,163** distinct texts")
     add("   / **40,169** tokens / **106** construct-free records. The committed generator")
-    add("   produces **635 / 1,161 / 40,251 / 92**. Small, and it changes no conclusion —")
+    add("   produces **635 / 1,161 / 40,251 / 92**. Small, and it changes no conclusion - ")
     add("   but `CLAUDE.md` §9 claims a reviewer can reproduce these exactly, so a figure")
     add("   that does not reproduce is a defect regardless of size.")
     add("3. A field named `templates_per_record` counted **constructs**. Renamed.")
     add("4. **`src/evaluation/baselines.py` claimed the lexicon baseline is independent of")
-    add("   the corpus. It is not** — see §5b. That claim has been in the repo since Phase 7")
+    add("   the corpus. It is not** - see §5b. That claim has been in the repo since Phase 7")
     add("   and every lexicon number reported before v1.4 carries an upward bias.")
     add("")
 
@@ -271,13 +271,13 @@ def render_report(
     add("Token counts here use `profile.tokenise` (alphabetic words and placeholders),")
     add("which is **not** the generator's whitespace tokeniser. `docs/data_sources.md`")
     add("reports 33.9 words per record on the latter; this table reports 33.86 on the")
-    add("former. Neither is wrong and they must not be mixed — the generator's counts")
+    add("former. Neither is wrong and they must not be mixed - the generator's counts")
     add("digits and bare punctuation as tokens, this one does not, and a corpus")
     add("statistic quoted without its tokeniser is not reproducible.")
     add("")
     add("Confidence intervals are percentile bootstrap, 1,000 resamples, seed 42, via")
     add("`src/evaluation/metrics.py::bootstrap_statistic`. They quantify sampling")
-    add("variability **within this corpus** — that is, across draws from this template")
+    add("variability **within this corpus** - that is, across draws from this template")
     add("grammar. They say nothing about athlete language.")
     add("")
     add("![utterance length](figures/utterance_length_tokens.svg)")
@@ -292,7 +292,7 @@ def render_report(
     add("(challenge vs threat framing) is a stance towards an event, and a nine-token")
     add("sentence often does not carry enough of it for two annotators to agree. This is")
     add("the argument for giving annotators the **parent record as context** while asking")
-    add("them to label the utterance — recorded here as an input to Phase 10's")
+    add("them to label the utterance - recorded here as an input to Phase 10's")
     add("annotation-interface design.")
     add("")
 
@@ -314,7 +314,7 @@ def render_report(
     add(f"| Hapax rate | {v_with.hapax_rate:.4f} | {v_without.hapax_rate:.4f} |")
     add("")
     add(f"**Placeholder tokens in the corpus: {profile.placeholder_token_count}.** The two")
-    add("columns are identical, and that is the expected result — the A2 generator plants")
+    add("columns are identical, and that is the expected result - the A2 generator plants")
     add("no personal names, so the de-identifier had nothing to replace. The columns are")
     add("computed and reported separately anyway, because the moment an A3 consented")
     add("donation arrives they will diverge, and a report that only ever printed one")
@@ -327,7 +327,7 @@ def render_report(
         f"{profile.n_utterances:,} utterances is *not* comparable with the TTR Phase 7"
     )
     add(f"reported over {profile.n_records:,} records, even though the underlying text is")
-    add("the same — the number would fall with no change in lexical richness whatsoever,")
+    add("the same - the number would fall with no change in lexical richness whatsoever,")
     add("purely because the denominator grew. That is exactly the comparison a reader is")
     add("most likely to make. MATTR averages the TTR of every fixed-length window, so the")
     add("length confound is gone by construction and the figure **is** comparable across")
@@ -348,7 +348,7 @@ def render_report(
     add("split them into `[`, `EVENT`, `_`, `WINDOW`, `]` unless they are registered as")
     add("special tokens. That would turn one privacy artefact into five vocabulary items")
     add("and put a subword boundary *inside* a span the explainability layer later")
-    add("attributes over — which is contribution #2's unit. Register them.")
+    add("attributes over - which is contribution #2's unit. Register them.")
     add("")
     add("Most frequent types (including placeholders):")
     add("")
@@ -360,7 +360,7 @@ def render_report(
 
     # -- 3. duplicates
     ud, rd = profile.utterance_duplicates, profile.record_duplicates
-    add("## 3. Duplicates — the largest data-quality finding in this phase")
+    add("## 3. Duplicates - the largest data-quality finding in this phase")
     add("")
     add("| Measure | Utterances | Records |")
     add("|---|---|---|")
@@ -429,11 +429,11 @@ def render_report(
         "repeated_token_run",
     ):
         if check not in junk.by_check:
-            add(f"| `{check}` | 0 | — |")
+            add(f"| `{check}` | 0 | - |")
     add("")
     add("Only `too_short` fires. `MIN_ANNOTATABLE_TOKENS` is 4 words; the flagged items")
     add("are discourse fragments such as `That's it.` Nothing is deleted on the strength")
-    add("of this flag — the corpus keeps them, and only the **gold sample** excludes them,")
+    add("of this flag - the corpus keeps them, and only the **gold sample** excludes them,")
     add("because handing an annotator a two-word fragment and then reporting the resulting")
     add("disagreement as annotator unreliability would be measuring the sampling design.")
     add("")
@@ -445,7 +445,7 @@ def render_report(
     add("")
 
     # -- 5. synonym sweep
-    add("## 5. Systematic synonym sweep — OPEN-015 was not an isolated defect")
+    add("## 5. Systematic synonym sweep - OPEN-015 was not an isolated defect")
     add("")
     total_events = len(SA.substitution_events())
     add(
@@ -453,10 +453,10 @@ def render_report(
         "`src/ingestion/synonym_audit.py` replaces that with an **exhaustive** enumeration"
     )
     add(
-        f"of every single-token substitution the generator can make — "
+        f"of every single-token substitution the generator can make - "
         f"{len(SA.varied_templates())} filled template variants, **{total_events} substitution"
     )
-    add("events** — screened by six mechanical probes (idiom membership, article agreement,")
+    add("events** - screened by six mechanical probes (idiom membership, article agreement,")
     add("number agreement, particle/argument structure, inflected form, and arity).")
     add("")
     add(f"- **{len(findings)} distinct signatures flagged**, every one carrying a recorded")
@@ -475,15 +475,15 @@ def render_report(
     add("and left the other 15%. Examples, all now eliminated:")
     add("")
     add('- *"I can feel my heart pick up a bit when I **figure about** the first ball."*')
-    add('- *"my **insides is** in knots and my fingers won\'t stop shaking"* — number')
-    add('- *"we\'ve got **a approach** for the first bell"* — article agreement')
-    add("- *\"I'm **on edge I'll** let everyone down\"* — no clausal complement")
+    add('- *"my **insides is** in knots and my fingers won\'t stop shaking"* - number')
+    add('- *"we\'ve got **a approach** for the first bell"* - article agreement')
+    add("- *\"I'm **on edge I'll** let everyone down\"* - no clausal complement")
     add("")
     add("**Resolved at v1.3 by guarding the generator, not by shrinking it** (OPEN-016,")
     add("option (c)). `_vary` applies each candidate substitution, checks the result against")
     add("the ruled-defective signatures, and reverts it if it would produce one. `think →")
     add('figure` is broken in *"all I figure about"* and unremarkable in *"I figure I\'m')
-    add('ready"* — the defect belongs to the **frame**, not the word.')
+    add('ready"* - the defect belongs to the **frame**, not the word.')
     add("")
     add("Both candidate remedies were measured at n=4,000 rather than argued:")
     add("")
@@ -491,7 +491,7 @@ def render_report(
     add("|---|---|---|---|")
     add("| v1.2, unguarded | 64 groups | 643 types | 630 (15.75%) |")
     add("| Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |")
-    add("| **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |")
+    add("| **Option (c): guard - chosen** | **64, unchanged** | **625 types** | **0** |")
     add("")
     add(
         f"**Current corpus: {defect_records[0]} of {defect_records[1]} records and "
@@ -503,7 +503,7 @@ def render_report(
     add("Doubling the template bank created **28 substitution frames nobody had ruled on**,")
     add('and the build refused to pass until each was judged: 19 `broken` (*"a entry list"*,')
     add('*"spectators keeps"*, *"I keep myself crowded with"*), 5 `degraded`, 4 fine. Not')
-    add("one of them was found by reading — the sweep enumerated them, the test failed, and")
+    add("one of them was found by reading - the sweep enumerated them, the test failed, and")
     add("a human ruled. **That is the difference between a control and a good intention.**")
     add(f"The sweep now covers {len(SA.substitution_events())} substitution events over")
     add(f"{len(findings)} signatures, all reviewed.")
@@ -521,7 +521,7 @@ def render_report(
     add('`src/evaluation/baselines.py` documented `LexiconBaseline` as *"immune to the')
     add('template leakage that inflates the others"*, on the reasoning that its cues were')
     add("hand-written from `taxonomy.yaml` rather than induced from labels. Avoiding")
-    add("induction prevents *direct* inheritance. It does not prevent **shared ancestry** —")
+    add("induction prevents *direct* inheritance. It does not prevent **shared ancestry** - ")
     add("the template bank was written from the same `positive_examples`, several Phase 7")
     add("templates reproduce them near-verbatim, and so cue list and corpus are cousins.")
     add("")
@@ -541,7 +541,7 @@ def render_report(
     add("1. **The lexicon's template-disjoint macro-F1 fell 0.780 → 0.461.** The corpus did")
     add("   not get harder; the baseline lost an advantage it should never have been")
     add("   credited with. **0.461 is the more honest floor**, and every lexicon number")
-    add("   published before v1.4 carries an upward bias. Report the drop — a baseline whose")
+    add("   published before v1.4 carries an upward bias. Report the drop - a baseline whose")
     add("   score depends this much on phrasing overlap with its own source is a finding")
     add("   about lexicon baselines in general, not a defect peculiar to this project.")
     add("2. **The Phase 9 'cue fraction' correction is withdrawn.** Phase 9 used this")
@@ -567,7 +567,7 @@ def render_report(
     for name, interval in profile.coverage.items():
         add(f"| `{name}` | {ci(interval)} |")
     add("")
-    add("`training_load_hint` is the only partially-covered field, by design — the")
+    add("`training_load_hint` is the only partially-covered field, by design - the")
     add("generator emits it for a subset of records, so it is a genuinely optional")
     add("context signal and any model using it must handle its absence. Every other")
     add("field is complete. A CI of `[1.000, 1.000]` looks redundant at 100% and is not:")
@@ -593,7 +593,7 @@ def render_report(
     add("")
 
     # -- 7. sampling plan
-    add("## 7. Gold-set sampling plan (Phase 11) — the deliverable")
+    add("## 7. Gold-set sampling plan (Phase 11) - the deliverable")
     add("")
     add("Implemented in `src/evaluation/sampling.py`; the drawn candidates are written to")
     add("`data/processed/gold_candidates/`. **Not** `data/gold/`, which is human-owned and")
@@ -609,14 +609,14 @@ def render_report(
     add("")
     add("The cause: `template_disjoint_split` shuffles all 85 templates as a single pool.")
     add("With 7–12 templates per construct, a global 20% holdout can miss a construct")
-    add("entirely. That function is not wrong — it is the right tool for the leakage")
-    add("*comparison* it was built for — it is the wrong tool for carving an evaluation")
+    add("entirely. That function is not wrong - it is the right tool for the leakage")
+    add("*comparison* it was built for - it is the wrong tool for carving an evaluation")
     add("set that must cover every label. It is unchanged; a stricter partitioner was")
     add("added alongside it.")
     add("")
     add("### 7.2 The plan")
     add("")
-    add("**Step 1 — partition templates per construct.**")
+    add("**Step 1 - partition templates per construct.**")
     add(
         "`construct_stratified_template_partition` holds out "
         f"{plan.partition.holdout_fraction:.0%} of *each construct's* templates"
@@ -634,14 +634,14 @@ def render_report(
         f"**{plan.partition.constructs_without_holdout or 'none'}**."
     )
     add("")
-    add("**Step 2 — assign records, not utterances.** A record joins the gold pool only if")
+    add("**Step 2 - assign records, not utterances.** A record joins the gold pool only if")
     add("*every* template it uses is held out; the training pool only if none is;")
     add("otherwise it is discarded. This is the one place the unit must be the record:")
     add("two utterances of the same record share its templates, so drawing utterances")
     add("independently would put siblings on both sides and reintroduce exactly the")
     add("leakage Phase 7 quantified.")
     add("")
-    add("**Step 3 — filter for annotatability.**")
+    add("**Step 3 - filter for annotatability.**")
     add("")
     add("| Exclusion | gold_eval pool | gold_dev pool |")
     add("|---|---|---|")
@@ -653,7 +653,7 @@ def render_report(
     add(f"| Exact / near duplicate | {e.excluded_duplicate:,} | {d.excluded_duplicate:,} |")
     add(f"| **Eligible** | **{e.eligible:,}** | **{d.eligible:,}** |")
     add("")
-    add("**Step 4 — draw, construct quotas first then context balance.** Round-robin")
+    add("**Step 4 - draw, construct quotas first then context balance.** Round-robin")
     add("across constructs to the per-construct floor, then greedily fill the remainder")
     add("by whichever item most improves the worst-served stratum cell, in priority order")
     add("`time_band` → `sport` → `competition_level` → `region`. Marginal balance, not")
@@ -661,14 +661,14 @@ def render_report(
     add("400 items, so a jointly balanced design is arithmetically impossible and claiming")
     add("one would be false.")
     add("")
-    add("**Step 5 — two annotators, 100% double-annotated.** Both annotators label every")
+    add("**Step 5 - two annotators, 100% double-annotated.** Both annotators label every")
     add("gold_eval item, so Cohen's kappa is computable per construct on the whole set.")
     add("Partial double-annotation would save time and make the per-construct kappas rest")
     add("on a subset too small to interval. `generation_spec` is **stripped** from every")
     add("written candidate: showing an annotator which construct the generator planted is")
     add("the most direct possible way to destroy the independence a kappa depends on.")
     add("")
-    add("**Step 6 — calibrate on `gold_dev` first.** `gold_dev` is drawn from")
+    add("**Step 6 - calibrate on `gold_dev` first.** `gold_dev` is drawn from")
     add("**training-side** templates. Annotators argue over the rubric on it, revise")
     add("`docs/annotation_guidelines.md`, and only then start `gold_eval`. An item read")
     add("during an argument about the rubric is no longer an independent measurement, so")
@@ -684,7 +684,7 @@ def render_report(
         f"| Distinct parent records | {len(plan.gold_eval.parent_record_ids)} | "
         f"{len(plan.gold_dev.parent_record_ids)} |"
     )
-    add(f"| Leakage-safe | {plan.is_leakage_safe} | — |")
+    add(f"| Leakage-safe | {plan.is_leakage_safe} | - |")
     add("")
     add("Construct coverage of the drawn sample. " + WARNING)
     add("")
@@ -716,7 +716,7 @@ def render_report(
     add("**One correction, withdrawn.** Phase 9 reported that ~38% of drawn items carried")
     add("no construct cue, applied that as a 0.62× correction to the coverage table, and")
     add("concluded that 7 of 10 constructs were still under-powered. **That correction is")
-    add("withdrawn** — it was computed with `LexiconBaseline`, which §5b shows is not a")
+    add("withdrawn** - it was computed with `LexiconBaseline`, which §5b shows is not a")
     add("construct detector but a measure of overlap with its own cue list. The evidence:")
     add("the same proxy now reports a *worse* figure on a corpus with twice the construct")
     add("phrasings, which is not a statement about constructs at all.")
@@ -725,7 +725,7 @@ def render_report(
     add("unknown until humans annotate.** Phase 11 is what settles it. The two things to")
     add("carry into that phase:")
     add("")
-    add("1. The coverage table below is still an **upper bound**, for the OPEN-019 reason —")
+    add("1. The coverage table below is still an **upper bound**, for the OPEN-019 reason - ")
     add("   `generation_spec` is replicated onto every utterance of a record, including the")
     add("   ones realising no construct. That fact is independent of the lexicon and stands.")
     add(
@@ -737,13 +737,13 @@ def render_report(
         f"{plan.gold_eval.eligibility.eligible if plan.gold_eval.eligibility else 0} items,"
     )
     add(f"   so `TARGET_GOLD_EVAL` can rise from {plan.gold_eval.size} without regenerating")
-    add("   anything — at the cost of proportionally more annotation time.")
+    add("   anything - at the cost of proportionally more annotation time.")
     add("")
     add("**One tempting fix stays rejected.** The draw could prefer utterances the lexicon")
     add("detects, which would make the coverage table look better immediately. It must not:")
     add("selecting gold items by lexicon detectability builds that baseline's strengths into")
     add("the evaluation set, so the lexicon would then beat the transformer on a test set")
-    add("chosen to suit it. §5b makes this worse, not better — the lexicon is already")
+    add("chosen to suit it. §5b makes this worse, not better - the lexicon is already")
     add("entangled with the template bank, and selecting on it would entangle the gold set")
     add("too. That is not a gold set, it is a rigged one.")
     add("")
@@ -776,7 +776,7 @@ def render_report(
     )
     add(
         f"| 7 | Sub-annotatable utterances | {junk.flagged} ({_pct(junk.flagged_rate_ci.point)}) | "
-        "— | handled in sampling |"
+        " - | handled in sampling |"
     )
     add("")
 

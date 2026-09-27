@@ -52,7 +52,7 @@ from src.dashboard import (  # noqa: E402
 
 st.set_page_config(page_title="Evidence coverage", layout="wide")
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 

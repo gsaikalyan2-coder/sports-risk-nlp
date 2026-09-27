@@ -60,26 +60,12 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-# Light or dark, chosen by the reader and held in session state so the detail
-# page opens in the same mode the tile was clicked in. Every colour on both
-# surfaces comes from `theme.palette(mode)`, which defines the full token set
-# for each mode -- a partial palette is how a dark page ends up with dark text.
-# Streamlit garbage-collects a widget's state when that widget is not rendered
-# on the current page, so a radio key alone does NOT survive navigation -- the
-# reader picked dark, opened Page 2, and got a light page. Found by clicking
-# through the running app; the unit tests cannot see session lifetime at all.
-# So the choice is copied into a plain (non-widget) key, which does persist, and
-# every page reads that.
-_choice = st.sidebar.radio(
-    "Appearance",
-    ("light", "dark"),
-    index=("light", "dark").index(st.session_state.get("mode", theme.DEFAULT_MODE)),
-    format_func=str.capitalize,
-    horizontal=True,
-    key="appearance_choice",
-)
-st.session_state["mode"] = _choice
-mode = _choice
+# Light or dark, chosen by the reader. Every colour on both surfaces comes from
+# `theme.palette(mode)`, which defines the full token set for each mode: a
+# partial palette is how a dark page ends up with dark text. The control itself
+# lives in `theme.mode_control`, which every page in this app calls, and whose
+# docstring records why the choice cannot live in the radio's own key.
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 # Say why the Phase 26 pages are not in the menu, rather than leaving a reader to
@@ -131,28 +117,6 @@ def _replay():
     return known_examples()
 
 
-def _announcement() -> None:
-    """The black strip, with the close control DESIGNcohere.md specifies for it.
-
-    The component was always documented as dismissible -- "centred microcopy with
-    an underlined link and a close control at the far right" -- and shipped
-    without the control, so it sat permanently across the top of every screen.
-    Closing it is per-session and does not persist, so the next visitor sees it
-    once. The same wording is in the provenance expander at the foot of the page
-    and in `docs/ethics.md`; this strip is the reminder, not the record.
-    """
-    if st.session_state.get("announcement_closed"):
-        return
-    bar, close = st.columns([20, 1])
-    with bar:
-        st.markdown(f'<div class="announcement">{plain.ANNOUNCEMENT}</div>', unsafe_allow_html=True)
-    with close:
-        st.button("✕", key="close_announcement", help="Dismiss for this session")
-    if st.session_state.get("close_announcement"):
-        st.session_state["announcement_closed"] = True
-        st.rerun()
-
-
 def _open_detail(construct: str) -> None:
     """Route to the detail page for one construct.
 
@@ -161,8 +125,6 @@ def _open_detail(construct: str) -> None:
     """
     st.session_state["detail_construct"] = construct
 
-
-_announcement()
 
 st.markdown('<p class="mono-label">Pre-competition construct profiling</p>', unsafe_allow_html=True)
 st.markdown(f"# {plain.PAGE1_TITLE}")
@@ -301,7 +263,6 @@ if st.session_state.get("detail_construct"):
     st.switch_page(DETAIL_PAGE)
 
 with st.expander("Provenance and limitations: read before quoting any number"):
-    st.markdown(f"- {plain.ANNOUNCEMENT}")
     st.markdown(f"- {view.policy_note}")
     for notice in view.notices:
         st.markdown(f"- {notice}")

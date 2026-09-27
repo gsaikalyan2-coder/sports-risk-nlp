@@ -7,11 +7,11 @@ Nothing should be closed here without evidence.
 
 ---
 
-## OPEN-001 — Docker daemon not running; Phase 2 gate unmet
+## OPEN-001 - Docker daemon not running; Phase 2 gate unmet
 
 **Status: RESOLVED 2026-08-09.** Docker Desktop was started on the owner machine and
 `.\scripts\verify_env.ps1` reported **checks 1–9 passing**, including check 7 (container
-build) and check 8 (container hello-world) — the two that defined this issue. The only
+build) and check 8 (container hello-world) - the two that defined this issue. The only
 remaining failure in that run was check 10, an unrelated detect-secrets false positive
 (see OPEN-010, closed the same day).
 
@@ -20,15 +20,15 @@ problem and the CUDA-torch problem documented below had to be fixed before it co
 neither alone was sufficient.
 
 **Owned by:** Phase 2 (dev environment & tooling)
-**Was blocking at:** Phase 6 — resolved before it bit.
+**Was blocking at:** Phase 6 - resolved before it bit.
 
-### Update 2026-08-09 — a second, independent defect was found and fixed
+### Update 2026-08-09 - a second, independent defect was found and fixed
 
 The daemon being down was never the only problem. `docker compose build` would also
 have failed or crawled, for a reason that had nothing to do with Docker Desktop:
 
 The old `Dockerfile` ran `pip install -r requirements.txt`, and that manifest contained
-`torch>=2.2`. On Linux the default PyPI wheel for torch is the **CUDA** build — roughly
+`torch>=2.2`. On Linux the default PyPI wheel for torch is the **CUDA** build - roughly
 2.5 GB plus a stack of `nvidia-*` CUDA runtime libraries, none of which a CPU-only
 container ever loads. Estimated result: a ~6 GB image and a 30–60 minute build, with a
 real chance of failing on disk or a network timeout.
@@ -52,22 +52,22 @@ unverified"). That warning turned out to be the important sentence.
 | `numpy<2.1` bound removed | it would have **downgraded** the owner's working numpy 2.4.6 |
 
 **Verified in the Linux sandbox** (no Docker available there, so this is a proxy not a
-substitute): `requirements-base.txt` resolves cleanly with no dependency conflicts —
+substitute): `requirements-base.txt` resolves cleanly with no dependency conflicts -
 the failure mode a build would most likely have hit after the torch fix.
 
-**Still required from the owner** — the actual gate:
+**Still required from the owner** - the actual gate:
 
 1. Start Docker Desktop, wait for the tray icon to read "Docker Desktop is running".
 2. `docker info --format '{{.ServerVersion}}'` returns a version.
-3. `.\scripts\verify_docker.ps1` — probes the daemon, then runs checks 7, 8 and an
+3. `.\scripts\verify_docker.ps1` - probes the daemon, then runs checks 7, 8 and an
    in-container crew run.
-4. `.\scripts\verify_env.ps1` — expect 10/10 (now 11 checks; see `docs/docker.md`).
+4. `.\scripts\verify_env.ps1` - expect 10/10 (now 11 checks; see `docs/docker.md`).
 
 Full runbook including WSL and virtualization troubleshooting: **`docs/docker.md`**.
 
 ### Why this is now lower-risk than it was
 
-Phase 6's gate — one orchestrated multi-agent run that logs cost — **passes outside
+Phase 6's gate - one orchestrated multi-agent run that logs cost - **passes outside
 Docker**, via `python scripts/run_crew.py --offline`. Docker is no longer on the
 critical path for Phase 6 itself. It remains required for the Phase 21 dashboard and
 the Phase 24 reproducible artifact, which `CLAUDE.md` §9 makes a publication
@@ -75,7 +75,7 @@ requirement. So it must still be closed, but it is no longer blocking forward pr
 
 ---
 
-## OPEN-001-HISTORICAL — original Phase 2 diagnosis (retained for the record)
+## OPEN-001-HISTORICAL - original Phase 2 diagnosis (retained for the record)
 
 **Status:** superseded by the update above; kept because the reasoning is still correct.
 
@@ -97,14 +97,14 @@ open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specifie
 ### Diagnosis
 
 Docker Desktop is not running. The Docker CLI is finding no daemon at the end of the
-Windows named pipe. This is a **single root cause producing both failures** — it is not
+Windows named pipe. This is a **single root cause producing both failures** - it is not
 two independent problems, and it is not evidence that the `Dockerfile` or
 `docker-compose.yml` are wrong. Those files have never been successfully built, so they
 remain **unverified**, which is a distinct open question from the daemon being down.
 
 ### Why it is safe to defer right now
 
-`PROJECT_PLAN.md` Phase 5 is *Ethics, data governance & risk plan* — policy only, no code
+`PROJECT_PLAN.md` Phase 5 is *Ethics, data governance & risk plan* - policy only, no code
 and no containers. Phase 5 can be completed and gated with Docker down.
 
 ### Why it must NOT be deferred past Phase 6
@@ -125,7 +125,7 @@ is ultimately a paper requirement, not merely a convenience.
 3. If it will not start, check WSL (`wsl --status`, then `wsl --update`) and confirm
    virtualization is enabled in BIOS (Task Manager -> Performance -> CPU -> Virtualization).
 4. Re-run `.\scripts\verify_env.ps1`; expect all 10 checks to pass.
-5. **Separately confirm the container definitions actually build** — a passing check 7 is
+5. **Separately confirm the container definitions actually build** - a passing check 7 is
    the first real test the `Dockerfile` has had.
 
 ### Related
@@ -136,9 +136,9 @@ hygiene is verified; only containerization is outstanding.
 
 ---
 
-## OPEN-007 — CrewAI execution backend is written but never executed
+## OPEN-007 - CrewAI execution backend is written but never executed
 
-**Status:** OPEN — new 2026-08-09
+**Status:** OPEN - new 2026-08-09
 **Owned by:** Phase 6
 **Becomes blocking at:** whenever the project needs CrewAI specifically, realistically
 **Phase 10** (bulk weak labeling) if the crewai engine is chosen for it.
@@ -153,8 +153,8 @@ The verified, default path is `--engine simple`: the built-in sequential orchest
 in `src/agents/crew.py`, which is fully covered by tests and runs offline for free.
 
 **Why this is acceptable rather than sloppy.** `CLAUDE.md` §10 confirms CrewAI as the
-framework, so the integration belongs in the repo. But the Phase 6 gate — one
-orchestrated run that logs cost — is satisfied by the simple engine, and a reviewer
+framework, so the integration belongs in the repo. But the Phase 6 gate - one
+orchestrated run that logs cost - is satisfied by the simple engine, and a reviewer
 reproducing the artifact should not need an API key. Isolating CrewAI in its own module
 that nothing else imports means a CrewAI breaking change cannot take down the pipeline.
 CrewAI already went 0.x → 1.x during this project's lifetime, so that is not a
@@ -166,14 +166,14 @@ contact. Budget roughly $0.01. Record the outcome here.
 
 **Known limitation to decide on before Phase 10.** CrewAI calls the provider itself, so
 our ledger cannot see individual calls and records one coarse summary row instead of
-per-call rows. If per-record cost attribution matters for the paper's cost analysis —
-and it probably does — prefer `--engine simple` for bulk labeling.
+per-call rows. If per-record cost attribution matters for the paper's cost analysis -
+and it probably does - prefer `--engine simple` for bulk labeling.
 
 ---
 
-## OPEN-008 — No OpenRouter API key present
+## OPEN-008 - No OpenRouter API key present
 
-**Status: PARTIALLY RESOLVED 2026-08-10 — the key exists; no live call has been made.**
+**Status: PARTIALLY RESOLVED 2026-08-10 - the key exists; no live call has been made.**
 
 The owner added `OPENROUTER_API_KEY` to `.env` during Phase 10. Verified only as *set and
 non-empty*; the value was never read, printed, or written anywhere. `git check-ignore -v
@@ -188,9 +188,9 @@ in `logs/cost_ledger.csv`.
 
 **Two things must happen before that pilot, in order:**
 
-1. `python scripts/refresh_pricing.py --check` — must pass. `scripts/run_labeling.py`
+1. `python scripts/refresh_pricing.py --check` - must pass. `scripts/run_labeling.py`
    refuses `--live` without `--pricing-checked` for this reason (OPEN-009).
-2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` — a bounded pilot
+2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` - a bounded pilot
    that measures the real cache-read rate, the real escalation rate, and the real output
    length, all three of which the projection currently assumes.
 
@@ -219,9 +219,9 @@ cheap tier is estimated at about **$1.12**. The arithmetic is in
 
 ---
 
-## OPEN-009 — Model IDs and prices drift without notice
+## OPEN-009 - Model IDs and prices drift without notice
 
-**Status:** OPEN — monitoring in place
+**Status:** OPEN - monitoring in place
 **Owned by:** Phase 6
 **Becomes blocking at:** any large batch run, and at write-up time.
 
@@ -250,7 +250,7 @@ precisely the failure this issue exists to prevent recurring.
 
 ---
 
-## OPEN-010 — detect-secrets false positive on `api_key_env`
+## OPEN-010 - detect-secrets false positive on `api_key_env`
 
 **Status: RESOLVED 2026-08-09.** Same day it was raised.
 
@@ -274,7 +274,7 @@ and its value separately. If you ever need to quote a triggering line literally 
 append `# pragma: allowlist secret` to that line rather than reformulating it.
 
 **Resolution:** inline `# pragma: allowlist secret` with a comment stating why it is a
-false positive — the same mechanism already used for the deliberately fake key in
+false positive - the same mechanism already used for the deliberately fake key in
 `docs/setup.md`. Verified afterwards that the pragma is parsed as a YAML comment and the
 loaded value is still exactly `OPENROUTER_API_KEY`.
 
@@ -283,19 +283,19 @@ normally a smell. It is justified here because the finding is structurally impos
 be a real secret: the file is committed, the value is a variable name, and the actual key
 only ever lives in `.env`, which is gitignored, excluded from Docker images via
 `.dockerignore`, and confirmed untracked by check 11 in the same run. The narrow inline
-pragma also leaves the detector fully armed for every other line in the file — a baseline
+pragma also leaves the detector fully armed for every other line in the file - a baseline
 regeneration would have been the blunter, riskier fix.
 
 ---
 
-## OPEN-011 — The corpus contains no real athlete text
+## OPEN-011 - The corpus contains no real athlete text
 
-**Status:** OPEN — new 2026-08-09, Phase 7
+**Status:** OPEN - new 2026-08-09, Phase 7
 **Owned by:** Phase 7 (data strategy), realised in Phases 8–11
 **Becomes blocking at:** **Phase 11** (gold standard). Does not block Phases 8–10.
 
 The Phase 7 survey established that **no public corpus of pre-competition athlete text
-exists** — every athlete-speech corpus located is post-match, which is the wrong side of
+exists** - every athlete-speech corpus located is post-match, which is the wrong side of
 the event for an anticipatory taxonomy. Full reasoning and the rejected-candidate table:
 `docs/data_sources.md` §1 and §4.
 
@@ -319,15 +319,15 @@ strength:
 
 Option 2 is publishable but materially weaker, and it is the default if nothing changes.
 
-**Resolution — any one of these closes it, and all three are the owner's to action:**
+**Resolution - any one of these closes it, and all three are the owner's to action:**
 
-- **Cornell** — email Liye Fu / Cristian Danescu-Niculescu-Mizil / Lillian Lee asking for
+- **Cornell** - email Liye Fu / Cristian Danescu-Niculescu-Mizil / Lillian Lee asking for
   written permission to use the transcript dataset for research. One line back converts an
   unlicensed download into a recordable A1 basis. Post-match, so useful as contrastive
   data rather than as the core corpus.
-- **iMiGUE-Speech** — contact Haoyu Chen (University of Oulu) to sign the licence
+- **iMiGUE-Speech** - contact Haoyu Chen (University of Oulu) to sign the licence
   agreement. Cleanest licence position of any candidate; base iMiGUE is identity-free.
-- **A3 consented donation** — the only route that yields genuinely *pre-competition* text.
+- **A3 consented donation** - the only route that yields genuinely *pre-competition* text.
   A handful of adult athletes at SRMIST donating pre-event journal entries under written
   consent. Highest scientific value, longest lead time, and it pairs naturally with the
   **OPEN-004** expert-rater recruitment that is already overdue.
@@ -338,7 +338,7 @@ the asking stands in the way.
 
 ---
 
-## OPEN-012 — Synthetic corpus vocabulary is too small to train a generalising model
+## OPEN-012 - Synthetic corpus vocabulary is too small to train a generalising model
 
 **Status: SUBSTANTIALLY MITIGATED 2026-08-09, same day it was raised.** Downgraded from
 blocking to monitored. Two things were done, and the second matters more than the first.
@@ -350,7 +350,7 @@ now runs after template rendering: near-synonym substitution plus discourse fram
 |---|---|---|
 | Vocabulary (types) | 444 | **638** |
 | Distinct texts | 81.3% | **96.9%** |
-| MATTR-50 | — | **0.819** |
+| MATTR-50 | - | **0.819** |
 
 Raw TTR barely moved (0.0146 → 0.0159) and that is a property of the metric, not the
 corpus: TTR's denominator grows without bound while its numerator saturates. **MATTR-50 and
@@ -371,13 +371,13 @@ Templates on both sides: 85 → **0**. Verbatim test texts seen in train: 3.8% �
 8-gram overlap: 60.3% → 11.8%.
 
 A pure memoriser loses **0.53 macro-F1** when templates are held out; a system that cannot
-memorise is unchanged. That gap *is* OPEN-012, now quantified rather than feared — and
+memorise is unchanged. That gap *is* OPEN-012, now quantified rather than feared - and
 because a transformer memorises far more readily than 1-NN, 0.53 is a **lower bound** on the
 inflation Phase 14 would otherwise have reported.
 
 **What remains open, and why this is not closed.** The mitigation makes the metric honest;
 it does not make the corpus real. A 638-word synthetic vocabulary still will not produce a
-model that transfers to actual athlete speech — that requires **OPEN-011**. Two standing
+model that transfers to actual athlete speech - that requires **OPEN-011**. Two standing
 obligations:
 
 - Re-run `scripts/run_benchmark_audit.py` **after** the transformer exists. The probe's 0.53
@@ -391,7 +391,7 @@ two passes cannot be confused.
 
 ---
 
-## OPEN-012-HISTORICAL — original statement (retained for the record)
+## OPEN-012-HISTORICAL - original statement (retained for the record)
 
 **Status:** superseded by the mitigation above; the reasoning still holds.
 **Owned by:** Phase 7 (generator), realised at Phase 10
@@ -411,20 +411,20 @@ the single most damaging thing this project could do to its own credibility.
 
 **Resolution options, in preference order:**
 
-1. **LLM paraphrase pass** over the existing records once **OPEN-008** is closed —
+1. **LLM paraphrase pass** over the existing records once **OPEN-008** is closed -
    preserves the construct/intensity structure while widening lexis. Cheap on the
    cheap tier; `GeneratorStamp` already distinguishes generators so the two passes never
    get confused. This is the recommended Phase 8/10 follow-on.
-2. **Expand the template bank** in `src/ingestion/synthetic.py` — free and deterministic,
+2. **Expand the template bank** in `src/ingestion/synthetic.py` - free and deterministic,
    but effort scales linearly and the ceiling is still low.
-3. **Accept it and report it** — state the TTR, and report held-out numbers on the *real*
+3. **Accept it and report it** - state the TTR, and report held-out numbers on the *real*
    gold set only, never on synthetic held-out data.
 
 Option 3 is mandatory regardless of whether 1 or 2 is done.
 
 ---
 
-## OPEN-013 — De-identification cannot be validated against a corpus with no identifiers
+## OPEN-013 - De-identification cannot be validated against a corpus with no identifiers
 
 **Status: CLOSED 2026-08-09 (Phase 8).** The fixture was delivered at Phase 7 and the
 measurement has now been made. All five obligations listed at the bottom of this entry were
@@ -440,12 +440,12 @@ met, and the numbers are in `docs/preprocessing.md` §3.
 
 Reported per difficulty band (easy, medium, hard all 100% exact) and per category. A
 **held-out 10-case generalisation probe**, never consulted while writing the rules, scores
-10/10 exact — reported and deliberately **not** gated, because a probe that gates becomes a
+10/10 exact - reported and deliberately **not** gated, because a probe that gates becomes a
 second fixture the next person tunes against.
 
 **One fixture case was corrected, and it should be recorded rather than glossed.** `name_01`
 originally expected the bare role noun *"the coach"* to be replaced with `[COACH]`. That
-contradicted `negative_04` in the same file — *"'my Coach' is a role, not an identity"* — and
+contradicted `negative_04` in the same file - *"'my Coach' is a role, not an identity"* - and
 contradicted `docs/ethics.md` §5.1, which lists person **names** for replacement, not role
 nouns. The two cases could not both be satisfied, and `name_01` was the one that disagreed
 with the policy. It was amended to expect `[ATHLETE] said the coach was happy with the
@@ -454,14 +454,14 @@ the case's own `notes` field so the file explains itself.
 
 **A 100% score on 34 cases is not a strong claim, and the paper must not present it as one.**
 Every case was written by this project; none of it is real athlete text (OPEN-011). The
-number means the cascade handles the failure modes we thought to write down — not that it
+number means the cascade handles the failure modes we thought to write down - not that it
 handles the ones we did not. Re-measure when OPEN-011 resolves and report both numbers, with
 the fixture score labelled as an **upper bound**. The seven stated limitations in
 `docs/preprocessing.md` §5 are the honest counterweight to this number.
 
 ---
 
-## OPEN-015 — Generator v1.1 lexical variation produced an ungrammatical substitution
+## OPEN-015 - Generator v1.1 lexical variation produced an ungrammatical substitution
 
 **Status: CLOSED 2026-08-10 (Phase 9).** Option (a) was taken with the owner's approval. The
 `("part", "portion", "corner", "piece")` group was deleted, generator bumped to **v1.2**, the
@@ -469,7 +469,7 @@ corpus regenerated at seed 42, and the Phase 7, Phase 8 and benchmark gates all 
 re-reported together. Occurrences of `corner of me`, `portion of me` and `piece of me` in the
 regenerated corpus: **0, 0, 0**.
 
-Regenerating moved the RNG stream, so every downstream count changed — 4,110 → **4,141**
+Regenerating moved the RNG stream, so every downstream count changed - 4,110 → **4,141**
 utterances; memorisation probe 0.732/0.198 → **0.738/0.146**. Full before/after table in
 `reports/eda.md` §0.
 
@@ -486,7 +486,7 @@ OPEN-016.**
 **Original entry follows.**
 
 **Owned by:** Phase 7 (synthetic generator), found at Phase 8
-**Becomes blocking at:** never on its own — but it is a **corpus quality** defect, so it
+**Becomes blocking at:** never on its own - but it is a **corpus quality** defect, so it
 belongs to **Phase 9** (EDA & quality profiling), which is the phase that exists to find
 exactly this.
 
@@ -496,7 +496,7 @@ exactly this.
 > *"To be fair, corner of me wants to attack it and part of me just wants to survive it."*
 
 `corner of me` is not English. Generator v1.1's near-synonym substitution layer replaced
-*part* with *corner* — a valid synonym in isolation ("a corner of the room"), invalid in the
+*part* with *corner* - a valid synonym in isolation ("a corner of the room"), invalid in the
 idiom *part of me*.
 
 **Prevalence: 9 of 1,200 records (0.8%).**
@@ -504,14 +504,14 @@ idiom *part of me*.
 `phase8_handover.md` §B6b records that a first pass of the substitution layer produced
 "fixating *about* the result", "I must *to* not mess this up", and "Sessions *has* been", and
 that those groups were deleted with the reasoning recorded inline. This one survived the same
-review, because the constraint applied was shared part-of-speech **and** argument structure —
+review, because the constraint applied was shared part-of-speech **and** argument structure -
 and *part* → *corner* satisfies both. Idiom membership is a third constraint that was not
 checked and cannot be checked from POS alone.
 
 **Why it matters more than 0.8% suggests.** The corpus is the dataset contribution. A
 reviewer who reads nine ungrammatical records will discount the whole generator, and the
 paper claims the template grammar produces *plausible* pre-competition language. It also
-pollutes the vocabulary statistics that OPEN-012 was mitigated against — some of the
+pollutes the vocabulary statistics that OPEN-012 was mitigated against - some of the
 444→638 vocabulary gain is noise of this kind, and nobody has measured how much.
 
 **Resolution, owner's choice:**
@@ -534,7 +534,7 @@ records. A systematic sweep of the whole synonym bank against the corpus is EDA 
 
 ---
 
-## OPEN-016 — 15.8% of records still carry a broken or degraded synonym substitution
+## OPEN-016 - 15.8% of records still carry a broken or degraded synonym substitution
 
 **Status: CLOSED 2026-08-10 (Phase 9).** Resolved by **option (c)**, the generation-time
 guard, on the owner's instruction. Generator bumped to **v1.3**.
@@ -550,10 +550,10 @@ produce one. **Zero synonym groups were deleted.** Current corpus: **0 of 4,000 
 |---|---|---|---|
 | v1.2, unguarded | 64 groups | 643 types | 630 (15.75%) |
 | Option (a): delete the 34 implicated members | 57 groups | 594 types | 0 |
-| **Option (c): guard — chosen** | **64, unchanged** | **625 types** | **0** |
+| **Option (c): guard - chosen** | **64, unchanged** | **625 types** | **0** |
 
-Deleting costs 49 realised types; the guard costs 18. The guard is **not free** — a word whose
-only frames in the bank were defective now never appears — but it keeps 31 more types than
+Deleting costs 49 realised types; the guard costs 18. The guard is **not free** - a word whose
+only frames in the bank were defective now never appears - but it keeps 31 more types than
 deletion and removes nothing from the bank, so a future template using one of those words in a
 good frame gets it back automatically. Deletion would not. This is why the vocabulary line in
 `docs/data_sources.md` reads 636 → 625 rather than 636 → 594.
@@ -572,24 +572,24 @@ notice it over and over.
 
 **One structural detail worth recording**, because it was caught by a test rather than by
 review. The three OPEN-015 signatures (`corner of me`, `piece of me`, `portion of me`) were
-first added straight into `VERDICTS`, which broke `test_no_orphan_verdicts` — that test asserts
+first added straight into `VERDICTS`, which broke `test_no_orphan_verdicts` - that test asserts
 every verdict corresponds to a frame the audit can still produce, and the deleted group can
 produce none of them. The invariant is correct. The two tables answer different questions, so
 the guard entries moved to a separate `RETIRED_DEFECTS` tuple. The test was not weakened.
 
 **Original entry follows.**
 
-**Was:** OPEN — needs an owner decision; it is a trade-off, not a bug fix
+**Was:** OPEN - needs an owner decision; it is a trade-off, not a bug fix
 **Owned by:** Phase 7 (synthetic generator), found at Phase 9
 **Becomes blocking at:** **Phase 11.** An annotator asked to judge
 *"my insides is in knots"* is being asked to judge text no athlete would produce, and the
 kappa that results describes the generator's defects as much as the rubric's clarity.
 
-**How it was found — and this part is the reusable finding.** OPEN-015 was found by a human
+**How it was found - and this part is the reusable finding.** OPEN-015 was found by a human
 reading about twenty records. That is luck, and luck does not scale to 65 synonym groups.
 `src/ingestion/synonym_audit.py` replaces it with an **exhaustive** enumeration of every
-single-token substitution the generator can make — 221 filled template variants, **727
-substitution events** — screened by six mechanical probes: idiom membership, indefinite
+single-token substitution the generator can make - 221 filled template variants, **727
+substitution events** - screened by six mechanical probes: idiom membership, indefinite
 article agreement, number agreement, particle/argument structure, inflected form, and arity
 (one word swapped for a phrase or the reverse). Every flagged signature carries a recorded
 human verdict, and a test fails the build if any signature is unreviewed, so editing the
@@ -625,8 +625,8 @@ always miss the class nobody thought of; enumerating the search space mechanical
 guarantee.**
 
 **Why it is not fixed in Phase 9.** The remedy is to delete or repair roughly fifteen more
-synonym groups. That shrinks the vocabulary OPEN-012's mitigation rests on — the same 636
-types that justify calling OPEN-012 "substantially mitigated" — and it regenerates the corpus
+synonym groups. That shrinks the vocabulary OPEN-012's mitigation rests on - the same 636
+types that justify calling OPEN-012 "substantially mitigated" - and it regenerates the corpus
 a second time, invalidating every number in `reports/eda.md`, `docs/preprocessing.md` and
 `docs/data_sources.md`. **Corpus grammaticality versus lexical diversity is an owner
 trade-off**, and it is the same reasoning under which Phase 8 declined to fix OPEN-015.
@@ -634,12 +634,12 @@ trade-off**, and it is the same reasoning under which Phase 8 declined to fix OP
 **Resolution, owner's choice:**
 
 - **(a) Repair, don't delete.** Replace the offending groups with narrower ones that keep the
-  type count — e.g. `("think", "reckon")` instead of `("think", "reckon", "figure",
-  "suppose")` — and re-run the sweep until the defective-signature count is zero. Costs the
+  type count - e.g. `("think", "reckon")` instead of `("think", "reckon", "figure",
+  "suppose")` - and re-run the sweep until the defective-signature count is zero. Costs the
   most vocabulary at the margin but keeps the diversity claim honest. *Recommended.*
 - **(b) Delete the offending groups outright.** Fastest; costs ~15 groups of vocabulary and
   weakens OPEN-012's mitigation.
-- **(c) Make `_vary` context-aware** — refuse a substitution whose result matches a flagged
+- **(c) Make `_vary` context-aware** - refuse a substitution whose result matches a flagged
   signature. Reuses `synonym_audit.VERDICTS` as a live filter rather than an audit, so
   defects cannot be generated at all. Most robust, most work, and it makes the generator
   depend on a hand-curated verdict table.
@@ -652,7 +652,7 @@ regenerate-and-re-gate cycle, and doing them in one pass costs one re-report ins
 
 ---
 
-## OPEN-017 — The gold pool is too small for a per-construct kappa
+## OPEN-017 - The gold pool is too small for a per-construct kappa
 
 **Status: CLOSED 2026-08-10 (Phase 9) against its stated criterion; the residual is now
 OPEN-020.** Resolved by **option (a)**: `DEFAULT_COUNT` in `scripts/run_ingestion.py` raised
@@ -668,8 +668,8 @@ from 1,200 to **4,000**, corpus regenerated at seed 42, all four gates re-run.
 
 **But the correction this entry warned about did not go away, and it is now the binding
 constraint.** The lexicon proxy still finds **153 of 400 (38.2%)** drawn items carrying no
-construct cue, because that fraction is a property of *records* — a record is ~3.4 utterances
-of which ~2 realise a construct — and multiplying records does not change the ratio. Corrected
+construct cue, because that fraction is a property of *records* - a record is ~3.4 utterances
+of which ~2 realise a construct - and multiplying records does not change the ratio. Corrected
 at 0.62×, **7 of 10 constructs fall back below 40.**
 
 Swept, correcting each draw by its own measured cue fraction:
@@ -694,7 +694,7 @@ owner's time budget, not a code decision. It is a one-constant change in
 
 **Original entry follows.**
 
-**Was:** OPEN — needs an owner decision on corpus size
+**Was:** OPEN - needs an owner decision on corpus size
 **Owned by:** Phase 9, blocks Phase 11
 **Becomes blocking at:** **Phase 11**, immediately and unavoidably.
 
@@ -717,16 +717,16 @@ excluded for straddling the partition or carrying no template, 251 as duplicates
 
 **How much of an upper bound, estimated.** Running the Phase 7 lexicon baseline over the
 drawn sample as a proxy detector, **97 of 235 `gold_eval` items (41.3%) contain no construct
-cue of any kind** — the first drawn item is *"Kit arrived yesterday, so that's one thing
+cue of any kind** - the first drawn item is *"Kit arrived yesterday, so that's one thing
 sorted."*, a logistics sentence selected because its *parent record* plants a construct. The
 lexicon is crude and this is an estimate, not a measurement. But if it is even roughly right,
 the per-construct counts should be read at about **0.6×** the table above, under which **no
-construct meets the floor** — which strengthens this issue rather than changing its direction.
+construct meets the floor** - which strengthens this issue rather than changing its direction.
 Those items are not waste (a gold set with no negatives cannot measure false positives), but
 they are negatives and the coverage table counts them as positives.
 
 **Those counts are an upper bound, not an estimate.** Phase 8 copies `generation_spec` from
-the raw record onto every utterance cut from it, verbatim — verified, and asserted by a test.
+the raw record onto every utterance cut from it, verbatim - verified, and asserted by a test.
 A record averaging 3.45 utterances and planting 2 constructs therefore reports both constructs
 on all 3.45 of them, including the neutral logistics sentence and the discourse suffix that
 realise neither. The *true* count of gold utterances expressing each construct is lower than
@@ -767,19 +767,19 @@ computed on 3 phrasings is a kappa about those 3 phrasings.
   method to the result.
 
 **Whichever is chosen, `reports/eda.md` and `tests/test_profile.py`'s three fixed-corpus
-assertions become stale on regeneration — deliberately. Those tests exist to fail loudly so
+assertions become stale on regeneration - deliberately. Those tests exist to fail loudly so
 the report cannot silently drift from the corpus.**
 
 ---
 
-## OPEN-018 — 73.6% of utterances are exact duplicates of another utterance
+## OPEN-018 - 73.6% of utterances are exact duplicates of another utterance
 
 **Status: CLOSED 2026-08-10 (Phase 9b).** Utterance duplication **87.4% → 37.6%**; 9,302
 utterances over 6,444 distinct texts, against 13,651 over 3,131. Record-level duplication is
 3.9%.
 
 **The fix was not the one this entry recommended, and the failed first attempt is the useful
-part.** Option (a) — apply `_vary` to the suffixes and expand the bank from 8 entries to 17 —
+part.** Option (a) - apply `_vary` to the suffixes and expand the bank from 8 entries to 17 -
 was implemented first. It *spread* the repeats without reducing them: every construct sentence
 still drew a suffix, Phase 8 still segmented each suffix into its own standalone utterance, and
 38.6% of all utterances still sat in twenty strings. **Bank size was never the lever.
@@ -787,12 +787,12 @@ Sentence-hood was.**
 
 A discourse suffix is now a **clause** joined with an em dash, and `_frame` strips the parent's
 full stop before attaching, so `"I'm nervous. That's where my head is at."` becomes `"I'm
-nervous — that's where my head is at."` The segmenter has nothing to split, and the repeated
+nervous - that's where my head is at."` The segmenter has nothing to split, and the repeated
 text stops being a whole utterance.
 
 **Two consequences, both wanted.** Utterance count fell from 13,651 to 9,302 on a corpus that
 did not shrink. And **median utterance length rose from 9 tokens to 17**, which independently
-answers the concern Phase 9 raised in `reports/eda.md` §1 — that a 9-token median is too short
+answers the concern Phase 9 raised in `reports/eda.md` §1 - that a 9-token median is too short
 for an annotator to judge `appraisal_orientation` from. Asserted by
 `tests/test_profile.py::test_utterances_are_long_enough_to_annotate`.
 
@@ -801,7 +801,7 @@ construct-free records; all three previously bypassed it.
 
 **Original entry follows.**
 
-**Was:** OPEN — mitigated in the sampling plan, root cause not fixed
+**Was:** OPEN - mitigated in the sampling plan, root cause not fixed
 **Owned by:** Phase 7 (generator) / Phase 8 (segmenter), found at Phase 9
 **Becomes blocking at:** never on its own; it would have silently corrupted Phase 11's kappa
 if the sampling plan had not been written to avoid it.
@@ -812,7 +812,7 @@ record level the same corpus is **5.0%** duplicated. So this is an artefact of s
 not of generation, and it is invisible in every statistic Phase 7 published.
 
 **Mechanism.** `DISCOURSE_SUFFIXES` and `NEUTRAL_SENTENCES` are appended as whole sentences
-and are rendered **without** the near-synonym variation layer — `generate_records` applies
+and are rendered **without** the near-synonym variation layer - `generate_records` applies
 `_vary` to construct realisations only. Phase 8 then segments each into its own standalone
 utterance. A bank of ~8 suffixes across 1,200 records produces the same string hundreds of
 times: `"It is what it is."` 268 times, `"Anyway, that's the reality."` 266, `"That's the
@@ -821,7 +821,7 @@ honest version."` 265.
 **Why it matters.** Two annotators agreeing on `"It is what it is."` 268 times is **one**
 agreement counted 268 times. A gold set sampled without collapsing duplicates would report a
 kappa inflated by repetition, and the inflation would be invisible in the kappa itself. It
-also means the *effective* per-utterance corpus for any model is 1,528 strings, not 4,141 —
+also means the *effective* per-utterance corpus for any model is 1,528 strings, not 4,141 -
 which changes what a training-set size of "4,141 utterances" means in the paper.
 
 **Mitigation already in place.** `eligible_utterances` collapses exact and near-duplicates
@@ -831,8 +831,8 @@ the drawn sample is duplicate-free. That protects the kappa. It does not fix the
 **Resolution, owner's choice:**
 
 - **(a) Apply `_vary` to the discourse suffixes and neutral sentences too.** Cheap, and it
-  raises real diversity. Interacts with OPEN-016 — more varied text is more substitution
-  surface — so run the sweep afterwards.
+  raises real diversity. Interacts with OPEN-016 - more varied text is more substitution
+  surface - so run the sweep afterwards.
 - **(b) Attach discourse suffixes to the preceding sentence instead of letting the segmenter
   split them out.** Changes segmentation, which changes offsets, which contribution #2
   depends on. More invasive than it looks.
@@ -842,9 +842,9 @@ the drawn sample is duplicate-free. That protects the kappa. It does not fix the
 
 ---
 
-## OPEN-019 — `generation_spec` is replicated onto every utterance of a record
+## OPEN-019 - `generation_spec` is replicated onto every utterance of a record
 
-**Status:** OPEN — documentation and schema clarity, no data loss
+**Status:** OPEN - documentation and schema clarity, no data loss
 **Owned by:** Phase 8, found at Phase 9
 **Becomes blocking at:** never directly, but it is the most likely source of a wrong number
 in the paper.
@@ -857,8 +857,8 @@ reports both constructs on all 3.45 utterances, including the neutral logistics 
 the discourse suffix that realise neither.
 
 So **any per-utterance count derived from `generation_spec` is a per-record count multiplied
-by ~3.45**, not a per-utterance quantity. It is not wrong to carry the field forward —
-provenance requires it — but it is very easy to read as an utterance-level annotation,
+by ~3.45**, not a per-utterance quantity. It is not wrong to carry the field forward -
+provenance requires it - but it is very easy to read as an utterance-level annotation,
 because an interim record looks far more like training data than a raw one does.
 
 `src/evaluation/profile.py::GeneratorMetadataProfile` documents this and every downstream
@@ -870,23 +870,23 @@ bound** for exactly this reason.
 1. State the replication in `docs/preprocessing.md` next to the schema, where a reader meets
    the field, not only in an evaluation module. *(Done at Phase 9.)*
 2. If the generator is ever changed to record *which utterance* realises which construct, that
-   is a genuine schema improvement — but it must be introduced as new metadata, not by
+   is a genuine schema improvement - but it must be introduced as new metadata, not by
    narrowing `generation_spec`, or it starts looking exactly like the label it must never be.
 
 ---
 
-## OPEN-013-SUPERSEDED — fixture delivery note (retained for the record)
+## OPEN-013-SUPERSEDED - fixture delivery note (retained for the record)
 
 **Status:** superseded by the closure above; retained because the design reasoning still
 stands.
 
-`tests/fixtures/deid_cases.jsonl` — **34 cases** with expected placeholder output, covering
+`tests/fixtures/deid_cases.jsonl` - **34 cases** with expected placeholder output, covering
 every category in the `docs/ethics.md` §5.1 removal table: person names (including
 nicknames, lowercase, hyphenated, and honorific forms), handles, contacts, URLs, teams and
 sponsors, locations, events, exact dates, quasi-identifier combinations, and health detail
 (removed entirely, not placeholdered). Spans easy/medium/hard difficulty bands.
 
-**Eight of the 34 are negatives** — text that must come back *unchanged*. This is the half
+**Eight of the 34 are negatives** - text that must come back *unchanged*. This is the half
 that is usually forgotten. A de-identifier that redacts everything scores perfect recall and
 destroys the corpus, and `docs/ethics.md` §5.2 requires typed placeholders precisely because
 blanking "destroys the linguistic structure the model needs". The negatives include "**Mark**
@@ -895,7 +895,7 @@ my words" (common given name used as a verb), "The **Final** is on **Sunday** an
 figure, contrasted against jersey number 47 in the positive set), and "**Two days out**"
 (relative timing, which is contribution #3 and must survive).
 
-Every name in the fixture is invented. 12 tests enforce the fixture's own integrity —
+Every name in the fixture is invented. 12 tests enforce the fixture's own integrity -
 unique IDs, required fields, positives that change, negatives that do not, health cases that
 delete rather than placeholder, timing preserved, and that none of it has leaked into
 `data/raw/`.
@@ -905,14 +905,14 @@ delete rather than placeholder, timing preserved, and that none of it has leaked
 1. Report **recall, precision, and exact-match**, not recall alone.
 2. Report **per difficulty band**. An aggregate hides that easy passes and hard fails.
 3. Treat the fixture measurement as the real gate. "Spot-check shows no identifiers remain"
-   against the synthetic corpus is true and worthless — that corpus never had any.
+   against the synthetic corpus is true and worthless - that corpus never had any.
 4. Do not tune until it overfits 34 cases. It is a smoke test with teeth, not a benchmark,
    and `docs/ethics.md` §5.3 already names residual re-identification risk as a limitation.
 5. Re-measure against real text when **OPEN-011** resolves, and report both numbers.
 
 ---
 
-## OPEN-013-HISTORICAL — original statement (retained for the record)
+## OPEN-013-HISTORICAL - original statement (retained for the record)
 
 **Status:** superseded by the fixture above.
 **Owned by:** Phase 8 (preprocessing & de-identification)
@@ -920,14 +920,14 @@ delete rather than placeholder, timing preserved, and that none of it has leaked
 **Becomes blocking at:** **Phase 8's own gate** ("spot-check sample shows no direct
 identifiers remain").
 
-`src/ingestion/synthetic.py` deliberately emits **no personal names**, real or invented —
+`src/ingestion/synthetic.py` deliberately emits **no personal names**, real or invented -
 inventing names risks colliding with real people, and the corpus needs no identifiers. A
 test enforces this.
 
 The consequence is that Phase 8's `deidentify.py` will be run against text containing
 essentially nothing to remove, and will trivially pass its own gate while telling us
 **nothing about its recall**. `docs/ethics.md` §5.3 already names automated
-de-identification as imperfect and highest-risk for A4 press text — precisely the text this
+de-identification as imperfect and highest-risk for A4 press text - precisely the text this
 corpus does not contain.
 
 **Why it matters beyond tidiness.** "Spot-check shows no identifiers remain" is a claim the
@@ -940,14 +940,14 @@ worthless.
   synthetic utterances deliberately seeded with names, handles, teams, venues, and event
   names, with the expected placeholder output recorded. That gives `deidentify.py` a real
   recall measurement without needing real athlete data, and it is cheap.
-- Keep it in `tests/fixtures/`, **not** in `data/raw/` — it is a test artefact, not corpus.
+- Keep it in `tests/fixtures/`, **not** in `data/raw/` - it is a test artefact, not corpus.
 - When real text arrives (**OPEN-011**), re-measure against it and report both numbers.
 
 ---
 
-## OPEN-002 — Misconfigured plugin hook fires on every file write
+## OPEN-002 - Misconfigured plugin hook fires on every file write
 
-**Status:** OPEN — cosmetic
+**Status:** OPEN - cosmetic
 **Owned by:** local tooling, not the project
 
 The `pixeltable` plugin registers a `PostToolUse` hook pointing at
@@ -957,7 +957,7 @@ session. Remove or repair the plugin's hook configuration.
 
 ---
 
-## OPEN-003 — No off-machine backup of the repository
+## OPEN-003 - No off-machine backup of the repository
 
 **Status: CLOSED 2026-08-10 (Phase 9).** Pushed to a **private** GitHub remote,
 `gsaikalyan2-coder/sports-risk-nlp`, 273 objects. `main` now tracks `origin/main`.
@@ -983,30 +983,30 @@ actually reachable off this machine.
 
 **Original entry follows.**
 
-**Was:** OPEN — accepted risk
+**Was:** OPEN - accepted risk
 **Owned by:** Phase 1
 
 Per the documented Phase 1 deviation, the previous codebase was permanently deleted at the
 owner's instruction and no `legacy-backup` branch was created. Only `main` exists and there
-is no remote. Every artifact produced so far — the Phase 3 citation sweep, the Phase 4
-taxonomy and rubric — exists in exactly one place on one machine.
+is no remote. Every artifact produced so far - the Phase 3 citation sweep, the Phase 4
+taxonomy and rubric - exists in exactly one place on one machine.
 
 Pushing to a private remote would close this in a few minutes.
 
 ---
 
-## OPEN-004 — Expert-rater recruitment not started
+## OPEN-004 - Expert-rater recruitment not started
 
-**Status:** OPEN — **instrument delivered 2026-08-12 (Phase 17); raters still not recruited.**
+**Status:** OPEN - **instrument delivered 2026-08-12 (Phase 17); raters still not recruited.**
 **Owned by:** Phase 17, but `PROJECT_PLAN.md` risk #4 says recruitment starts Week 1-2
 
-### Update 2026-08-12 (Phase 17) — the buildable half is built
+### Update 2026-08-12 (Phase 17) - the buildable half is built
 
 Everything that does not require another human now exists:
 
-- `docs/expert_validation_protocol.md` — the full protocol, with the reporting
+- `docs/expert_validation_protocol.md` - the full protocol, with the reporting
   thresholds **fixed in advance** so they cannot be chosen to fit the result.
-- `src/explainability/study.py` — generates a blinded rating sheet mixing genuine
+- `src/explainability/study.py` - generates a blinded rating sheet mixing genuine
   model spans with length-matched **random-span controls** and **mismatched**
   attention-check items, and computes approval rates, the control margin, and
   unweighted Cohen's kappa.
@@ -1015,7 +1015,7 @@ Everything that does not require another human now exists:
 
 **The rating task was reframed, and the reframing is what makes this survivable.**
 Raters are asked whether a highlighted phrase is a *plausible textual cue for the
-named construct* — not whether an athlete is anxious. That question needs sports
+named construct* - not whether an athlete is anxious. That question needs sports
 familiarity plus the `docs/annotation_guidelines.md` rubric, not a clinical
 licence, so a sports-familiar student gives a defensible answer to it where they
 could not to a clinical one. It also keeps the instrument inside
@@ -1030,13 +1030,13 @@ sports-familiar student raters"**, never "expert validation".
 
 **Resolution:** contact SRMIST sports-department coaches and any sport-psychology
 staff. The ask is 25 minutes and one Markdown file. Pair it with the A3
-consented-donation recruitment (`docs/recruitment.md`) — same population, one
+consented-donation recruitment (`docs/recruitment.md`) - same population, one
 conversation, and it also moves OPEN-011.
 
 ### Original entry follows.
 
 The expert-validation study needs at least one coach or sport-psych practitioner. This is
-the headline differentiator of the paper — the Phase 3 review found that sports XAI
+the headline differentiator of the paper - the Phase 3 review found that sports XAI
 explanations are almost never validated with practitioners, and filling that gap is
 contribution #2. It is also the item with the longest lead time and the least control,
 since it depends on someone else's calendar.
@@ -1046,7 +1046,7 @@ That fallback materially weakens the contribution, so it should be a last resort
 
 ---
 
-## OPEN-033 — `scripts/run_explain.py` has never been executed
+## OPEN-033 - `scripts/run_explain.py` has never been executed
 
 **Status:** CLOSED 2026-08-13 (Phase 18 intake). The owner ran it on 2026-08-12 and
 `reports/explain/{explain.md,attributions.json,faithfulness.json,cards.md,agreement.json,rating_sheet.md}`
@@ -1066,14 +1066,14 @@ artefacts is not a study that produced ratings.
 
 ### Original entry follows.
 
-**Status:** OPEN — new 2026-08-12, Phase 17
+**Status:** OPEN - new 2026-08-12, Phase 17
 **Owned by:** Phase 17
-**Becomes blocking at:** immediately — Phase 17's measured artefacts do not exist until it runs.
+**Becomes blocking at:** immediately - Phase 17's measured artefacts do not exist until it runs.
 
 The Phase 17 explainability stack was written in a session whose sandbox had no
 torch: `download.pytorch.org` was blocked by the proxy and ~3 GB of free disk
 could not hold the CUDA wheel from PyPI. So `IntegratedGradients.attribute` and
-`ShapPartition.explain_record` — the only genuinely new torch code — have never
+`ShapPartition.explain_record` - the only genuinely new torch code - have never
 executed against the real checkpoint.
 
 **This is the OPEN-007 failure mode with a different module name**, and it is
@@ -1102,9 +1102,9 @@ and record the outcome here. Closes on the first successful full run.
 
 ---
 
-## OPEN-005 — Ethics-review exemption not yet in writing
+## OPEN-005 - Ethics-review exemption not yet in writing
 
-**Status:** OPEN — favourable determination, documentary record missing
+**Status:** OPEN - favourable determination, documentary record missing
 **Owned by:** Phase 5 (ethics & data governance)
 **Becomes blocking at:** **paper submission** (1st week of September 2026). Does **not** block
 Phase 7 ingestion.
@@ -1114,14 +1114,14 @@ review, as secondary analysis of public/licensed/consented/synthetic text with n
 human-subjects collection. Recorded in `docs/ethics.md` §3.4 on 2026-08-08. On the strength of
 that, A3 and A4 collection are unblocked.
 
-What is missing is the *documentary* form of the determination — an email, a letter, or a
+What is missing is the *documentary* form of the determination - an email, a letter, or a
 committee reference number naming the determining body and the date.
 
 **Why this stays open even though the answer was favourable.** An exemption is a claim about
 process, and reviewers and ethics editors ask for its provenance. "The author states the work was
 exempt" is materially weaker than "exempt per SRMIST, determination dated X, reference Y". The gap
 is only closable before submission, and it is cheapest to close now while the conversation is
-fresh — one email — rather than in September against a deadline.
+fresh - one email - rather than in September against a deadline.
 
 **Resolution:** obtain the written determination; save as `docs/ethics_review_exemption.*`, or if
 it carries personal contact details, record only the reference number in `docs/ethics.md` §3.4 and
@@ -1129,11 +1129,11 @@ keep the document out of the repo. Cite it in the paper's Ethics section.
 
 ---
 
-## OPEN-006 — Withdrawal/incident contact route is a personal address
+## OPEN-006 - Withdrawal/incident contact route is a personal address
 
-**Status:** **CLOSED 2026-08-24 (Phase 22)** — institutional route live
+**Status:** **CLOSED 2026-08-24 (Phase 22)** - institutional route live
 **Owned by:** Phase 5 (ethics & data governance)
-**Was blocking at:** any public release — corpus, code, or paper.
+**Was blocking at:** any public release - corpus, code, or paper.
 
 **Resolution as shipped.** `docs/ethics.md` §7.1 now names
 **`sk8069@srmist.edu.in`** (SRMIST institutional address) as primary, with
@@ -1146,7 +1146,7 @@ which is what makes this closure checkable rather than asserted.
 
 **Residual, not blocking.** The supervisor is named but no separate mailbox for
 him is published. If SRMIST requires two independently reachable addresses on a
-released artefact, add his institutional address to §7.1 and re-propagate — one
+released artefact, add his institutional address to §7.1 and re-propagate - one
 edit, same six files.
 
 ---
@@ -1154,14 +1154,14 @@ edit, same six files.
 ### Original statement (retained for the record)
 
 `docs/ethics.md` §7.1 nominated the owner's personal webmail address (redacted here at
-Phase 22 — quoting it back is the same disclosure the fix removes; prefix `[SPORTS-RISK-NLP]`, 7-day
+Phase 22 - quoting it back is the same disclosure the fix removes; prefix `[SPORTS-RISK-NLP]`, 7-day
 acknowledgement) as the route for withdrawal, correction, and incident reports. That was adequate
 for a project with nothing released yet.
 
 It is not adequate on a published artefact, for two reasons. **Accountability:** the project's only
 accountability mechanism should be traceable to the institution that determined it exempt, not to
 one individual's private webmail. **Continuity:** an A3 donor may withdraw consent two years after
-publication, and the route has to still work — past the owner's graduation.
+publication, and the route has to still work - past the owner's graduation.
 
 **Resolution:** before release, update §7.1 to an **SRMIST institutional address** as primary plus
 a **named supervisor or lab contact** as secondary, then propagate to `README.md`,
@@ -1180,21 +1180,21 @@ fails, which is worse than an honest interim one.
 | 2026-08-08 | Register created at end of Phase 4. OPEN-001 through OPEN-004 logged. |
 | 2026-08-08 | Phase 5 owner decisions resolved. OPEN-005 (exemption not in writing) and OPEN-006 (personal contact address) logged as the two residuals. Neither blocks Phase 7. |
 | 2026-08-09 | Phase 6. OPEN-001 updated: a second defect (CUDA torch in the image) found and fixed; container definitions split and hardened. OPEN-007 (CrewAI backend unexecuted), OPEN-008 (no OpenRouter key), OPEN-009 (model/price drift) logged. |
-| 2026-08-09 | **OPEN-001 RESOLVED** — Docker Desktop started; verify_env checks 1–9 pass including container build and container hello-world. First successful build of the `Dockerfile`. OPEN-010 (detect-secrets false positive) raised and resolved the same day. |
+| 2026-08-09 | **OPEN-001 RESOLVED** - Docker Desktop started; verify_env checks 1–9 pass including container build and container hello-world. First successful build of the `Dockerfile`. OPEN-010 (detect-secrets false positive) raised and resolved the same day. |
 | 2026-08-09 | Phase 7 follow-up. OPEN-012 **substantially mitigated** (generator v1.1 lexical variation: vocab 444->638, distinct texts 81%->97%; plus template-disjoint splitting in `src/evaluation/`, memorisation probe drops 0.732->0.198). OPEN-013 **fixture delivered** (34 cases, 8 negatives). Allow-list and ethics.md version headers corrected to 1.1. |
 | 2026-08-09 | Phase 7. Source survey found **no public pre-competition athlete corpus**; owner chose synthetic-first. OPEN-011 (no real athlete text), OPEN-012 (synthetic vocabulary too small), OPEN-013 (de-identification unvalidatable against an identifier-free corpus) logged. OPEN-011 supersedes risk #1 in `PROJECT_PLAN.md` as the project's live highest risk. |
-| 2026-08-09 | **Phase 8. OPEN-013 CLOSED** — de-identifier measured against the fixture: precision 100%, recall 100%, exact 100% (34/34), leak rate 0%, negatives 8/8, reported per difficulty band; held-out 10-case probe 10/10. Fixture case `name_01` corrected: it had required a bare role noun to be redacted, contradicting `negative_04` and `docs/ethics.md` §5.1; the implementation was not changed to chase it. Language-filter defect found and fixed by running the pipeline: unequal stopword profiles dropped 2 English records as Portuguese (`docs/preprocessing.md` §4.1). **OPEN-015 raised** — generator v1.1 substitution produced "corner of me" in 9/1,200 records; owned by Phase 9. |
-| 2026-08-11 | **Phase 13. Gate PASSED; every number PROVISIONAL.** `src/models/{dataset,classical}.py`, `scripts/run_baselines.py`, `tests/test_models.py` (19 tests, 416→435). Six systems scored under template-disjoint and random splits with bootstrap CIs. **The honest floor is the lexicon at 0.462** — both learned classical models score *below* it (LogReg 0.222, LinearSVC 0.181), while LinearSVC hits **1.000 on the random split**, a **+0.819** memorisation gap that is the strongest OPEN-012 evidence yet. **OPEN-028 raised:** the whole silver set is PRNG output keyed on the prompt hash, a consequence of OPEN-008 — single-label, 6/10 constructs, chance agreement; `--gold` refuses rather than falling back to it. |
-| 2026-08-10 | **Phase 9b. OPEN-018 and OPEN-020 CLOSED.** OPEN-020: template bank 7-12 -> **15 realisations per construct** (150 templates, 5 phrasings held out per construct against 2-4); realised vocabulary **625 -> 860** (+38%). OPEN-018: discourse suffixes became **clauses** rather than sentences after the obvious fix (a bigger suffix bank) was implemented and measured to do nothing — utterance duplication **87.4% -> 37.6%**, utterance count 13,651 -> 9,302, median utterance length 9 -> **17 tokens**. The ratchet flagged **28 new unruled substitution frames** and blocked the build until each was judged. All four gates re-run and PASSED; 253 tests. **OPEN-021 raised** — the lexicon baseline is NOT independent of the corpus (shared ancestry via `taxonomy.yaml` positive_examples): it fires on 73% of pre-9b templates and 22% of 9b templates, macro-F1 **0.780 -> 0.461**, and Phase 9's cue-fraction correction is **withdrawn**. |
-| 2026-08-10 | **Phase 9 follow-up. OPEN-016 and OPEN-017 CLOSED.** OPEN-016 by generation-time guard (generator **v1.3**, `substitution_verdicts.py`): defective records **190/1,200 → 0/4,000**, zero synonym groups deleted, realised vocabulary 643 → 625 against 594 had the 34 implicated members been deleted instead. OPEN-017 by raising `DEFAULT_COUNT` 1,200 → **4,000**: gold_eval **235 → 400** items, constructs below the 40-positive floor **7/10 → 0/10**. All four gates re-run and PASSED; 251 tests. **OPEN-020 raised** — corrected for the 0.62 cue fraction, 7/10 constructs still fall short, and the sweep shows no corpus size fixes it; the remedy is ~15 templates per construct. **OPEN-018 worsened as predicted**: utterance duplication 73.6% → **87.4%**. |
-| 2026-08-10 | **Phase 9. OPEN-015 CLOSED** — `("part","portion","corner","piece")` deleted, generator bumped to v1.2, corpus regenerated at seed 42, Phase 7 / Phase 8 / benchmark gates all re-run and PASSED. 4,110 → **4,141** utterances; memorisation probe 0.732/0.198 → 0.738/0.146. Four issues raised: **OPEN-016** (exhaustive synonym sweep — 727 substitution events, 127 flagged signatures, **15.8% of records still carry a broken/degraded substitution**; OPEN-015 was not isolated), **OPEN-017** (gold pool too small — 235 of a 400 target, 7/10 constructs below the 40-positive floor; 4,000 generated records measured as the minimum), **OPEN-018** (**73.6% utterance-level exact duplication**, a segmentation artefact invisible at record level; mitigated in the sampling plan), **OPEN-019** (`generation_spec` replicated onto every utterance). Three published numbers corrected: v1.1 vocabulary 638→**635**, distinct texts 1,163→**1,161**, `"corner of me"` 11→**9** in a code comment. Deliverables: `reports/eda.md`, 9 SVG figures, `notebooks/01_eda.ipynb`, `data/processed/gold_candidates/sampling_plan.json`. |
+| 2026-08-09 | **Phase 8. OPEN-013 CLOSED** - de-identifier measured against the fixture: precision 100%, recall 100%, exact 100% (34/34), leak rate 0%, negatives 8/8, reported per difficulty band; held-out 10-case probe 10/10. Fixture case `name_01` corrected: it had required a bare role noun to be redacted, contradicting `negative_04` and `docs/ethics.md` §5.1; the implementation was not changed to chase it. Language-filter defect found and fixed by running the pipeline: unequal stopword profiles dropped 2 English records as Portuguese (`docs/preprocessing.md` §4.1). **OPEN-015 raised** - generator v1.1 substitution produced "corner of me" in 9/1,200 records; owned by Phase 9. |
+| 2026-08-11 | **Phase 13. Gate PASSED; every number PROVISIONAL.** `src/models/{dataset,classical}.py`, `scripts/run_baselines.py`, `tests/test_models.py` (19 tests, 416→435). Six systems scored under template-disjoint and random splits with bootstrap CIs. **The honest floor is the lexicon at 0.462** - both learned classical models score *below* it (LogReg 0.222, LinearSVC 0.181), while LinearSVC hits **1.000 on the random split**, a **+0.819** memorisation gap that is the strongest OPEN-012 evidence yet. **OPEN-028 raised:** the whole silver set is PRNG output keyed on the prompt hash, a consequence of OPEN-008 - single-label, 6/10 constructs, chance agreement; `--gold` refuses rather than falling back to it. |
+| 2026-08-10 | **Phase 9b. OPEN-018 and OPEN-020 CLOSED.** OPEN-020: template bank 7-12 -> **15 realisations per construct** (150 templates, 5 phrasings held out per construct against 2-4); realised vocabulary **625 -> 860** (+38%). OPEN-018: discourse suffixes became **clauses** rather than sentences after the obvious fix (a bigger suffix bank) was implemented and measured to do nothing - utterance duplication **87.4% -> 37.6%**, utterance count 13,651 -> 9,302, median utterance length 9 -> **17 tokens**. The ratchet flagged **28 new unruled substitution frames** and blocked the build until each was judged. All four gates re-run and PASSED; 253 tests. **OPEN-021 raised** - the lexicon baseline is NOT independent of the corpus (shared ancestry via `taxonomy.yaml` positive_examples): it fires on 73% of pre-9b templates and 22% of 9b templates, macro-F1 **0.780 -> 0.461**, and Phase 9's cue-fraction correction is **withdrawn**. |
+| 2026-08-10 | **Phase 9 follow-up. OPEN-016 and OPEN-017 CLOSED.** OPEN-016 by generation-time guard (generator **v1.3**, `substitution_verdicts.py`): defective records **190/1,200 → 0/4,000**, zero synonym groups deleted, realised vocabulary 643 → 625 against 594 had the 34 implicated members been deleted instead. OPEN-017 by raising `DEFAULT_COUNT` 1,200 → **4,000**: gold_eval **235 → 400** items, constructs below the 40-positive floor **7/10 → 0/10**. All four gates re-run and PASSED; 251 tests. **OPEN-020 raised** - corrected for the 0.62 cue fraction, 7/10 constructs still fall short, and the sweep shows no corpus size fixes it; the remedy is ~15 templates per construct. **OPEN-018 worsened as predicted**: utterance duplication 73.6% → **87.4%**. |
+| 2026-08-10 | **Phase 9. OPEN-015 CLOSED** - `("part","portion","corner","piece")` deleted, generator bumped to v1.2, corpus regenerated at seed 42, Phase 7 / Phase 8 / benchmark gates all re-run and PASSED. 4,110 → **4,141** utterances; memorisation probe 0.732/0.198 → 0.738/0.146. Four issues raised: **OPEN-016** (exhaustive synonym sweep - 727 substitution events, 127 flagged signatures, **15.8% of records still carry a broken/degraded substitution**; OPEN-015 was not isolated), **OPEN-017** (gold pool too small - 235 of a 400 target, 7/10 constructs below the 40-positive floor; 4,000 generated records measured as the minimum), **OPEN-018** (**73.6% utterance-level exact duplication**, a segmentation artefact invisible at record level; mitigated in the sampling plan), **OPEN-019** (`generation_spec` replicated onto every utterance). Three published numbers corrected: v1.1 vocabulary 638→**635**, distinct texts 1,163→**1,161**, `"corner of me"` 11→**9** in a code comment. Deliverables: `reports/eda.md`, 9 SVG figures, `notebooks/01_eda.ipynb`, `data/processed/gold_candidates/sampling_plan.json`. |
 
 ---
 
-## OPEN-020 — The template bank is too small for a defensible per-construct kappa
+## OPEN-020 - The template bank is too small for a defensible per-construct kappa
 
 **Status: CLOSED 2026-08-10 (Phase 9b).** The bank went from 7–12 realisations per construct
-to a uniform **15** — five per intensity level for the six graded constructs, five per label
+to a uniform **15** - five per intensity level for the six graded constructs, five per label
 for the four categorical ones. 150 templates against 85.
 
 | | Before | **After** |
@@ -1205,14 +1205,14 @@ for the four categorical ones. 150 templates against 85.
 | Distinct record texts | 94.9% | **97.2%** |
 | `gold_eval` / constructs below the 40-positive floor | 400 / 0 | 400 / **0** |
 
-**Five phrasings is not generous and the paper should say so** — but it is the difference
+**Five phrasings is not generous and the paper should say so** - but it is the difference
 between a kappa a reviewer interrogates and one they dismiss. Held by
 `tests/test_profile.py::test_every_construct_has_fifteen_templates`, which fails if the bank
 falls back below 14.
 
 **The new templates were written against `taxonomy.yaml`'s definitions and edge cases, and
 deliberately NOT against its `positive_examples`.** That choice was made to avoid reproducing
-the same phrasings twice — and it is what exposed **OPEN-021**, because the lexicon baseline's
+the same phrasings twice - and it is what exposed **OPEN-021**, because the lexicon baseline's
 cues came from those same examples. A methodological decision made for one reason turned out
 to be the instrument that falsified an unrelated claim.
 
@@ -1226,12 +1226,12 @@ difference between a control and a good intention.
 because it is the guard working in the direction that matters: *"after Tuesday's session"*
 tripped `test_generated_text_contains_no_personal_names`, whose heuristic flags mid-sentence
 capitalised tokens outside a known-safe list. The template was reworded. **The allow-list was
-not extended** — adding possessive weekday forms to a name guard is the kind of accretion that
+not extended** - adding possessive weekday forms to a name guard is the kind of accretion that
 eventually lets a real name through.
 
 **Original entry follows.**
 
-**Was:** OPEN — the residual of OPEN-017, and the last corpus-side blocker on
+**Was:** OPEN - the residual of OPEN-017, and the last corpus-side blocker on
 contribution #1
 **Owned by:** Phase 7 (generator), raised at Phase 9
 **Becomes blocking at:** **Phase 11.**
@@ -1240,7 +1240,7 @@ contribution #1
 
 **1. Coverage.** A record realises ~2 constructs across ~3.4 utterances, so ~38% of any gold
 sample carries no construct at all. Corrected for that, 7 of 10 constructs sit below the
-40-positive floor even at 4,000 records — and the sweep in OPEN-017 shows no corpus size fixes
+40-positive floor even at 4,000 records - and the sweep in OPEN-017 shows no corpus size fixes
 it, because the cue fraction is a per-record property. More construct realisations per record
 raises it directly.
 
@@ -1259,23 +1259,23 @@ contribution #1 and a reviewer will find it.**
 `config/taxonomy.yaml`. It is the single highest-value corpus action left, and unlike
 OPEN-011 it is entirely within the owner's control.
 
-**Do it together with OPEN-018's option (a)** — applying `_vary` to the discourse suffixes and
+**Do it together with OPEN-018's option (a)** - applying `_vary` to the discourse suffixes and
 neutral sentences. Both are template-bank edits, both need one regenerate-and-re-gate cycle,
 and both feed the same weakness.
 
 **Sequencing note.** New templates create new substitution frames, so
 `scripts/run_eda.py` will flag unruled signatures and the build will fail until each is ruled
-in `substitution_verdicts.VERDICTS`. That is the ratchet working, not an obstacle — but budget
+in `substitution_verdicts.VERDICTS`. That is the ratchet working, not an obstacle - but budget
 for it, and do not merge template work without re-running the sweep.
-| 2026-08-10 | **OPEN-003 CLOSED** — repository pushed to a private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`), 273 objects, `main` tracking `origin/main`. First off-machine backup since Phase 1. `.env` confirmed untracked before the push. Pushing is now part of every phase gate, not a one-off. |
+| 2026-08-10 | **OPEN-003 CLOSED** - repository pushed to a private GitHub remote (`gsaikalyan2-coder/sports-risk-nlp`), 273 objects, `main` tracking `origin/main`. First off-machine backup since Phase 1. `.env` confirmed untracked before the push. Pushing is now part of every phase gate, not a one-off. |
 
 ---
 
-## OPEN-021 — The lexicon baseline is not independent of the corpus
+## OPEN-021 - The lexicon baseline is not independent of the corpus
 
-**Status:** OPEN — a **reporting and framing** obligation, not a bug to fix
+**Status:** OPEN - a **reporting and framing** obligation, not a bug to fix
 **Owned by:** Phase 7 (evaluation harness), found at Phase 9b
-**Becomes blocking at:** **Phase 18** (results and ablations) — and it must be in the paper.
+**Becomes blocking at:** **Phase 18** (results and ablations) - and it must be in the paper.
 
 **The claim that was wrong.** `src/evaluation/baselines.py` documented `LexiconBaseline` as
 *"immune to the template leakage that inflates the others"*, and `CONSTRUCT_CUES` carried the
@@ -1287,7 +1287,7 @@ was judged.
 Avoiding induction from labels prevents **direct** inheritance. It does not prevent **shared
 ancestry**. Both the cue list and `src/ingestion/synthetic.py`'s template bank were written
 from `config/taxonomy.yaml`'s `positive_examples`, and several Phase 7 templates reproduce them
-close to verbatim — *"I'm just drained. I don't even care how this one goes anymore."* is
+close to verbatim - *"I'm just drained. I don't even care how this one goes anymore."* is
 simultaneously a taxonomy example and a generator template. The cues and the corpus are
 cousins, and the baseline scores partly by matching its own relative.
 
@@ -1318,7 +1318,7 @@ before v1.4 carries an upward bias.**
 Phase 9 used this lexicon as a proxy detector to estimate what share of gold candidates carry
 construct language, reported 0.62, and concluded 7 of 10 constructs were under-powered once
 corrected. That number measured overlap with the cue list. The tell is that the same proxy
-reports a *worse* figure on a corpus with twice the construct phrasings — which is not a
+reports a *worse* figure on a corpus with twice the construct phrasings - which is not a
 statement about constructs at all. `reports/eda.md` §7.4 no longer quotes a corrected floor;
 OPEN-017's residual can only be settled by annotation at Phase 11.
 
@@ -1335,15 +1335,15 @@ output relabelled *"Label-leakage-immune"* with an inline note, and §5b added t
 2. **Never reuse `LexiconBaseline` as a construct detector.** It is a baseline. Phase 9 used it
    as an instrument and got a number that measured the instrument.
 3. **Re-examine the same question for the transformer at Phase 14.** The gold set is human
-   labelled, so it does not share this ancestry — but the *silver* labels from Phase 10 will be
+   labelled, so it does not share this ancestry - but the *silver* labels from Phase 10 will be
    produced by an LLM given the taxonomy, including its `positive_examples`. That is the same
    shared-ancestry shape one level up, and it deserves to be checked rather than assumed away.
 
 ---
 
-## OPEN-022 — Template era is not recorded, so the OPEN-021 probe cannot be run properly
+## OPEN-022 - Template era is not recorded, so the OPEN-021 probe cannot be run properly
 
-**Status:** OPEN — new 2026-08-10
+**Status:** OPEN - new 2026-08-10
 **Owned by:** Phase 7 (generator) / Phase 10 (found here)
 **Becomes blocking at:** Phase 18 (the paper's limitations section)
 
@@ -1357,7 +1357,7 @@ because Phase 9b restructured the bank to five realisations per (construct, labe
 than appending to it. Nothing in the corpus records when a template was written.
 
 So `src/labeling/ancestry.py` falls back to lexical overlap with `taxonomy.yaml`'s
-`positive_examples` — a proxy for ancestry, and a coarse one. It is the available
+`positive_examples` - a proxy for ancestry, and a coarse one. It is the available
 substitute, not the preferred instrument.
 
 **Remedy (cheap, and it should be done before the corpus is regenerated again):** add an
@@ -1370,9 +1370,9 @@ a weaker probe than the one used for the lexicon, and the difference has to be a
 
 ---
 
-## OPEN-023 — The config's Phase 10 cost estimate is low by an order of magnitude
+## OPEN-023 - The config's Phase 10 cost estimate is low by an order of magnitude
 
-**Status:** OPEN — new 2026-08-10 (documented; the config comment is NOT yet corrected)
+**Status:** OPEN - new 2026-08-10 (documented; the config comment is NOT yet corrected)
 **Owned by:** Phase 6 (`config/model_routing.yaml`)
 **Becomes blocking at:** the first live labelling run, i.e. immediately
 
@@ -1380,7 +1380,7 @@ a weaker probe than the one used for the lexicon, and the difference has to be a
 a full labeling pass on the cheap tier"**, resting on "~400 input tokens (rubric is cached;
 only the utterance varies)".
 
-The assembled rubric prompt is **3,946 estimated tokens**, not 400 — ten construct
+The assembled rubric prompt is **3,946 estimated tokens**, not 400 - ten construct
 definitions, forty examples, ten edge-case notes, the intensity anchors and the five
 discriminating questions. The estimate was written at Phase 6, before the prompt existed,
 so Phase 10 is the first opportunity anyone has had to check it.
@@ -1409,11 +1409,11 @@ confident manifest is the failure it exists to prevent.
 
 **Not yet actioned:** the misleading comment block still sits in `config/model_routing.yaml`.
 It should be corrected in place, with the old figure kept and marked wrong rather than
-deleted — the same treatment Phase 9 gave the three incorrect `data_sources.md` figures.
+deleted - the same treatment Phase 9 gave the three incorrect `data_sources.md` figures.
 
 ---
 
-## OPEN-024 — The cost ledger was O(n^2) and had never been run at scale
+## OPEN-024 - The cost ledger was O(n^2) and had never been run at scale
 
 **Status: RESOLVED 2026-08-10, in the same session that found it.**
 **Owned by:** Phase 6
@@ -1425,7 +1425,7 @@ roughly 43 million row parses plus 39,000 filesystem syscalls, and the first ful
 run did not finish.
 
 Measured with cProfile: `_ensure_header` accounted for **11.2 of 11.9 seconds** on a
-600-prompt run — 95% of wall time spent re-asking whether a file it had just written to
+600-prompt run - 95% of wall time spent re-asking whether a file it had just written to
 still existed.
 
 **Fixed:** the month total is cached and maintained incrementally under the same lock as
@@ -1439,16 +1439,16 @@ could appear.
 
 ---
 
-## OPEN-025 — No second annotator. Contribution #1 does not exist yet.
+## OPEN-025 - No second annotator. Contribution #1 does not exist yet.
 
-**Status:** OPEN — new 2026-08-10 (the Phase 11 tooling is built; the person is not)
+**Status:** OPEN - new 2026-08-10 (the Phase 11 tooling is built; the person is not)
 **Owned by:** Phase 11
 **Becomes blocking at:** **now**
 
 `config/annotators.yaml` lists one annotator, A1 (the owner). Cohen's kappa is defined for a
 **pair**. Until a second person completes a pass, `data/gold/` holds a labelled set, not a
-gold standard, and contribution #1 — *"a construct-grounded athlete-text corpus with span→
-construct labels and reported inter-annotator agreement"* — is unsupported.
+gold standard, and contribution #1 - *"a construct-grounded athlete-text corpus with span→
+construct labels and reported inter-annotator agreement"* - is unsupported.
 
 **This is deliberately not routed around.** `scripts/run_annotation.py --agreement` reports
 UNMEASURABLE and exits non-zero on a single-annotator batch, and `compute_agreement` raises
@@ -1467,9 +1467,9 @@ phases.
 
 ---
 
-## OPEN-026 — Annotation burden is unmeasured, and Phase 12 depends on it
+## OPEN-026 - Annotation burden is unmeasured, and Phase 12 depends on it
 
-**Status:** OPEN — **half closed 2026-08-10 at Phase 12.** The arithmetic exists; the
+**Status:** OPEN - **half closed 2026-08-10 at Phase 12.** The arithmetic exists; the
 stopwatch does not.
 **Owned by:** Phase 11
 **Becomes blocking at:** **Phase 12** (the taxonomy freeze)
@@ -1484,7 +1484,7 @@ and the actual instrument cannot drift. Under the current 10 constructs it proje
 
 **That number is an estimate and the report says so in its own text, every time.** The timing
 constants were chosen, not observed. `TimingModel.measured` is `False`, `basis` reads
-`UNMEASURED ASSUMPTION (OPEN-026)`, and both the Markdown and the JSON carry it — because the
+`UNMEASURED ASSUMPTION (OPEN-026)`, and both the Markdown and the JSON carry it - because the
 failure mode this issue exists to prevent is an assumption quietly becoming a citation.
 
 **To close it:** time the `gold_dev` pass and re-run with
@@ -1494,7 +1494,7 @@ assumption. One stopwatch reading rescales the model for all 400 items.
 
 The marginal-cost table is the part that feeds the freeze: it reports what *dropping* each
 construct returns (≈1.33 h over `gold_eval`, 5.5% each), charging only the per-construct
-intensity judgement and never the shared span pass — overstating what a drop saves is how a
+intensity judgement and never the shared span pass - overstating what a drop saves is how a
 taxonomy gets trimmed for no gain.
 
 `config/taxonomy.yaml` states the construct set is *"FROZEN AT PHASE 12, after checking
@@ -1513,19 +1513,19 @@ trimmed on evidence if the measurement says 400 items is unreasonable. Trimming 
 is a Phase 12 owner decision, but it must be made against a measured burden, not a feeling.
 
 **The failure this prevents:** an annotator who rushes the last 200 items produces a worse
-dataset than one who carefully annotates 200, and the damage is invisible in the kappa — two
+dataset than one who carefully annotates 200, and the damage is invisible in the kappa - two
 tired annotators drift toward the same defaults and *agree more*.
 
 ---
 
-## OPEN-028 — The entire silver set is PRNG output, not labels
+## OPEN-028 - The entire silver set is PRNG output, not labels
 
-**Status:** OPEN — new 2026-08-11 (Phase 13)
+**Status:** OPEN - new 2026-08-11 (Phase 13)
 **Owned by:** Phase 10
 **Becomes blocking at:** **Phase 14**, which is specified as "fine-tune on gold+silver"
 
 `data/processed/silver/synth_precomp_v1/silver.jsonl` holds 9,302 rows that are well-formed,
-schema-valid, provenance-carrying, span-anchored — and contain no information about the text
+schema-valid, provenance-carrying, span-anchored - and contain no information about the text
 they are attached to.
 
 This is a **consequence of OPEN-008, not a separate defect.** No live OpenRouter call has ever
@@ -1533,7 +1533,7 @@ been made, so every silver row was produced by `OfflineLLM._synthesise_silver`
 (`src/agents/llm.py`), which selects a construct with
 `rng.randrange(len(self.constructs))` where `rng` is seeded from
 `sha256(f"{seed}:{system+user}")`. The label is a hash of the prompt. The stub is honest about
-this in its own docstring — *"The content is meaningless -- that is the point of a stub"* — and
+this in its own docstring - *"The content is meaningless -- that is the point of a stub"* - and
 the rationale string on every row reads *"shape is real, judgement is not."*
 
 **What was measured at Phase 13:**
@@ -1546,15 +1546,15 @@ the rationale string on every row reads *"shape is real, judgement is not."*
 | Silver construct ∈ parent's planted set | 20.2% | well above the 16.7% chance rate for a uniform pick over 6 |
 | Distinct texts with conflicting label sets | **580** | ~0 |
 
-The four missing constructs — `motivation_orientation`, `attentional_focus`, `coping_style`,
-`appraisal_orientation` — are the categorical ones. `scripts/run_labeling.py` deliberately
+The four missing constructs - `motivation_orientation`, `attentional_focus`, `coping_style`,
+`appraisal_orientation` - are the categorical ones. `scripts/run_labeling.py` deliberately
 gives the stub only the *graded* construct names, for a good reason (a categorical construct
 would come back with `value="present"` and the parser would correctly refuse it). That
 narrowing is correct for exercising the pipeline and fatal for using the output as data.
 
 **Demonstrated, not just asserted.** `python scripts/run_baselines.py --silver` runs the full
 Phase 13 harness over this source. Every system lands at ~0.10 macro-F1 on the
-template-disjoint split and the lexicon scores **0.040 — below stratified-random**. That
+template-disjoint split and the lexicon scores **0.040 - below stratified-random**. That
 collapse is the evidence.
 
 **Why this was not caught at Phase 10.** The Phase 10 gate checks that every label carries a
@@ -1566,13 +1566,13 @@ carefully written path that had never been run against the thing it was for.
 
 **What Phase 13 did about it:** `src/models/dataset.py` refuses to load this source unless the
 caller passes `acknowledge_no_signal=True`, and `load_gold` refuses outright rather than
-falling back to it — a fallback here would silently relabel a chance-agreement score as
+falling back to it - a fallback here would silently relabel a chance-agreement score as
 accuracy.
 
 **Resolution, in order:**
 
 1. `python scripts/refresh_pricing.py --check` (OPEN-009).
-2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` — the bounded pilot
+2. `python scripts/run_labeling.py --live --pricing-checked --limit 50` - the bounded pilot
    OPEN-008 already asks for. **Inspect the 50 labels by hand before going further**; that is
    the step whose absence created this issue.
 3. Full live pass, then re-run `python scripts/run_baselines.py --silver` and confirm the
@@ -1586,11 +1586,11 @@ like a dataset for a full phase.
 
 ---
 
-## OPEN-027 — The Potato ingest path has not been run against real Potato output
+## OPEN-027 - The Potato ingest path has not been run against real Potato output
 
-**Status:** ✅ **RESOLVED 2026-08-10 — and it was not a formality.** The path was broken.
+**Status:** ✅ **RESOLVED 2026-08-10 - and it was not a formality.** The path was broken.
 **Owned by:** Phase 11
-**Became blocking at:** the first completed annotation pass — reached before any human annotated
+**Became blocking at:** the first completed annotation pass - reached before any human annotated
 
 ### What resolving it found
 
@@ -1611,21 +1611,21 @@ is the failure this parser exists to prevent, and it was the failure it had.
 
 ### The fix
 
-`src/annotation/potato_output.py` — reads both real artifacts (`user_state.json`, and the
+`src/annotation/potato_output.py` - reads both real artifacts (`user_state.json`, and the
 `annotations.jsonl` the exporter writes) and normalises them to one payload. Span surface text
 is recovered by **slicing the utterance with Potato's own offsets**, which makes the
 "evidence spans must be literal substrings" invariant structural on the gold side rather than
 procedural. Out-of-range offsets are refused, never clipped. `_collect_spans` now raises
 `SPAN_WITHOUT_SURFACE` instead of skipping.
 
-`tests/test_potato_output.py` — 13 tests against **recorded real output** committed under
+`tests/test_potato_output.py` - 13 tests against **recorded real output** committed under
 `tests/fixtures/potato/`. Fixtures written by the parser's own author cannot detect the
 author's wrong assumption; a recorded artifact from the real library can, and did.
 
 ### What is still not closed by this
 
 The end-to-end run stops at the roster lock: `--ingest --annotator A2` is refused because A2
-is not a real person (**OPEN-025**). That refusal is correct and was left intact — the
+is not a real person (**OPEN-025**). That refusal is correct and was left intact - the
 agreement arithmetic is exercised in tests against a `tmp_path` store and a fixture roster,
 never by inventing an annotator in `config/annotators.yaml`.
 
@@ -1647,7 +1647,7 @@ This is the same shape as OPEN-007 (the CrewAI backend written but never execute
 Phase 10 live path: a code path that looks finished and has never met its real input.
 
 **Deliberately not resolved by fabricating gold.** Running the ingest CLI end-to-end would
-mean writing invented annotations into `data/gold/` under a real annotator id — precisely what
+mean writing invented annotations into `data/gold/` under a real annotator id - precisely what
 the four locks in `src/annotation/store.py` exist to prevent. A verification that requires
 violating the invariant it verifies is not a verification.
 
@@ -1659,7 +1659,7 @@ this during the `gold_dev` calibration pass, not after.
 
 ---
 
-## OPEN-029 — The Phase 14 training loop has been written but never executed
+## OPEN-029 - The Phase 14 training loop has been written but never executed
 
 **Status:** OPEN, raised 2026-08-11
 **Owned by:** Phase 14
@@ -1690,19 +1690,19 @@ None of these is a defect in the code, and none can be worked around from that e
 
 OPEN-007 (CrewAI backend), OPEN-008 (live OpenRouter call), OPEN-027 (Potato ingest) and now
 this one: a path written carefully against a documented interface and never executed.
-**OPEN-027 is the precedent that matters — when it was finally run, it was broken, in three
+**OPEN-027 is the precedent that matters - when it was finally run, it was broken, in three
 separate ways, one of which silently discarded evidence.** The lesson recorded there applies
 verbatim here: assume this path is broken until it has run.
 
 Specific things most likely to be wrong on first execution, in rough order of likelihood:
 
-1. DeBERTa-v3's sentencepiece tokenizer conversion under transformers 5.x — the usual
+1. DeBERTa-v3's sentencepiece tokenizer conversion under transformers 5.x - the usual
    failure mode is a slow-tokenizer fallback or an outright load error. `--base-model
    roberta-base` is the escape hatch and exists for this.
 2. `AutoModelForSequenceClassification` with `problem_type="multi_label_classification"`
    applies its own `BCEWithLogitsLoss` when `labels` are passed. This code passes no
    `labels` and computes the loss itself, precisely so `pos_weight` is not silently
-   dropped — but that arrangement should be confirmed against the installed version rather
+   dropped - but that arrangement should be confirmed against the installed version rather
    than trusted.
 3. CPU wall-clock. 4 epochs x 2,591 records x 256 tokens x 6 configurations x 2 splits is
    plausibly hours on a laptop CPU. Run one configuration first, without `--sweep`, and
@@ -1726,7 +1726,7 @@ this item with the observed numbers and whatever broke.
 **Do not quote a Phase 14 number until this is closed.** There are currently no Phase 14
 numbers to quote, which is the safe failure mode and should be kept that way.
 
-### Update 2026-08-11 — first execution attempted; predicted failure #1 hit immediately
+### Update 2026-08-11 - first execution attempted; predicted failure #1 hit immediately
 
 `python scripts/run_transformer.py --epochs 1 --max-length 128` was run on the owner machine.
 It reached the tokenizer load and stopped there. **Predicted failure #1 (DeBERTa-v3's
@@ -1734,8 +1734,8 @@ SentencePiece tokenizer under transformers 5.x) was correct**, though the mechan
 than anticipated: the missing package does not produce a missing-package error.
 
 `sentencepiece` was absent. transformers caught the resulting `ImportError`, fell back to a
-TikToken extractor, and that extractor attempted to parse `spm.model` — a SentencePiece
-protobuf — as a text BPE file, dying on a raw `\x0e` byte:
+TikToken extractor, and that extractor attempted to parse `spm.model` - a SentencePiece
+protobuf - as a text BPE file, dying on a raw `\x0e` byte:
 
 ```
 ValueError: Error parsing line b'\x0e' in ...\models--microsoft--deberta-v3-base\...\spm.model
@@ -1746,14 +1746,14 @@ names `sentencepiece` or suggests installing anything.
 
 **Three fixes, all landed:**
 
-1. `requirements-ml.txt` — `sentencepiece>=0.2` pinned, with the reason. Its absence from the
+1. `requirements-ml.txt` - `sentencepiece>=0.2` pinned, with the reason. Its absence from the
    ML layer was a genuine repository defect, not a machine-local one: **no environment
    provisioned from this file could ever have loaded the default base model.**
-2. `src/models/transformer.py` — `load_tokenizer()` translates this specific failure into
+2. `src/models/transformer.py` - `load_tokenizer()` translates this specific failure into
    `MLDependencyMissing` naming both the install command and the `--base-model roberta-base`
    escape hatch. Narrow by construction: it matches on both signatures and re-raises anything
    else untouched, because a confident wrong explanation is worse than none.
-3. `scripts/run_transformer.py` — catches `MLDependencyMissing` around training too, not only
+3. `scripts/run_transformer.py` - catches `MLDependencyMissing` around training too, not only
    at the import check, so it exits 2 (config error) instead of dumping a traceback. The
    tokenizer loads minutes into a run, well past the import check.
 
@@ -1765,7 +1765,7 @@ arrangement against the installed transformers version), #3 (CPU wall-clock) and
 by the per-epoch `best_state` copy) remain unexercised. The lesson from OPEN-027 stands
 until a run completes.
 
-### Update 2026-08-11 (second attempt) — two of the four predictions were right
+### Update 2026-08-11 (second attempt) - two of the four predictions were right
 
 **Still OPEN.** `reports/transformer.json` does not exist; no configuration has completed.
 
@@ -1774,7 +1774,7 @@ pinned in `requirements-ml.txt` and `load_tokenizer` translates the un-Googleabl
 `ValueError: Error parsing line b'\x0e'` into a message naming the real cause.
 
 Prediction 3 (CPU wall-clock) **was correct** and was worse than estimated, for a reason the
-prediction missed — the run was doing several times more work than it needed to:
+prediction missed - the run was doing several times more work than it needed to:
 
 | defect | fix | effect |
 |---|---|---|
@@ -1789,7 +1789,7 @@ associativity. `tests/test_transformer.py` asserts that every token the mask mar
 survives trimming unchanged.
 
 **The HF token warning is not a defect and needs no action.** It is a rate-limit notice; the
-371 MB download completed. No token, and no account, is required to fetch public weights —
+371 MB download completed. No token, and no account, is required to fetch public weights -
 which also preserves the "a reviewer reproduces the artifact with no account" property that
 `CLAUDE.md` §10 established at Phase 6.
 
@@ -1804,7 +1804,7 @@ run. `scripts/diagnose_transformer.py` walks the load-tokenize-forward-backward 
 flushed step at a time and projects total sweep time, for the next time a run dies without a
 traceback.
 
-### Update 2026-08-12 — RESOLVED. The path ran, and prediction 2 was wrong in the project's favour
+### Update 2026-08-12 - RESOLVED. The path ran, and prediction 2 was wrong in the project's favour
 
 **Status: ✅ RESOLVED 2026-08-12.** `reports/transformer.json` exists. Six configurations
 completed on the template-disjoint split plus the best on the random split.
@@ -1820,21 +1820,21 @@ completed on the template-disjoint split plus the best on the random split.
 
 **Unlike OPEN-027, the path was not broken.** The predictions in the original entry scored:
 
-1. **DeBERTa-v3 tokenizer — correct.** Failed exactly as predicted. Fixed by pinning
+1. **DeBERTa-v3 tokenizer - correct.** Failed exactly as predicted. Fixed by pinning
    `sentencepiece` and translating the un-Googleable tiktoken `ValueError` in `load_tokenizer`.
-2. **`pos_weight` silently dropped — wrong.** The custom loss is computed outside the model and
+2. **`pos_weight` silently dropped - wrong.** The custom loss is computed outside the model and
    `pos_weight` was applied as intended.
-3. **CPU wall-clock — correct, and worse than estimated**, for a reason the prediction missed: the
+3. **CPU wall-clock - correct, and worse than estimated**, for a reason the prediction missed: the
    run was doing ~5x more work than needed (`max_length=256` against a 125-token corpus, fixed
    padding against a 50-token median). Fixed; see the 2026-08-11 update.
-4. **`best_state` memory — not a problem** at distilroberta size across six configurations.
+4. **`best_state` memory - not a problem** at distilroberta size across six configurations.
 
 ### Findings worth carrying into the paper
 
 **Threshold tuning degraded macro-F1 in all six configurations**, by 0.014 to 0.112. The best
 untuned result (0.639 at lr3e-5, thresholds fixed at 0.5) beats the best tuned result (0.588).
 Per-construct thresholds fitted on a 355-record validation slice were fitting noise. This argues
-for dropping the ten tuned parameters entirely — the rare case where the more conservative choice
+for dropping the ten tuned parameters entirely - the rare case where the more conservative choice
 also scores better. Caveat recorded in `docs/model_card.md` §7 item 9: the conclusion was reached
 after seeing test results, and while the direction of travel is toward *fewer* parameters and the
 effect is consistent across all six runs, it is still a decision informed by the test split.
@@ -1852,7 +1852,7 @@ corpus property of `synth_precomp_v1`.
 
 ---
 
-## OPEN-030 — The ethics exemption predates the A5 amendment
+## OPEN-030 - The ethics exemption predates the A5 amendment
 
 **Status:** OPEN, raised 2026-08-11
 **Owned by:** Phase 5 / ethics
@@ -1874,13 +1874,13 @@ both. Do it before submission.
 
 ---
 
-## OPEN-031 — A5 route (b) was blocked by Reddit; the amendment is now unused
+## OPEN-031 - A5 route (b) was blocked by Reddit; the amendment is now unused
 
 **Status:** OPEN (route closed, decision pending), raised 2026-08-12
 **Owned by:** Phase 7
 **Blocking at:** OPEN-011, which remains the project's highest live risk
 
-C2 route (b) — unauthenticated public JSON — was added 2026-08-12 because the owner could not
+C2 route (b) - unauthenticated public JSON - was added 2026-08-12 because the owner could not
 register a Reddit application. It was exercised the same day.
 
 **Every request returned `HTTP 403 Blocked`.** Eight of eight communities, zero posts fetched,
@@ -1891,8 +1891,8 @@ an obstacle. It was applied without argument: **no User-Agent rotation, no proxy
 impersonation, no retry schedule.** Each of those is circumvention of an access control (**P5**),
 and P5 stands unweakened under A5.
 
-**Consequence.** The A5 amendment — which narrowed a previously absolute prohibition and cost a
-recorded residual ethical concession (§3.5.2) — has produced **no data**. It is retained in the
+**Consequence.** The A5 amendment - which narrowed a previously absolute prohibition and cost a
+recorded residual ethical concession (§3.5.2) - has produced **no data**. It is retained in the
 policy rather than reverted, so the audit trail shows the permissive route was tried, failed, and
 was not worked around.
 
@@ -1910,7 +1910,7 @@ report the attempt and the block as a finding about the accessibility of social 
 
 ---
 
-## OPEN-032 — A3 donor mapping must live outside the repository
+## OPEN-032 - A3 donor mapping must live outside the repository
 
 **Status:** OPEN, raised 2026-08-12
 **Owned by:** Phase 7 / ethics
@@ -1920,7 +1920,7 @@ report the attempt and the block as a finding about the accessibility of social 
 which `record_id` belongs to which donor, which means a name↔id mapping has to exist somewhere.
 
 **It must never be in git.** `scripts/run_donation.py` reads only text and coarse metadata into
-`data/` — verified: a donor name placed in the inbox file does not reach `data/`. But the inbox
+`data/` - verified: a donor name placed in the inbox file does not reach `data/`. But the inbox
 file itself, and any signed consent forms, contain real names. A file committed once is committed
 forever, and `.gitignore` does not help retroactively.
 
@@ -1928,17 +1928,17 @@ forever, and `.gitignore` does not help retroactively.
 
 1. Add `donations_inbox*.jsonl` and `consent_forms/` to `.gitignore`.
 2. Keep signed forms outside the repository directory entirely.
-3. Record where the mapping lives in `docs/security.md` — a withdrawal route nobody can find is
+3. Record where the mapping lives in `docs/security.md` - a withdrawal route nobody can find is
    the same as no withdrawal route.
 
 ---
 
-## OPEN-025 update 2026-08-12 — RESOLVED. A2 recruited.
+## OPEN-025 update 2026-08-12 - RESOLVED. A2 recruited.
 
 **Status: ✅ RESOLVED 2026-08-12** (annotation not yet performed).
 
 A second annotator has agreed: a teammate of the owner with sports-domain familiarity.
-`config/annotators.yaml` now lists **A1 and A2**, kept pseudonymous per that file's header —
+`config/annotators.yaml` now lists **A1 and A2**, kept pseudonymous per that file's header -
 the paper reports per-annotator statistics, and a published kappa table naming two students is a
 disclosure nobody consented to.
 
@@ -1956,7 +1956,7 @@ A1's row is the cheapest way to fake a second annotator and produce a kappa of 1
 ### What remains before a kappa exists
 
 1. A2 reads `docs/annotation_guidelines.md` and `onboarding/README.md`.
-2. Calibration pass on `data/processed/gold_candidates/gold_dev.jsonl` — 100 items, ~3.03 h
+2. Calibration pass on `data/processed/gold_candidates/gold_dev.jsonl` - 100 items, ~3.03 h
    estimated, **split across two sittings**. `reports/annotation_burden.md` warns that a rushed
    second half *raises* kappa while *lowering* data quality, because tired annotators drift toward
    shared defaults. Agreeing more is not the goal.
@@ -1967,7 +1967,7 @@ A1's row is the cheapest way to fake a second annotator and produce a kappa of 1
 ### What this does NOT resolve
 
 **OPEN-004 (Phase 17 expert rater) is a different requirement and is still open.** Phase 17's
-contribution is that explanations were validated by *coaches or sport-psychology practitioners* —
+contribution is that explanations were validated by *coaches or sport-psychology practitioners* -
 people who work with athletes professionally. A teammate with sports-domain familiarity is a
 perfectly good annotator, and is not the same thing as a practitioner rater.
 
@@ -1984,7 +1984,7 @@ match the raters.
 
 ---
 
-## OPEN-034 — a presence-only claim gate certified a claim its evidence contradicted
+## OPEN-034 - a presence-only claim gate certified a claim its evidence contradicted
 
 **Status:** CLOSED 2026-08-13, same session, Phase 18. Recorded because the
 *shape* of the defect recurs and the lesson is cheaper than rediscovering it.
@@ -1999,7 +1999,7 @@ On the first real run it passed, all seven claims green. One of them was wrong.
 
 The claim `silver_is_noise` read *"training on it degrades rather than improves a
 model"*. The `silver_classical` ablation had just measured **delta = +0.033 at
-p = 0.110** — no significant change in either direction, and the point estimate
+p = 0.110** - no significant change in either direction, and the point estimate
 pointing the *opposite* way from the sentence. The gate saw a populated evidence
 key and stopped looking.
 
@@ -2028,21 +2028,21 @@ failure message says so in those words.
 
 ---
 
-## OPEN-035 — `scripts/run_evaluation.py --cache-predictions` has not been run on the real checkpoint
+## OPEN-035 - `scripts/run_evaluation.py --cache-predictions` has not been run on the real checkpoint
 
-**Status:** OPEN — new 2026-08-13, Phase 18
+**Status:** OPEN - new 2026-08-13, Phase 18
 **Owned by:** Phase 18
-**Becomes blocking at:** immediately — `reports/results.md` does not exist until it runs.
+**Becomes blocking at:** immediately - `reports/results.md` does not exist until it runs.
 
 Same environment constraint as OPEN-033: the authoring session's sandbox has no
-torch (and Python 3.10, not the project's 3.11), so step 1 — loading the Phase 14
-checkpoint and dumping per-construct probabilities — has never executed.
+torch (and Python 3.10, not the project's 3.11), so step 1 - loading the Phase 14
+checkpoint and dumping per-construct probabilities - has never executed.
 
 **Unlike OPEN-033, the untested surface here is small and named.** Step 1 is
 roughly forty lines and calls only APIs that Phase 14 and Phase 17 have both
 already exercised in anger: `TransformerBaseline.load`, `predict_proba`,
-`predict`, `manifest`. Everything downstream of the cache — all scoring, all
-three ablations, the claim ledger, the figures, the report — was executed
+`predict`, `manifest`. Everything downstream of the cache - all scoring, all
+three ablations, the claim ledger, the figures, the report - was executed
 end-to-end in the authoring session against a scratch cache in `/tmp`, and the
 classical rows it produced reproduce the published Phase 13 numbers exactly
 (lexicon 0.462, TF-IDF+LogReg 0.222 template-disjoint; TF-IDF+LogReg 0.999 on the
@@ -2050,7 +2050,7 @@ random split). That is a meaningful cross-check: the new harness and the Phase 1
 harness agree to three decimals on the same data.
 
 **One consequence to expect and not misread.** In the scratch run the gate
-FAILED on `transformer_beats_lexicon`, correctly — the stand-in "transformer" in
+FAILED on `transformer_beats_lexicon`, correctly - the stand-in "transformer" in
 that cache *was* the lexicon, so delta was 0 and the predicate refused it. On the
 real checkpoint Phase 14 measured 0.588 vs 0.462 at p = 0.000, so the claim
 should pass. If it does not, that is a finding, not a bug to tune around.
@@ -2064,7 +2064,7 @@ and record the outcome here. Closes on the first successful pair.
 
 ---
 
-## OPEN-036 — a module-level import cycle that a full-suite pytest run hides
+## OPEN-036 - a module-level import cycle that a full-suite pytest run hides
 
 **Status: CLOSED 2026-08-16 (Phase 19), same session it was found.**
 **Owned by:** Phase 18 · **Found at:** Phase 19 pre-commit verification
@@ -2106,7 +2106,7 @@ suite passes" being accepted as "the modules import"**.
 Same shape as OPEN-034, Phase 17's ethics guard, and Phase 9b's duplication
 fix: *the check and the thing it protects were related by assumption rather
 than by construction.* A green `pytest -q` is evidence about one import order,
-not about importability — and nothing in the suite asserted the difference until
+not about importability - and nothing in the suite asserted the difference until
 now.
 
 **Carry forward:** an aggregate pass is not a per-module pass. Where import
@@ -2115,7 +2115,7 @@ the condition it claims to check rather than inherit it from the runner.
 
 ---
 
-## OPEN-037 — a measured figure quoted without the condition that produced it
+## OPEN-037 - a measured figure quoted without the condition that produced it
 
 **Status: CLOSED 2026-09-23 (Phase 32 review), before the work was merged.**
 **Owned by:** Phase 31 · **Found at:** Phase 32 self-review
@@ -2124,7 +2124,7 @@ Two instances of one shape, found together:
 
 1. **"20.2%" quoted with no cue list.** It is the silence rate of the *widened*
    demo cue list. The frozen list the paper evaluates is silent on 58.8% of the
-   same corpus — a factor of three. Phase 32 propagated the bare figure into
+   same corpus - a factor of three. Phase 32 propagated the bare figure into
    six lines across five files (`docs/dashboard.md`, `docs/model_card.md`, the
    plan, `src/dashboard/copy.py`, `src/dashboard/coverage.py` twice), the worst
    being `docs/model_card.md`, whose §4–§5 evaluation uses
@@ -2137,7 +2137,7 @@ Two instances of one shape, found together:
    instrument at all and "2 of 8" is reached by 2 texts in 100.
 
 **The shape.** Both are a measurement quoted outside the conditions it was taken
-under — the same family as OPEN-034 (a presence-only gate certifying a claim its
+under - the same family as OPEN-034 (a presence-only gate certifying a claim its
 evidence contradicted) and OPEN-036 (an aggregate pass read as a per-module
 pass). A number is not portable just because it is true.
 
@@ -2151,7 +2151,7 @@ quotation was a copy of a copy with nothing to check it against.
   one table, so the number has a reproducible source and its list is printed
   beside it. `src/evaluation/abstention.py::silence_rates` computes it; it is
   the one place the widened list is measured, and it measures coverage, never
-  accuracy — every *scored* figure in that module still uses the frozen list.
+  accuracy - every *scored* figure in that module still uses the frozen list.
 * Every site quoting a silence rate now carries both figures and cites §4.
 * The plan's §5, `docs/model_card.md` and the plan's DoD carry the measured
   distribution instead of the hand-picked best case.
@@ -2161,9 +2161,9 @@ quotation was a copy of a copy with nothing to check it against.
 `test_the_frozen_lists_two_silence_figures_differ_only_by_the_refused` in
 `tests/test_abstention.py`; and
 `test_a_realistic_passage_speaks_to_a_minority_of_the_instrument_set` in
-`tests/test_coverage.py`, whose bound was tightened from `mean < 2.0` — which the
+`tests/test_coverage.py`, whose bound was tightened from `mean < 2.0` - which the
 real mean of 0.62 clears by a factor of three, so it passed however much the
-finding softened — to the measured shape in both directions.
+finding softened - to the measured shape in both directions.
 
 **Carry forward:** a figure that is only in a commit message is not a
 measurement anybody can check. If a number is worth quoting twice, it belongs in

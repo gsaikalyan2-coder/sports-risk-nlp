@@ -45,7 +45,7 @@ from src.dashboard import (  # noqa: E402
     theme,
 )
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 st.markdown('<p class="mono-label">Corpus</p>', unsafe_allow_html=True)
@@ -84,7 +84,7 @@ st.markdown("## Row by row")
 for lane in cloud.lanes:
     middle = lane.median.display if lane.median else "no middle to report"
     st.markdown(
-        f"**{lane.plain_name}** &mdash; {lane.n_planted} records planted, "
+        f"**{lane.plain_name}** - {lane.n_planted} records planted, "
         f"{lane.n_scored} scored, middle {middle}"
     )
 

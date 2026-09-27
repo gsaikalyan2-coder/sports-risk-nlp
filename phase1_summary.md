@@ -14,7 +14,7 @@ them into an **interpretable psychological risk index** with span-level explanat
 
 - **Explicitly NOT** sentiment analysis and **NOT** clinical diagnosis of any real named person.
 - **Framing:** research / decision-support for coaches and researchers.
-- **Target venue:** IEEE conference (iTriply Explore) — full paper.
+- **Target venue:** IEEE conference (iTriply Explore) - full paper.
 - **Timeline:** 8 weeks; code freeze ~Week 7; paper draft by 1st week of September 2026.
 - **Governing docs:** `.claude.md` (standing brief / single source of truth) and `PROJECT_PLAN.md`
   (25-phase blueprint).
@@ -49,12 +49,12 @@ Phase 1 = **repository reset and re-scaffold from scratch**, plus locking projec
 | Explainability | SHAP + attention rollout | Maps text spans → constructs → risk |
 | Dashboard | Streamlit | Fast Python demo |
 | Paper | LaTeX (IEEE template) | Venue requirement |
-| Expansions | Temporal / Multimodal / Team-aggregation / Outcome-linkage — **all parked until after Phase 19**; only Outcome-linkage attempted in-window | Protect the deadline; rest documented as "Future Work" |
+| Expansions | Temporal / Multimodal / Team-aggregation / Outcome-linkage - **all parked until after Phase 19**; only Outcome-linkage attempted in-window | Protect the deadline; rest documented as "Future Work" |
 | Repo | Full rewrite; previous version deleted | Owner wanted a clean slate |
 
 ---
 
-## 4. Artifacts Produced — Locations & Status
+## 4. Artifacts Produced - Locations & Status
 
 All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 
@@ -66,7 +66,7 @@ All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 | Construct taxonomy (8 constructs, CSAI-2/ABQ/SDT-anchored) | `config/taxonomy.yaml` | ✅ Seeded; refine in Phase 12 |
 | LLM cost routing (cheap/mid/premium + budget) | `config/model_routing.yaml` | ⚠️ Model IDs are placeholders `<...-model-id>` |
 | Global settings (seed, splits, base model) | `config/settings.yaml` | ✅ Complete |
-| Python packages (ingestion, preprocessing, taxonomy, labeling, models, risk, explainability, evaluation, agents) | `src/*/__init__.py` | ⬜ Empty stubs — no logic yet |
+| Python packages (ingestion, preprocessing, taxonomy, labeling, models, risk, explainability, evaluation, agents) | `src/*/__init__.py` | ⬜ Empty stubs - no logic yet |
 | Data tiers | `data/{raw,interim,processed/silver,gold,external}/` | ⬜ Empty (`.gitkeep` only) |
 | Doc stubs | `docs/{annotation_guidelines,related_work,ethics,security,model_card}.md` | ⬜ Headings only |
 | Dashboard stub | `dashboard/app.py` | ⬜ Skeleton with TODOs |
@@ -75,7 +75,7 @@ All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 | Dependency manifest | `requirements.txt`, `pyproject.toml` | ⚠️ Written but **not yet installed/verified** |
 | Container | `Dockerfile`, `docker-compose.yml` (app + dashboard) | ⚠️ Written but **not yet built** |
 | Secrets template | `.env.example` | ✅ Complete |
-| Existing secrets file | `.env` | ⚠️ Pre-existing (55 bytes); contents [UNVERIFIED — CONFIRM WHAT KEY IT HOLDS]; gitignored |
+| Existing secrets file | `.env` | ⚠️ Pre-existing (55 bytes); contents [UNVERIFIED - CONFIRM WHAT KEY IT HOLDS]; gitignored |
 
 ---
 
@@ -90,7 +90,7 @@ All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 - No virtual environment created; dependencies **not installed**.
 - Docker images **not built**; container run **not verified**.
 - No pre-commit hooks (formatter / secret scan) configured yet.
-- All `src/` modules are empty — no pipeline logic exists yet.
+- All `src/` modules are empty - no pipeline logic exists yet.
 - No data ingested; no models; no OpenRouter connectivity tested.
 
 ---
@@ -111,11 +111,11 @@ All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 
 ## 7. Dependencies & Prerequisites for Phase 2
 
-1. **Python 3.11** installed locally — [CONFIRM INSTALLED].
-2. **Docker Desktop** installed and running — [CONFIRM INSTALLED].
-3. **VS Code** with Python + Docker extensions — [CONFIRM].
+1. **Python 3.11** installed locally - [CONFIRM INSTALLED].
+2. **Docker Desktop** installed and running - [CONFIRM INSTALLED].
+3. **VS Code** with Python + Docker extensions - [CONFIRM].
 4. Network access to PyPI for `pip install`.
-5. (Not blocking for Phase 2, needed by Phase 6) **OpenRouter account + API key + monthly budget** — [NOT YET OBTAINED].
+5. (Not blocking for Phase 2, needed by Phase 6) **OpenRouter account + API key + monthly budget** - [NOT YET OBTAINED].
 
 ---
 
@@ -137,10 +137,10 @@ All paths are under the project root `C:\Users\x\sports-risk-nlp`.
 
 ## 9. Lessons Learned / Team Notes to Preserve
 
-- **Nothing recoverable remains from the old project** — the prior scraped corpus, labeled CSVs, and
+- **Nothing recoverable remains from the old project** - the prior scraped corpus, labeled CSVs, and
   trained RoBERTa/HRV-fusion models were deleted at the owner's request. Phase 7 data must be sourced fresh.
 - The owner prefers **concise, direct** communication and to **be taught while doing** (sophomore level).
-- **Ask before locking any new tool/library** — decisions must be confirmed, not assumed (`.claude.md` §8).
+- **Ask before locking any new tool/library** - decisions must be confirmed, not assumed (`.claude.md` §8).
 - Keep `.claude.md` updated whenever a decision changes; it is the single source of truth.
 - Ethics framing (research/decision-support, de-identification, non-diagnosis) is mandatory and must
   survive into the paper.

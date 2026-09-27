@@ -1,4 +1,4 @@
-"""Phase 21 — the re-runnable half of the security audit.
+"""Phase 21 - the re-runnable half of the security audit.
 
 Why this is a package and not a terminal transcript
 ---------------------------------------------------

@@ -1,4 +1,4 @@
-# Construct taxonomy — the academic backbone of the project.
+# Construct taxonomy - the academic backbone of the project.
 #
 # Each construct maps to a validated sports-psychology instrument or an established
 # theoretical source so that labels are reviewer-defensible. Every `instrument_anchor`
@@ -8,8 +8,8 @@
 #   - GRADED constructs  -> presence (0/1) + intensity (0=none, 1=mild, 2=moderate, 3=strong)
 #   - CATEGORICAL constructs -> one label from `labels`, plus intensity for the non-`none` label
 #
-# The full labelling rubric — span rules, intensity anchors, decision rules, worked
-# examples — lives in docs/annotation_guidelines.md. Keep the two files in sync.
+# The full labelling rubric - span rules, intensity anchors, decision rules, worked
+# examples - lives in docs/annotation_guidelines.md. Keep the two files in sync.
 #
 # DO NOT add or remove constructs without owner sign-off. Final set frozen at Phase 12.
 #
@@ -23,7 +23,7 @@ intensity_scale: [0, 1, 2, 3]   # 0 none, 1 mild, 2 moderate, 3 strong
 # ---------------------------------------------------------------------------
 # ETHICS NOTE (must survive into the paper)
 # These constructs describe LANGUAGE, not people. A label records that a span of
-# text expresses a construct — it is not a diagnosis, a clinical judgement, or a
+# text expresses a construct - it is not a diagnosis, a clinical judgement, or a
 # claim about any named individual's mental health. Research and decision-support
 # only. See docs/ethics.md (Phase 5).
 # ---------------------------------------------------------------------------
@@ -33,7 +33,7 @@ constructs:
   cognitive_anxiety:
     label_type: graded
     definition: >
-      Negative expectations and worry about performance — fear of failure, rumination,
+      Negative expectations and worry about performance - fear of failure, rumination,
       self-doubt, or catastrophising about the upcoming competition. The mental
       component of competitive anxiety, as distinct from bodily arousal.
     instrument_anchor: "CSAI-2 cognitive-anxiety subscale [Martens1990; Cox2003]"
@@ -53,14 +53,14 @@ constructs:
   somatic_anxiety:
     label_type: graded
     definition: >
-      Perception of bodily arousal or physiological tension tied to the competition —
+      Perception of bodily arousal or physiological tension tied to the competition -
       racing heart, butterflies, shakiness, nausea, tight muscles, disturbed sleep.
       The physical component of competitive anxiety.
     instrument_anchor: "CSAI-2 somatic-anxiety subscale [Martens1990; Cox2003]"
     risk_direction: raises
     positive_examples:
       - "My stomach is in knots and my hands won't stop shaking."
-      - "I couldn't sleep at all the night before — heart going the whole time."
+      - "I couldn't sleep at all the night before - heart going the whole time."
     negative_examples:
       - "I feel calm and physically ready."
       - "My legs feel fresh after the taper."
@@ -68,7 +68,7 @@ constructs:
       Injury or illness symptoms with no anxiety framing = 0 (e.g. "my hamstring is tight"
       is not somatic anxiety). Fatigue from training load alone = 0; route that to
       burnout_signal only if exhaustion language is present. Bodily arousal described as
-      welcome (e.g. "good nerves") is still somatic_anxiety — the direction is captured
+      welcome (e.g. "good nerves") is still somatic_anxiety - the direction is captured
       separately by interpretation_modifier, not by lowering intensity.
 
   self_confidence:
@@ -88,7 +88,7 @@ constructs:
       Confidence in the TEAM or in a coach, with no self-reference, = 0. Bravado that the
       surrounding text contradicts should be labelled at low intensity, and the contradiction
       noted; do not infer insincerity beyond what the text shows. Absence of confidence
-      language is 0, not low confidence — under-confidence is captured by a LOW
+      language is 0, not low confidence - under-confidence is captured by a LOW
       self_confidence intensity only when the text expresses doubt.
 
   motivation_orientation:
@@ -100,7 +100,7 @@ constructs:
     labels: [approach, avoidance, mixed, none]
     risk_direction: "avoidance raises risk; approach lowers it"
     positive_examples:
-      - "I want to go out and take the race on — see what I'm capable of."     # approach
+      - "I want to go out and take the race on - see what I'm capable of."     # approach
       - "I just don't want to embarrass myself in front of that crowd."        # avoidance
       - "I want the win, but mostly I need to not choke like last time."       # mixed
     negative_examples:
@@ -116,14 +116,14 @@ constructs:
   perceived_stress:
     label_type: graded
     definition: >
-      Sense that competitive or surrounding demands exceed available resources —
+      Sense that competitive or surrounding demands exceed available resources -
       feeling overloaded, pressured, stretched, or unable to control what is coming.
       Distinct from cognitive_anxiety: stress is about DEMAND vs. RESOURCE, anxiety is
       about WORRY over the outcome.
     instrument_anchor: "Perceived Stress Scale [Cohen1983]; pre-competition stress in athletes [Toth2025]"
     risk_direction: raises
     positive_examples:
-      - "There's just too much on right now — exams, selection, and now this meet."
+      - "There's just too much on right now - exams, selection, and now this meet."
       - "Everyone wants something from me this week and I can't keep up."
       - "It feels like it's all out of my hands."
     negative_examples:
@@ -138,13 +138,13 @@ constructs:
   attentional_focus:
     label_type: categorical
     definition: >
-      Direction and stability of attention — task-focused concentration on controllables
+      Direction and stability of attention - task-focused concentration on controllables
       versus distraction by irrelevant cues, the outcome, the crowd, rivals, or media.
     instrument_anchor: "Attentional width/direction model and TAIS [Nideffer1976]"
     labels: [focused, distracted, mixed, none]
     risk_direction: "distracted raises risk; focused lowers it"
     positive_examples:
-      - "All I'm thinking about is my first 200 metres — nothing past that."   # focused
+      - "All I'm thinking about is my first 200 metres - nothing past that."   # focused
       - "I keep checking what the other lane is doing instead of my own race." # distracted
       - "I know my plan, but the crowd noise keeps pulling me out of it."      # mixed
     negative_examples:
@@ -160,7 +160,7 @@ constructs:
     label_type: graded
     definition: >
       Emotional and physical exhaustion, reduced sense of accomplishment, or sport
-      devaluation — the three ABQ dimensions. Signals depletion and disengagement rather
+      devaluation - the three ABQ dimensions. Signals depletion and disengagement rather
       than acute pre-competition arousal.
     instrument_anchor: "Athlete Burnout Questionnaire [Raedeke2001]; coping-burnout link [Madigan2020]"
     risk_direction: raises
@@ -180,7 +180,7 @@ constructs:
   coping_style:
     label_type: categorical
     definition: >
-      How the athlete manages competitive pressure — TASK-FOCUSED coping (planning,
+      How the athlete manages competitive pressure - TASK-FOCUSED coping (planning,
       reappraisal, routine, seeking support, problem-solving) versus AVOIDANCE coping
       (disengagement, distraction, denial, suppression, withdrawal).
     instrument_anchor: "Coping in sport systematic review [Nicholls2007]; coping and burnout [Madigan2020]"
@@ -194,7 +194,7 @@ constructs:
       - "The nerves are pretty bad this week."
       - "I warm up ninety minutes before."
     edge_cases: >
-      A described strategy is required — merely naming an emotion is not coping. Deliberate
+      A described strategy is required - merely naming an emotion is not coping. Deliberate
       pre-race distraction as a planned routine ("I read a book to switch off") is
       `task_focused`, not `avoidance`, when framed as an intentional strategy. Refusing to
       acknowledge a problem is `avoidance`.
@@ -203,21 +203,21 @@ constructs:
     label_type: graded
     definition: >
       Expressed capacity to maintain or recover psychological functioning under competitive
-      pressure — bounce-back after setbacks, steadiness, confidence in handling adversity.
+      pressure - bounce-back after setbacks, steadiness, confidence in handling adversity.
       Distinct from self_confidence: confidence is about EXPECTED SUCCESS, resilience is
       about RECOVERY IF THINGS GO WRONG.
     instrument_anchor: "CD-RISC resilience construct [Connor2003]; resilience as mediator in athletes [Li2025]"
     risk_direction: lowers
     positive_examples:
       - "Whatever happens out there, I know I can reset and keep going."
-      - "I've been behind before and come back — that doesn't scare me."
+      - "I've been behind before and come back - that doesn't scare me."
     negative_examples:
       - "If I make one mistake early I know I'll fall apart."
       - "One bad start and the whole thing is gone."
     edge_cases: >
       Requires an explicit or implied SETBACK-and-recovery frame. Generic optimism with no
       adversity reference = 0 (label self_confidence instead). Negative examples above express
-      LOW resilience — record them as resilience intensity 0 and, where the fragility is
+      LOW resilience - record them as resilience intensity 0 and, where the fragility is
       explicit, note it via the low-resilience flag described in the guidelines.
 
   appraisal_orientation:
@@ -231,23 +231,23 @@ constructs:
     risk_direction: "threat raises risk; challenge lowers it"
     positive_examples:
       - "This is exactly the kind of field I've been waiting to test myself against."  # challenge
-      - "This field is way above me — I'm going to get exposed out there."             # threat
+      - "This field is way above me - I'm going to get exposed out there."             # threat
       - "It's a huge opportunity, but I'm not sure I'm ready for it."                  # mixed
     negative_examples:
       - "It's a strong field this year."
       - "The final is on Sunday."
     edge_cases: >
-      A neutral statement of difficulty is `none` — appraisal requires the athlete to
+      A neutral statement of difficulty is `none` - appraisal requires the athlete to
       position THEMSELVES against the demand. Threat appraisal frequently co-occurs with
       cognitive_anxiety; label both when both are present. `challenge` does not require
       expressed confidence, only sufficiency of resources.
 
 # ---------------------------------------------------------------------------
-# Directional modifier — NOT a standalone construct.
+# Directional modifier - NOT a standalone construct.
 # For cognitive_anxiety and somatic_anxiety, record how the athlete INTERPRETS the
 # arousal: facilitative (helpful, sharpening) vs. debilitative (harmful, undermining).
 # Two athletes with identical anxiety intensity can carry very different risk depending
-# on this direction — this is the intensity/direction distinction from Jones1992 and is
+# on this direction - this is the intensity/direction distinction from Jones1992 and is
 # why the project does not treat "anxiety" as monolithically bad.
 # ---------------------------------------------------------------------------
 interpretation_modifier:
@@ -257,7 +257,7 @@ interpretation_modifier:
   default: unclear
   note: "debilitative interpretation raises risk even at equal intensity"
   positive_examples:
-    - "The nerves are there but that's how I know I'm ready — I need them."   # facilitative
+    - "The nerves are there but that's how I know I'm ready - I need them."   # facilitative
     - "The nerves just wreck me. I lose the plot completely once they start."  # debilitative
   negative_examples:
     - "I'm nervous."                                                           # unclear

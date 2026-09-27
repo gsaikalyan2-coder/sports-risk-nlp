@@ -275,14 +275,14 @@ def verify_interim(store: InterimStore) -> bool:
 def write_audit_sample(results: list[PreprocessResult], path: Path) -> None:
     """Write the stratified manual-audit sample `docs/ethics.md` sec.5.2 requires."""
     lines = [
-        "# Phase 8 — de-identification manual audit sample",
+        "# Phase 8 - de-identification manual audit sample",
         "",
         "Stratified by sport × time-to-competition band. Records carrying residual-risk",
         "flags are drawn first: the automated cascade already handled the rest, so a",
         "sample that ignores the pipeline's own uncertainty wastes the reader's attention.",
         "",
         "**How to use this.** Read each passage and mark anything that could identify a",
-        "person. Log failures here — `docs/ethics.md` §5.2 requires failures to be logged,",
+        "person. Log failures here - `docs/ethics.md` §5.2 requires failures to be logged,",
         "and an audit with no written outcome is an audit nobody can check.",
         "",
     ]

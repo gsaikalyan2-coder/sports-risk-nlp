@@ -1,4 +1,4 @@
-# Data-source allow-list — machine-readable companion to docs/ethics.md §3.
+# Data-source allow-list - machine-readable companion to docs/ethics.md §3.
 #
 # Phase 7 ingestion MUST validate every source against this file before any text
 # enters data/raw/. The default for an unlisted source is DENY. This file is
@@ -65,7 +65,7 @@ permitted:
       - consent_states_construct_labelling_purpose
       - withdrawal_right_explained_and_honoured
       - donor_is_adult
-      - institutional_review_resolved      # SATISFIED 2026-08-08 — exempt, see docs/ethics.md §3.4
+      - institutional_review_resolved      # SATISFIED 2026-08-08 - exempt, see docs/ethics.md §3.4
       - contact_route_present_in_consent_form   # see docs/ethics.md §7.1
     redistribution: "only as the consent form permits"
     status: permitted
@@ -73,20 +73,20 @@ permitted:
       UNBLOCKED 2026-08-08. Institutional review determined EXEMPT (docs/ethics.md §3.4);
       documentary record still to be obtained (OPEN-005) but collection may proceed.
       The consent form must carry the §7.1 contact route and the withdrawal terms as
-      written — including that models already trained are not retrained retroactively.
+      written - including that models already trained are not retrained retroactively.
 
   A4_official_press_material:
     primary: false
     description: >
       Officially published press-conference and pre/post-match interview
-      transcripts — public, professional-capacity speech.
+      transcripts - public, professional-capacity speech.
     requires:
       - officially_published_by_org_or_outlet
       - subject_is_adult
       - deidentified_despite_being_public
       - no_individual_level_published_output
       - no_named_athlete_claims
-      - institutional_review_resolved      # SATISFIED 2026-08-08 — exempt, see docs/ethics.md §3.4
+      - institutional_review_resolved      # SATISFIED 2026-08-08 - exempt, see docs/ethics.md §3.4
       - excluded_if_attribution_would_harm_speaker   # §3.3 condition 4, applied at annotation time
     redistribution: "derived artefacts only; never verbatim source text"
     status: permitted
@@ -95,7 +95,7 @@ permitted:
       conservative A1+A2+A3 fallback was NOT taken. Still the ethically hardest
       permission in this file: all six `requires` above are mandatory, not advisory.
       Note especially that a distinctive verbatim quote is itself an identifier and is
-      findable by search — so `no_individual_level_published_output` means paper,
+      findable by search - so `no_individual_level_published_output` means paper,
       dashboard, and figure examples must be synthetic or paraphrased beyond
       re-identification, even after de-identification.
 
@@ -142,7 +142,7 @@ permitted:
       records it as such.
 
 # ---------------------------------------------------------------------------
-# PROHIBITED — non-negotiable. Not overridable by any agent or any phase.
+# PROHIBITED - non-negotiable. Not overridable by any agent or any phase.
 #
 # P1 was NARROWED on 2026-08-11 (see its amendment_note and docs/ethics.md
 # sec.3.5). Every other prohibition below stands unweakened and applies to the
@@ -204,7 +204,7 @@ prohibited:
     reason: "Unverifiable provenance is unpublishable."
 
 # ---------------------------------------------------------------------------
-# Required provenance fields — Phase 7 writes one provenance.json per source.
+# Required provenance fields - Phase 7 writes one provenance.json per source.
 # Ingestion fails closed if any required field is missing or null.
 # ---------------------------------------------------------------------------
 provenance_required_fields:
@@ -238,7 +238,7 @@ enforcement:
   on_missing_required_provenance_field: refuse_and_log
   on_prohibited_match: refuse_and_log
   on_category_pending_owner_confirmation: refuse_and_log
-  # ^ As of 2026-08-08 no category is `pending_owner_confirmation` — A3 and A4 are both
+  # ^ As of 2026-08-08 no category is `pending_owner_confirmation` - A3 and A4 are both
   #   `permitted`. Keep this rule anyway: it is the fail-closed default for any category
   #   added later, and removing it would silently permit an unratified source.
   on_category_status_not_permitted: refuse_and_log

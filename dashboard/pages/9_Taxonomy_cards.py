@@ -34,7 +34,7 @@ st.set_page_config(page_title="Taxonomy cards", layout="wide")
 
 from src.dashboard import card_deck, load_cards, plain, theme  # noqa: E402
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 cards = load_cards()

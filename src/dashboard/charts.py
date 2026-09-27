@@ -563,7 +563,7 @@ def benchmark_chart(benchmarks, *, width: int = CHART_WIDTH) -> str:
     )
     out.append(
         f'<text x="8" y="{height - 10}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
-        f"bars from 0; whiskers are the interval &#8212; the two unseen-pattern intervals "
+        f"bars from 0; whiskers are the interval - the two unseen-pattern intervals "
         f"do not overlap (difference {benchmarks.delta:+.3f})</text>"
     )
     out.append("</svg>")
@@ -924,7 +924,7 @@ def sentence_ribbon(ribbon, *, width: int = CHART_WIDTH) -> str:
     y = base + 34
     for band in bands:
         shown = band.value
-        reading = f"{shown:.2f}" if shown is not None else "—"
+        reading = f"{shown:.2f}" if shown is not None else " - "
         muted = shown is None or not band.moved
         out.append(
             f'<text x="8" y="{y:.1f}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
@@ -1029,7 +1029,7 @@ def corpus_cloud_chart(cloud, *, width: int = CHART_WIDTH) -> str:
             # and the em dash is the only honest summary available.
             out.append(
                 f'<text x="{left + plot_w + 6}" y="{mid + 4:.1f}" {FONT_SVG_MONO} '
-                f'font-size="10" fill="{COLOUR_MUTED}">—</text>'
+                f'font-size="10" fill="{COLOUR_MUTED}"> - </text>'
             )
             continue
         median_x = left + plot_w * max(0.0, min(1.0, lane.median.value))
@@ -1067,7 +1067,7 @@ def corpus_cloud_chart(cloud, *, width: int = CHART_WIDTH) -> str:
     out.append(
         f'<text x="8" y="{height - 10}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
         "a dot sitting exactly on the midpoint is a record where every detected "
-        "construct was directionally unresolved, so nothing moved the index &#8212; a "
+        "construct was directionally unresolved, so nothing moved the index - a "
         "real reading, not a missing one</text>"
     )
     out.append("</svg>")

@@ -1,10 +1,10 @@
-# Handover — Phase 5: Ethics, Data Governance & Risk Plan
+# Handover - Phase 5: Ethics, Data Governance & Risk Plan
 
 Self-contained. A new AI session can start from this file plus the repo; no chat history needed.
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes.
 Construct-grounded NLP that detects validated sports-psychology constructs in an athlete's
@@ -32,15 +32,15 @@ interpretability; (3) a time-aware, fusion-ready design.
 
 | Phase | Status | Commit |
 |---|---|---|
-| 1 — Repo reset & scaffold | Complete | `fb87925` |
-| 2 — Dev environment & tooling | Complete, **pending owner-machine verification** | `07d77ab` |
-| 3 — Related work & novelty | Complete | `b104b8d` |
-| **4 — Construct taxonomy** | **Complete (this session)** | **`d238721`** |
-| 5 — Ethics, data governance & risk plan | **NEXT** | — |
+| 1 - Repo reset & scaffold | Complete | `fb87925` |
+| 2 - Dev environment & tooling | Complete, **pending owner-machine verification** | `07d77ab` |
+| 3 - Related work & novelty | Complete | `b104b8d` |
+| **4 - Construct taxonomy** | **Complete (this session)** | **`d238721`** |
+| 5 - Ethics, data governance & risk plan | **NEXT** | - |
 
 **Carried-forward caveats:**
 
-- **Phase 1 deviation:** no `legacy-backup` branch was created — the previous codebase was
+- **Phase 1 deviation:** no `legacy-backup` branch was created - the previous codebase was
   permanently deleted at the owner's instruction. Only `main` exists; there is no off-machine
   backup.
 - **Phase 2:** ask the owner whether `.\scripts\verify_env.ps1` has been run and passed on
@@ -51,15 +51,15 @@ interpretability; (3) a time-aware, fusion-ready design.
 
 ---
 
-## PART B — Current Session Summary (Phase 4)
+## PART B - Current Session Summary (Phase 4)
 
 ### Objective
 
-Lock the construct taxonomy — the academic backbone every downstream phase depends on.
+Lock the construct taxonomy - the academic backbone every downstream phase depends on.
 
 ### What was accomplished
 
-**1. `config/taxonomy.yaml` — rewritten and locked (v1 → v2).**
+**1. `config/taxonomy.yaml` - rewritten and locked (v1 → v2).**
 
 All 10 constructs now carry a complete, uniform record: `definition`, `label_type`,
 `instrument_anchor`, `risk_direction`, ≥2 positive examples, ≥2 negative examples, and an
@@ -72,7 +72,7 @@ New structural additions:
 - Explicit `label_type` on every construct: `graded` (presence + intensity 0–3) or
   `categorical` (one label from a set + intensity).
 - `risk_direction` on every construct, including the ones that previously lacked it.
-- Definitions sharpened at the confusable boundaries — `perceived_stress` vs.
+- Definitions sharpened at the confusable boundaries - `perceived_stress` vs.
   `cognitive_anxiety` (demand-vs-resource against outcome-worry), and `resilience` vs.
   `self_confidence` (recovery-if-wrong against expected-success).
 - An ethics note at the top of the file: these constructs describe **language, not people**.
@@ -83,13 +83,13 @@ New structural additions:
 `(Tóth2025)` on the old line ~88 → ASCII `Toth2025`, with attribution corrected. A file-wide
 sweep confirms **zero** remaining non-ASCII citation strings in `taxonomy.yaml`.
 
-**3. `paper/refs.bib` — extended from 19 to 30 entries (new Section E).**
+**3. `paper/refs.bib` - extended from 19 to 30 entries (new Section E).**
 Every `instrument_anchor` that was previously a descriptive placeholder is now grounded in a
 real, citable instrument or theoretical source, each resolved to a primary publisher record:
 
 | Key | Source | DOI | Anchors |
 |---|---|---|---|
-| `Martens1990` | CSAI-2 original (Human Kinetics book chapter) | **none — pre-DOI**; paired with `Cox2003` | cognitive/somatic anxiety, self-confidence |
+| `Martens1990` | CSAI-2 original (Human Kinetics book chapter) | **none - pre-DOI**; paired with `Cox2003` | cognitive/somatic anxiety, self-confidence |
 | `Cox2003` | CSAI-2R revision, *JSEP* 25(4) | `10.1123/jsep.25.4.519` | same, + directional tradition |
 | `Jones1992` | Intensity/direction dimensions, *Percept Mot Skills* | `10.2466/pms.1992.74.2.467` | interpretation_modifier |
 | `Raedeke2001` | Athlete Burnout Questionnaire, *JSEP* 23(4) | `10.1123/jsep.23.4.281` | burnout_signal |
@@ -102,18 +102,18 @@ real, citable instrument or theoretical source, each resolved to a primary publi
 | `Connor2003` | CD-RISC resilience scale, *Depress Anxiety* | `10.1002/da.10113` | resilience |
 
 **Zero `[UNRESOLVED]` markers. Zero fabricated citations.** The one entry without a DOI
-(`Martens1990`) genuinely predates DOI assignment — it is a 1990 Human Kinetics book chapter —
+(`Martens1990`) genuinely predates DOI assignment - it is a 1990 Human Kinetics book chapter -
 and this is stated in a `note` field and paired with `Cox2003`, which does have a DOI and is the
 version current practice recommends.
 
 *Author-order correction made during verification:* the TCTSA paper is Jones, Meijen,
-**McCarthy, Sheffield** — not Meijen, Sheffield, McCarthy as commonly miscited.
+**McCarthy, Sheffield** - not Meijen, Sheffield, McCarthy as commonly miscited.
 
-**4. `docs/annotation_guidelines.md` — written from a 5-line stub to a complete rubric.**
+**4. `docs/annotation_guidelines.md` - written from a 5-line stub to a complete rubric.**
 
-Sections: (0) ethics framing — you are labelling language, not diagnosing people; (1) unit of
+Sections: (0) ethics framing - you are labelling language, not diagnosing people; (1) unit of
 annotation, span-selection rules table, overlapping and multi-label span rules; (2) the label
-model — graded vs. categorical, the 0–3 intensity anchor table with calibration tips
+model - graded vs. categorical, the 0–3 intensity anchor table with calibration tips
 (hedges pull down, intensifiers pull up, take the strongest not the average), the
 interpretation modifier, and the `low_resilience_explicit` flag; (3) an 8-step decision
 procedure; (4) five **discriminating questions** for the confusable construct pairs that cause
@@ -129,11 +129,11 @@ construct quick-reference table; (10) a change log.
 
 A script loaded the YAML and checked every gate condition mechanically:
 
-- `config/taxonomy.yaml` parses as valid YAML — v2, 10 constructs.
+- `config/taxonomy.yaml` parses as valid YAML - v2, 10 constructs.
 - Every construct passes: definition ✓, instrument_anchor ✓, ≥2 examples ✓, edge_cases ✓,
   label_type ✓, risk_direction ✓, and `labels` present on all categorical constructs. **Gate: PASS.**
 - Citation-key consistency, checked in both directions: 14 keys cited in `taxonomy.yaml`,
-  14 in `annotation_guidelines.md`, all bracketed keys in `related_work.md` — **all resolve to
+  14 in `annotation_guidelines.md`, all bracketed keys in `related_work.md` - **all resolve to
   entries in `refs.bib`; zero missing.** `refs.bib` now holds 30 entries.
 - Zero remaining `Tóth2025` occurrences.
 
@@ -147,7 +147,7 @@ A script loaded the YAML and checked every gate condition mechanically:
    distinguish them.
 3. **`mixed` is not "undecided."** It requires an independent span for each pole. Undecided
    resolves to `none`. This directly protects the inter-annotator agreement statistic.
-4. **Intensity anchors are linguistic, not inferential** — graded on hedges, intensifiers, and
+4. **Intensity anchors are linguistic, not inferential** - graded on hedges, intensifiers, and
    repetition rather than on the annotator's estimate of the athlete's true internal state.
    This is what makes the rubric reproducible by a second annotator.
 5. **Two constructs given sharper boundaries** to reduce predictable annotator confusion
@@ -157,19 +157,19 @@ A script loaded the YAML and checked every gate condition mechanically:
 ### Blockers and unresolved issues
 
 > **`docs/open_issues.md` is the single source of truth for open items.** It is deliberately
-> not duplicated here. As of 2026-08-08 it carries **OPEN-001** (Docker daemon down — deferred
+> not duplicated here. As of 2026-08-08 it carries **OPEN-001** (Docker daemon down - deferred
 > by owner, **hard gate on Phase 6**), **OPEN-002** (broken plugin hook), **OPEN-003** (no
 > off-machine backup), **OPEN-004** (expert-rater recruitment not started), **OPEN-005**
-> (ethics exemption not yet in writing — blocks submission), **OPEN-006** (contact route is a
-> personal address — blocks release). Read it before planning any phase.
+> (ethics exemption not yet in writing - blocks submission), **OPEN-006** (contact route is a
+> personal address - blocks release). Read it before planning any phase.
 
-- **Stale git lock files — RESOLVED 2026-08-08.** `.git/HEAD.lock`, `.git/index.lock`, and
+- **Stale git lock files - RESOLVED 2026-08-08.** `.git/HEAD.lock`, `.git/index.lock`, and
   `.git/objects/maintenance.lock` were deleted on the owner machine; commits work again.
-- **`pre-commit` — RESOLVED.** Could not run in the sandbox, but `verify_env.ps1` check 9 ran
+- **`pre-commit` - RESOLVED.** Could not run in the sandbox, but `verify_env.ps1` check 9 ran
   the full hook set on Windows: trailing whitespace, end-of-files, check-yaml, merge-conflict,
-  large-files, detect-private-key, ruff, ruff-format, detect-secrets — all **Passed**. Check 10
+  large-files, detect-private-key, ruff, ruff-format, detect-secrets - all **Passed**. Check 10
   confirms `.env` is untracked.
-- **Phase 2 verification — 8/10 pass.** Only Docker checks 7 and 8 fail; see OPEN-001. The
+- **Phase 2 verification - 8/10 pass.** Only Docker checks 7 and 8 fail; see OPEN-001. The
   Python environment is verified and safe to rely on.
 - **Open for Phase 12:** the construct set is locked but not frozen. `burnout_signal` and
   `attentional_focus` are the most likely candidates to show weak inter-annotator agreement.
@@ -179,7 +179,7 @@ A script loaded the YAML and checked every gate condition mechanically:
 
 ---
 
-## PART C — Phase 5 Brief
+## PART C - Phase 5 Brief
 
 > **Note:** the incoming request for this session referred to Phase 5 as "Government
 > Validation." That does not match the blueprint. `PROJECT_PLAN.md` defines Phase 5 as
@@ -196,7 +196,7 @@ A script loaded the YAML and checked every gate condition mechanically:
    - consent and licensing rules for source text;
    - the de-identification policy that `src/preprocessing/deidentify.py` will implement in
      Phase 8 (names, handles, locations, club/team identifiers, dates that enable re-identification);
-   - the **non-diagnosis framing** — the paper must be able to cite this section directly;
+   - the **non-diagnosis framing** - the paper must be able to cite this section directly;
    - misuse risks (selection decisions, contract decisions, media use), bias risks (sport,
      gender, language, and cultural variation in emotional expression), and stigmatisation risk
      from a "risk score" label attached to an individual;
@@ -216,11 +216,11 @@ should extend rather than restate); `config/taxonomy.yaml` (the ethics note at t
 
 **Constraints:**
 
-- Do **not** touch `data/` or `src/` in Phase 5 either — this phase is policy, not code.
+- Do **not** touch `data/` or `src/` in Phase 5 either - this phase is policy, not code.
 - Confirmed in Phase 3/§10 of `CLAUDE.md`: data strategy is **existing public/licensed datasets
   first**, with a hybrid synthetic-plus-small-real-gold-set fallback revisited at Phase 7. The
   allow-list must be consistent with that.
-- Ask the owner before locking any policy that constrains later data acquisition — an
+- Ask the owner before locking any policy that constrains later data acquisition - an
   over-tight allow-list written now becomes a Phase 7 blocker.
 
 **Do not start Phase 6.**
@@ -236,5 +236,5 @@ should extend rather than restate); `config/taxonomy.yaml` (the ethics note at t
 | `paper/refs.bib` | +11 entries (19 → 30), new Section E |
 | `phase5_handover.md` | This file |
 
-**Commit:** `d238721` — *Phase 4: lock construct taxonomy and annotation rubric*
+**Commit:** `d238721` - *Phase 4: lock construct taxonomy and annotation rubric*
 **Working tree:** clean.

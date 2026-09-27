@@ -109,7 +109,7 @@ def test_the_stamp_check_is_on_the_word_not_on_the_default_sentence():
     extended = SIMULATED_STAMP + " Seed 7, 256 samples at 128 Hz."
     assert a_window(stamp=extended).stamp == extended
     # Case is not a way around it.
-    assert a_window(stamp="simulated — generated, not recorded").stamp
+    assert a_window(stamp="simulated - generated, not recorded").stamp
 
 
 def test_a_window_refuses_a_malformed_channel_or_feature():
@@ -418,7 +418,7 @@ def test_the_risk_index_is_bit_identical_with_and_without_the_context_mapping():
 
 
 # ---------------------------------------------------------------------------
-# (f) V3 — the cognitive-load feature functions
+# (f) V3 - the cognitive-load feature functions
 # ---------------------------------------------------------------------------
 
 
@@ -524,7 +524,7 @@ def test_the_cardio_window_context_is_still_ignored_by_the_scorer():
 
 
 # ---------------------------------------------------------------------------
-# (g) V5 — the session state machine, checked on paper
+# (g) V5 - the session state machine, checked on paper
 # ---------------------------------------------------------------------------
 
 

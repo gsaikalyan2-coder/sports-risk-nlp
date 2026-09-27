@@ -2,7 +2,7 @@
 
 **Governs:** `src/annotation/`, `scripts/run_annotation.py`, `config/annotators.yaml`,
 `data/gold/`
-**Tool:** [Potato](https://github.com/davidjurgens/potato) — "the portable annotation tool",
+**Tool:** [Potato](https://github.com/davidjurgens/potato) - "the portable annotation tool",
 pinned at **2.7.1**
 **Status:** built and verified 2026-08-10. **No annotation has been performed yet, and the
 second annotator does not exist.**
@@ -21,21 +21,21 @@ and a wrong offset is invisible: it looks like a valid label and silently misatt
 construct to the wrong words. Since span-level explanation is contribution #2, that failure
 would corrupt the thing the paper is about.
 
-Potato removes the class of error entirely — the annotator drags over text and the tool
+Potato removes the class of error entirely - the annotator drags over text and the tool
 records the offsets.
 
 ## 2. Why Potato, and why not the other repo
 
 Two candidates were considered.
 
-**Potato** (`davidjurgens/potato`) — a Flask + YAML annotation server from the Jurgens lab.
+**Potato** (`davidjurgens/potato`) - a Flask + YAML annotation server from the Jurgens lab.
 Config-driven, multi-annotator with a closed user list, and it ships the exact schemes this
 rubric needs: `span` with labelled highlights, `radio`, `multiselect`, `text`, and
 `pure_display` for read-only context. Adopted.
 
-**`sciknoworg/ALD-E-ImageMiner`** — **rejected, and the reason is worth recording.** It is
+**`sciknoworg/ALD-E-ImageMiner`** - **rejected, and the reason is worth recording.** It is
 not a general annotation tool. It is a domain-specific *dataset* project for annotating
-**figures and images** from atomic-layer-deposition and etching papers — chart-type
+**figures and images** from atomic-layer-deposition and etching papers - chart-type
 classification, data extraction from plots, and multimodal QA with Qwen2.5-VL. Our task is
 span-level construct labelling over English text. The two share the word "annotation" and
 nothing else.
@@ -73,7 +73,7 @@ separately with `pip install potato-annotation==2.7.1`. Three consequences, all 
 
 **Spans carry construct identity; radios carry intensity.** Potato spans hold no magnitude,
 so the two halves of a label need two mechanisms. Categorical constructs use
-`construct:pole` span labels, which is what makes each pole span-anchored — guidelines sec.2b
+`construct:pole` span labels, which is what makes each pole span-anchored - guidelines sec.2b
 requires a span for *each* pole when `mixed` is used, and that is unrepresentable with one
 label per construct. `mixed` is therefore **derived** from two poles being marked, not
 offered as a button: a button can be pressed without evidencing either side.
@@ -100,30 +100,30 @@ Three quarters of the evaluation set gained roughly twice as much text to judge 
 It matters twice. **Agreement:** `appraisal_orientation` is a stance toward an event and a
 17-token clause frequently does not carry one; two annotators guessing from a fragment
 disagree, and the kappa then measures the fragment. **Fairness:** the Phase 10 labeller *was*
-given the parent record (`docs/labeling.md` sec.3 — it is why deduplication saved 0.5% instead
+given the parent record (`docs/labeling.md` sec.3 - it is why deduplication saved 0.5% instead
 of 31%). Humans annotating without it would make the Phase 14 comparison a measurement of
 context asymmetry. The annotation view now shows **the same context the model saw**, and a
 test asserts the reconstruction is the same one.
 
-## 6. `data/gold/` is human-owned — how that survives a module that writes to it
+## 6. `data/gold/` is human-owned - how that survives a module that writes to it
 
 Three stores refuse `data/gold/` outright. `src/annotation/store.py` writes there, which looks
 like the rule being relaxed at the first inconvenience. It is not.
 
 `CLAUDE.md` sec.4 means the *content* originates from a person's judgement, not that no code
-may ever write the bytes — read literally, gold could never exist. Four locks enforce the
+may ever write the bytes - read literally, gold could never exist. Four locks enforce the
 purpose:
 
 1. **`GoldLabel` has no machine author.** `author_kind` accepts only `human`.
 2. **The annotator must be on the roster** in `config/annotators.yaml`.
 3. **Writing requires an `Annotator` object**, and `scripts/run_annotation.py` only obtains one
-   from a mandatory `--annotator` argument — a human types their own id every time.
+   from a mandatory `--annotator` argument - a human types their own id every time.
 4. **Silver cannot become gold.** `SilverLabel` is a different type with a `confidence` and no
    `annotator_id`, and `ingest_potato` is the only producer of `GoldLabel`s.
 
 **What this does not protect against, stated plainly:** someone can hand-write fabricated
 annotations under their own roster id. No schema stops research fraud. The locks stop the
-realistic failure — a future session deciding silver labels are "good enough" to seed gold.
+realistic failure - a future session deciding silver labels are "good enough" to seed gold.
 
 ## 7. Agreement: four numbers, never one
 
@@ -136,7 +136,7 @@ realistic failure — a future session deciding silver labels are "good enough" 
 
 **Per-construct, never a single headline.** `config/taxonomy.yaml` freezes the construct set at
 Phase 12 *"after checking annotation burden and inter-annotator agreement. Any construct with
-poor agreement is a candidate to drop."* That check is impossible against an average — a macro
+poor agreement is a candidate to drop."* That check is impossible against an average - a macro
 kappa of 0.6 hides `burnout_signal` at 0.2, and `burnout_signal` is the most clinically loaded
 label in the taxonomy.
 
@@ -185,11 +185,11 @@ agreement, it cannot be undone, and it makes the headline statistic worthless.
 ## 9. Verification performed
 
 - Both generated projects pass **Potato 2.7.1's own validator**, `python -m
-  potato.validate_cli <config> --strict`: *"OK — no issues found."* That check caught a real
+  potato.validate_cli <config> --strict`: *"OK - no issues found."* That check caught a real
   defect: an `html_layout` key carried over from an older Potato API, pointing at a template
   this project does not ship. It was deleted rather than justified.
 - 48 tests in `tests/test_annotation.py`, all offline.
-- One test asserts the shipped roster has exactly one annotator — if it starts failing,
+- One test asserts the shipped roster has exactly one annotator - if it starts failing,
   someone has been recruited.
 - **13 tests in `tests/test_potato_output.py` run against output written by Potato 2.7.1's
   own serialiser** (recorded under `tests/fixtures/potato/`), including a check that the raw
@@ -199,13 +199,13 @@ agreement, it cannot be undone, and it makes the headline statistic worthless.
 ## 8b. What running against real Potato output found (OPEN-027)
 
 The ingest path had been written against an *assumed* Potato interface and never executed
-against the real one. It did not work. Three mismatches — the output lives in
+against the real one. It did not work. Three mismatches - the output lives in
 `annotation_output/<user_id>/user_state.json` rather than any `.jsonl`; the item key is
 `instance_id`; and **Potato spans carry `start`/`end` offsets and no surface text at all.**
 
 The third was the dangerous one. `_collect_spans` silently skipped spans with no surface
 text, so against real output every span would have vanished and the item would then have been
-counted as "not yet annotated" — evidence lost without an error. `src/annotation/
+counted as "not yet annotated" - evidence lost without an error. `src/annotation/
 potato_output.py` is the fix, and it makes the situation better than it was assumed to be:
 because the surface text is now produced by slicing the utterance with Potato's own offsets,
 **a gold evidence span cannot be a paraphrase.** The invariant `SilverLabel` enforces with a
@@ -222,7 +222,7 @@ remaining unexecuted paths and should be assumed broken until executed.
    does not exist yet. This is the Phase 11 blocker and no code can close it.
 3. **Burden is unmeasured.** Ten intensity questions plus a span pass, per item, per
    annotator, over 400 items. `CLAUDE.md` sec.3 schedules exactly this check before the
-   taxonomy freezes at Phase 12 — **time the `gold_dev` pass** and use the number. The
+   taxonomy freezes at Phase 12 - **time the `gold_dev` pass** and use the number. The
    generator supports a `constructs` filter so the set can be trimmed on evidence.
 4. **Span F1 uses token overlap**, which is lenient. It rewards finding the same evidence, not
    the same boundaries, and the paper should say so.
@@ -230,7 +230,7 @@ remaining unexecuted paths and should be assumed broken until executed.
    than a theoretical one.** The parser was written against an interface Potato 2.7.1 does not
    have (§8b). `potato_output.py` handles both artifacts 2.7.1 writes and is defensive about
    shape, but it is not guaranteed against a future release. The pin in `POTATO_VERSION` is
-   the mitigation, and **`tests/fixtures/potato/` must be regenerated if that pin is raised** —
+   the mitigation, and **`tests/fixtures/potato/` must be regenerated if that pin is raised** -
    the recorded artifacts are the only thing that would catch the same class of change again.
 6. **The recorded fixtures are a rehearsal, not data.** The judgements in them were produced
    by a script to exercise the parser; they carry no psychological meaning and must never be

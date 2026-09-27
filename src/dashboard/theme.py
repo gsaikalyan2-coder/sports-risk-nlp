@@ -168,6 +168,53 @@ def palette(mode: str) -> dict[str, str]:
     return MODES.get(mode, MODES[DEFAULT_MODE])
 
 
+#: The widget key the appearance radio uses, and the plain key the choice is
+#: copied into. They must differ: Streamlit forbids assigning to a key a widget
+#: owns, and the whole point of the plain key is that it is NOT a widget's.
+APPEARANCE_WIDGET_KEY = "appearance_choice"
+MODE_KEY = "mode"
+
+
+def mode_control(st) -> str:
+    """Render the light/dark control in the sidebar and return the chosen mode.
+
+    Takes the Streamlit module as an argument rather than importing it, so this
+    package stays importable with no Streamlit installed. Every test under
+    `tests/test_dashboard*.py` relies on that, and a module-level
+    `import streamlit` here would be the one import that broke it.
+
+    Why a helper at all, when the radio is six lines
+    ------------------------------------------------
+    Before this, three of eleven pages offered the control and eight did not, so a
+    reader who opened the brain atlas or the taxonomy deck first had no way to
+    switch appearance at all: the page painted whatever `mode` happened to be in
+    session state, with no visible cause and no way to change it. Copying the
+    radio into eight more files would have put eleven copies of the widget key,
+    the fallback and the write-back in the tree, and the failure that shape
+    produces is one page seeding its index from a different key than it writes.
+
+    Streamlit garbage-collects a widget's state when the widget is not rendered
+    on the current page, so the radio's own key does NOT survive navigation. The
+    choice is therefore copied into a plain (non-widget) key, which does persist,
+    and the index is seeded from that key on every page. An unknown value in it
+    falls back rather than raising, because session state outlives a rename.
+    """
+    modes = tuple(MODES)
+    current = st.session_state.get(MODE_KEY, DEFAULT_MODE)
+    if current not in modes:
+        current = DEFAULT_MODE
+    choice = st.sidebar.radio(
+        "Appearance",
+        modes,
+        index=modes.index(current),
+        format_func=str.capitalize,
+        horizontal=True,
+        key=APPEARANCE_WIDGET_KEY,
+    )
+    st.session_state[MODE_KEY] = choice
+    return choice
+
+
 #: The three Phase 26 pages, by the fragment Streamlit puts in their nav href.
 COGNITIVE_PAGES: tuple[str, ...] = ("Brain_atlas", "Cognitive_load", "Neurofeedback_demo")
 
@@ -284,11 +331,6 @@ def app_css(mode: str = DEFAULT_MODE) -> str:
         text-transform:uppercase; color:var(--slate)}}
       .micro{{font-size:12px; line-height:1.4; color:var(--muted)}}
 
-      /* Announcement bar: full-width black strip, 36px, centred microcopy. */
-      .announcement{{background:{p["surface-alt"] if mode == "dark" else COHERE_BLACK}; color:{p["ink"] if mode == "dark" else ON_DARK}; border-bottom:1px solid {p["hairline"] if mode == "dark" else COHERE_BLACK}; height:36px;
-        display:flex; align-items:center; justify-content:center; font-size:12px;
-        line-height:1.4; margin:-{SPACE_XXL} -100vw {SPACE_XXL} -100vw;
-        padding:0 100vw}}
 
       /* Widget tiles: warm stone product cards, 8px, flat -- no drop shadow.
          Fixed min-height and a flex column, so a tile with a two-line title is
@@ -377,6 +419,26 @@ def app_css(mode: str = DEFAULT_MODE) -> str:
       [data-testid="stSelectbox"] div{{background-color:var(--canvas)!important}}
       [data-testid="stSelectbox"] *{{color:var(--ink)!important}}
       [data-testid="stSelectbox"] svg{{fill:var(--ink)!important}}
+      /* The list the select DROPS is portalled to <body>, outside the widget's
+         own testid, so every rule above stops at the closed control. In dark
+         mode that meant a navy select opening a white sheet of light-ink options
+         over a dark page. Found with the list open in a browser: a screenshot of
+         the closed control, and every unit test, passes either way. */
+      [data-testid="stSelectboxVirtualDropdown"]{{background:var(--canvas)!important;
+        border:1px solid var(--hairline)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] *{{color:var(--ink)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] [role="option"]{{
+        background:var(--canvas)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] [role="option"]:hover,
+      [data-testid="stSelectboxVirtualDropdown"] [aria-selected="true"]{{
+        background:var(--stone)!important}}
+      /* Streamlit's own running indicator is painted from the static theme
+         config, whose textColor is the light-mode ink, so "Running" and "Stop"
+         were ink-on-ink for the seconds a dark page was rerunning. */
+      [data-testid="stStatusWidget"], [data-testid="stStatusWidget"] *{{
+        color:var(--ink)!important; fill:var(--ink)!important}}
+      [data-baseweb="tooltip"], [data-baseweb="tooltip"] *{{
+        background:var(--stone)!important; color:var(--ink)!important}}
       label p{{font-size:14px!important; color:var(--body-muted)!important}}
 
       /* Rule-separated rows and quiet containers, not boxes everywhere. */
@@ -618,10 +680,6 @@ def claude_css(mode: str = DEFAULT_MODE) -> str:
       .mono-label{{font-family:{CLAUDE_FONT_UI}; font-size:12px; font-weight:500;
         letter-spacing:1.5px; text-transform:uppercase; color:var(--c-muted)}}
 
-      /* The announcement strip becomes a dark cookie-card-style band. */
-      .announcement{{background:var(--c-dark); color:var(--c-on-dark); height:auto;
-        display:flex; align-items:center; justify-content:center; font-size:14px;
-        line-height:1.55; border-radius:12px; padding:12px 24px; margin-bottom:32px}}
 
       /* The score is a full-bleed coral callout -- the system's voltage moment,
          used once on the page and nowhere else. */
@@ -694,6 +752,21 @@ def claude_css(mode: str = DEFAULT_MODE) -> str:
       [data-testid="stSelectbox"] div{{background-color:var(--c-canvas)!important}}
       [data-testid="stSelectbox"] *{{color:var(--c-ink)!important}}
       [data-testid="stSelectbox"] svg{{fill:var(--c-ink)!important}}
+      /* Same defect as the dashboard's, in this language: the dropped list is
+         portalled out of the widget, so on the dark surface a white sheet of
+         options opened over the page. See the matching block in `app_css`. */
+      [data-testid="stSelectboxVirtualDropdown"]{{background:var(--c-canvas)!important;
+        border:1px solid var(--c-hairline)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] *{{color:var(--c-ink)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] [role="option"]{{
+        background:var(--c-canvas)!important}}
+      [data-testid="stSelectboxVirtualDropdown"] [role="option"]:hover,
+      [data-testid="stSelectboxVirtualDropdown"] [aria-selected="true"]{{
+        background:var(--c-card)!important}}
+      [data-testid="stStatusWidget"], [data-testid="stStatusWidget"] *{{
+        color:var(--c-ink)!important; fill:var(--c-ink)!important}}
+      [data-baseweb="tooltip"], [data-baseweb="tooltip"] *{{
+        background:var(--c-card)!important; color:var(--c-ink)!important}}
       .stTextArea textarea{{background:var(--c-canvas)!important}}
       [data-testid="stSidebarNav"] a[href*="Signal_detail"]{{display:none}}
       {_cognitive_nav_css()}

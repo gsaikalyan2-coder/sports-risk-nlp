@@ -20,7 +20,7 @@ containing:
 | Field | Meaning |
 |---|---|
 | `labels[]` | zero or more `{construct, value, intensity 0-3, evidence_spans[], confidence}` |
-| `abstained` | true when no construct is expressed — a first-class answer, not a failure |
+| `abstained` | true when no construct is expressed - a first-class answer, not a failure |
 | `rationale` | one or two sentences describing the *language*, never the person |
 | `confidence` | the model's confidence in the whole judgement |
 | `interpretation_modifier` | facilitative / debilitative / unclear, only where the rubric allows |
@@ -54,7 +54,7 @@ Four design choices worth defending:
 2. **The system prompt is byte-stable across calls.** Constructs are emitted in
    `taxonomy.yaml` file order, nothing record-specific appears in it, and it is memoised
    per process. `prompt_caching: true` only pays if the prefix is identical, and a prompt
-   that drifts silently stops hitting the cache while everything still appears to work —
+   that drifts silently stops hitting the cache while everything still appears to work -
    only the bill changes. `SYSTEM_PROMPT_VERSION` is stamped onto every row so a
    mixed-version silver set is detectable after the fact.
 3. **Placeholders are glossed.** `[ATHLETE]`, `[EVENT_WINDOW]` and twelve others are
@@ -67,7 +67,7 @@ Four design choices worth defending:
 
 ---
 
-## 3. Deduplication — the measured finding that changed the design
+## 3. Deduplication - the measured finding that changed the design
 
 `phase10_handover.md` and `reports/eda.md` both put the saving at ~31%: 9,302 utterances
 over 6,444 distinct texts. **That figure is correct and it does not survive the
@@ -79,7 +79,7 @@ Recomputed on the actual corpus (generator v1.4, seed 42):
 |---|---|---|
 | utterance text alone | 6,444 | 30.7% |
 | (utterance, parent record) | 9,185 | 1.3% |
-| **(utterance, parent record, days-to-competition) — used** | **9,260** | **0.5%** |
+| **(utterance, parent record, days-to-competition) - used** | **9,260** | **0.5%** |
 
 636 utterance texts appear in more than one distinct parent record, and they are the
 frequent ones: `"Results from the heats should be up by lunchtime."` occurs 109 times
@@ -92,8 +92,8 @@ about which parts of the prompt matter.
 
 **The saving was given up deliberately.** The cheap-tier pass costs single-digit dollars
 either way, so the difference is well under a dollar. Buying context for the constructs
-that need it — `appraisal_orientation` is a stance toward an event, and a 17-token clause
-frequently does not carry one — is worth that. `--no-context` keeps the abandoned option
+that need it - `appraisal_orientation` is a stance toward an event, and a 17-token clause
+frequently does not carry one - is worth that. `--no-context` keeps the abandoned option
 measurable as an ablation rather than merely asserted.
 
 *This is the third time a number carried forward from a superseded corpus version has
@@ -106,7 +106,7 @@ Recompute, do not carry forward.*
 
 | Step | Policy |
 |---|---|
-| Start | `cheap` — `agent_defaults.labeling` in `config/model_routing.yaml` |
+| Start | `cheap` - `agent_defaults.labeling` in `config/model_routing.yaml` |
 | Escalate when | the parser refused the output, **or** the weakest confidence < 0.65 |
 | Escalate to | `mid`, **once**, and never to `premium` |
 | Still unparseable | leave the utterance **unlabelled**, send it to the review queue |
@@ -121,7 +121,7 @@ quantity that the review queue surfaces. A coerced one is a corrupted row that n
 downstream can detect and that Phase 14 would attribute to the labeller.
 
 **Why low-confidence labels are kept.** Discarding every uncertain label would bias the
-silver distribution toward easy utterances — the same selection error Phase 9 rejected
+silver distribution toward easy utterances - the same selection error Phase 9 rejected
 when it refused to draw gold items by lexicon detectability.
 
 **0.65 is a starting value and is treated as one.** It was written into the config at
@@ -131,7 +131,7 @@ gold set, and Phase 18's ablation should report sensitivity to it.
 
 ---
 
-## 5. Cost — and a config figure this phase falsified
+## 5. Cost - and a config figure this phase falsified
 
 `config/model_routing.yaml` carries a worked estimate concluding **"about $1.12 for a full
 labeling pass on the cheap tier"**, built on "~400 input tokens (rubric is cached; only the
@@ -155,7 +155,7 @@ Measured projection for the full corpus (`scripts/run_labeling.py --project-only
 The projection deliberately errs high on every axis it controls: every escalation is
 charged at mid, output length is set at the upper end, and prompt caching is given **no**
 credit at all (`--cache-discount 1.0`, the default). Cache-read rates vary by provider and
-drift without notice — the same problem OPEN-009 already tracks for prices — so the
+drift without notice - the same problem OPEN-009 already tracks for prices - so the
 discount is a declared parameter rather than a guess baked into a number.
 
 Four levers, in the order they should be considered:
@@ -165,7 +165,7 @@ Four levers, in the order they should be considered:
 2. **Measure the real escalation rate.** 25% is assumed. The offline stub's 39% is an
    artefact of its uniform(0.45, 0.95) confidence and says nothing about a real model.
 3. **Shorten the rubric.** Dropping negative examples and edge cases would cut it by
-   perhaps a third — at the cost of the discriminating detail that stops this being
+   perhaps a third - at the cost of the discriminating detail that stops this being
    sentiment analysis. Not recommended.
 4. **Raise the cap.** Only as an explicit owner decision, never to make a run finish.
 
@@ -192,7 +192,7 @@ Three structural guards rather than three warnings:
   `GENERATION_SPEC_IN_SILVER`.
 * The Annotation-QA queue is blind to what was planted. Every flag is derived from the
   label or the text. "The model missed a planted construct" would be the circularity trap
-  wearing a QA badge — a human working that queue would learn to reproduce the generator.
+  wearing a QA badge - a human working that queue would learn to reproduce the generator.
 * Also note **OPEN-019**: Phase 8 replicates the parent's spec onto every utterance
   verbatim, so any per-utterance count derived from it is a per-record count × ~2.3.
 
@@ -205,7 +205,7 @@ labeller, reported as such.
 
 ## 7. OPEN-021 one level up: is the labeller independent of the corpus?
 
-Phase 9b established that `LexiconBaseline` was never corpus-independent — its cues and the
+Phase 9b established that `LexiconBaseline` was never corpus-independent - its cues and the
 template bank were both written from `taxonomy.yaml`'s `positive_examples`, and its
 macro-F1 fell 0.780 → 0.461 once the templates stopped reusing those phrasings.
 
@@ -217,14 +217,14 @@ max over the construct's examples, threshold 0.30) and reports the labeller's as
 and mean confidence in each bucket. A large gap bounds how much apparent competence is
 recognition rather than comprehension; a small gap is weak evidence against, not proof.
 
-**The check that could not be built.** The comparison that exposed the lexicon — Phase
-7-era templates against Phase 9b-era ones — **is not recoverable from the corpus**.
+**The check that could not be built.** The comparison that exposed the lexicon - Phase
+7-era templates against Phase 9b-era ones - **is not recoverable from the corpus**.
 `template_id` is `construct:label:index` with index 0–4 across all 150 templates, because
 Phase 9b restructured the bank rather than appending to it, and no field records when a
 template was written. Lexical overlap is the available substitute, not the preferred
 instrument. Raised as **OPEN-022**.
 
-The offline table is noise by construction — the stub picks constructs at random. The probe
+The offline table is noise by construction - the stub picks constructs at random. The probe
 is only interpretable on a live run, and its result belongs in the paper's limitations
 either way.
 
@@ -236,8 +236,8 @@ either way.
 money requires typing `--live`, and `--live` additionally requires `--pricing-checked`
 because a retired model ID returns 404 and kills a batch partway through (OPEN-009).
 
-The offline run **proves the plumbing** — dedup, routing, escalation, parsing, span
-validation, fan-out, storage, the QA queue, the ledger — end to end, for free, from a fresh
+The offline run **proves the plumbing** - dedup, routing, escalation, parsing, span
+validation, fan-out, storage, the QA queue, the ledger - end to end, for free, from a fresh
 clone, which is the property a reviewer needs.
 
 It **proves nothing about label quality.** The stub's content is meaningless by
@@ -246,7 +246,7 @@ random number generator. Do not quote them as findings.
 
 **Determinism.** Two consecutive offline runs produce a byte-identical
 `logs/review_queue.jsonl` and a `silver.jsonl` that is byte-identical once `run_id` and
-`labeled_on` are stripped — verified. Those two fields are per-run by design, so any
+`labeled_on` are stripped - verified. Those two fields are per-run by design, so any
 determinism check must strip them.
 
 ---
@@ -265,8 +265,8 @@ determinism check must strip them.
    abstention happens and is not the only answer. What the *right* abstention rate is can
    only be answered by human gold.
 5. **The escalation threshold is uncalibrated.** See sec.4.
-6. **The cost projection rests on three declared assumptions** — output length, escalation
-   fraction, cache discount — none of them measured. It is an upper bound, not a forecast.
+6. **The cost projection rests on three declared assumptions** - output length, escalation
+   fraction, cache discount - none of them measured. It is an upper bound, not a forecast.
 7. **Prompt caching is configured but unverified.** `prompt_caching: true` is a config flag;
    whether the provider actually caches a 3,946-token prefix, and at what rate, is unknown
    until a live run reports it.

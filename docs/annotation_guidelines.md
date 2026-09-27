@@ -1,12 +1,12 @@
 # Annotation Guidelines
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes
-**Version:** 1.0 — locked at Phase 4, 2026-08-08
+**Version:** 1.0 - locked at Phase 4, 2026-08-08
 **Governs:** `config/taxonomy.yaml` v2
 **Audience:** human annotators (Phase 11) and the Labeling Agent (Phase 10)
 
 If this document and `config/taxonomy.yaml` ever disagree, **`taxonomy.yaml` wins** and this
-file must be corrected. Do not annotate from memory — keep this open.
+file must be corrected. Do not annotate from memory - keep this open.
 
 ---
 
@@ -41,7 +41,7 @@ harm. That is why the "when in doubt, label 0" rule below exists.
 - Within a record you mark **spans**. A span is a contiguous stretch of text that carries the
   evidence for a construct.
 - Every construct label must be **anchored to at least one span**. A label with no span is
-  invalid. This is what makes the model's span-level explanations verifiable later — it is a
+  invalid. This is what makes the model's span-level explanations verifiable later - it is a
   core contribution of the paper, so it is not optional bookkeeping.
 
 ### Span-selection rules
@@ -78,7 +78,7 @@ Two label types. `taxonomy.yaml` states which type each construct uses.
 
 Record **intensity 0–3**. Presence is implied: intensity ≥ 1 means present.
 
-| Intensity | Name | Anchor — what it takes to earn this level |
+| Intensity | Name | Anchor - what it takes to earn this level |
 |---|---|---|
 | **0** | None | The construct is not expressed. Also the value for a merely neutral or factual statement. **This is the default.** |
 | **1** | Mild | Expressed once, hedged, in passing, or immediately qualified away. Reads as an ordinary, in-range reaction. *"A few nerves, but nothing unusual."* |
@@ -91,7 +91,7 @@ Record **intensity 0–3**. Presence is implied: intensity ≥ 1 means present.
 - Hedges ("a bit", "kind of", "maybe", "I guess") pull intensity **down** one level.
 - Intensifiers ("really", "completely", "can't stop", "every") pull intensity **up** one level.
 - Repetition across the record pulls **up**; a single mention pulls **down**.
-- Do not average across a record — take the **strongest** evidence present.
+- Do not average across a record - take the **strongest** evidence present.
 - Sarcasm and joking: label the literal content at **reduced** intensity (usually 1), and add
   a note. Do not label 0 just because it was framed as a joke.
 
@@ -104,7 +104,7 @@ using the same 0–3 anchors above.
 
 - `none` is the default and always takes intensity 0.
 - `mixed` is for genuine co-presence of *both* poles in the same record, each independently
-  supported by a span. `mixed` is **not** a synonym for "I couldn't decide" — if you cannot
+  supported by a span. `mixed` is **not** a synonym for "I couldn't decide" - if you cannot
   decide, the answer is `none`.
 - When you use `mixed`, you must mark a span for **each** pole.
 
@@ -115,18 +115,18 @@ intensity is ≥ 1.
 
 | Label | When to use |
 |---|---|
-| `facilitative` | The athlete evaluates the arousal as **helpful** — sharpening, energising, a sign of readiness. |
-| `debilitative` | The athlete evaluates the arousal as **harmful** — undermining, derailing, something to be rid of. |
+| `facilitative` | The athlete evaluates the arousal as **helpful** - sharpening, energising, a sign of readiness. |
+| `debilitative` | The athlete evaluates the arousal as **harmful** - undermining, derailing, something to be rid of. |
 | `unclear` | **Default.** The arousal is reported without evaluation. |
 
 This distinction matters more than it looks. Two athletes can report identical anxiety
 intensity and carry very different risk depending on whether they read those nerves as fuel or
-as a problem. Do not collapse it into intensity — record it separately.
+as a problem. Do not collapse it into intensity - record it separately.
 
 ### 2d. Low-resilience flag
 
 `resilience` is scored 0–3 for *expressed* resilience. Text expressing the **opposite**
-("one mistake and I'm done") is not negative resilience — it is `resilience = 0` **plus** the
+("one mistake and I'm done") is not negative resilience - it is `resilience = 0` **plus** the
 boolean note `low_resilience_explicit: true`. Explicit fragility is different from silence, and
 the risk model in Phase 15 needs to tell them apart.
 
@@ -162,7 +162,7 @@ true at once; label both when both have spans.
 **`cognitive_anxiety` vs. `appraisal_orientation = threat`**
 → *Is this worry, or is this a positioning of self against the demand?*
 "I'm scared I'll mess up" = anxiety. "This field is beyond me" = threat appraisal. They very
-often co-occur — that is fine, label both.
+often co-occur - that is fine, label both.
 
 **`self_confidence` vs. `resilience`**
 → *Expected success, or recovery if it goes wrong?*
@@ -185,7 +185,7 @@ lane" = distracted (no strategy). Naming an emotion is neither.
 
 **Example 1**
 
-> "Honestly the nerves have been brutal all week — I've barely slept, stomach's a mess. But
+> "Honestly the nerves have been brutal all week - I've barely slept, stomach's a mess. But
 > that's normal for me before a big one, it means I'm switched on. I know my plan and I'll
 > stick to it."
 
@@ -193,17 +193,17 @@ lane" = distracted (no strategy). Naming an emotion is neither.
 |---|---|---|---|
 | somatic_anxiety | present | 3 | "I've barely slept, stomach's a mess" |
 | cognitive_anxiety | present | 2 | "the nerves have been brutal all week" |
-| interpretation_modifier | facilitative | — | "it means I'm switched on" |
+| interpretation_modifier | facilitative | - | "it means I'm switched on" |
 | self_confidence | present | 2 | "I know my plan and I'll stick to it" |
 | attentional_focus | focused | 2 | "I know my plan and I'll stick to it" |
 
-*Why:* high somatic intensity ("barely", "mess") but explicitly read as helpful — this is
+*Why:* high somatic intensity ("barely", "mess") but explicitly read as helpful - this is
 exactly the case where intensity alone would overstate risk. Note the same span supports two
 constructs; that is allowed.
 
 **Example 2**
 
-> "There's a lot going on — exams, and selection is next month, and now this. Everyone wants
+> "There's a lot going on - exams, and selection is next month, and now this. Everyone wants
 > something. I just want to get through it without embarrassing myself."
 
 | Construct | Label | Intensity | Span |
@@ -211,11 +211,11 @@ constructs; that is allowed.
 | perceived_stress | present | 3 | "There's a lot going on"; "Everyone wants something" |
 | motivation_orientation | avoidance | 2 | "without embarrassing myself" |
 | cognitive_anxiety | present | 1 | "without embarrassing myself" |
-| appraisal_orientation | none | 0 | — |
+| appraisal_orientation | none | 0 | - |
 
 *Why:* demand-exceeds-resources, not outcome worry, so the headline label is stress not anxiety.
 "Get through it without embarrassing myself" is avoidance motivation and carries mild outcome
-worry. No self-versus-demand positioning, so appraisal is `none` — **not** `threat`, even
+worry. No self-versus-demand positioning, so appraisal is `none` - **not** `threat`, even
 though it feels negative.
 
 **Example 3**
@@ -225,9 +225,9 @@ though it feels negative.
 | Construct | Label | Intensity | Span |
 |---|---|---|---|
 | self_confidence | present | 1 | "I'll turn up and do the job" |
-| everything else | — | 0 | — |
+| everything else | - | 0 | - |
 
-*Why:* terse and flat. It is tempting to read burnout into "not much else to say" — **do not**.
+*Why:* terse and flat. It is tempting to read burnout into "not much else to say" - **do not**.
 There is no exhaustion, devaluation, or reduced-accomplishment language. This is the
 when-in-doubt rule in action.
 
@@ -239,8 +239,8 @@ when-in-doubt rule in action.
 | Construct | Label | Intensity | Span |
 |---|---|---|---|
 | coping_style | avoidance | 3 | "avoiding the video"; "keep putting it off" |
-| resilience | — | 0 | — |
-| *(flag)* | `low_resilience_explicit: true` | — | "I know I'll unravel" |
+| resilience | - | 0 | - |
+| *(flag)* | `low_resilience_explicit: true` | - | "I know I'll unravel" |
 | cognitive_anxiety | present | 2 | "If I have a start like that again" |
 
 *Why:* a described strategy of disengagement = avoidance coping, not distraction. Explicit
@@ -255,7 +255,7 @@ fragility gets `resilience = 0` **plus** the flag, not a negative score.
 This is the single most important rule in this document, and it is deliberate rather than lazy.
 
 The risk here is asymmetric. A missed label costs us a little recall. A **hallucinated** label
-teaches the model to see anxiety, stress, or burnout in ordinary language — and a model that
+teaches the model to see anxiety, stress, or burnout in ordinary language - and a model that
 over-reads distress in athlete text is precisely the harmful artefact this project must not
 produce. Under-labelling is recoverable; over-labelling poisons both the dataset and the ethics
 position of the paper.
@@ -276,7 +276,7 @@ Applied specifically:
   are routed to adjudication and are reported in the paper's agreement analysis.
 - Mark a record `escalate: true` and **do not label it** when it is unreadable, off-topic, not
   athlete-authored, not pre-competition, or still contains identifying information.
-- Never discuss specific records with the other annotator before both passes are complete —
+- Never discuss specific records with the other annotator before both passes are complete -
   that inflates the agreement statistic and makes it worthless.
 - Adjudication happens after both passes, with the project owner, against this document. If
   adjudication reveals a rule this document does not cover, **the fix is to amend this document
@@ -292,7 +292,7 @@ Applied specifically:
 - [ ] No interpretation modifier on an anxiety construct scored 0.
 - [ ] No clinical language anywhere in your notes.
 - [ ] Any record with surviving identifying information is flagged, not labelled.
-- [ ] You applied the when-in-doubt rule at least once — if you labelled everything with
+- [ ] You applied the when-in-doubt rule at least once - if you labelled everything with
       confidence across a whole batch, re-check the batch.
 
 ---

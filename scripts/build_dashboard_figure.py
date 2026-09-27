@@ -40,7 +40,7 @@ CAPTION = (
     "Two-level explanation for one synthetic record. Sign is encoded by position "
     "relative to the rule, not by colour; the four directionally unresolved "
     "constructs carry a hatched, dashed marker and an explicit (inert) label. "
-    "PROVISIONAL — planted-label corpus-property measurement, NOT accuracy. "
+    "PROVISIONAL - planted-label corpus-property measurement, NOT accuracy. "
     "data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011)."
 )
 

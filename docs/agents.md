@@ -72,7 +72,7 @@ For a 10,000-utterance labeling pass at ~400 input and ~120 output tokens each:
 | Tier | Model | Estimated pass cost |
 |---|---|---|
 | cheap | `openai/gpt-5.6-luna` | **~$1.12** |
-| premium | `anthropic/claude-sonnet-5` | ~$20 — the entire monthly cap |
+| premium | `anthropic/claude-sonnet-5` | ~$20 - the entire monthly cap |
 
 That ratio is the whole argument for tiered routing, and it is a real number
 rather than a claim.
@@ -84,7 +84,7 @@ instead of trimming the batch.
 
 A job that dies with a clear message is recoverable. A labeling run that quietly
 processed 6,000 of 10,000 utterances produces a corrupted dataset that may not be
-noticed until the results look strange weeks later — by which point the cause is
+noticed until the results look strange weeks later - by which point the cause is
 buried. Loud failure is the cheaper error.
 
 ### 3.4 Escalation is an orchestration decision, not a model decision
@@ -94,7 +94,7 @@ If a cheap-tier answer reports confidence below `escalation.confidence_threshold
 calls to the ledger with the reason.
 
 It lives in `crew.py` rather than inside the LLM client because Phase 18 needs to
-ablate it — "with vs. without escalation" is a result, so the switch has to be
+ablate it - "with vs. without escalation" is a result, so the switch has to be
 somewhere it can be switched.
 
 **The 0.65 threshold is a starting value, not an evidence-backed one.** Phase 10
@@ -122,7 +122,7 @@ call:
    rather than resolving it with a guess.
 
 A test asserts this text is present for every agent in the roster, so it cannot
-be dropped by accident. The smoke-test utterance is synthetic — written for the
+be dropped by accident. The smoke-test utterance is synthetic - written for the
 test, not taken from any real athlete.
 
 ---
@@ -132,7 +132,7 @@ test, not taken from any real athlete.
 | | `simple` (default) | `crewai` |
 |---|---|---|
 | Status | **verified**, test-covered | written, **never executed** (OPEN-007) |
-| Offline | yes | no — real calls only |
+| Offline | yes | no - real calls only |
 | Cost rows | one per call | one coarse summary row |
 | Depends on | nothing external | crewai 1.15.x |
 
@@ -141,7 +141,7 @@ repo. But CrewAI went 0.x → 1.x during this project's lifetime, and keeping th
 *contract* in our own code means a future breaking change cannot take down the
 pipeline. Only `crewai_engine.py` imports crewai; nothing else does.
 
-**For Phase 10 bulk labeling, prefer `simple`** — CrewAI calls the provider
+**For Phase 10 bulk labeling, prefer `simple`** - CrewAI calls the provider
 itself, so per-record cost attribution is not available through it, and that
 attribution is what the cost analysis in the paper rests on.
 
@@ -155,7 +155,7 @@ attribution is what the cost analysis in the paper rests on.
    `prose`) and `expects_json`.
 
 `kind` declares the expected answer shape explicitly. Do not infer it from prompt
-text — the offline stub originally sniffed for the word "propose", which also
+text - the offline stub originally sniffed for the word "propose", which also
 matches "the propos**ed** label" in the QA instruction, so the QA step silently
 returned a label proposal instead of a verdict. There is a regression test for
 exactly that.

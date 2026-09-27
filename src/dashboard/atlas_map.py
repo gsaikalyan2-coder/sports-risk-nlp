@@ -54,9 +54,9 @@ REFS_PATH = REPO_ROOT / "paper" / "refs.bib"
 #: naming a real source has to be added here deliberately, beside a test, rather
 #: than appearing in the YAML and being accepted because the field was non-empty.
 EVIDENCE_STATES: dict[str, str] = {
-    "none_in_repository": "no imaging source here — hypothesised association, not imaging",
+    "none_in_repository": "no imaging source here - hypothesised association, not imaging",
     "outside_athlete_population": (
-        "imaging is from workplace burnout, not athletes — hypothesised association, not imaging"
+        "imaging is from workplace burnout, not athletes - hypothesised association, not imaging"
     ),
 }
 
@@ -70,7 +70,7 @@ EVIDENCE_STATES: dict[str, str] = {
 #: on are in the panel's stamp and caption regardless of what a cell says.
 EVIDENCE_SHORT: dict[str, str] = {
     "none_in_repository": "no imaging source here",
-    "outside_athlete_population": "different population — see note",
+    "outside_athlete_population": "different population - see note",
 }
 
 
@@ -139,14 +139,14 @@ class AtlasRow:
     def evidence_note(self) -> str:
         """The full sentence. Printed under the table, never as a tooltip."""
         if self.unmapped:
-            return "unmapped — " + " ".join(self.rationale.split())
+            return "unmapped - " + " ".join(self.rationale.split())
         return EVIDENCE_STATES[self.network_evidence]
 
     @property
     def evidence_short(self) -> str:
         """The table-cell form. See `EVIDENCE_SHORT` for why there are two."""
         if self.unmapped:
-            return "unmapped — see below"
+            return "unmapped - see below"
         return EVIDENCE_SHORT[self.network_evidence]
 
 

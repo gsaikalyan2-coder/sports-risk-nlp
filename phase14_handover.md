@@ -1,13 +1,13 @@
-# Phase 14 Handover — Pre-Competition Psychological Risk Profiling of Athletes
+# Phase 14 Handover - Pre-Competition Psychological Risk Profiling of Athletes
 
 **Prepared:** 2026-08-12
-**Phase completed:** 14 — Transformer fine-tuning
-**Next phase:** 16 — (optional) AutoML benchmark, then 17 — Explainability + expert validation
+**Phase completed:** 14 - Transformer fine-tuning
+**Next phase:** 16 - (optional) AutoML benchmark, then 17 - Explainability + expert validation
 **Self-contained:** a new session should be able to continue from this file alone.
 
 ---
 
-## Part A — Project summary
+## Part A - Project summary
 
 **Goal.** Detect validated sports-psychology constructs (CSAI-2 / SDT / ABQ tradition) in athlete
 text and fuse them into an interpretable pre-competition risk index. Target: IEEE conference full
@@ -21,10 +21,10 @@ paper. Owner: Saikalyan, sophomore, SRMIST. Single source of truth: `CLAUDE.md`.
 
 | Phases | Status |
 |---|---|
-| 1–13 | Complete — scoping, literature, taxonomy, ethics, ingestion, preprocessing, synthetic corpus, silver labelling, annotation tooling, classical baselines |
-| **14** | **Complete — transformer fine-tuned, gate PASSED** |
-| 15 | Complete — risk fusion + per-construct calibration (`src/risk/`, `reports/calibration.md`) |
-| 16 | Not started — optional, no DataRobot account, likely skipped |
+| 1–13 | Complete - scoping, literature, taxonomy, ethics, ingestion, preprocessing, synthetic corpus, silver labelling, annotation tooling, classical baselines |
+| **14** | **Complete - transformer fine-tuned, gate PASSED** |
+| 15 | Complete - risk fusion + per-construct calibration (`src/risk/`, `reports/calibration.md`) |
+| 16 | Not started - optional, no DataRobot account, likely skipped |
 | 17–25 | Not started |
 
 **The one sentence that governs how every number in this project is read:** `data/gold/` is empty,
@@ -33,13 +33,13 @@ corpus property of a synthetic template grammar.
 
 ---
 
-## Part B — What happened this session
+## Part B - What happened this session
 
 ### 1. Phase 14 built and executed
 
-`src/models/transformer.py` — multi-label transformer behind the same `Baseline` interface as the
+`src/models/transformer.py` - multi-label transformer behind the same `Baseline` interface as the
 Phase 13 classical models, so the gate scores both through one harness. Thresholds tuned on a
-template-disjoint validation slice carved from *training* data. `scripts/run_transformer.py` — the
+template-disjoint validation slice carved from *training* data. `scripts/run_transformer.py` - the
 gate, comparing against the Phase 13 bar read from `reports/baselines.json` (not hardcoded) with a
 **paired bootstrap**, not a point comparison.
 
@@ -66,7 +66,7 @@ psychological constructs in athlete text.** `PROJECT_PLAN.md` Phase 14's gate is
    fitting noise. Argues for dropping per-construct thresholds entirely.
 2. **Top three configurations are statistically indistinguishable** (0.588 / 0.582 / 0.558, CIs
    overlapping). Report as "no configuration clearly dominated".
-3. **The memorisation gap is the headline contribution.** +0.317 vs TF-IDF's +0.819 — a pretrained
+3. **The memorisation gap is the headline contribution.** +0.317 vs TF-IDF's +0.819 - a pretrained
    encoder generalises across held-out templates where bag-of-ngrams collapses. Measured, not
    asserted.
 
@@ -76,14 +76,14 @@ psychological constructs in athlete text.** `PROJECT_PLAN.md` Phase 14's gate is
 padding → **dynamic padding** with per-batch trimming; `use_safetensors=True` (the first run
 downloaded the model twice); **live progress output** with loss and ETA. Combined ~5× less CPU
 work. Sweep restructured: grid runs on the template-disjoint split only, random foil runs for the
-winner — the memorisation gap is a corpus property, not a hyperparameter one.
+winner - the memorisation gap is a corpus property, not a hyperparameter one.
 
-### 4. Ethics amendment — A5, then its collapse
+### 4. Ethics amendment - A5, then its collapse
 
-`docs/ethics.md` **§3.5** — prohibition **P1 narrowed** (not repealed) to permit **topic-scoped**
+`docs/ethics.md` **§3.5** - prohibition **P1 narrowed** (not repealed) to permit **topic-scoped**
 collection from public pseudonymous forums as category **A5**, with 11 binding conditions.
 Account-centred collection remains prohibited absolutely. §3.5.2 records the argument *against*,
-including that P1's actual objection — *authors do not anticipate psychological profiling* — is
+including that P1's actual objection - *authors do not anticipate psychological profiling* - is
 **not** answered by pseudonymity.
 
 `src/ingestion/reddit.py` enforces C1 **structurally**: there is no `author` parameter on any entry
@@ -113,18 +113,18 @@ OPEN-030/031/032 raised), `.gitignore`, `pyproject.toml`, `requirements-ml.txt`,
 
 ---
 
-## Part C — Open items, by urgency
+## Part C - Open items, by urgency
 
 | # | Item | Status |
 |---|---|---|
-| 1 | **OPEN-011 — no real athlete text.** A1 exhausted (Phase 7), A5 blocked by Reddit (OPEN-031). **A3 is the remaining route** and materials are built. Nothing collected yet. | **highest risk** |
-| 2 | **OPEN-025 — no second annotator.** κ needs two people; contribution #1 unmet without it. The ask is ~3 hours on the 100-item `gold_dev` set, in two sittings. Owner currently intends to annotate solo, which **cannot** close this. | **critical, 3 phases overdue** |
-| 3 | **OPEN-004 — no expert rater.** Phase 17 is the headline contribution and has the longest lead time. | overdue |
-| 4 | OPEN-030 — ethics exemption predates the A5 amendment | before submission |
-| 5 | OPEN-005 — exemption documentary record not obtained | before submission |
-| 6 | OPEN-006 — personal webmail is the only contact route | release blocker |
-| 7 | OPEN-031 — A5 amendment paid its ethical cost and produced nothing; revert or report? | decision |
-| 8 | OPEN-032 — A3 donor mapping must stay out of git | before first donation |
+| 1 | **OPEN-011 - no real athlete text.** A1 exhausted (Phase 7), A5 blocked by Reddit (OPEN-031). **A3 is the remaining route** and materials are built. Nothing collected yet. | **highest risk** |
+| 2 | **OPEN-025 - no second annotator.** κ needs two people; contribution #1 unmet without it. The ask is ~3 hours on the 100-item `gold_dev` set, in two sittings. Owner currently intends to annotate solo, which **cannot** close this. | **critical, 3 phases overdue** |
+| 3 | **OPEN-004 - no expert rater.** Phase 17 is the headline contribution and has the longest lead time. | overdue |
+| 4 | OPEN-030 - ethics exemption predates the A5 amendment | before submission |
+| 5 | OPEN-005 - exemption documentary record not obtained | before submission |
+| 6 | OPEN-006 - personal webmail is the only contact route | release blocker |
+| 7 | OPEN-031 - A5 amendment paid its ethical cost and produced nothing; revert or report? | decision |
+| 8 | OPEN-032 - A3 donor mapping must stay out of git | before first donation |
 | 9 | OPEN-012 / OPEN-021 / OPEN-028 | known, documented |
 
 **One person could close items 1, 2 and 3 simultaneously:** an SRMIST coach or sport-psych
@@ -133,11 +133,11 @@ has been deferred across five phases. `docs/recruitment.md` has the ask.
 
 ---
 
-## Part D — Immediate next steps
+## Part D - Immediate next steps
 
 1. **Commit Phase 14** (Part E below).
-2. **Send the A3 recruitment message this week** — `docs/recruitment.md`. Target 40–50 donations.
-3. **Ask one person to be annotator A2** — any careful person, no sports-psych expertise needed.
+2. **Send the A3 recruitment message this week** - `docs/recruitment.md`. Target 40–50 donations.
+3. **Ask one person to be annotator A2** - any careful person, no sports-psych expertise needed.
 4. **Then Phase 17** (explainability + expert validation), the headline contribution.
 
 **Paper framing decision, due by code freeze.** If real gold never arrives, the honest paper is a
@@ -146,7 +146,7 @@ finding. Decide by Week 7 rather than discovering it.
 
 ---
 
-## Part E — Commit sequence
+## Part E - Commit sequence
 
 Pre-commit stashes unstaged changes, and if hooks then modify staged files the restore conflicts
 and **all fixes roll back**. Stage everything first.
@@ -204,10 +204,10 @@ python -m pytest -q         # full suite
 
 ---
 
-## Part F — Environment notes for the next session
+## Part F - Environment notes for the next session
 
 - **Python 3.11** (`datetime.UTC` is used; it does not exist on 3.10).
-- `pip install -r requirements-ml.txt --extra-index-url https://download.pytorch.org/whl/cpu` —
+- `pip install -r requirements-ml.txt --extra-index-url https://download.pytorch.org/whl/cpu` -
   the CPU wheel index matters; default PyPI torch is the CUDA build.
 - `sentencepiece` is required for DeBERTa-v3 and is pinned. Without it the failure is an
   un-Googleable tiktoken `ValueError`; `load_tokenizer` translates it.
@@ -215,7 +215,7 @@ python -m pytest -q         # full suite
 - Full sweep on CPU: ~5 hours at distilroberta size. One config, one epoch: ~10 minutes.
 - `scripts/diagnose_transformer.py` isolates a native crash one flushed step at a time.
 - **`pytest` excludes `-m slow` by default** (`pyproject.toml` `addopts`). The default run is
-  offline, deterministic and free. The one network-dependent test — the fine-tune smoke test — runs
+  offline, deterministic and free. The one network-dependent test - the fine-tune smoke test - runs
   only with `pytest -m slow`, and skips rather than fails when the hub is unreachable. A red report
   that means "someone else's server is down" trains people to ignore red reports.
 - **`TransformerBaseline.load()`** reloads a saved checkpoint with its tuned thresholds and refuses
