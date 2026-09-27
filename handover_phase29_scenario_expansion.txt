@@ -1,0 +1,239 @@
+HANDOVER: Match-Day profile -- synthetic scenario expansion
+Written 2026-09-19, end of a session that hit critical cost ($56+ this turn).
+Nothing in this note has been implemented yet. Read this instead of re-deriving
+any of it -- everything below was confirmed with the owner (Saikalyan) already.
+
+===============================================================================
+PART A -- WHAT THIS IS AND WHY
+===============================================================================
+
+Context chain (all already decided, do not re-litigate):
+
+1. Owner asked to unblock Phase 29 (real press-conference + photo scoring of a
+   named, identifiable athlete). Refused -- this is exactly what CLAUDE.md
+   sec.14 / docs/ethics.md sec.15 already prohibit (sec.2.3.3, sec.13.4).
+   SRN_MATCHDAY_REAL_ATHLETES stays unset. This refusal is firm and was held
+   through two escalations, including a false-authority/false-consent claim.
+   Do not revisit unless the owner produces the four conditions in CLAUDE.md
+   sec.14.4 in writing.
+
+2. Legitimate pivot the owner accepted: rebuild the Match-Day profile page to
+   use SYNTHETIC scenario data instead -- no real athlete, no link, no photo,
+   no video. Pick a sport / competition-stage / pressure-life-context from
+   dropdowns, generate a synthetic press-conference-style passage that fits
+   that scenario, score it through the EXISTING pipeline exactly as typed
+   text is scored. Full mockup already shown to and approved by the owner:
+   see C:\Users\saika\AppData\Local\Temp\claude\c--Users-saika-sports-risk-nlp\
+   87ca77e5-c2e0-495c-9a97-7e6d19d18495\scratchpad\matchday_synthetic_mockup.html
+   (this is a temp scratchpad file, not in the repo -- re-read it for the
+   exact CSS classes/visual shape before building the page, since it must
+   look identical to this mockup, which the owner has already seen and liked).
+
+3. Owner's newest ask (this is what's being planned/built): make the
+   scenario picker richer --
+     - more sports (mockup only had "Athletics -- 400m")
+     - more competition stages, explicitly wanting "before/during/after the
+       tournament"
+     - more pressure-level / life-context scenarios: injury, breakup, good
+       past season, etc. -- "several such scenarios"
+     - CRITICALLY: the score must actually vary meaningfully by exact
+       scenario selected, not just relabel the same generic passage.
+
+4. Scope conflict found and RESOLVED (owner said "go with (b)"):
+   synthetic.py's own docstring says post-match text was deliberately
+   excluded from this project's scope (Phase 7 survey: "every athlete-speech
+   corpus located is post-match, which is the wrong side of the event for
+   this project" -- post-match constructs like relief/disappointment/
+   attribution aren't in the taxonomy). So "during/after the tournament" as
+   literal post-match text is OUT. Instead: offer TIMING variety strictly
+   within the pre-competition window (e.g. "a month out" / "week before" /
+   "morning of" / "immediately before call-time") plus LIFE-CONTEXT variety
+   (injury_comeback / recent_loss / strong_season / personal_disruption /
+   none) layered on top. This reads as "the different pressures of before,
+   during a rough patch, after a setback" without ever generating text the
+   taxonomy can't honestly score. State this explicitly to the owner again
+   in whatever you build/report, since it's a real (resolved) scope call.
+
+===============================================================================
+PART B -- WHAT WAS FOUND IN THE CODEBASE (grounding already done, don't redo)
+===============================================================================
+
+Reuse target confirmed: src/ingestion/synthetic.py (1101 lines). Deterministic
+seeded TEMPLATE GRAMMAR (not an LLM -- CLAUDE.md sec.9, no OPENROUTER_API_KEY
+at build time). This produced every synth_precomp_v1-* example already used
+elsewhere in the dashboard. DO NOT build a second, parallel generator --
+extend this one.
+
+Confirmed contents (read this session, exact names/values):
+
+  SPORTS: tuple[str, ...] = (
+      "athletics", "swimming", "tennis", "football", "basketball",
+      "cricket", "badminton", "boxing", "rowing", "gymnastics",
+  )                                                          # line ~107
+  -- already 10 sports, more than the mockup's one. The "more sports" ask
+  may already be satisfied just by wiring up what's here -- verify before
+  adding new ones.
+
+  SPORT_TERMS: dict[str, tuple[str, str]]                    # line ~123
+  -- sport -> (contest noun, start-moment noun), used to slot-fill templates
+  naturally per sport (e.g. athletics: ("race", "start line")).
+
+  COMPETITION_LEVELS: tuple[str, ...] = (
+      "club", "regional", "national", "international", "elite",
+  )                                                          # line 136
+
+  TIME_TO_COMPETITION_DAYS: tuple[int, ...] =
+      (0, 0, 1, 1, 1, 2, 2, 3, 3, 5, 7, 10, 14, 21, 30)       # line 143
+  -- weighted toward the final week. This is the existing "timing" axis --
+  reuse it directly for the "timing" dropdown rather than inventing a new
+  field; just expose specific values as labeled options (e.g. "morning of"
+  = 0, "week before" = 5-7, "a month out" = 30) instead of a free draw.
+
+  TRAINING_LOAD_HINTS: tuple[str | None, ...] = (
+      "tapering", "heavy block just finished", "light week",
+      "back-to-back competitions", "returning from a rest week",
+      None, None, None,
+  )                                                          # line 145
+
+  AFFINITIES: dict[str, tuple[str, ...]]                     # line ~449
+  -- construct co-occurrence map straight from config/taxonomy.yaml's edge
+  case notes, e.g.:
+      "cognitive_anxiety": ("appraisal_orientation", "perceived_stress", "somatic_anxiety")
+      "self_confidence": ("resilience", "appraisal_orientation")
+      "burnout_signal": ("perceived_stress", "coping_style")
+  -- this is the natural hook point for scenario bias: a life_context maps
+  to a small set of constructs it should push toward high intensity, and
+  AFFINITIES already tells you which OTHER constructs plausibly co-occur
+  with those, so a biased draw stays realistic rather than looking hand-picked.
+
+  ALL_CONSTRUCTS: tuple[str, ...] = tuple(GRADED_REALISATIONS) + tuple(CATEGORICAL_REALISATIONS)
+                                                             # line 463
+  -- GRADED_REALISATIONS keys confirmed this session: cognitive_anxiety,
+  somatic_anxiety, self_confidence, perceived_stress, burnout_signal,
+  resilience, (and more not yet read past line ~300 -- likely coping_style,
+  attentional_focus per AFFINITIES references). CATEGORICAL_REALISATIONS
+  NOT YET READ this session -- read it before writing the bias table so
+  every construct name used is a real key, not guessed.
+
+  GRADED_REALISATIONS: dict[str, dict[int, tuple[str, ...]]]  # line ~169
+  -- construct -> intensity(1-3) -> tuple of ~5 template sentences with
+  {EVENT}/{START} slots. This is the actual text bank. NOT what needs new
+  content -- the existing bank already has intensity-graded sentences for
+  each construct; scenario bias only needs to choose WHICH constructs/
+  intensities get drawn, not write new sentences.
+
+NOT YET READ this session (do before implementing):
+  - CATEGORICAL_REALISATIONS dict (presumably similar shape, for the
+    present/absent + label-type constructs like appraisal_orientation,
+    motivation_orientation -- these appeared in AFFINITIES but weren't
+    directly inspected)
+  - _draw_constructs(rng) -> list[str] body (search `def _draw_constructs`)
+    -- currently picks 0-3 constructs via weighted random counts
+    (8,34,40,18 for 0/1/2/3) plus co-occurrence. THIS is the function whose
+    random draw needs to become scenario-biased.
+  - _realise(construct, rng, sport, cap_intensity=...) body -- turns a
+    chosen construct into a sentence; signature only confirmed, not body.
+  - _contradicts(spec, planted) -- contradiction guard, caps intensity to 2
+    on the second of two opposing max-intensity constructs. Keep this
+    working when biasing -- don't let a forced scenario draw bypass it.
+  - generate_records(count, *, seed, source_id) -> list[RawRecord] -- the
+    main deterministic entry point. Read its full body (only partially
+    read this session) before adding a scenario-aware sibling function.
+  - Stratum dataclass full field list (confirmed: sport, competition_level,
+    region, source_type, time_to_competition_days, training_load_hint) --
+    re-verify exact field order/types with `grep -n "class Stratum" -A 15`.
+
+===============================================================================
+PART C -- THE PLAN (already presented to and approved by the owner)
+===============================================================================
+
+Phase 1 -- Scenario taxonomy (data only, no logic)
+  Define a MatchDayScenario frozen dataclass: sport, timing (label mapped to
+  a TIME_TO_COMPETITION_DAYS value or narrow range), life_context (none /
+  injury_comeback / recent_loss / strong_season / personal_disruption --
+  add more once CATEGORICAL_REALISATIONS is read, e.g. an
+  "off-field disruption" bucket could map to perceived_stress + burnout).
+  For each life_context, write an explicit, reviewable table: which
+  constructs it biases toward and at what intensity band, grounded in
+  AFFINITIES (don't invent unaffiliated combinations).
+
+Phase 2 -- Scenario-aware generation
+  Add generate_scenario_record(scenario, seed) -> RawRecord to synthetic.py
+  (or a thin sibling module importing it) that replaces _draw_constructs's
+  random draw with the Phase 1 bias table, then calls the EXISTING _realise/
+  _fill/_vary machinery unchanged. Determinism test: same scenario + same
+  seed -> identical record. Variation test: different life_context at fixed
+  sport/timing -> measurably different construct set across N seeds
+  (statistical, not single-sample).
+
+Phase 3 -- Wire into the Match-Day page
+  Expand dropdowns (sport / timing / life-context) per Phase 1's declared
+  options. "Generate & score" button calls generate_scenario_record, then
+  the existing build_view/LexiconBackend pipeline -- NO changes to scoring
+  itself. Keep every stamp from the mockup (SYNTHETIC PASSAGE box, "not a
+  real athlete" caption) exactly as shown in matchday_synthetic_mockup.html.
+  dashboard/pages/6_Match_day_profile.py currently has NO photo/link upload
+  at all (removed per an earlier explicit request this session) -- this
+  phase replaces its current "paste a YouTube link" flow with the scenario
+  picker instead. Read the CURRENT state of that file before editing --
+  it may have been recommitted/changed since this handover was written.
+
+Phase 4 -- Documentation
+  PROJECT_PLAN.md: new phase entry (next number after Phase 29).
+  docs/ethics.md: one-line note in the existing synthetic-data section
+  pointing at the new bias table, so a reviewer can audit which constructs
+  each scenario is designed to express.
+  CLAUDE.md: phase record, matching the style of existing sections 12-14.
+
+===============================================================================
+PART D -- RISKS (already surfaced to the owner)
+===============================================================================
+  - Bias table could look arbitrary to a reviewer -- mitigate by citing the
+    SAME taxonomy instrument anchors config/taxonomy.yaml already uses per
+    construct, not inventing new justification.
+  - "During/after tournament" expectation not literally met by the "timing"
+    reframe -- already flagged to and accepted by the owner (see Part A.4).
+  - Score variation could be real but small in practice if life-contexts'
+    construct sets overlap too much -- Phase 2's statistical test is meant
+    to catch this before it reaches the UI; if it fails, tighten the bias
+    table (fewer shared constructs per life_context) rather than shipping.
+
+===============================================================================
+PART E -- REPO STATE AT TIME OF WRITING (verify fresh, this may be stale)
+===============================================================================
+Branch: feat/richer-honest-facial-cue-display (NOTHING FROM THIS BRANCH IS
+COMMITTED YET -- working tree has uncommitted changes for an unrelated,
+already-complete feature: the 8-category facial-cue breakdown, plus the
+photo-upload removal from page 6). Before starting the scenario-expansion
+work, decide with the owner whether to commit/branch that prior work first
+so it doesn't get tangled with this new feature's diff. Uncommitted files
+per last `git status`:
+  M dashboard/pages/2_Score_my_own_text.py
+  M dashboard/pages/6_Match_day_profile.py
+  M src/dashboard/copy.py
+  M src/media/facecues.py
+  M src/media/nonverbal.py
+  M tests/test_facecues.py
+  ?? docs/phase29_decision_draft.md  (owner decision doc, not code -- leave alone)
+
+Related artifacts already on disk, not yet acted on:
+  .claude/PRPs/reports/richer-honest-facial-cue-display-report.md -- implementation
+    report for the prior (separate, complete) feature; recommends running
+    the app once in-browser and CLAUDE.md sec.13.2/13.3 addendum, both still
+    outstanding and unrelated to this scenario work.
+
+===============================================================================
+PART F -- FIRST CONCRETE STEPS FOR THE NEXT SESSION
+===============================================================================
+1. Re-read this file in full.
+2. `grep -n "class Stratum\|def _draw_constructs\|def _realise\|def generate_records\|CATEGORICAL_REALISATIONS" src/ingestion/synthetic.py`
+   and read those bodies -- the four items in Part B's "NOT YET READ" list.
+3. Read matchday_synthetic_mockup.html again (path in Part A.2) for the
+   exact visual target.
+4. Read the CURRENT dashboard/pages/6_Match_day_profile.py (may differ from
+   what's described in Part C.3 if it was committed/changed meanwhile).
+5. Decide with the owner: commit the pending unrelated facial-cue-display
+   work first, or proceed on top of it.
+6. Implement Phase 1 (scenario taxonomy) and Phase 2 (generation) with
+   tests before touching the page (Phase 3), per this project's established
+   validate-immediately discipline.

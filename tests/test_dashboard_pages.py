@@ -118,7 +118,7 @@ def _expander_lines(tree: ast.Module) -> list[int]:
     """Lines where the page actually calls `st.expander`.
 
     Read off the syntax tree rather than grepped for, because the rule is about
-    collapsible sections the page *renders*. Phase 30 added a page whose docstring
+    collapsible sections the page *renders*. Phase 34 added a page whose docstring
     explains why it deliberately has none, and a substring check failed it for
     saying so -- the rule and the thing it protects related by assumption, which is
     the defect shape this file already names four times. Prose about an API is not
@@ -138,7 +138,7 @@ def _stamp_lines(tree: ast.Module) -> list[int]:
 
     Matched on any `.stamp` access, not on `risk.stamp`. The rule was written when
     the only stamped surface was the risk score; Phase 26 added pages whose stamp
-    comes off a `BiosignalWindow` or a source, and Phase 30 pages whose stamp comes
+    comes off a `BiosignalWindow` or a source, and Phase 34 pages whose stamp comes
     off a `Ribbon` or a `CorpusCloud`. A rule scoped to one attribute name stops
     protecting the app the moment a second kind of stamped surface arrives.
     """

@@ -637,7 +637,146 @@ def per_construct_chart(rows: Sequence, *, caption: str = "", width: int = CHART
 
 
 # ---------------------------------------------------------------------------
-# Phase 30 -- two marks that answer "what shape is this?" rather than "how big?"
+# Phase 30 -- the paired diff
+# ---------------------------------------------------------------------------
+#
+# The two charts above answer "what did each construct do in THIS text?". Put two
+# of them side by side and a reader has to hold ten pairs of bar lengths in their
+# head across a column gutter, which is the job a diff chart exists to remove.
+#
+# What it may not become: a measured effect. Subtracting one uncalibrated ranking
+# from another leaves an uncalibrated ranking, and the difference carries no
+# interval because neither number does. That sentence is drawn INTO the figure
+# rather than left to the page around it, for the same reason the provenance
+# stamp is: a figure travels, and a caption written beside it does not travel
+# with it.
+
+#: Rendered inside every delta figure, below the plot. Quoted verbatim or the
+#: figure does not ship -- `tests/test_compare.py` asserts its presence.
+DELTA_CAPTION = (
+    "a difference between two rankings, not a measured effect: neither text's "
+    "number is calibrated, so the gap between them has no interval either"
+)
+
+
+def construct_delta_chart(
+    left: Sequence[ConstructBar],
+    right: Sequence[ConstructBar],
+    *,
+    left_label: str = "A",
+    right_label: str = "B",
+    width: int = CHART_WIDTH,
+) -> str:
+    """How much more strongly each construct was detected in B than in A.
+
+    Diverging: right of the rule means B detected the construct more strongly,
+    left of it means A did. Sign is position, never colour alone, and the numeric
+    reading sits on every row, so the figure survives grayscale and a stripped
+    stylesheet exactly as the other two do.
+
+    **Detection strength, not contribution.** Probability is diffed because it
+    exists for all ten constructs; contribution is structurally zero for the
+    inert four under the default policy, so a contribution diff would draw four
+    empty rows and imply those constructs did not move between the texts when
+    they may have moved a great deal. A construct that is inert in BOTH texts is
+    marked as such on its own row, so a large delta on a row that counted as zero
+    twice reads as what it is.
+
+    Rows are paired by construct NAME, not by position: two views built from
+    different backends are not guaranteed to order their bars identically, and a
+    positional zip would silently subtract one construct from another. Mismatched
+    sets raise rather than rendering a partial figure.
+    """
+    a_by = {b.construct: b for b in left}
+    b_by = {b.construct: b for b in right}
+    if a_by.keys() != b_by.keys():
+        missing = (a_by.keys() | b_by.keys()) - (a_by.keys() & b_by.keys())
+        raise ValueError(
+            f"cannot diff two decompositions over different constructs: {sorted(missing)}. "
+            "Both views must come from the same taxonomy."
+        )
+    rows = [(a_by[bar.construct], b_by[bar.construct]) for bar in left]
+
+    # A reserved right-hand gutter, only when something needs to go in it. The
+    # inert note was first drawn beside the row label, where a long construct
+    # name ran straight through it -- the kind of defect a unit test asserting
+    # "the string is present" reports as green.
+    gutter = 150 if any(a.inert and b.inert for a, b in rows) else 0
+    height = len(rows) * ROW_HEIGHT + 78
+    plot_width = width - LABEL_WIDTH - 60 - gutter
+    centre = LABEL_WIDTH + plot_width / 2
+    span = max((abs(b.probability - a.probability) for a, b in rows), default=1.0) or 1.0
+    scale = (plot_width / 2 - 40) / span
+    hatch = _hatch_id("delta", tuple(left) + tuple(right))
+
+    out: list[str] = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" '
+        f'aria-label="Difference in detection strength between two texts, per construct">',
+        _defs(hatch),
+        f'<rect width="{width}" height="{height}" fill="{COLOUR_SURFACE}"/>',
+        f'<text x="8" y="18" {FONT} font-size="12" fill="{COLOUR_INK}" font-weight="600">'
+        f"Detection strength: {escape(right_label)} minus {escape(left_label)}</text>",
+        f'<text x="8" y="34" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"right of the rule means {escape(right_label)} detected it more strongly; "
+        "sign is position, not colour</text>",
+    ]
+
+    top = 46
+    for i, (a, b) in enumerate(rows):
+        y = top + i * ROW_HEIGHT
+        mid = y + ROW_HEIGHT / 2
+        delta = b.probability - a.probability
+        both_inert = a.inert and b.inert
+        out.append(
+            f'<text x="8" y="{mid + 4:.1f}" {FONT} font-size="11" '
+            f'fill="{COLOUR_MUTED if both_inert else COLOUR_INK}">'
+            f"{escape(_label(a.construct, both_inert))}</text>"
+        )
+
+        length = abs(delta) * scale
+        higher = delta > 0
+        x = centre if higher else centre - length
+        colour = COLOUR_RAISES if higher else COLOUR_LOWERS
+        out.append(
+            f'<rect x="{x:.1f}" y="{y + 5:.1f}" width="{max(length, 1.0):.1f}" height="14" '
+            f'fill="{colour}" rx="3"/>'
+        )
+        label_x = centre + max(length, 1.0) + 6 if higher else centre - max(length, 1.0) - 6
+        anchor = "start" if higher else "end"
+        out.append(
+            f'<text x="{label_x:.1f}" y="{mid + 4:.1f}" {FONT} font-size="10" '
+            f'fill="{COLOUR_INK}" text-anchor="{anchor}">{delta:+.2f}</text>'
+        )
+        if both_inert:
+            # Hatch keeps the meaning it has everywhere else in this module --
+            # "present, and contributing nothing" -- so it marks the row, not the
+            # delta. The delta is real; what counted as zero is the construct.
+            out.append(
+                f'<rect x="{width - gutter + 8:.1f}" y="{y + 5:.1f}" width="18" height="14" '
+                f'fill="url(#{hatch})" stroke="{COLOUR_MUTED}" stroke-width="1.5" '
+                'stroke-dasharray="3 2" rx="3"/>'
+            )
+            out.append(
+                f'<text x="{width - 8:.1f}" y="{mid + 4:.1f}" {FONT} font-size="9" '
+                f'fill="{COLOUR_MUTED}" font-style="italic" text-anchor="end">'
+                "inert in both, counted as zero</text>"
+            )
+
+    out.append(
+        f'<line x1="{centre:.1f}" y1="{top}" x2="{centre:.1f}" y2="{top + len(rows) * ROW_HEIGHT}" '
+        f'stroke="{COLOUR_RULE}" stroke-width="1.5"/>'
+    )
+    out.append(
+        f'<text x="8" y="{height - 10}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"{DELTA_CAPTION}</text>"
+    )
+    out.append("</svg>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Phase 34 -- two marks that answer "what shape is this?" rather than "how big?"
 # ---------------------------------------------------------------------------
 #
 # Everything above draws ONE record. Two questions a reader could not ask of the

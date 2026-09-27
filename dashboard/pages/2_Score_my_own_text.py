@@ -172,10 +172,25 @@ if media is not None and not media and media.face_only:
             with column:
                 st.markdown(
                     f'<div class="widget"><span class="wl">{name.replace("_", " ")}</span>'
-                    f'<span class="wv" style="font-size:32px">{value:.2f}</span>'
+                    f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
                     f'<span class="wu">weight {media_weights[name]:+.2f}</span></div>',
                     unsafe_allow_html=True,
                 )
+    supporting = sorted((k, v) for k, v in media_context.items() if k not in media_weights)
+    if supporting:
+        st.markdown(f"### {plain.FACE_EXPRESSION_HEADLINE}")
+        st.markdown(theme.claude_lede(plain.FACE_EXPRESSION_PLAIN), unsafe_allow_html=True)
+        for row_start in range(0, len(supporting), 5):
+            row = supporting[row_start : row_start + 5]
+            for column, (name, value) in zip(st.columns(len(row)), row, strict=False):
+                with column:
+                    st.markdown(
+                        f'<div class="widget is-inert"><span class="wl">'
+                        f"{name.replace('expr_', '').replace('_', ' ')}</span>"
+                        f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
+                        f'<span class="wu">shown, weighted as zero</span></div>',
+                        unsafe_allow_html=True,
+                    )
     st.caption(media.nonverbal_stamp)
     st.error(FACE_ONLY_STAMP)
     with st.expander("Provenance and limitations: read before quoting this figure"):
@@ -334,19 +349,22 @@ if view.unevidenced_driver_count:
 if media is not None and media_context:
     st.markdown("## The non-verbal reading")
     st.caption(plain.FACE_CUES_MEASURED if media.face_measured else plain.FACE_CUES_NOT_MEASURED)
-    for column, (name, value) in zip(
-        st.columns(len(media_context)), sorted(media_context.items()), strict=False
-    ):
-        with column:
-            st.markdown(
-                f'<div class="widget{"" if name in media_weights else " is-inert"}">'
-                f'<span class="wl">{name.replace("_", " ")}</span>'
-                f'<span class="wv" style="font-size:32px">{value:.2f}</span>'
-                f'<span class="wu">'
-                f"{'moved the score' if name in media_weights else 'shown, weighted as zero'}"
-                f"</span></div>",
-                unsafe_allow_html=True,
-            )
+    if any(name.startswith("expr_") for name in media_context):
+        st.markdown(theme.claude_lede(plain.FACE_EXPRESSION_PLAIN), unsafe_allow_html=True)
+    context_items = sorted(media_context.items())
+    for row_start in range(0, len(context_items), 5):
+        row = context_items[row_start : row_start + 5]
+        for column, (name, value) in zip(st.columns(len(row)), row, strict=False):
+            with column:
+                st.markdown(
+                    f'<div class="widget{"" if name in media_weights else " is-inert"}">'
+                    f'<span class="wl">{name.replace("expr_", "").replace("_", " ")}</span>'
+                    f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
+                    f'<span class="wu">'
+                    f"{'moved the score' if name in media_weights else 'shown, weighted as zero'}"
+                    f"</span></div>",
+                    unsafe_allow_html=True,
+                )
     st.caption(media.nonverbal_stamp)
 
 with st.expander("Provenance and limitations: read before quoting any number"):

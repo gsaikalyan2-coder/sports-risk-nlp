@@ -1,4 +1,4 @@
-"""Honesty tests for the taxonomy deck (Phase 30).
+"""Honesty tests for the taxonomy deck (Phase 34).
 
 `tests/test_taxonomy.py` already validates `config/taxonomy.yaml` as configuration.
 This file validates it as a **surface**, which is a different job and turns on two

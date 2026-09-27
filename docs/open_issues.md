@@ -2112,3 +2112,59 @@ now.
 **Carry forward:** an aggregate pass is not a per-module pass. Where import
 order, environment or ordering can change an outcome, the test must construct
 the condition it claims to check rather than inherit it from the runner.
+
+---
+
+## OPEN-037 — a measured figure quoted without the condition that produced it
+
+**Status: CLOSED 2026-09-23 (Phase 32 review), before the work was merged.**
+**Owned by:** Phase 31 · **Found at:** Phase 32 self-review
+
+Two instances of one shape, found together:
+
+1. **"20.2%" quoted with no cue list.** It is the silence rate of the *widened*
+   demo cue list. The frozen list the paper evaluates is silent on 58.8% of the
+   same corpus — a factor of three. Phase 32 propagated the bare figure into
+   six lines across five files (`docs/dashboard.md`, `docs/model_card.md`, the
+   plan, `src/dashboard/copy.py`, `src/dashboard/coverage.py` twice), the worst
+   being `docs/model_card.md`, whose §4–§5 evaluation uses
+   the frozen list, and whose adjacent paragraph says in writing that "no
+   coverage figure may appear in the paper without naming the cue list that
+   produced it". The rule was broken in the section that states it.
+2. **"A realistic passage speaks to a quarter of the instrument set."** From
+   three hand-picked passages. Measured over all 100 `gold_dev` texts the mean
+   is **0.62 of 8**, distribution {0: 40, 1: 58, 2: 2}: 40% of texts speak to no
+   instrument at all and "2 of 8" is reached by 2 texts in 100.
+
+**The shape.** Both are a measurement quoted outside the conditions it was taken
+under — the same family as OPEN-034 (a presence-only gate certifying a claim its
+evidence contradicted) and OPEN-036 (an aggregate pass read as a per-module
+pass). A number is not portable just because it is true.
+
+**Root cause of (1): no artifact carried the figure.** 20.2% was measured during
+the Phase 31 widening and recorded only in a commit message, so every later
+quotation was a copy of a copy with nothing to check it against.
+
+**Fix.**
+
+* `reports/abstention.md` §4 (new) measures **both** cue lists over one corpus in
+  one table, so the number has a reproducible source and its list is printed
+  beside it. `src/evaluation/abstention.py::silence_rates` computes it; it is
+  the one place the widened list is measured, and it measures coverage, never
+  accuracy — every *scored* figure in that module still uses the frozen list.
+* Every site quoting a silence rate now carries both figures and cites §4.
+* The plan's §5, `docs/model_card.md` and the plan's DoD carry the measured
+  distribution instead of the hand-picked best case.
+
+**Regression tests.**
+`test_every_silence_rate_is_printed_beside_the_cue_list_that_produced_it` and
+`test_the_frozen_lists_two_silence_figures_differ_only_by_the_refused` in
+`tests/test_abstention.py`; and
+`test_a_realistic_passage_speaks_to_a_minority_of_the_instrument_set` in
+`tests/test_coverage.py`, whose bound was tightened from `mean < 2.0` — which the
+real mean of 0.62 clears by a factor of three, so it passed however much the
+finding softened — to the measured shape in both directions.
+
+**Carry forward:** a figure that is only in a commit message is not a
+measurement anybody can check. If a number is worth quoting twice, it belongs in
+a regenerable artifact, printed next to the condition it was measured under.

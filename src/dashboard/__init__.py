@@ -48,8 +48,10 @@ from .benchmarks import (
     load_per_construct,
 )
 from .charts import (
+    DELTA_CAPTION,
     benchmark_chart,
     construct_contribution_chart,
+    construct_delta_chart,
     construct_probability_chart,
     corpus_cloud_chart,
     evidence_coverage_chart,
@@ -65,12 +67,21 @@ from .corpus_cloud import (
     CorpusCloudMissing,
     load_cloud,
 )
+from .coverage import CoverageLedger, CoverageState, coverage_for
+from .coverage_panel import coverage_height, coverage_panel
 from .deck import card_deck
 from .gibberish import TextAdmission, admit
 from .matchday import (
+    LIFE_CONTEXT_LABELS,
+    LIFE_CONTEXTS,
     PRESS_STAMP,
+    SCENARIO_SPORTS,
+    SCENARIO_STAMP,
+    TIMING_LABELS,
+    TIMINGS,
     MatchDayProfile,
     build_profile,
+    build_scenario_profile,
     face_stack_status,
     transcript_stack_status,
 )
@@ -100,10 +111,10 @@ from .view import (
     known_examples,
     scorer_for,
 )
-from .widgets import Widget, widget_for, widgets_for
+from .widgets import Widget, coverage_widget, widget_for, widgets_for
 
 __all__ = [
-    # Phase 30: the sentence ribbon, the corpus constellation, the taxonomy deck.
+    # Phase 34: the sentence ribbon, the corpus constellation, the taxonomy deck.
     "build_ribbon",
     "Ribbon",
     "SentenceBand",
@@ -120,6 +131,12 @@ __all__ = [
     "TaxonomyCardError",
     "card_deck",
     "widgets_for",
+    "CoverageLedger",
+    "CoverageState",
+    "coverage_for",
+    "coverage_height",
+    "coverage_panel",
+    "coverage_widget",
     "admit",
     "read_upload",
     "MediaResult",
@@ -131,8 +148,15 @@ __all__ = [
     "face_stack_status",
     "transcript_stack_status",
     "build_profile",
+    "build_scenario_profile",
     "MatchDayProfile",
     "PRESS_STAMP",
+    "SCENARIO_STAMP",
+    "SCENARIO_SPORTS",
+    "TIMINGS",
+    "TIMING_LABELS",
+    "LIFE_CONTEXTS",
+    "LIFE_CONTEXT_LABELS",
     "TextAdmission",
     "widget_for",
     "theme",
@@ -164,6 +188,8 @@ __all__ = [
     "assert_no_forbidden_language",
     "build_view",
     "construct_contribution_chart",
+    "construct_delta_chart",
+    "DELTA_CAPTION",
     "construct_probability_chart",
     "evidence_coverage_chart",
     "evidence_height",

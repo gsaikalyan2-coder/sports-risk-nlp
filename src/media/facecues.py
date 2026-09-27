@@ -75,6 +75,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from src.media.nonverbal import (
+    FACE_EXPRESSION_FEATURES,
     FACE_FEATURES,
     NonVerbalEthicsGate,
     NonVerbalReading,
@@ -349,8 +350,24 @@ class FaceCueReader:
         return NonVerbalReading(source=self.name, stamp=FACE_STAMP, features=features)
 
 
+def _expression_breakdown(scores: list[float]) -> dict[str, float]:
+    """The model's own eight category scores, under the fixed `expr_*` names.
+
+    Verified empirically (2026-09-19, `enet_b0_8_va_mtl`, `logits=False`): the
+    eight scores are a real softmax distribution -- they sum to ~1.0 -- so
+    `_unit()` here is a bounds clamp for float noise, not a rescale hiding a
+    different kind of number. Zipped positionally against `EXPRESSIONS`, which
+    is the engine's own output order; `FACE_EXPRESSION_FEATURES` in
+    `nonverbal.py` is declared in that same order.
+    """
+    return {
+        name: _unit(value)
+        for name, value in zip(FACE_EXPRESSION_FEATURES, scores[: len(EXPRESSIONS)], strict=True)
+    }
+
+
 def _features_from_scores(scores: list[float]) -> dict[str, float]:
-    """Turn the model's output row into the two bounded features this project uses.
+    """Turn the model's output row into the bounded features this project carries.
 
     The multi-task model returns eight expression scores followed by valence and
     arousal, each in [-1, 1]. Both are rescaled to [0, 1] because
@@ -359,21 +376,34 @@ def _features_from_scores(scores: list[float]) -> dict[str, float]:
     more negative-looking expression and the declared weight can be positive
     like every other risk-raising term in `fusion.MAGNITUDES`.
 
+    The eight expression scores also come back, under `expr_*` names, at zero
+    weight -- see `FACE_WEIGHTS`, which does not list them. They are supporting
+    detail for the two weighted cues, never a substitute for them and never
+    ranked into a single "detected emotion" by this function or by the page
+    that renders it.
+
     If a build returns only the eight expression scores, valence is derived from
     the negative-expression mass and arousal is left at the neutral midpoint,
     which is the coarser reading rather than a wrong one. The page shows the
-    engine string, so which path ran is visible.
+    engine string, so which path ran is visible. The eight raw scores are still
+    returned in this path -- they are the one signal actually present here, and
+    hiding them would be a step backward for exactly this degraded case.
     """
     if len(scores) >= len(EXPRESSIONS) + 2:
         valence, arousal = scores[-2], scores[-1]
         return {
             "negative_valence": _unit((1.0 - float(valence)) / 2.0),
             "arousal": _unit((float(arousal) + 1.0) / 2.0),
+            **_expression_breakdown(scores),
         }
     if len(scores) >= len(EXPRESSIONS):
         total = sum(abs(value) for value in scores[: len(EXPRESSIONS)]) or 1.0
         negative = sum(abs(scores[EXPRESSIONS.index(name)]) for name in _NEGATIVE)
-        return {"negative_valence": _unit(negative / total), "arousal": 0.5}
+        return {
+            "negative_valence": _unit(negative / total),
+            "arousal": 0.5,
+            **_expression_breakdown(scores),
+        }
     raise FaceCueUnavailable(
         f"The engine returned {len(scores)} values, which this code does not know how "
         "to read. No cues were produced."

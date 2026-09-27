@@ -1,0 +1,213 @@
+================================================================================
+PHASE 33 (proposed) -- REPO MAP, ISOLATED-FILE CLEANUP, AND NEXT-STEP AUDIT
+
+Status:   NOT STARTED. This file is the session prompt, written 2026-09-26 by
+          the session that completed the Phase 32 corrections below.
+Written:  2026-09-26
+For:      A cold-start Claude Code session with no prior context.
+Owner:    Saikalyan. Deletion decisions are HIS, not the agent's (stated
+          2026-09-26: "Ill take care of that").
+================================================================================
+
+
+--------------------------------------------------------------------------------
+0. WHY THIS FILE EXISTS
+--------------------------------------------------------------------------------
+The previous session finished the Phase 32 contradiction fixes but hit a cost
+ceiling ($89.51) before it could run the two requested skills. Nothing about the
+map or the audit was started. This file carries everything the next session
+needs so it does not re-derive facts that are already measured.
+
+
+--------------------------------------------------------------------------------
+1. STARTING STATE -- 15 UNCOMMITTED FILES YOU MUST NOT LOSE
+--------------------------------------------------------------------------------
+Branch:  feat/richer-honest-facial-cue-display
+HEAD:    60f1c24  "fix: attribute the silence rate to its cue list"
+Tree:    DIRTY -- 15 modified files, all of them deliberate, none committed.
+
+  CLAUDE.md                               new sec.16 (Phases 31-32); sec.11.3
+                                          flag default corrected
+  PROJECT_PLAN.md                         phase-order debt note; Phase 31 + 32
+                                          sections; Phase 26 gate marked breached
+  docs/dashboard.md                       silence-rate citations fixed
+  docs/model_card.md                      citations + measured coverage shape
+  docs/open_issues.md                     OPEN-037 added
+  docs/phase32_implementation_plan.md     sec.5 corrected, sec.12 DoD amended,
+                                          baseline counts measured
+  handover_phase_32_evidence_coverage.txt marked SUPERSEDED
+  reports/abstention.{md,json}            REGENERATED -- now carry sec.4
+  reports/evidence_coverage_mockup.html   annotated as predating N4
+  src/dashboard/copy.py                   comment: cue-list attribution
+  src/dashboard/coverage.py               docstring: cue-list attribution
+  src/evaluation/abstention.py            +silence_rates(), SilenceResult,
+                                          CUE_LISTS, is_silent(); report sec.4
+  tests/test_abstention.py                +3 tests
+  tests/test_coverage.py                  coverage-shape bound tightened
+
+FIRST ACTION OF THE NEW SESSION: decide with the owner whether to commit this
+work before doing anything else. A file-deletion pass on top of 15 uncommitted
+edits makes any mistake much harder to unwind. Suggested commit message:
+
+    fix: attribute every coverage figure to its cue list, and correct the
+         measured coverage shape
+
+    Closes OPEN-037. reports/abstention.md sec.4 measures both cue lists over
+    one corpus so no silence rate is quoted without its list. Plan sec.5 and
+    the model card carry the measured distribution instead of three hand-picked
+    passages. CLAUDE.md sec.16 covers Phases 31-32; sec.11.3's flag default
+    corrected to match theme.cognitive_layer_enabled(). PROJECT_PLAN.md records
+    the Phase 23 ordering debt.
+
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+
+--------------------------------------------------------------------------------
+2. MEASURED FACTS -- DO NOT RE-DERIVE, DO NOT CONTRADICT
+--------------------------------------------------------------------------------
+All measured 2026-09-23 on this machine. Every one of these is now written into
+a committed-or-staged artifact; quoting them differently reopens OPEN-037.
+
+  Cue-list silence over gold_dev+gold_eval (n=500):
+      CONSTRUCT_CUES (frozen, evaluated)      294/500 = 58.8%
+      + DASHBOARD_EXTRA_CUES (widened, demo)  101/500 = 20.2%
+      Source of record: reports/abstention.md sec.4 (regenerate with
+      `python scripts/run_abstention_report.py`)
+      NB sec.3's `no_detection` reads 58.6% for the frozen list -- one text
+      lower, because `refused` outranks it in the cause ordering. Both correct.
+
+  Instruments spoken to (LexiconBackend = the widened list):
+      gold_dev  n=100  mean 0.62 of 8   dist {0: 40, 1: 58, 2: 2}  max 2
+      gold_eval n=400  mean 0.56 of 8   dist {0: 177, 1: 223}      max 1
+      "A quarter of the instrument set" was three hand-picked passages. Dead.
+
+  Test suite (measured both sides, not inferred):
+      e1f9787 (Phase 32 baseline)  1095 passed, 2 skipped, 2 deselected
+      HEAD + this work             1136 passed, 2 skipped, 2 deselected
+      Runtime ~11.5 min uncontended. Zero regressions.
+
+
+--------------------------------------------------------------------------------
+3. THE FOUR TASKS, IN ORDER
+--------------------------------------------------------------------------------
+T1. MAP EVERY FILE.  Run /anthropic-skills:graphify over the repo. It is NOT
+    installed yet (see sec.4). Edges that matter for this project: Python
+    imports, doc<->doc cross-references, code->config (*.yaml), code->data
+    (*.jsonl), script->report (reports/*), test->src, and page->src.dashboard.
+
+T2. REMOVE ISOLATED FILES.  Files with no inbound edge. **The agent proposes,
+    the owner disposes** -- present a classified list and wait. See the trap in
+    sec.5; this is the one task that can destroy something irreplaceable.
+
+T3. PERSIST THE MAP.  The owner's words: "map all the files so that that memory
+    gets carried on forever." Two places, because they serve different readers:
+      - docs/PROJECT_MAP.md -- committed, human- and reviewer-readable, the
+        artifact. Regenerable, and it says how to regenerate itself.
+      - ~/.claude/projects/c--Users-saika-sports-risk-nlp/memory/ -- one
+        `project`-type memory file pointing AT docs/PROJECT_MAP.md, plus a line
+        in MEMORY.md. Do not paste the map into memory; memory holds the
+        pointer and the non-obvious facts, the repo holds the content.
+
+T4. AUDIT NEXT STEPS.  Run /ponytail:ponytail-audit and turn it into a ranked
+    list of immediate next steps. Feed it sec.6 below -- the audit must not
+    recommend a thirty-third feature when the paper is the blocker.
+
+
+--------------------------------------------------------------------------------
+4. SETUP -- RUN THESE BEFORE T1
+--------------------------------------------------------------------------------
+  cd C:\Users\saika\sports-risk-nlp          # already the cwd; Python 3.11.9
+  git status --porcelain                     # expect the 15 files in sec.1
+
+  # graphify is NOT installed. Pick one:
+  uv tool install --upgrade graphifyy        # preferred if uv exists
+  python -m pip install graphifyy            # fallback
+
+  # Optional but it changes the cost profile completely: with a Gemini key the
+  # skill uses Gemini for semantic extraction instead of dispatching ~23 Claude
+  # subagents over ~500 files.
+  #   setx GEMINI_API_KEY ...      (new shell needed afterwards)
+
+  # Cheap first pass, if cost is tight -- structural only, no LLM:
+  #   graphify export html   after an AST-only extract; or just ask for the
+  #   grep+AST map and skip graphify's semantic half entirely. The isolation
+  #   question is structural and does not need the LLM pass.
+
+
+--------------------------------------------------------------------------------
+5. HARD CAUTIONS
+--------------------------------------------------------------------------------
+* THE PROVENANCE TRAP (the big one). ~40 files have zero inbound edges and are
+  NOT junk: handover_phase_*.txt, phase*_handover.md, phase*_summary.md,
+  phase*_prompt.md, docs/phase29_decision_draft.md, docs/findings.md. Nothing
+  imports them because they are the audit trail -- the record of what was
+  decided, when, and why, which is what the paper's reproducibility and ethics
+  claims rest on. An "isolated file" sweep would delete the project's memory in
+  the same session it was asked to preserve it. Classify by KIND, not by degree.
+
+* Genuinely regenerable, safe to delete: **/__pycache__/, *.pyc,
+  docs/.fuse_hidden0000005200000002 (a stray editor artifact -- it is a
+  byte-identical copy of docs/security.md; verify before removing).
+
+* Unclear, ask: "Claude outputs/" (top-level dir, space in the name),
+  DESIGNclaude.md, DESIGNcohere.md, ARTIFACT.md, donations_inbox.jsonl.
+
+* data/ is gitignored. data/processed/gold_candidates/*.jsonl and the other
+  corpus files exist on disk only. A worktree or fresh clone has no corpus and
+  4 tests fail for that reason alone -- copy the 5 untracked data files in if
+  you ever run the suite outside the main checkout.
+
+* `pytest -q` gives you `-qq`. pyproject's addopts already sets `-q`, so adding
+  another suppresses the summary count entirely -- dots and no total. Run
+  `python -m pytest --no-header`.
+
+* A GateGuard hook demands you state the request and what the command does
+  before the FIRST Bash call of a session. State the facts, then re-issue the
+  identical command.
+
+* PONYTAIL MODE is active (full). Ladder: does it need to exist -> already in
+  the codebase -> stdlib -> platform -> installed dep -> one line -> minimum
+  code. Deletion over addition. It does not license skipping comprehension.
+
+* Cost. The previous session ended at $89.51, largely on full-suite runs
+  (~11.5 min each) and the Phase 32 review. graphify's semantic half is the
+  expensive part of T1. Decide the budget with the owner before dispatching
+  subagents.
+
+
+--------------------------------------------------------------------------------
+6. WHAT THE AUDIT MUST NOT MISS -- THE REAL BLOCKER
+--------------------------------------------------------------------------------
+Phases 26 through 32 all shipped ahead of PHASE 23, the IEEE draft, which was
+due the first week of September 2026 and HAS NOT STARTED. PROJECT_PLAN.md gated
+Phase 26 on "starts only after Phase 23 ships"; that gate was breached on
+2026-09-13 and is now recorded as breached in the status board.
+
+paper/ contains refs.bib and an empty figures/. Both headline contributions are
+blocked on two human acts that no amount of code performs:
+
+  1. A2 annotating 100 gold_dev items (~3h, agreed 2026-08-12, not started).
+     Until this happens data/gold/ is EMPTY, there is no kappa, and no number
+     anywhere in the repository is an accuracy.
+  2. Two sports-familiar raters, ~45 min each. Deadline was set at 2026-09-28
+     -- that is TWO DAYS from this file's date.
+
+OPEN-011 (no real athlete text) remains the project's highest live risk, because
+contribution #1 is a corpus contribution and the corpus is synthetic.
+
+So: any audit output that ranks a new dashboard feature above "start Phase 23"
+or "get the annotation done" is wrong, and the owner should be told so plainly.
+
+
+--------------------------------------------------------------------------------
+7. DEFINITION OF DONE FOR THIS SESSION
+--------------------------------------------------------------------------------
+[ ] The 15 files of sec.1 are committed (or the owner has said not to).
+[ ] A file map exists, covering every tracked file, with the isolated set named.
+[ ] docs/PROJECT_MAP.md is committed and says how to regenerate itself.
+[ ] A memory file points at it; MEMORY.md carries one line for it.
+[ ] Nothing was deleted that the owner did not approve by name.
+[ ] Next steps are ranked, with Phase 23 and the annotation debt at the top
+    unless the owner overrules that.
+[ ] The suite is green: expect 1136 passed, 2 skipped (`pytest --no-header`).
+================================================================================

@@ -1,0 +1,147 @@
+{
+  "provenance": "PROVISIONAL -- planted-label corpus-property measurement, NOT accuracy. data/gold/ is empty (OPEN-025); no real athlete text exists (OPEN-011).",
+  "corpus": {
+    "name": "corpus",
+    "n": 500,
+    "refused": 1,
+    "refusal_rate": 0.002,
+    "off_register": 78,
+    "off_register_rate": 0.156,
+    "at_midpoint": 356,
+    "midpoint_rate": 0.712,
+    "ungated_midpoint": 355,
+    "ungated_midpoint_rate": 0.71,
+    "reasons": {
+      "not_english": 1
+    },
+    "causes": {
+      "refused": 1,
+      "no_detection": 293,
+      "all_inert": 62,
+      "moved": 144
+    }
+  },
+  "junk": [
+    {
+      "name": "empty_extraction",
+      "n": 3,
+      "refused": 3,
+      "refusal_rate": 1.0,
+      "off_register": 3,
+      "off_register_rate": 1.0,
+      "at_midpoint": 3,
+      "midpoint_rate": 1.0,
+      "ungated_midpoint": 0,
+      "ungated_midpoint_rate": 0.0,
+      "reasons": {
+        "empty": 3
+      },
+      "causes": {
+        "refused": 3,
+        "no_detection": 0,
+        "all_inert": 0,
+        "moved": 0
+      }
+    },
+    {
+      "name": "keyboard_mash",
+      "n": 4,
+      "refused": 4,
+      "refusal_rate": 1.0,
+      "off_register": 4,
+      "off_register_rate": 1.0,
+      "at_midpoint": 4,
+      "midpoint_rate": 1.0,
+      "ungated_midpoint": 0,
+      "ungated_midpoint_rate": 0.0,
+      "reasons": {
+        "not_english": 1,
+        "not_words": 2,
+        "too_short": 1
+      },
+      "causes": {
+        "refused": 4,
+        "no_detection": 0,
+        "all_inert": 0,
+        "moved": 0
+      }
+    },
+    {
+      "name": "symbols_and_digits",
+      "n": 3,
+      "refused": 3,
+      "refusal_rate": 1.0,
+      "off_register": 3,
+      "off_register_rate": 1.0,
+      "at_midpoint": 3,
+      "midpoint_rate": 1.0,
+      "ungated_midpoint": 0,
+      "ungated_midpoint_rate": 0.0,
+      "reasons": {
+        "not_letters": 3
+      },
+      "causes": {
+        "refused": 3,
+        "no_detection": 0,
+        "all_inert": 0,
+        "moved": 0
+      }
+    },
+    {
+      "name": "too_short",
+      "n": 4,
+      "refused": 4,
+      "refusal_rate": 1.0,
+      "off_register": 3,
+      "off_register_rate": 0.75,
+      "at_midpoint": 4,
+      "midpoint_rate": 1.0,
+      "ungated_midpoint": 0,
+      "ungated_midpoint_rate": 0.0,
+      "reasons": {
+        "too_short": 4
+      },
+      "causes": {
+        "refused": 4,
+        "no_detection": 0,
+        "all_inert": 0,
+        "moved": 0
+      }
+    },
+    {
+      "name": "off_register",
+      "n": 7,
+      "refused": 0,
+      "refusal_rate": 0.0,
+      "off_register": 7,
+      "off_register_rate": 1.0,
+      "at_midpoint": 7,
+      "midpoint_rate": 1.0,
+      "ungated_midpoint": 7,
+      "ungated_midpoint_rate": 1.0,
+      "reasons": {},
+      "causes": {
+        "refused": 0,
+        "no_detection": 7,
+        "all_inert": 0,
+        "moved": 0
+      }
+    }
+  ],
+  "silence": [
+    {
+      "name": "CONSTRUCT_CUES",
+      "description": "frozen; the list every committed figure was measured with",
+      "n": 500,
+      "silent": 294,
+      "rate": 0.588
+    },
+    {
+      "name": "CONSTRUCT_CUES + DASHBOARD_EXTRA_CUES",
+      "description": "widened; demo only, no measured score of its own",
+      "n": 500,
+      "silent": 101,
+      "rate": 0.202
+    }
+  ]
+}

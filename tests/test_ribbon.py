@@ -1,6 +1,6 @@
-"""Honesty tests for the sentence ribbon (Phase 30 V7).
+"""Honesty tests for the sentence ribbon (Phase 34 V7).
 
-The ribbon is the riskiest of the three Phase 30 surfaces, for one reason: it puts
+The ribbon is the riskiest of the three Phase 34 surfaces, for one reason: it puts
 a column per sentence on a 0-to-1 axis, and `LexiconBackend` will happily return an
 all-zero decomposition that squashes to exactly 0.50. Drawn naively, a passage of
 sentences the detector had nothing to say about becomes a flat mid-height fence

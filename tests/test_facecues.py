@@ -33,7 +33,12 @@ from src.media.facecues import (
     face_cue_reader,
     face_stack_status,
 )
-from src.media.nonverbal import FACE_FEATURES, NonVerbalEthicsGate, NonVerbalReading
+from src.media.nonverbal import (
+    FACE_EXPRESSION_FEATURES,
+    FACE_FEATURES,
+    NonVerbalEthicsGate,
+    NonVerbalReading,
+)
 
 STACK = face_stack_status()
 needs_stack = pytest.mark.skipif(
@@ -183,6 +188,45 @@ def test_a_build_without_the_valence_head_degrades_rather_than_lies() -> None:
 def test_an_unreadable_engine_row_produces_no_number() -> None:
     with pytest.raises(FaceCueUnavailable):
         _features_from_scores([0.1, 0.2])
+
+
+# ---------------------------------------------------------------------------
+# 4b. The eight-way expression breakdown -- supporting detail, never weighted
+# ---------------------------------------------------------------------------
+
+
+def test_a_full_row_carries_all_eight_expression_scores() -> None:
+    row = [0.03, 0.06, 0.03, 0.25, 0.08, 0.23, 0.05, 0.26, 0.32, 0.14]
+    features = _features_from_scores(row)
+    assert set(FACE_EXPRESSION_FEATURES) <= set(features)
+    assert all(0.0 <= features[name] <= 1.0 for name in FACE_EXPRESSION_FEATURES)
+
+
+def test_a_degraded_eight_only_row_still_carries_the_breakdown() -> None:
+    """The one case where the eight scores are the only signal present."""
+    row = [0.0] * len(EXPRESSIONS)
+    row[EXPRESSIONS.index("Sadness")] = 1.0
+    features = _features_from_scores(row)
+    assert set(FACE_EXPRESSION_FEATURES) <= set(features)
+    assert features["expr_sadness"] == pytest.approx(1.0)
+
+
+def test_the_expression_keys_never_drift_from_the_declared_name_set() -> None:
+    row = [0.03, 0.06, 0.03, 0.25, 0.08, 0.23, 0.05, 0.26, 0.32, 0.14]
+    features = _features_from_scores(row)
+    expression_keys = set(features) - {"negative_valence", "arousal"}
+    assert expression_keys == set(FACE_EXPRESSION_FEATURES)
+
+
+def test_expression_scores_are_never_a_face_weights_key() -> None:
+    """FACE_EXPRESSION_FEATURES must stay disjoint from FACE_WEIGHTS.
+
+    This is the property the whole plan depends on: the eight scores can be
+    shown without ever being able to move the index, because `fusion.score`
+    only adds a context term for a name present in both a reading's features
+    and the scorer's weights.
+    """
+    assert set(FACE_EXPRESSION_FEATURES).isdisjoint(FACE_WEIGHTS)
 
 
 # ---------------------------------------------------------------------------

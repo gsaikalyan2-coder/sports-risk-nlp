@@ -359,8 +359,14 @@ The layer copies the architecture the dashboard already proved, rather than inve
 - **`BiosignalSource` Protocol** mirroring `PredictionBackend`. `SimulatedEEGSource` and
   `SimulatedCardioOculoSource` ship now; `MuseSource` / `OpenBCISource` / `PolarH10Source` drop in
   later behind the same interface with no page change.
-- **Feature flag.** `SRN_COGNITIVE_LAYER=1`. When unset the pages are not registered and
-  `src/biosignals` is never imported, so the dashboard is byte-identical to today.
+- **Feature flag.** `SRN_COGNITIVE_LAYER`. **Planned as off-by-default; shipped
+  on-by-default, and the code is right.** `theme.cognitive_layer_enabled()` treats unset as ON and
+  only an explicit off value turns the layer off, because a default of off meant three deployments
+  in a row rendered a dashboard with three pages silently missing — the app correct and looking
+  broken. The reversal is argued in that function's docstring, which is the binding statement; this
+  bullet is the plan it supersedes, kept so the change reads as deliberate rather than as drift.
+  Nothing about the layer's honesty rests on the default: the stamps, the ethics gate in
+  `src/biosignals/sources.py` and the activation screen never consult it.
 - **Widget placement.** Navigation order becomes **Dashboard → Score my own text → Brain atlas →
   Cognitive load → Neurofeedback (demo)**. Each feature is a page *and* exposes a compact summary
   tile built through the existing `src/dashboard/widgets.py::Widget` contract, so the same three
@@ -586,7 +592,8 @@ Recommended order: **shared → V1 → V3 → V5.** V1 first because it is indep
 exercises `neurovis.py` before the biosignal layer is on the critical path.
 
 ### Definition of done for the layer
-- `SRN_COGNITIVE_LAYER` unset ⇒ the dashboard is byte-identical to Phase 24 output.
+- `SRN_COGNITIVE_LAYER` set to an explicit off value ⇒ the dashboard is byte-identical to
+  Phase 24 output. (Written as "unset ⇒ off"; the shipped default is on — see §11.3.)
 - All existing tests green (74 at the time of writing), plus the new suites.
 - No number on any new surface is absent from a stamped source or a `DashboardView`.
 - Every new page passes the existing shell rules in `tests/test_dashboard_pages.py`.
@@ -811,6 +818,69 @@ None of these exist yet, and none is created by this section:
 Until all four exist and are written into `docs/ethics.md`, the flag stays
 unset in every environment this project controls.
 
+### 14.6 Owner decision recorded (2026-09-20)
+
+The question was put to the owner via `docs/phase29_decision_draft.md`, worked
+through against all four §14.4 conditions. **Decision: Declined.** §2.3.3 and
+§13.4 stand unchanged; `SRN_MATCHDAY_REAL_ATHLETES` stays permanently unset.
+See §15 below for what was built instead.
+
+## 15. Phase 30 — Scenario-driven match-day profile (synthetic, built 2026-09-20)
+
+> **Status: built.** With Phase 29's real-athlete path declined (§14.6), the
+> Match-day profile page needed something honest to score. This phase adds a
+> scenario the reader picks from dropdowns instead of a real link.
+
+### 15.1 What was requested and what was built
+
+Owner request, 2026-09-20: more sports, more competition-timing options, and
+pressure/life-context scenarios (injury, breakup, a strong past season, etc.)
+in the Match-day page's dropdowns, such that a different combination produces
+a meaningfully different score rather than a different label on the same
+generic text.
+
+`src/ingestion/scenarios.py` adds a `life_context -> construct bias` table
+(`SCENARIO_BIAS`) that decides which of the ten constructs a scenario plants
+and at what intensity or label, then reuses `src/ingestion/synthetic.py`'s own
+realisation banks and framing/variation helpers UNCHANGED to render the text.
+`src/dashboard/matchday.py::build_scenario_profile` scores the result through
+the ordinary `build_view`/`LexiconBackend` pipeline — no change to scoring
+itself. `dashboard/pages/6_Match_day_profile.py` renders the three dropdowns
+and a "Generate & score" button, placed before the real-link path's gate so it
+always renders regardless of §14's block.
+
+### 15.2 Why "timing," not "during or after the event"
+
+`synthetic.py`'s own docstring records that the Phase 7 source survey
+deliberately excluded post-match text: it expresses relief, disappointment and
+attribution, constructs outside this project's taxonomy. Offering a
+during/after option here would need new taxonomy work this feature does not
+do. `TIMINGS` (`week_before` / `morning_of` / `immediately_before`) therefore
+stays entirely on the pre-competition side, varying only the distance from the
+event — the owner-approved resolution to this scope conflict.
+
+### 15.3 Grounding, and what stayed untouched
+
+Every construct named in `SCENARIO_BIAS` cites the same `config/taxonomy.yaml`
+instrument anchor that construct already carries in `synthetic.py`'s own
+realisation bank (e.g. `injury_comeback`'s `resilience` entry cites CD-RISC
+[Connor2003], the same anchor `taxonomy.yaml` gives that construct generally)
+— the mapping is grounded in the same instruments, not invented fresh.
+`src/ingestion/synthetic.py` has zero diff: its version-history comments warn
+that changing its construct-drawing or realisation internals reshuffles the
+RNG stream for every existing seeded corpus artefact, so the bias table lives
+in a new module that imports those internals rather than editing them.
+
+### 15.4 Verification
+
+`tests/test_scenarios.py` (14 tests): input validation, determinism (same
+scenario + seed → identical text), and a statistical check over 30 seeds that
+a different `life_context` at the same sport/timing changes the planted
+construct set at least 90% of the time. An end-to-end check through the real
+`LexiconBackend` (same sport, same timing, five life contexts) produced scores
+of 50 / 62 / 27 / 82 / 73 — confirming the score moves for a real, auditable
+reason rather than a cosmetic one.
+
 ### 14.5 What is deliberately still not built
 
 * Any UI path that sets `SRN_MATCHDAY_REAL_ATHLETES` from inside the app. It is
@@ -822,14 +892,77 @@ unset in every environment this project controls.
   the deployed Streamlit Community Cloud app. Both are installed locally only
   (§6 below); the caption route is the only one `requirements-base.txt` ships.
 
-## 15. Phase 30 — three read-only surfaces (built 2026-09-26)
+## 16. Phases 31–32 — abstention measurement, cue widening, evidence coverage (built 2026-09-21/23)
+
+> **Status: built and tested.** Written 2026-09-23, late: §8 rule 10 says this file is
+> updated when a decision is confirmed, and Phases 31 and 32 both shipped without a
+> section. The lateness is the finding — a rule that is only obeyed when convenient is
+> not a rule, and the four mis-cited figures in §16.3 are what it cost.
+
+### 16.1 Owner decisions (locked 2026-09-21/22)
+
+| Question | Decision |
+|---|---|
+| Fix the 0.50 problem by removing the §12.3 refusal rule | **No.** Measured at +0.2% of corpus traffic; the rule stands |
+| How to lower the silence rate instead | **Widen the demo cue list only** (`DASHBOARD_EXTRA_CUES`), from the generator's own taxonomy-anchored realisation banks, never from corpus text |
+| Does the widened list enter any committed figure | **No.** `LexiconBaseline` and macro-F1 0.462 are untouched; the widened list has no measured score |
+| Ship the Evidence Coverage widget behind a flag | **No flag.** It introduces no source, no signal, no dependency and no new number |
+| Retain the pre-build mockup after the panel lands | **Yes**, as the design contract |
+
+### 16.2 What was built
+
+**Phase 31** — `src/evaluation/abstention.py` measures the three refusal gates for the
+first time and computes the counterfactual index each refused input would have received.
+The measurement contradicted `§12.3`'s prose: an index of exactly 0.50 is reached three
+ways and the gates close only the narrowest (`refused` 0.2%; `no_detection` 58.6%;
+`all_inert` 12.4%). `reports/abstention.md` is the artifact.
+
+**Phase 32** — `config/instruments.yaml` + `src/dashboard/{instruments,coverage,coverage_panel}.py`
++ `dashboard/pages/7_Evidence_coverage.py` project one already-scored `DashboardView` onto
+the eight instruments behind the taxonomy and report, per subscale, `evidenced` / `inert` /
+`silent`. It computes no new number and cannot move the risk index. `docs/phase32_implementation_plan.md`
+is the plan; `docs/dashboard.md` and `docs/model_card.md` carry the standing documentation.
+
+### 16.3 The rule these phases add, and the rule they broke
+
+**A coverage figure is meaningless without the cue list that produced it.** The project
+runs two detectors — the frozen `CONSTRUCT_CUES` every committed figure was measured with,
+and that list widened by `DASHBOARD_EXTRA_CUES` for the deployed page only. Their silence
+rates over the same corpus are **58.8%** and **20.2%**: a factor of three.
+
+Phase 32 quoted "20.2%" on six lines across five files without naming the list, including
+in the paragraph
+of `docs/model_card.md` that states the rule, while the surrounding evaluation uses the
+frozen list. Both figures now travel together and both are measured in one place —
+`reports/abstention.md` §4, added 2026-09-23 so the number has a reproducible source rather
+than a commit message. (§3 of that report reads 58.6% for the frozen list because it files
+the single refused text under `refused`; §4 counts the detector, §3 counts the pipeline.)
+
+**The corrected headline.** The plan claimed a realistic passage speaks to "a quarter of the
+instrument set", from three hand-picked passages. Measured over every text: `gold_dev` mean
+**0.62 of 8** (0: 40, 1: 58, 2: 2), `gold_eval` mean **0.56 of 8**. A typical text speaks to
+zero or one instrument and 40% of `gold_dev` speaks to none. The starker number is the true
+one and it is the better one for the paper.
+
+### 16.4 What is deliberately not built
+
+* A measured score for the widened cue list. Coverage is measured; precision is not, and it
+  cannot be until `data/gold/` is annotated (OPEN-025).
+* Coverage aggregated across several texts from one athlete over time — the natural next
+  phase, and Future Work until the temporal hook is claimed.
+* Any scoring of a subscale. The moment a subscale carries a number this stops being a
+  limitations display and becomes an unvalidated psychometric instrument.
+* Any reproduction or paraphrase of an instrument item. CSAI-2, ABQ, CD-RISC and TAIS are
+  copyrighted; every prompt derives from this project's own `config/taxonomy.yaml` definitions.
+
+## 17. Phase 34 — three read-only surfaces (built 2026-09-26)
 
 > **Status: built and tested.** Three pages that show what the project already
 > computes, from angles it had no surface for. None adds a model, a weight, a
 > channel or a claim, and none touches a person — which is why none of them needed
 > an ethics decision and why `docs/ethics.md` is untouched.
 
-### 15.1 What was asked for and what was built
+### 17.1 What was asked for and what was built
 
 Owner request, 2026-09-26: visually appealing features, unrelated to the
 compare-two-texts page. Three were proposed and all three built:
@@ -840,7 +973,7 @@ compare-two-texts page. Three were proposed and all three built:
 | **Corpus constellation** | `dashboard/pages/8_Corpus_constellation.py` | All 4,000 synthetic records as dots, in lanes by the construct the generator planted |
 | **Taxonomy card deck** | `dashboard/pages/9_Taxonomy_cards.py` | `config/taxonomy.yaml` as ten designed cards: definition, anchor, examples, edge cases |
 
-### 15.2 The one rule all three are shaped around
+### 17.2 The one rule all three are shaped around
 
 §12.3 again, three new doors. `LexiconBackend` scores anything, and an all-zero
 decomposition squashes to **exactly 0.50** — a number that is arithmetically
@@ -862,7 +995,7 @@ A *real* 0.50 still exists and is marked rather than hidden: a sentence whose on
 detected constructs are inert genuinely sums to zero, and is drawn hatched with
 "counted as zero". Two different facts, two different markings.
 
-### 15.3 New modules
+### 17.3 New modules
 
 | File | Responsibility |
 |---|---|
@@ -877,7 +1010,7 @@ detected constructs are inert genuinely sums to zero, and is drawn hatched with
 the deck's card geometry; `copy.py` gains the `RIBBON_*`, `CLOUD_*` and `DECK_*`
 strings, screened at import as usual.
 
-### 15.4 Rules this layer adds
+### 17.4 Rules this layer adds
 
 1. **No new arithmetic anywhere.** Every number comes from `build_view` — the ribbon
    calls it per sentence, the builder called it per record. Nothing here fits a
@@ -893,7 +1026,7 @@ strings, screened at import as usual.
    are the conservative default working as designed, and an unexplained flat row
    reads as a broken detector.
 
-### 15.5 One existing test was changed, and why
+### 17.5 One existing test was changed, and why
 
 `tests/test_dashboard_pages.py::test_every_page_that_shows_a_number_shows_the_stamp_before_any_expander`
 matched `st.expander` as a **substring of the page source**, so page 9's docstring —
@@ -902,7 +1035,7 @@ mentioning it. The check now reads the syntax tree for a real call, which is
 strictly more precise and leaves every existing page passing. The `app.py`
 exemption in `STAMP_ABOVE_FOLD_EXEMPT` is untouched.
 
-### 15.6 What is deliberately not built
+### 17.6 What is deliberately not built
 
 * **No interaction.** Streamlit renders these figures as static SVG in markdown, so
   a clickable dot cannot route back to a page. Dropped rather than faked.

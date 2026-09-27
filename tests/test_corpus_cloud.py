@@ -1,4 +1,4 @@
-"""Honesty tests for the corpus constellation (Phase 30).
+"""Honesty tests for the corpus constellation (Phase 34).
 
 The figure draws 4,000 records at once, which makes it the most quotable picture
 this project produces and the easiest to quote wrongly. Three failures matter more
