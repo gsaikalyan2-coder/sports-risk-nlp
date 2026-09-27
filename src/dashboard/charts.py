@@ -65,6 +65,10 @@ COLOUR_GRID = theme.BORDER_LIGHT
 COLOUR_SURFACE = theme.CANVAS
 
 FONT = theme.FONT_SVG
+#: The technical-label stack, for the digits in a dense row. Same token source as
+#: the shell's `.mono-label`, so a reading in a figure and a reading in the page
+#: chrome are set in the same face.
+FONT_SVG_MONO = theme.FONT_SVG_MONO
 
 ROW_HEIGHT = 26
 LABEL_WIDTH = 200
@@ -628,5 +632,304 @@ def per_construct_chart(rows: Sequence, *, caption: str = "", width: int = CHART
             f'<text x="8" y="{height - 8}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
             f"{escape(caption[:120])}</text>"
         )
+    out.append("</svg>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Phase 30 -- two marks that answer "what shape is this?" rather than "how big?"
+# ---------------------------------------------------------------------------
+#
+# Everything above draws ONE record. Two questions a reader could not ask of the
+# page at all were:
+#
+#   "does this passage have a shape?"       -> sentence_ribbon
+#   "what does the whole corpus look like?" -> corpus_cloud_chart
+#
+# Same rules as every mark above. One hue for magnitudes, hatch-plus-dash-plus-
+# the-word for anything non-contributing, no band labels, legible in grayscale.
+# One rule is new, and it is the rule `.claude.md` section 12.3 exists for: a
+# sentence or a record the detector said nothing about is drawn as *absent*, not
+# as a bar of height 0.50. Both marks refuse to invent the midpoint.
+
+
+def _clip(text: str, limit: int) -> str:
+    """Truncate for an SVG row, with an ellipsis so the cut is visible.
+
+    SVG has no text wrapping and no measurement, so every label in this module is
+    length-capped by hand. A silent truncation would make a long sentence look
+    like a short one, which on the ribbon is a claim about the text.
+    """
+    collapsed = " ".join(text.split())
+    return collapsed if len(collapsed) <= limit else collapsed[: limit - 1] + "…"
+
+
+def sentence_ribbon(ribbon, *, width: int = CHART_WIDTH) -> str:
+    """The passage as a contour: one column per sentence, width by sentence length.
+
+    Three marks, because there are three genuinely different facts and only one of
+    them is a number:
+
+    * a sentence that moved the index -> a solid column to its own index;
+    * a sentence whose only detected constructs are inert -> a hatched, dashed
+      column *and* the words "counted as zero" in its row. Its index really is
+      0.50 and nothing was fabricated, but a solid half-height bar would read as
+      a middling sentence, so the marking says which 0.50 this is;
+    * a sentence the detector said nothing about -> **no column at all**, just a
+      hatched footing on the baseline and "nothing detected" in its row. This is
+      the only honest drawing available: an all-zero decomposition squashes to
+      exactly 0.50, and a bar there would be the section 12.3 defect rendered at
+      half height.
+
+    The whole passage's own index is drawn as a dotted rule across the profile,
+    and the footnote says it is not the average of the columns -- because the
+    squash is not linear and a skipped sentence has no value to average in.
+    """
+    bands = list(ribbon.bands)
+    row_h = 22
+    profile_h = 132
+    top = 48
+    left = 40
+    plot_w = width - left - 18
+    base = top + profile_h
+    height = base + 30 + len(bands) * row_h + 26
+    total_chars = sum(max(b.chars, 1) for b in bands) or 1
+    hatch = f"{INERT_HATCH_ID}-ribbon-{len(bands)}-{total_chars}"
+
+    out: list[str] = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" '
+        f'aria-label="Risk index per sentence across one passage, with unscored '
+        f'sentences drawn as absent">',
+        _defs(hatch),
+        f'<rect width="{width}" height="{height}" fill="{COLOUR_SURFACE}"/>',
+        f'<text x="8" y="18" {FONT} font-size="12" fill="{COLOUR_INK}" font-weight="600">'
+        "The shape of this passage, sentence by sentence</text>",
+        f'<text x="8" y="34" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "column width is sentence length; height is that sentence scored on its own; "
+        "a sentence with nothing detected has no column</text>",
+    ]
+
+    # Axis: 0 and 1 only. No mid tick, because a tick at 0.5 would be read as a
+    # threshold and this scale has none -- the same argument risk_meter makes for
+    # refusing bands.
+    out.append(
+        f'<line x1="{left}" y1="{base}" x2="{left + plot_w}" y2="{base}" '
+        f'stroke="{COLOUR_RULE}" stroke-width="1.5"/>'
+    )
+    out.append(
+        f'<line x1="{left}" y1="{top}" x2="{left + plot_w}" y2="{top}" '
+        f'stroke="{COLOUR_GRID}" stroke-width="1"/>'
+    )
+    out.append(
+        f'<text x="{left - 6}" y="{base + 4}" {FONT} font-size="10" '
+        f'fill="{COLOUR_MUTED}" text-anchor="end">0</text>'
+    )
+    out.append(
+        f'<text x="{left - 6}" y="{top + 4}" {FONT} font-size="10" '
+        f'fill="{COLOUR_MUTED}" text-anchor="end">1</text>'
+    )
+
+    cursor = float(left)
+    for band in bands:
+        band_w = plot_w * max(band.chars, 1) / total_chars
+        inner = max(band_w - 3, 2.0)
+        value = band.value
+        if value is None:
+            # Absent, and visibly so: a hatched footing on the baseline. Drawn at
+            # the baseline rather than as a full-height dashed ghost, because a
+            # ghost the height of the plot reads as a suppressed maximum.
+            out.append(
+                f'<rect x="{cursor:.1f}" y="{base - 8:.1f}" width="{inner:.1f}" height="8" '
+                f'fill="url(#{hatch})" stroke="{COLOUR_MUTED}" stroke-width="1.2" '
+                'stroke-dasharray="3 2"/>'
+            )
+        else:
+            column_h = max(profile_h * max(0.0, min(1.0, value)), 1.5)
+            if band.moved:
+                out.append(
+                    f'<rect x="{cursor:.1f}" y="{base - column_h:.1f}" width="{inner:.1f}" '
+                    f'height="{column_h:.1f}" fill="{COLOUR_SEQUENTIAL}" rx="2"/>'
+                )
+            else:
+                out.append(
+                    f'<rect x="{cursor:.1f}" y="{base - column_h:.1f}" width="{inner:.1f}" '
+                    f'height="{column_h:.1f}" fill="url(#{hatch})" stroke="{COLOUR_MUTED}" '
+                    'stroke-width="1.2" stroke-dasharray="3 2" rx="2"/>'
+                )
+            if inner >= 22:
+                out.append(
+                    f'<text x="{cursor + inner / 2:.1f}" y="{base - column_h - 5:.1f}" '
+                    f'{FONT} font-size="9" fill="{COLOUR_INK}" text-anchor="middle">'
+                    f"{value:.2f}</text>"
+                )
+        out.append(
+            f'<text x="{cursor + inner / 2:.1f}" y="{base + 13:.1f}" {FONT} font-size="9" '
+            f'fill="{COLOUR_MUTED}" text-anchor="middle">{band.index + 1}</text>'
+        )
+        cursor += band_w
+
+    # The whole passage, as a rule across the columns. Dotted and labelled, so it
+    # cannot be mistaken for one of the sentences.
+    whole_y = base - profile_h * max(0.0, min(1.0, ribbon.whole.value))
+    out.append(
+        f'<line x1="{left}" y1="{whole_y:.1f}" x2="{left + plot_w}" y2="{whole_y:.1f}" '
+        f'stroke="{COLOUR_INK}" stroke-width="1.2" stroke-dasharray="2 3"/>'
+    )
+    out.append(
+        f'<text x="{left + plot_w}" y="{whole_y - 5:.1f}" {FONT} font-size="9" '
+        f'fill="{COLOUR_INK}" text-anchor="end">whole passage '
+        f"{ribbon.whole.display}</text>"
+    )
+
+    y = base + 34
+    for band in bands:
+        shown = band.value
+        reading = f"{shown:.2f}" if shown is not None else "—"
+        muted = shown is None or not band.moved
+        out.append(
+            f'<text x="8" y="{y:.1f}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+            f"{band.index + 1}</text>"
+        )
+        out.append(
+            f'<text x="26" y="{y:.1f}" {FONT_SVG_MONO} font-size="10" '
+            f'fill="{COLOUR_MUTED if muted else COLOUR_INK}">{reading}</text>'
+        )
+        out.append(
+            f'<text x="62" y="{y:.1f}" {FONT} font-size="10" '
+            f'fill="{COLOUR_MUTED if muted else COLOUR_INK}">'
+            f"{escape(_clip(band.text, 62))}</text>"
+        )
+        out.append(
+            f'<text x="{width - 8}" y="{y:.1f}" {FONT} font-size="9" fill="{COLOUR_MUTED}" '
+            f'text-anchor="end" font-style="italic">{escape(band.state)}</text>'
+        )
+        y += row_h
+
+    out.append(
+        f'<text x="8" y="{height - 12}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"{ribbon.n_silent} of {len(bands)} sentences have no column: nothing was detected "
+        "in them. The whole-passage rule is not the average of the columns</text>"
+    )
+    out.append("</svg>")
+    return "".join(out)
+
+
+def corpus_cloud_chart(cloud, *, width: int = CHART_WIDTH) -> str:
+    """Every scored record in the corpus as one dot, in the lane it was planted in.
+
+    A strip plot, one lane per construct, and the lane is the construct the corpus
+    *generator planted* -- not one the detector picked. That choice is the whole
+    point of the figure: reading left to right within a lane says how the index
+    ranks records that were built to contain the same thing, and comparing lanes
+    says whether the index separates them at all. A lane assigned by the detector
+    would be the detector grading its own homework.
+
+    Position carries everything. Ten categorical hues cannot be told apart by
+    anyone (`dataviz` caps categorical series at eight, softly at six), so the
+    dots are one hue and the construct is the row label, exactly as the
+    decomposition charts above put constructs on a shared position axis.
+
+    Records the detector said nothing about are **not plotted**, and their count
+    is printed on the lane. They would otherwise stack into a false spike at
+    exactly 0.50 -- the section 12.3 defect, arriving four thousand times at once.
+    """
+    lanes = list(cloud.lanes)
+    lane_h = 30
+    top = 62
+    left = 168
+    plot_w = width - left - 62
+    height = top + len(lanes) * lane_h + 46
+    dot_r = 2.4
+
+    out: list[str] = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" '
+        f'aria-label="Risk index of every scored corpus record, in lanes by the '
+        f'construct planted in it">',
+        f'<rect width="{width}" height="{height}" fill="{COLOUR_SURFACE}"/>',
+        f'<text x="8" y="18" {FONT} font-size="12" fill="{COLOUR_INK}" font-weight="600">'
+        "The whole corpus, one dot per record</text>",
+        f'<text x="8" y="34" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "each dot is one record, placed left to right by its risk index; the lane is the "
+        "construct the generator planted in it, not one the detector chose</text>",
+        f'<text x="8" y="48" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"{escape(_clip(cloud.sample_note, 118))}</text>",
+    ]
+
+    for index, lane in enumerate(lanes):
+        y = top + index * lane_h
+        mid = y + lane_h / 2
+        out.append(
+            f'<line x1="{left}" y1="{mid:.1f}" x2="{left + plot_w}" y2="{mid:.1f}" '
+            f'stroke="{COLOUR_GRID}" stroke-width="1"/>'
+        )
+        out.append(
+            f'<text x="8" y="{mid - 1:.1f}" {FONT} font-size="10" fill="{COLOUR_INK}">'
+            f"{escape(_clip(lane.plain_name, 24))}</text>"
+        )
+        out.append(
+            f'<text x="8" y="{mid + 10:.1f}" {FONT} font-size="9" fill="{COLOUR_MUTED}">'
+            f"{lane.n_scored} plotted, {lane.n_silent} with nothing detected</text>"
+        )
+        # Dots first, median tick over them: the tick is the summary and has to
+        # survive a dense lane.
+        for offset, value in enumerate(lane.dots):
+            # A deterministic two-row jitter, not a random one. Random jitter
+            # makes the figure move between runs, and a paper figure that is not
+            # byte-stable cannot be diffed.
+            dy = -3.0 if offset % 2 else 3.0
+            x = left + plot_w * max(0.0, min(1.0, value))
+            out.append(
+                f'<circle cx="{x:.1f}" cy="{mid + dy:.1f}" r="{dot_r}" '
+                f'fill="{COLOUR_SEQUENTIAL}" fill-opacity="0.45"/>'
+            )
+        if lane.median is None:
+            # A lane the detector said nothing about anywhere. No tick and no
+            # reading: the same refusal the ribbon makes for a silent sentence,
+            # and the em dash is the only honest summary available.
+            out.append(
+                f'<text x="{left + plot_w + 6}" y="{mid + 4:.1f}" {FONT_SVG_MONO} '
+                f'font-size="10" fill="{COLOUR_MUTED}">—</text>'
+            )
+            continue
+        median_x = left + plot_w * max(0.0, min(1.0, lane.median.value))
+        out.append(
+            f'<line x1="{median_x:.1f}" y1="{y + 5:.1f}" x2="{median_x:.1f}" '
+            f'y2="{y + lane_h - 5:.1f}" stroke="{COLOUR_INK}" stroke-width="2"/>'
+        )
+        out.append(
+            f'<text x="{left + plot_w + 6}" y="{mid + 4:.1f}" {FONT_SVG_MONO} font-size="10" '
+            f'fill="{COLOUR_INK}">{lane.median.display}</text>'
+        )
+
+    axis_y = top + len(lanes) * lane_h + 4
+    out.append(
+        f'<line x1="{left}" y1="{axis_y}" x2="{left + plot_w}" y2="{axis_y}" '
+        f'stroke="{COLOUR_RULE}" stroke-width="1.5"/>'
+    )
+    out.append(
+        f'<text x="{left}" y="{axis_y + 14}" {FONT} font-size="10" fill="{COLOUR_MUTED}">0</text>'
+    )
+    out.append(
+        f'<text x="{left + plot_w}" y="{axis_y + 14}" {FONT} font-size="10" '
+        f'fill="{COLOUR_MUTED}" text-anchor="end">1</text>'
+    )
+    out.append(
+        f'<text x="8" y="{height - 24}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "vertical tick is the lane median over every scored record; ranking only, not "
+        f"calibrated. {cloud.n_silent} of {cloud.n_records} records matched no cue at all "
+        "and are absent rather than drawn at the midpoint</text>"
+    )
+    # The four lanes that pile up on 0.50 are the honest consequence of the
+    # conservative default policy, not a detector failure -- and a reader who is
+    # not told that reads four flat lanes as four broken rows. Said on the figure,
+    # because the figure is what travels into a slide.
+    out.append(
+        f'<text x="8" y="{height - 10}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "a dot sitting exactly on the midpoint is a record where every detected "
+        "construct was directionally unresolved, so nothing moved the index &#8212; a "
+        "real reading, not a missing one</text>"
+    )
     out.append("</svg>")
     return "".join(out)

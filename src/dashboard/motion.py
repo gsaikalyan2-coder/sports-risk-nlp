@@ -131,6 +131,18 @@ _SURFACES: dict[str, dict[str, str]] = {
 DEFAULT_MODE = "light"
 
 
+def surface(mode: str) -> dict[str, str]:
+    """The iframe token set for one mode, falling back rather than half-painting.
+
+    Public counterpart to `theme.palette`, which covers the *host page* and carries
+    no font, radius or webfont-link tokens because a Streamlit stylesheet does not
+    need them. Anything mounting its own document needs this set instead, and
+    needs all of it -- a caller that filled in half the names would produce the
+    classic dark-text-on-dark-card page, visible only in a browser.
+    """
+    return dict(_SURFACES.get(mode, _SURFACES[DEFAULT_MODE]))
+
+
 def _style(mode: str) -> str:
     """The panel's stylesheet for one mode."""
     t = _SURFACES.get(mode, _SURFACES[DEFAULT_MODE])

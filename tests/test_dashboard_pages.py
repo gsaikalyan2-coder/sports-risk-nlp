@@ -26,7 +26,6 @@ are allowed only because a mechanism, not a convention, keeps them honest.
 from __future__ import annotations
 
 import ast
-import re
 from pathlib import Path
 
 import pytest
@@ -115,29 +114,59 @@ STAMP_ABOVE_FOLD_EXEMPT: dict[str, str] = {
 }
 
 
+def _expander_lines(tree: ast.Module) -> list[int]:
+    """Lines where the page actually calls `st.expander`.
+
+    Read off the syntax tree rather than grepped for, because the rule is about
+    collapsible sections the page *renders*. Phase 30 added a page whose docstring
+    explains why it deliberately has none, and a substring check failed it for
+    saying so -- the rule and the thing it protects related by assumption, which is
+    the defect shape this file already names four times. Prose about an API is not
+    a call to it.
+    """
+    return [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "expander"
+    ]
+
+
+def _stamp_lines(tree: ast.Module) -> list[int]:
+    """Lines where the page reads a `.stamp` attribute off something.
+
+    Matched on any `.stamp` access, not on `risk.stamp`. The rule was written when
+    the only stamped surface was the risk score; Phase 26 added pages whose stamp
+    comes off a `BiosignalWindow` or a source, and Phase 30 pages whose stamp comes
+    off a `Ribbon` or a `CorpusCloud`. A rule scoped to one attribute name stops
+    protecting the app the moment a second kind of stamped surface arrives.
+    """
+    return [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and node.attr == "stamp"
+    ]
+
+
 def test_every_page_that_shows_a_number_shows_the_stamp_before_any_expander():
     """A stamp inside a collapsed expander is in the DOM and not on the screen."""
     for path in _shell_files():
-        source = path.read_text(encoding="utf-8")
-        if "st.expander" not in source:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        expanders = _expander_lines(tree)
+        if not expanders:
             continue
+        stamps = _stamp_lines(tree)
         if path.name in STAMP_ABOVE_FOLD_EXEMPT:
             # Exempt from the ORDERING rule only. The stamp must still be on the
             # page somewhere, or the exemption has quietly become a deletion.
-            assert re.search(r"\.stamp\b", source), (
+            assert stamps, (
                 f"{path.name} is exempt from rendering the stamp above the fold, "
                 "but has dropped it from the page entirely"
             )
             continue
-        # Matched on any `.stamp` access, not on `risk.stamp`. The rule was
-        # written when the only stamped surface was the risk score; Phase 26
-        # added pages whose stamp comes off a `BiosignalWindow` or a source, and
-        # a rule scoped to one attribute name stops protecting the app the
-        # moment a second kind of stamped surface arrives. Same defect shape as
-        # the filename-scoped import rule above.
-        stamps = [m.start() for m in re.finditer(r"\.stamp\b", source)]
         assert stamps, f"{path.name} has collapsible sections and no stamp"
-        assert min(stamps) < source.index("st.expander"), (
+        assert min(stamps) < min(expanders), (
             f"{path.name} renders the provenance stamp only inside a collapsed expander"
         )
 
