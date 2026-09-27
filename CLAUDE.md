@@ -1081,8 +1081,31 @@ whether the character is prose or data:
 * `src/ingestion/synthetic.py` - realisation-bank text. Changing it changes every generated
   record, which desyncs `reports/corpus_cloud.json`, the silver artefacts and the explain
   reports from the generator that claims to produce them. That is a corpus regeneration, not
-  a copy edit, and it is available on request as one run of `scripts/build_corpus_cloud.py`
-  plus the ingestion scripts. Until then an athlete passage on screen may still show one.
+  a copy edit.
+
+**Asked again on 2026-09-27, costed, and declined.** The sentence that stood here said the
+regeneration was "available on request as one run of `scripts/build_corpus_cloud.py` plus
+the ingestion scripts". That was wrong by about ten CPU-hours, and the correction is the
+useful part of this entry. What it actually costs, from `docs/reproducibility.md` and
+`src/reproducibility/manifest.py`:
+
+* `corpus_records` is pinned to SHA-256 `fa09f5ad...` and `utterances` to `87a796ca...`,
+  both enforced by `tests/test_reproducibility.py`. Changing one character of corpus text
+  invalidates both.
+* It cannot be applied to the artefacts as a character swap, because it changes
+  tokenisation. `reports/explain/attributions.json` alone carries 11,522 token offsets,
+  and those are recomputed rather than rewritten.
+* Tier C - retrain the transformer and regenerate its prediction cache - is **~10 CPU-hours**,
+  and the metrics `docs/reproducibility.md` declares byte-identical against this corpus
+  (lexicon `0.4617...`, transformer `0.5877...`, delta `0.1259...`, memorisation gap
+  `0.2342...`) can move underneath the Phase 23 paper.
+
+**Owner decision, 2026-09-27: leave it.** Twenty-two em dashes survive, every one of them
+inside quoted athlete speech - the one register in this repository where a dash is ordinary
+prose rather than a house-style slip. A reader who meets one on the dashboard is meeting a
+deliberate exception, not a missed file. The price of removing it is re-declaring the
+reproduction manifest's hashes and every headline number the paper reports, and that price
+buys punctuation.
 
 ### 18.4 The light/dark defects, and how they were found
 
