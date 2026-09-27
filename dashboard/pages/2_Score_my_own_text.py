@@ -9,6 +9,13 @@ band is constructed with a mandatory caveat and is only ever rendered through
 Pasted text is the reader's own. It is scored, shown back, and dropped: no
 store, no log, no cache, and the view it produces is marked non-exportable by
 the publication guard, so it cannot become a figure.
+
+Owner instruction, 2026-09-27: **typed words are the only input.** The photo /
+video uploader and the facial-cue consent tick that Phases 27 and 28 put on this
+page are gone from it. `src/media/` and `src/dashboard/mediaio.py` still exist
+and are still tested, so none of their honesty machinery was weakened, but no
+page calls them any more and therefore no picture reaches a score. The text-only
+path this page now takes is the one every number in the paper uses.
 """
 
 from __future__ import annotations
@@ -25,18 +32,15 @@ import streamlit.components.v1 as components  # noqa: E402
 
 from src.dashboard import (  # noqa: E402
     DEFAULT_POLICY_LABEL,
-    FACE_ONLY_STAMP,
     POLICY_LABELS,
     POLICY_TILE_NOTE,
     LexiconBackend,
     admit,
     build_view,
     evidence_height,
-    face_stack_status,
     motion_panel,
     panel_height,
     plain,
-    read_upload,
     score_from_view,
     scorer_for,
     spans_panel,
@@ -47,22 +51,14 @@ from src.dashboard import (  # noqa: E402
 st.set_page_config(page_title="Score my own text", layout="wide")
 # This page, and only this page, runs the Claude design language
 # (DESIGNclaude.md): serif display, coral CTA, warm surfaces. It follows the
-# reader's light/dark choice from the dashboard, expressed in *its* tokens --
+# reader's light/dark choice from the dashboard, expressed in *its* tokens:
 # the cream canvas becomes surface-dark #181715, the cream cards become
 # surface-dark-elevated #252320, the text roles invert to on-dark. The coral CTA
 # does not move: it is the brand voltage on both surfaces.
 # The control is repeated here rather than only on the dashboard, because a
 # reader can land on this page first. It reads and writes the same plain session
 # key, so the two pages stay in step in both directions.
-mode = st.sidebar.radio(
-    "Appearance",
-    ("light", "dark"),
-    index=("light", "dark").index(st.session_state.get("mode", theme.DEFAULT_MODE)),
-    format_func=str.capitalize,
-    horizontal=True,
-    key="appearance_choice_score",
-)
-st.session_state["mode"] = mode
+mode = theme.mode_control(st)
 CLAUDE_MODE = "claude-dark" if mode == "dark" else "claude"
 st.markdown(theme.claude_css(mode), unsafe_allow_html=True)
 
@@ -72,7 +68,6 @@ def _lexicon():
     return LexiconBackend()
 
 
-st.markdown(f'<div class="announcement">{plain.ANNOUNCEMENT}</div>', unsafe_allow_html=True)
 st.markdown('<p class="mono-label">Live scoring</p>', unsafe_allow_html=True)
 st.markdown(f"# {plain.PAGE2_TITLE}")
 st.markdown(theme.claude_lede(plain.PAGE2_LEDE), unsafe_allow_html=True)
@@ -81,38 +76,8 @@ pasted = st.text_area(
     "Text",
     height=160,
     key="pasted_text",
-    placeholder="Type or paste a few sentences an athlete wrote before a competition…",
+    placeholder="Type or paste a few sentences an athlete wrote before a competition...",
 )
-# Photo / video, as an alternative source of the same words.
-#
-# `read_upload` is the one door to `src.media`: this file may import from
-# `src.dashboard` and from nowhere else under `src.`, which the page-shell tests
-# enforce, and routing the media layer through `src/dashboard/mediaio.py` keeps
-# that true rather than making an exception for one feature.
-uploaded = st.file_uploader(
-    plain.MEDIA_UPLOAD_LABEL,
-    type=["png", "jpg", "jpeg", "gif", "webp", "mp4", "mov", "m4v", "webm"],
-    key="uploaded_media",
-    help=plain.MEDIA_PLAIN,
-)
-
-# Phase 28: consent, not a preference switch.
-#
-# Ticking this is what allows anything to look at a face, and it is phrased as a
-# statement of fact about the file rather than as a feature toggle, because that
-# is what it has to be: the uploader is asserting that the person shown agreed.
-# Unticked, `read_upload` never constructs a `FaceCueReader` and the simulated
-# reading is carried at zero weight exactly as in Phase 27.
-consent = st.checkbox(
-    plain.CONSENT_LABEL,
-    value=False,
-    key="face_consent",
-    help=plain.CONSENT_PLAIN,
-)
-st.caption(plain.CONSENT_PLAIN)
-_stack = face_stack_status()
-if consent and not _stack:
-    st.warning(_stack.detail)
 
 # Reads and writes the same plain key the dashboard writes, so the setting a
 # reader chose over there is the setting their own text is scored under here,
@@ -127,89 +92,7 @@ policy = st.selectbox(
 st.session_state[POLICY_STATE_KEY] = policy
 submitted = st.button(plain.PAGE2_SUBMIT)
 
-# Where the words come from. A file wins when one is attached, because
-# attaching a file is the more deliberate act; the text box is left alone rather
-# than cleared, so switching back costs nothing.
-media = (
-    read_upload(uploaded.name, uploaded.getvalue(), consent=consent)
-    if uploaded is not None
-    else None
-)
-media_context: dict[str, float] = dict(media.context) if media is not None else {}
-# The weights come from the RESULT, not from the page. A page that decided the
-# weights itself could weight a reading that was never taken; this way an empty
-# mapping is the direct consequence of no face having been read.
-media_weights: dict[str, float] = dict(media.context_weights) if media is not None else {}
-
-if media is not None and not media and media.face_only:
-    # A photograph of an athlete carrying no writing. There is no risk index
-    # here and there never can be -- the index is ten constructs found in words
-    # -- so this branch renders a different object entirely: two cues, one
-    # figure derived from them, its own stamp, and no tiles or spans beside it.
-    st.info(media.detail)
-    # The stamp goes above the figure, never only inside the expander below:
-    # tests/test_dashboard_pages.py enforces the ordering, and the reason it
-    # exists is that a stamp in a collapsed section is in the DOM and not on the
-    # screen, so a screenshot loses it.
-    st.caption(media.stamp)
-    st.error(f"**{plain.FACE_CUES_HEADLINE}.** {plain.FACE_CUES_LIMITATION}")
-    st.markdown(f"## {plain.FACE_ONLY_HEADLINE}")
-    st.markdown(theme.claude_lede(plain.FACE_ONLY_PLAIN), unsafe_allow_html=True)
-    figure, cues = st.columns([1, 2])
-    with figure:
-        st.markdown(
-            f'<div class="hero-figure"><span class="hl">Face-only figure</span>'
-            f'<span class="hv">{round(media.face_index * 100)}</span>'
-            f'<span class="hl">out of 100, ranking only</span></div>',
-            unsafe_allow_html=True,
-        )
-    with cues:
-        for column, (name, value) in zip(
-            st.columns(len(media_weights)),
-            sorted((k, v) for k, v in media_context.items() if k in media_weights),
-            strict=False,
-        ):
-            with column:
-                st.markdown(
-                    f'<div class="widget"><span class="wl">{name.replace("_", " ")}</span>'
-                    f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
-                    f'<span class="wu">weight {media_weights[name]:+.2f}</span></div>',
-                    unsafe_allow_html=True,
-                )
-    supporting = sorted((k, v) for k, v in media_context.items() if k not in media_weights)
-    if supporting:
-        st.markdown(f"### {plain.FACE_EXPRESSION_HEADLINE}")
-        st.markdown(theme.claude_lede(plain.FACE_EXPRESSION_PLAIN), unsafe_allow_html=True)
-        for row_start in range(0, len(supporting), 5):
-            row = supporting[row_start : row_start + 5]
-            for column, (name, value) in zip(st.columns(len(row)), row, strict=False):
-                with column:
-                    st.markdown(
-                        f'<div class="widget is-inert"><span class="wl">'
-                        f"{name.replace('expr_', '').replace('_', ' ')}</span>"
-                        f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
-                        f'<span class="wu">shown, weighted as zero</span></div>',
-                        unsafe_allow_html=True,
-                    )
-    st.caption(media.nonverbal_stamp)
-    st.error(FACE_ONLY_STAMP)
-    with st.expander("Provenance and limitations: read before quoting this figure"):
-        st.markdown(f"- {FACE_ONLY_STAMP}")
-        st.markdown(f"- {plain.FACE_CUES_LIMITATION}")
-        st.markdown(f"- Read from **{uploaded.name}** by {media.method or 'the face reader'}.")
-        st.markdown(f"- {media.stamp}")
-    st.stop()
-
-if media is not None and not media:
-    # Refused by one of the four gates in mediaio.read_upload. No view has been
-    # constructed, so there is no number to show and none is shown.
-    st.error(f"**{plain.MEDIA_REJECTED}** {media.detail}")
-    st.caption(plain.PAGE2_REJECTED_WHY)
-    if media.face_detail:
-        st.caption(media.face_detail)
-    st.stop()
-
-source_text = media.text if media is not None else pasted
+source_text = pasted
 
 if not (submitted or source_text.strip()):
     st.caption(plain.PAGE2_EMPTY)
@@ -234,48 +117,10 @@ if not admission:
     st.caption(plain.PAGE2_REJECTED_WHY)
     st.stop()
 
-view = build_view(
-    text=source_text,
-    backend=_lexicon(),
-    scorer=scorer_for(policy, context_weights=media_weights),
-    context=media_context,
-)
+view = build_view(text=source_text, backend=_lexicon(), scorer=scorer_for(policy))
 score = score_from_view(view)
 
-# The text-only score, computed alongside whenever the face moved the index.
-#
-# Shown rather than described: "the face raised this by 4 points" is a claim the
-# reader can check only if both numbers are on the page, and the difference is
-# the single most important thing to be able to see on a page where a picture
-# now changes a psychological number.
-text_only_score = None
-if media_weights:
-    text_only_score = score_from_view(
-        build_view(text=source_text, backend=_lexicon(), scorer=scorer_for(policy))
-    )
-
-if media is not None:
-    st.info(f"Read from **{uploaded.name}** by {media.method}. {plain.MEDIA_MACHINE_READ}")
-    st.caption(media.stamp)
 st.markdown(f"> {source_text}")
-
-# Register, shown loudly and beside the number rather than instead of it.
-#
-# The owner's decision (2026-09-15) was to score off-register text and flag it,
-# not to refuse it -- and that is the harder thing to get right, because a
-# warning has to survive being screenshotted next to the figure it qualifies.
-# So it renders above the score, outside any expander, in the error style, in the
-# same position the policy warning uses for the same reason.
-if media is not None and not media.on_topic:
-    st.error(f"**{plain.OFF_TOPIC_HEADLINE}** {media.relevance_detail}")
-    st.caption(plain.OFF_TOPIC_PLAIN)
-# The limitation docs/ethics.md sec.14 requires beside every face-derived number,
-# in the error style, above the score, outside any expander: the same position
-# and the same reason as the register flag.
-if media is not None and media.face_measured:
-    st.error(f"**{plain.FACE_CUES_HEADLINE}.** {plain.FACE_CUES_LIMITATION}")
-elif media is not None and media.face_detail:
-    st.warning(media.face_detail)
 
 st.caption(view.risk.stamp)
 st.warning(view.caveat)
@@ -297,12 +142,6 @@ with headline:
         unsafe_allow_html=True,
     )
     st.caption(score.band.describe())
-    if text_only_score is not None:
-        st.caption(
-            f"{plain.FACE_COMBINED_LABEL}: {score.score_100}. "
-            f"{plain.FACE_TEXT_ONLY_LABEL}: {text_only_score.score_100}. "
-            "The difference is what the face contributed."
-        )
 with panel:
     components.html(
         motion_panel(view, mode=CLAUDE_MODE), height=panel_height(view), scrolling=False
@@ -346,44 +185,9 @@ if view.unevidenced_driver_count:
         "words in the text. The system is asserting something it cannot point at."
     )
 
-if media is not None and media_context:
-    st.markdown("## The non-verbal reading")
-    st.caption(plain.FACE_CUES_MEASURED if media.face_measured else plain.FACE_CUES_NOT_MEASURED)
-    if any(name.startswith("expr_") for name in media_context):
-        st.markdown(theme.claude_lede(plain.FACE_EXPRESSION_PLAIN), unsafe_allow_html=True)
-    context_items = sorted(media_context.items())
-    for row_start in range(0, len(context_items), 5):
-        row = context_items[row_start : row_start + 5]
-        for column, (name, value) in zip(st.columns(len(row)), row, strict=False):
-            with column:
-                st.markdown(
-                    f'<div class="widget{"" if name in media_weights else " is-inert"}">'
-                    f'<span class="wl">{name.replace("expr_", "").replace("_", " ")}</span>'
-                    f'<span class="wv" style="font-size:32px">{value * 100:.0f}%</span>'
-                    f'<span class="wu">'
-                    f"{'moved the score' if name in media_weights else 'shown, weighted as zero'}"
-                    f"</span></div>",
-                    unsafe_allow_html=True,
-                )
-    st.caption(media.nonverbal_stamp)
-
 with st.expander("Provenance and limitations: read before quoting any number"):
     for notice in view.notices:
         st.markdown(f"- {notice}")
     st.markdown(f"- {plain.SCALE_NOTE_TEXT}")
     st.markdown(f"- {score.band.describe()}")
-    if media is not None:
-        st.markdown(f"- {media.stamp}")
-        st.markdown(f"- {media.nonverbal_stamp}")
-        if media.face_measured:
-            st.markdown(f"- {plain.FACE_CUES_LIMITATION}")
-            st.markdown(
-                "- Facial cue weights, declared and not learned: "
-                + ", ".join(f"{k} {v:+.2f}" for k, v in sorted(media_weights.items()))
-            )
-        st.markdown(f"- {plain.RELEVANCE_MEASURED}")
-        st.markdown(
-            f"- Register score for this text: {media.relevance:.2f} "
-            f"({'reads as athlete self-report' if media.on_topic else 'does not'})."
-        )
     st.markdown(f"**{view.risk.stamp}**")

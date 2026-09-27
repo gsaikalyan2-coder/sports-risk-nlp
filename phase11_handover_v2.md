@@ -1,4 +1,4 @@
-# Handover — Phase 11 (continued): Human Gold Annotation
+# Handover - Phase 11 (continued): Human Gold Annotation
 
 Self-contained. A new AI session can start from this file plus the repo; no chat history
 needed. **Supersedes `phase11_handover.md`**, which remains accurate for everything up to
@@ -6,7 +6,7 @@ needed. **Supersedes `phase11_handover.md`**, which remains accurate for everyth
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes.
 Construct-grounded NLP that detects validated sports-psychology constructs in an athlete's
@@ -35,8 +35,8 @@ interpretability; (3) a time-aware, fusion-ready design.
 
 | Phase | Status |
 |---|---|
-| 1–10 | Complete (Phase 10 complete **offline only** — no live OpenRouter call has ever been made) |
-| **11 — Human gold annotation** | **Tooling complete and now verified against the real annotation tool. The gate cannot pass: it needs a second human.** |
+| 1–10 | Complete (Phase 10 complete **offline only** - no live OpenRouter call has ever been made) |
+| **11 - Human gold annotation** | **Tooling complete and now verified against the real annotation tool. The gate cannot pass: it needs a second human.** |
 | 12 | Not started. **Do not start.** |
 
 **The Phase 11 gate reports `UNMEASURABLE` and that is correct.** Kappa is a property of two
@@ -48,7 +48,7 @@ than returning a placeholder, and that refusal is the design.
 - **Sandbox caveat:** the agent sandbox runs Python 3.10; the project pins 3.11. `datetime.UTC`
   (3.11+) is used in `src/agents/ledger.py`, `src/ingestion/allowlist.py` and
   `src/labeling/{schema,runner}.py`. Tests were run in the sandbox with an **uncommitted**
-  `sitecustomize.py` shim backfilling that alias. **Re-run `pytest` on the 3.11 machine —
+  `sitecustomize.py` shim backfilling that alias. **Re-run `pytest` on the 3.11 machine -
   expect 386/386.**
 - **OPEN-002** (broken pixeltable plugin hook) fired on every file write again. Cosmetic.
 - **Phase 3:** the BibTeX key `Toth2025` is historical. László Tóth was the handling editor,
@@ -59,7 +59,7 @@ than returning a placeholder, and that refusal is the design.
 
 ---
 
-## PART B — Current Session Summary
+## PART B - Current Session Summary
 
 ### B1. What this session was asked to do
 
@@ -70,7 +70,7 @@ built and committed (`e626395`, `b992fa1`). What remained were the three items
 (OPEN-027)**. The first two need a human. The third was the implementable work, and it is
 what this session did.
 
-### B2. The headline finding: OPEN-027 was not a formality — the path was broken
+### B2. The headline finding: OPEN-027 was not a formality - the path was broken
 
 `phase11_handover.md` framed OPEN-027 as *"five minutes converts an unexercised path into a
 tested one."* Those five minutes were spent. **The ingest path did not work at all.**
@@ -85,7 +85,7 @@ $ python scripts/run_annotation.py --ingest --batch gold_dev --annotator A1
 ERROR: no annotation output under .../annotation_output. Has A1 finished a pass in Potato?
 ```
 
-— over a directory containing two completed passes. Three mismatches, each read out of the
+- over a directory containing two completed passes. Three mismatches, each read out of the
 installed package rather than inferred:
 
 | `src/annotation/ingest.py` assumed | Potato 2.7.1 actually writes |
@@ -98,11 +98,11 @@ installed package rather than inferred:
 was empty. Against real output that meant **every span would have been silently dropped**, and
 an item annotated with spans but no intensity would then have been counted as "not yet
 annotated" rather than refused. A parser that loses evidence quietly is worse than one that
-crashes, and this one lost all of it — without an error, on the artifact the entire corpus
+crashes, and this one lost all of it - without an error, on the artifact the entire corpus
 contribution rests on.
 
 This is the second time in this project that "written carefully against the documented
-interface, just never run" turned out to mean "does not work" — the first was the Phase 6 cost
+interface, just never run" turned out to mean "does not work" - the first was the Phase 6 cost
 ledger (OPEN-024, quadratic, correct at n=5 and unusable at n=10,000). **OPEN-007 (CrewAI
 backend) and OPEN-008 (the live labelling path) are the two remaining unexecuted paths and
 should now be assumed broken until executed, not merely untested.**
@@ -110,14 +110,14 @@ should now be assumed broken until executed, not merely untested.**
 ### B3. The fix, and why it leaves the project better than the assumption did
 
 **`src/annotation/potato_output.py`** (new). Reads both artifacts Potato 2.7.1 actually
-writes — the authoritative per-user `user_state.json`, and the `annotations.jsonl` the
-exporter produces — and normalises them to one payload shape, so `parse_annotation` has a
+writes - the authoritative per-user `user_state.json`, and the `annotations.jsonl` the
+exporter produces - and normalises them to one payload shape, so `parse_annotation` has a
 single input and the rubric's coupling rules are checked in exactly one place.
 
 Span surface text is recovered by **slicing the utterance with Potato's own offsets**. That is
 not a workaround; it is stronger than what was there. `SilverLabel` requires every evidence
 span to be a literal substring of the utterance and enforces it with a check, because an LLM
-asked to quote will paraphrase. Gold now has that property **by construction** — a slice of
+asked to quote will paraphrase. Gold now has that property **by construction** - a slice of
 the utterance cannot be anything but a substring of it. Offsets that do not land inside the
 utterance are **refused, never clipped**: a clipped span is not the span the annotator marked,
 and the divergence it signals (the batch and the annotated text disagreeing) is exactly what
@@ -125,12 +125,12 @@ someone needs to be told about.
 
 `_collect_spans` now raises `SPAN_WITHOUT_SURFACE` instead of skipping. `scripts/
 run_annotation.py --ingest` discovers passes via `discover_passes()` and reports the specific
-case where output exists under a *different* annotator id — the likely real-world mistake,
+case where output exists under a *different* annotator id - the likely real-world mistake,
 since Potato names the directory after whatever id the person logged in with.
 
 ### B4. Verification, and the one thing it deliberately would not do
 
-`tests/test_potato_output.py` — **13 tests, all against recorded real output** committed under
+`tests/test_potato_output.py` - **13 tests, all against recorded real output** committed under
 `tests/fixtures/potato/`. The fixtures were written by Potato's own serialiser and its own
 exporter; nothing in them was typed by hand. That is the point: *a fixture written by the
 author of the parser cannot detect the author's wrong assumption.* The previous 48 tests were
@@ -155,13 +155,13 @@ the working tree confirmed clean.
 
 | Gate | Result |
 |---|---|
-| `scripts/run_ingestion.py --verify-only` | **Phase 7: PASSED** — 4,000 records |
-| `scripts/run_preprocessing.py` | **Phase 8: PASSED** — 0 residual-risk flags |
+| `scripts/run_ingestion.py --verify-only` | **Phase 7: PASSED** - 4,000 records |
+| `scripts/run_preprocessing.py` | **Phase 8: PASSED** - 0 residual-risk flags |
 | `scripts/run_benchmark_audit.py` | **PASSED** |
 | `scripts/run_eda.py` | **Phase 9: PASSED** |
-| `scripts/run_labeling.py` | **Phase 10: PASSED** — 9,302 labels verified |
+| `scripts/run_labeling.py` | **Phase 10: PASSED** - 9,302 labels verified |
 | `scripts/run_annotation.py --build --batch gold_dev` | **PASSED**, with the one-annotator warning |
-| `scripts/run_annotation.py --agreement` | **UNMEASURABLE** — correct; the human blocker |
+| `scripts/run_annotation.py --agreement` | **UNMEASURABLE** - correct; the human blocker |
 | `ruff check` / `ruff format --check` | clean, 77 files |
 | `pytest` | **385/386** in the sandbox; the one failure is `test_python_version_is_311` under 3.10, i.e. the test working correctly. **Expect 386/386 on the 3.11 machine.** |
 
@@ -172,9 +172,9 @@ Test count by file: agents 26 · annotation 48 · evaluation 34 · ingestion 53 
 
 | File | Change |
 |---|---|
-| `src/annotation/potato_output.py` | **new** — reads Potato 2.7.1's real artifacts |
-| `tests/test_potato_output.py` | **new** — 13 tests against recorded real output |
-| `tests/fixtures/potato/` | **new** — artifacts written by Potato's own serialiser, plus a README stating they are a rehearsal and not data |
+| `src/annotation/potato_output.py` | **new** - reads Potato 2.7.1's real artifacts |
+| `tests/test_potato_output.py` | **new** - 13 tests against recorded real output |
+| `tests/fixtures/potato/` | **new** - artifacts written by Potato's own serialiser, plus a README stating they are a rehearsal and not data |
 | `src/annotation/ingest.py` | `ingest_passes()` added as the production path; `_collect_spans` now refuses instead of silently dropping |
 | `src/annotation/__init__.py` | new exports |
 | `scripts/run_annotation.py` | `--ingest` discovers real passes; better error when the id does not match |
@@ -260,7 +260,7 @@ git push
 
 ---
 
-## PART C — What Phase 11 needs next
+## PART C - What Phase 11 needs next
 
 **No code can close the top item, and it has now been deferred across six phases.**
 
@@ -273,14 +273,14 @@ entry commented out with the reasoning. Uncomment it only when a real person has
 sport-psychology practitioner could broker pre-competition athlete text under an A3 consent
 basis (OPEN-011), serve as the second annotator (OPEN-025), *and* be the Phase 17 expert rater
 (OPEN-004). Three open items, one solution, and the two oldest of them are the project's
-highest-impact risks. A test asserts the roster has exactly one annotator — **if it starts
+highest-impact risks. A test asserts the roster has exactly one annotator - **if it starts
 failing, someone has been recruited; update this handover, do not "fix" the test.**
 
 ### 2. Time the `gold_dev` calibration pass (OPEN-026).
 
 Ten intensity questions plus a span pass, per item, per annotator, over 400 `gold_eval` items,
 has never been costed. `CLAUDE.md` sec.3 freezes the construct set at Phase 12 *after checking
-annotation burden*. Do not guess it — the generator supports a `constructs` filter and
+annotation burden*. Do not guess it - the generator supports a `constructs` filter and
 `--graded-only` so the taxonomy can be trimmed on evidence rather than by feel.
 
 ### 3. Then the annotation itself, in this order, which is load-bearing.
@@ -293,14 +293,14 @@ measurement.
 
 ### 4. Separately and in parallel: decide the live labelling run (OPEN-023).
 
-The Phase 10 projection is **$17.46 against a $20 enforced cap** — 87% of the cap for one pass,
+The Phase 10 projection is **$17.46 against a $20 enforced cap** - 87% of the cap for one pass,
 because `config/model_routing.yaml`'s "$1.12 per pass" assumed a ~400-token prompt and the real
 rubric is 3,946. Recommended: `refresh_pricing.py --check`, then `run_labeling.py --live
 --pricing-checked --limit 50` (costs pennies) to measure the cache-read rate, the real
 escalation rate and the real output length, then re-project. If it is still uncomfortable,
-shorten the rubric or reduce the escalation fraction — **do not raise `monthly_cap_usd`.**
+shorten the rubric or reduce the escalation fraction - **do not raise `monthly_cap_usd`.**
 
-### The rules that make the kappa meaningful — unchanged and non-negotiable
+### The rules that make the kappa meaningful - unchanged and non-negotiable
 
 - **100% double-annotated.** Both annotators do all 400 `gold_eval` items; that is what makes a
   per-construct Cohen's kappa computable.
@@ -313,7 +313,7 @@ shorten the rubric or reduce the escalation fraction — **do not raise `monthly
   exist because the whole corpus was labelled. Silver-vs-human measures *the labeller* and is
   reported as such at Phase 14. Agreement is between two people.
 - **Adjudicate after both passes**, against the document. If adjudication reveals a rule the
-  document does not cover, amend the document and re-run the affected batch — do not settle it
+  document does not cover, amend the document and re-run the affected batch - do not settle it
   verbally.
 - Per-construct kappa is reported **with a bootstrap interval, never a bare point estimate**
   (`PROJECT_PLAN.md` Phase 11 gate). Already implemented; the CI is suppressed below 20 items
@@ -346,17 +346,17 @@ shorten the rubric or reduce the escalation fraction — **do not raise `monthly
 | **OPEN-023** | Phase 10's cost estimate is low by ~10×; a full live pass projects at 87% of the monthly cap. Owner decision. | now |
 | **OPEN-026** | Annotation burden unmeasured; the Phase 12 taxonomy freeze depends on it. | Phase 12 |
 | **OPEN-008** | Partially resolved. The key exists; **no live call has ever been made.** Assume broken until executed. | Phase 10's live pilot |
-| **OPEN-007** | CrewAI backend written but never executed. **Assume broken until executed.** | — |
-| OPEN-027 | ~~Ingest never run against real Potato output~~ — **CLOSED this session, and it was broken.** | closed |
+| **OPEN-007** | CrewAI backend written but never executed. **Assume broken until executed.** | - |
+| OPEN-027 | ~~Ingest never run against real Potato output~~ - **CLOSED this session, and it was broken.** | closed |
 | OPEN-022 | Template era not recorded, so the sharpest shared-ancestry probe cannot be run. | Phase 18 |
 | OPEN-021 | The lexicon baseline is not independent of the corpus. A paper obligation. | Phase 18 |
-| OPEN-024 | ~~Ledger was O(n²)~~ — **CLOSED at Phase 10.** | closed |
+| OPEN-024 | ~~Ledger was O(n²)~~ - **CLOSED at Phase 10.** | closed |
 | OPEN-019 | `generation_spec` replicated per utterance (×~2.3). | monitored |
-| OPEN-009 | Model/price drift. Unverified — the sandbox has no route to openrouter.ai. | any large batch |
+| OPEN-009 | Model/price drift. Unverified - the sandbox has no route to openrouter.ai. | any large batch |
 | OPEN-012 | Vocabulary bounded by the template bank; 860 types. | Phase 14 (monitored) |
 | OPEN-005 | Ethics exemption not in writing. | Submission |
 | OPEN-006 | Withdrawal contact is a personal address. | Public release |
-| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. | — |
+| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. | - |
 
 **OPEN-025, OPEN-011 and OPEN-004 are one conversation.** Phase 11 is where OPEN-011 stops
 being a risk and becomes a limitation printed in the paper: annotating 400 synthetic

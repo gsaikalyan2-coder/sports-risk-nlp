@@ -74,7 +74,7 @@ from src.dashboard import (  # noqa: E402
 from src.dashboard.neurovis import atlas_height, atlas_panel  # noqa: E402
 from src.dashboard.widgets import atlas_widget  # noqa: E402
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 

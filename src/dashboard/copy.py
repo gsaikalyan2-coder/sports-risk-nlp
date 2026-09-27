@@ -240,10 +240,6 @@ NON_DEFAULT_POLICY_EXPORT = (
 # The two pages
 # ---------------------------------------------------------------------------
 
-ANNOUNCEMENT = (
-    "Synthetic text only. Not a clinical instrument, and no claim about any identifiable person."
-)
-
 PAGE1_TITLE = "Ten signals, read from what an athlete wrote"
 PAGE1_LEDE = (
     "Each tile below is one psychological signal the system looks for, showing only its "

@@ -50,7 +50,7 @@ from src.dashboard import (  # noqa: E402
     theme,
 )
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 policy = st.session_state.get("policy_label", DEFAULT_POLICY_LABEL)
@@ -90,7 +90,7 @@ with left:
         unsafe_allow_html=True,
     )
 with middle:
-    highest = peak.surface.display if peak else "&#8212;"
+    highest = peak.surface.display if peak else "-"
     where = f"sentence {peak.index + 1} of {len(ribbon.bands)}" if peak else "no sentence scored"
     st.markdown(
         f'<div class="widget"><span class="wl">Highest sentence</span>'
@@ -118,7 +118,7 @@ st.info(plain.RIBBON_NOT_AVERAGE)
 st.markdown("## Sentence by sentence")
 for band in ribbon.bands:
     reading = band.surface.display if band.surface else "no number"
-    st.markdown(f"**{band.index + 1}. {reading}** &mdash; {band.state}")
+    st.markdown(f"**{band.index + 1}. {reading}** - {band.state}")
     st.markdown(f"> {band.text}")
 
 with st.expander("Provenance and limitations: read before quoting anything here"):

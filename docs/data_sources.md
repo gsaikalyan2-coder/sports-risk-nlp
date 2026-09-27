@@ -22,11 +22,11 @@ That is not a licensing inconvenience, it is a construct-validity problem. This 
 taxonomy is anticipatory: `appraisal_orientation` asks whether the athlete frames an
 *upcoming* competition as challenge or threat, and `cognitive_anxiety` is worry about an
 outcome that has not happened. Post-match speech expresses relief, disappointment, and
-causal attribution instead — different constructs, elicited after the uncertainty has
+causal attribution instead - different constructs, elicited after the uncertainty has
 resolved. Training on post-match text and reporting it as pre-competition risk profiling
 would be a failure a reviewer would identify immediately.
 
-This is exactly risk #1 in `PROJECT_PLAN.md` ("data scarcity/licensing — highest risk")
+This is exactly risk #1 in `PROJECT_PLAN.md` ("data scarcity/licensing - highest risk")
 materialising. **Owner decision, 2026-08-09: synthetic-first (A2), pre-competition framing
 retained, full taxonomy retained.** Recorded in `CLAUDE.md` §10.
 
@@ -34,17 +34,17 @@ retained, full taxonomy retained.** Recorded in `CLAUDE.md` §10.
 
 ## 2. Ingested sources
 
-### 2.1 `synth_precomp_v1` — synthetic pre-competition athlete utterances
+### 2.1 `synth_precomp_v1` - synthetic pre-competition athlete utterances
 
 | Field | Value |
 |---|---|
 | Allow-list category | **A2_synthetic** |
 | Records | **4,000** |
 | Licence | Project-generated. No third-party licence applies; no human subject involved |
-| Redistribution | **Permitted** — the only source in the corpus quotable verbatim in the paper |
+| Redistribution | **Permitted** - the only source in the corpus quotable verbatim in the paper |
 | Generator | `construct-template-grammar@1.4`, seed `42` |
 | Language | English |
-| De-identified | `false` — Phase 8 sets this flag, not Phase 7 |
+| De-identified | `false` - Phase 8 sets this flag, not Phase 7 |
 | Path | `data/raw/synth_precomp_v1/` (`provenance.json` + `records.jsonl`) |
 
 **What it is.** A seeded template grammar over the ten locked constructs in
@@ -75,15 +75,15 @@ python scripts/run_ingestion.py            # defaults: --count 4000 --seed 42
 | Distinct texts | 976 (81.3%) | 1,161 (96.8%) | 1,158 (96.5%) | 3,797 (94.9%) | **3,888 (97.2%)** |
 | Tokens | 30,367 | 40,251 | 40,634 | 134,787 | **151,333** |
 | **Vocabulary (types)** | 444 | 635 | 636 | 625 | **860** |
-| **MATTR-50** | — | 0.818 | 0.820 | 0.819 | **0.819** |
+| **MATTR-50** | - | 0.818 | 0.820 | 0.819 | **0.819** |
 | Raw type–token ratio | 0.0146 | 0.0158 | 0.0157 | 0.0046 | 0.0057 |
 | Words per record | 25.3 | 33.5 | 33.9 | 33.7 | **37.8** |
 | Records with no construct planted | 106 (8.8%) | 92 (7.7%) | 85 (7.1%) | 300 (7.5%) | **345 (8.6%)** |
-| **Records with a broken substitution** | — | not measured | 190 (15.8%) | 0 | **0** |
+| **Records with a broken substitution** | - | not measured | 190 (15.8%) | 0 | **0** |
 
 > **Vocabulary is the headline: 625 → 860 types (+38%) at v1.4**, from doubling the
 > template bank (OPEN-020). MATTR-50 barely moves, and that is the correct
-> behaviour rather than a disappointment — MATTR measures richness *within a
+> behaviour rather than a disappointment - MATTR measures richness *within a
 > 50-token window*, and the new templates are as varied inside a sentence as the
 > old ones were. What grew is the number of distinct *sentences*, which is what
 > `vocabulary_size` and the distinct-text rate capture. The two measures answer
@@ -99,8 +99,8 @@ python scripts/run_ingestion.py            # defaults: --count 4000 --seed 42
 > **v1.3 lost 11 types against v1.2, and that was the OPEN-016 guard working.**
 > A generation-time check reverts a substitution that would produce a
 > ruled-defective frame, so a word whose only frames in the bank were defective
-> stopped appearing. The alternative — deleting the 34 implicated synonym-group
-> members — was measured at **594** types. The guard kept 31 more and removed
+> stopped appearing. The alternative - deleting the 34 implicated synonym-group
+> members - was measured at **594** types. The guard kept 31 more and removed
 > nothing from the bank, which is why the v1.4 template expansion could recover
 > the vocabulary so sharply: the words were still there waiting for good frames.
 
@@ -114,7 +114,7 @@ python scripts/run_ingestion.py            # defaults: --count 4000 --seed 42
 
 > **These are per-RECORD statistics** over `data/raw/`. The per-*utterance*
 > profile of `data/interim/` is in `reports/eda.md`, and the two are not
-> comparable — Phase 8 turns 4,000 records into 9,302 utterances, which changes
+> comparable - Phase 8 turns 4,000 records into 9,302 utterances, which changes
 > every denominator. Utterance-level exact duplication is **37.6%** (was 87.4% at
 > v1.3; OPEN-018), against 3.9% at record level.
 
@@ -129,7 +129,7 @@ vocabulary by 44% and moved raw TTR by 0.001. **MATTR-50** (mean TTR over slidin
 near-synonym substitution and discourse framing *after* a template renders. It
 raises the type count without altering template identity, so the
 template-disjoint split in §2.2 still holds every paraphrase of a template out
-together — a paraphrase of a seen template is still leakage, and treating it
+together - a paraphrase of a seen template is still leakage, and treating it
 otherwise would have manufactured the inflation this work exists to remove.
 
 Synonym groups are restricted to members sharing a part of speech **and** an
@@ -142,12 +142,12 @@ special-cased; the reasoning is recorded inline in `SYNONYM_GROUPS`.
 occurrence of *part* in the bank sits inside the idiom *part of me*, and the
 idiom does not survive substitution (OPEN-015). All four members share a part of
 speech **and** an argument structure, so the review rule above could not have
-caught it — **idiom membership is a third constraint**.
+caught it - **idiom membership is a third constraint**.
 
 **What v1.3 changed.** The v1.2 fix prompted an
 exhaustive sweep (`src/ingestion/synonym_audit.py`): all 727 single-token
 substitutions the generator can make, screened by six probes. It found that
-OPEN-015 had **not** been isolated — **15.8% of v1.2 records** still contained a
+OPEN-015 had **not** been isolated - **15.8% of v1.2 records** still contained a
 substitution a human ruled broken or degraded, across 55 realised signatures
 ("*figure about*", "*insides is*", "*a approach*", "*on edge I'll*").
 
@@ -156,7 +156,7 @@ verdicts at generation time and reverts any substitution that would produce a
 defective frame (OPEN-016, option (c)). `think → figure` is broken in *"all I
 figure about"* and fine in *"I figure I'm ready"*: the defect belongs to the
 **frame**, not the word, and a context-blind bank can only accept or reject the
-word. Measured both ways at n=4,000 — deleting the 34 implicated members costs
+word. Measured both ways at n=4,000 - deleting the 34 implicated members costs
 49 realised types, the guard costs 18, and both reach zero defects.
 
 The standing guarantee is a build-time ratchet, not a one-off measurement: the
@@ -165,13 +165,13 @@ signature lacks a human verdict, and a second test asserts the corpus contains n
 ruled-defective frame at all. **A new defect class still needs a human to notice
 it once; it no longer needs a human to notice it repeatedly.**
 
-**What v1.4 changed — the template bank, and the discourse layer.**
+**What v1.4 changed - the template bank, and the discourse layer.**
 
 *Templates (OPEN-020).* The bank went from 7–12 realisations per construct to a
 uniform **15**: five per intensity level for the six graded constructs, five per
 label for the four categorical ones. Written against `config/taxonomy.yaml`'s
 definitions and edge cases, and deliberately **not** against its
-`positive_examples` — which turned out to matter more than expected, because it
+`positive_examples` - which turned out to matter more than expected, because it
 is what exposed OPEN-021 (see below).
 
 Why 15 and not more: a 35% per-construct holdout over 15 templates puts **five
@@ -182,8 +182,8 @@ reviewer interrogates and one they dismiss.
 
 *Discourse suffixes (OPEN-018).* A suffix is now a **clause** joined with an em
 dash rather than a following sentence, and `_frame` strips the parent's full stop
-before attaching. The first attempt — expanding the suffix bank from 8 entries to
-17 — is worth recording because it looked right and was not: it spread the
+before attaching. The first attempt - expanding the suffix bank from 8 entries to
+17 - is worth recording because it looked right and was not: it spread the
 repeats without reducing them, because every construct sentence still drew a
 suffix and Phase 8 still segmented each into its own utterance. Bank size was
 never the lever; **sentence-hood was**. Utterance duplication fell 87.4% → 37.6%,
@@ -233,7 +233,7 @@ Constructs per record: 0 → 345, 1 → 1,401, 2 → 1,527, 3 → 727.
 #### Temporal and context coverage
 
 The Phase 7 gate requires these present where the source allows, explicitly null otherwise.
-This generator controls timing entirely, so anything below 100% would be a generator bug —
+This generator controls timing entirely, so anything below 100% would be a generator bug -
 `scripts/run_ingestion.py` fails the gate if a synthetic source leaves timing null.
 
 | Field | Coverage | Notes |
@@ -243,7 +243,7 @@ This generator controls timing entirely, so anything below 100% would be a gener
 | `competition_level` | **100%** | 5 levels, 228–254 each |
 | `region` | **100%** | 5 regions, 224–269 each |
 | `source_type` | **100%** | always `synthetic`; intended register in `generation_spec.rendered_as` |
-| `training_load_hint` | **62.3%** | deliberately sparse — real sources rarely carry this |
+| `training_load_hint` | **62.3%** | deliberately sparse - real sources rarely carry this |
 
 Time-to-competition distribution (days before): 0→167, 1→229, 2→153, 3→169, 5→72, 7→86,
 10→80, 14→86, 21→89, 30→69.
@@ -268,14 +268,14 @@ Stated plainly. Each of these belongs in the paper's limitations section.
 | **Register is asserted, not observed** | A record labelled `journal` in `rendered_as` is not written in a demonstrably different register from one labelled `presser`. The field records intent, not a measured stylistic difference. |
 | **Media-training artefact absent** | `docs/ethics.md` §6 names elite media training as a validity threat. Synthetic athletes have none, so the corpus is *cleaner* than reality in a way that flatters the model. |
 
-### 3.1 Circularity risk — read before using `generation_spec`
+### 3.1 Circularity risk - read before using `generation_spec`
 
 Each record carries `generation_spec.planted_constructs`, naming the constructs the
 generator planted.
 
 **This is generation metadata. It is not a label, and it must never be used as evaluation
 ground truth.** Doing so would measure whether a model can recover the template choices in
-`src/ingestion/synthetic.py` — a circular result that says nothing about athlete language,
+`src/ingestion/synthetic.py` - a circular result that says nothing about athlete language,
 while producing impressively high F1. The warning travels inside every record
 (`generation_spec.NOTE`) as well as here, and a test asserts it is present.
 
@@ -286,7 +286,7 @@ about model quality. Evaluation rests on the Phase 11 human gold set alone.
 
 ---
 
-## 2.2 Template leakage — measured, not assumed (OPEN-012)
+## 2.2 Template leakage - measured, not assumed (OPEN-012)
 
 A random train/test split on this corpus puts the **same template** on both sides. A model
 can then score highly by recognising a string it has already seen labelled. That is not an
@@ -324,7 +324,7 @@ would otherwise report.
 
 1. Phases 13, 14 and 18 **must** use `template_disjoint_split`. Using `random_split` for a
    reported result is a methodological error, and the function's docstring says so.
-2. Report **both** numbers in the paper. The gap is itself a contribution — evidence the
+2. Report **both** numbers in the paper. The gap is itself a contribution - evidence the
    failure mode was measured rather than assumed away, and reusable by anyone else building
    a template-seeded corpus.
 3. Every headline number carries a **bootstrap CI** (`src/evaluation/metrics.py`). With a
@@ -344,9 +344,9 @@ used, and because two of these become available if a licence conversation happen
 
 | Candidate | What it is | Rejected because |
 |---|---|---|
-| **Cornell Tennis Transcript and Commentary Dataset** ([page](https://www.cs.cornell.edu/~liye/tennis.html), [README](https://www.cs.cornell.edu/~liye/tennis_README.txt)) — Fu, Danescu-Niculescu-Mizil & Lee, 2016. 6,467 tennis singles **post-match** press conferences, 2007–2015, sourced from ASAP Sports | Freely downloadable | **No licence statement anywhere.** The project page and README carry a BibTeX citation request only. Fails A1's `explicit_licence_recorded_verbatim`, and triggers P7 (unverifiable provenance). Also post-match, so wrong side of the event. **Recoverable** with one written permission from the authors. |
-| **iMiGUE-Speech** ([repo](https://github.com/CV-AC/imigue-speech)) — Kakouros, Kang & Chen, 2026. 359 **post-match** athlete interviews with Whisper ASR transcripts, speaker separation, word-level alignment | Gated | Requires a **signed licence agreement** with the University of Oulu, not obtained. Would satisfy A1 once signed. Also post-match. Base iMiGUE is identity-free, which would help Phase 8. |
-| **ASAP Sports direct collection** (asapsports.com) — the underlying transcript archive, which does include pre-tournament press conferences | Not attempted | `terms.php` and `robots.txt` both returned empty content, so the terms of service **could not be verified**. Under the allow-list's fail-closed rule this is P4/P5 territory and ingestion must refuse. Needs a human to read the terms. |
+| **Cornell Tennis Transcript and Commentary Dataset** ([page](https://www.cs.cornell.edu/~liye/tennis.html), [README](https://www.cs.cornell.edu/~liye/tennis_README.txt)) - Fu, Danescu-Niculescu-Mizil & Lee, 2016. 6,467 tennis singles **post-match** press conferences, 2007–2015, sourced from ASAP Sports | Freely downloadable | **No licence statement anywhere.** The project page and README carry a BibTeX citation request only. Fails A1's `explicit_licence_recorded_verbatim`, and triggers P7 (unverifiable provenance). Also post-match, so wrong side of the event. **Recoverable** with one written permission from the authors. |
+| **iMiGUE-Speech** ([repo](https://github.com/CV-AC/imigue-speech)) - Kakouros, Kang & Chen, 2026. 359 **post-match** athlete interviews with Whisper ASR transcripts, speaker separation, word-level alignment | Gated | Requires a **signed licence agreement** with the University of Oulu, not obtained. Would satisfy A1 once signed. Also post-match. Base iMiGUE is identity-free, which would help Phase 8. |
+| **ASAP Sports direct collection** (asapsports.com) - the underlying transcript archive, which does include pre-tournament press conferences | Not attempted | `terms.php` and `robots.txt` both returned empty content, so the terms of service **could not be verified**. Under the allow-list's fail-closed rule this is P4/P5 territory and ingestion must refuse. Needs a human to read the terms. |
 | **YouTube captions via the Data API** (an `OPENROUTER`-independent route; `YOUTUBE_API_KEY` is present in `.env`) | Route closed | `captions.download` requires an OAuth token from the **channel that owns the video**; third-party requests return 403. Using any other extraction method would breach YouTube's terms → P4. |
 | **Hugging Face Hub** | Nothing relevant | Searched athlete/sports/interview/press-conference/anxiety. Zero athlete-text datasets. The anxiety datasets found are clinical or general mental-health, which P6 excludes and which are not athlete speech. |
 
@@ -374,7 +374,7 @@ are appended to `logs/ingestion_refusals.log`.
 | Write attempt into `data/gold/` | `store.RawStore._guard_root` | `GOLD_IS_HUMAN_OWNED` |
 
 All seven prohibitions P1–P7 must be **explicitly declared against** by the caller. An
-absent declaration is refused rather than defaulted to compliant — silence is not consent.
+absent declaration is refused rather than defaulted to compliant - silence is not consent.
 A parametrised test covers every declaration in both directions, and another test asserts
 that no prohibition can be added to the YAML without a corresponding code guard.
 

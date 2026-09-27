@@ -4,7 +4,7 @@ The problem this module exists to solve
 ---------------------------------------
 `data/raw/synth_precomp_v1` is generated from a template bank
 (`src/ingestion/synthetic.py`). Under a **random** split, the same template
-appears in both train and test — differing only in slot fillers and near-synonym
+appears in both train and test - differing only in slot fillers and near-synonym
 substitutions. A model can then score highly on held-out data by recognising
 "I cannot stop thinking about all the ways this could fall apart" as a string it
 has already seen labelled, without having learned anything about
@@ -18,7 +18,7 @@ The fix
 **Template-disjoint splitting.** Partition the *templates* first, then assign
 records. A record goes to test only if every template it uses is a test
 template. A model evaluated this way has never seen the phrasings it is tested
-on, so its score reflects generalisation across realisations of a construct —
+on, so its score reflects generalisation across realisations of a construct -
 which is the quantity of interest.
 
 Records whose templates straddle the partition are **discarded**, not quietly
@@ -127,7 +127,7 @@ def template_disjoint_split(
     """Partition templates first, then records. No template crosses the line.
 
     `test_size` targets the fraction of *templates* held out, which is only
-    approximately the fraction of records held out — records using several
+    approximately the fraction of records held out - records using several
     templates are likelier to be discarded, so the realised test fraction is
     smaller. `Split.summary()` reports what actually happened rather than what
     was requested.
@@ -224,11 +224,11 @@ def leakage_report(split: Split, *, ngram_sizes: Sequence[int] = (4, 6, 8)) -> L
 
     Three signals, weakest to strongest evidence of a problem:
 
-    * **n-gram overlap** — some is unavoidable and healthy; English shares
+    * **n-gram overlap** - some is unavoidable and healthy; English shares
       phrases. Very high 8-gram overlap means near-duplicate sentences.
-    * **exact text overlap** — a test record whose text appears verbatim in
+    * **exact text overlap** - a test record whose text appears verbatim in
       train. Should be 0. Anything above 0 invalidates the split.
-    * **shared templates** — the decisive one for this corpus. Non-zero means
+    * **shared templates** - the decisive one for this corpus. Non-zero means
       the model saw the phrasing pattern it is being tested on.
     """
     train_texts = {r.text for r in split.train}

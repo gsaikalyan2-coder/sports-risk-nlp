@@ -79,7 +79,7 @@ from src.dashboard.biosources import (  # noqa: E402
 from src.dashboard.neurovis import neurofeedback_height, neurofeedback_panel  # noqa: E402
 from src.dashboard.widgets import neurofeedback_widget  # noqa: E402
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 TICKS = 48

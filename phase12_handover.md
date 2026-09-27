@@ -1,12 +1,12 @@
-# Handover — Phase 12: Label Validation & Taxonomy Refinement
+# Handover - Phase 12: Label Validation & Taxonomy Refinement
 
 Self-contained. A new AI session can start from this file plus the repo; no chat history
-needed. Supersedes nothing — read alongside `phase11_handover_v2.md`, which remains the
+needed. Supersedes nothing - read alongside `phase11_handover_v2.md`, which remains the
 authority on the annotation tooling.
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes.
 Construct-grounded NLP that detects validated sports-psychology constructs in an athlete's
@@ -35,9 +35,9 @@ interpretability; (3) a time-aware, fusion-ready design.
 
 | Phase | Status |
 |---|---|
-| 1–10 | Complete (Phase 10 complete **offline only** — no live OpenRouter call has ever been made) |
-| 11 — Human gold annotation | Tooling complete and verified against real Potato output. **Gate UNMEASURABLE**: kappa needs a second human |
-| **12 — Label validation & taxonomy refinement** | **Tooling complete, tested and gated. `--burden` and `--propose` run today and produce real Phase 12 inputs. `--refine` reports BLOCKED, because it consumes gold that does not exist** |
+| 1–10 | Complete (Phase 10 complete **offline only** - no live OpenRouter call has ever been made) |
+| 11 - Human gold annotation | Tooling complete and verified against real Potato output. **Gate UNMEASURABLE**: kappa needs a second human |
+| **12 - Label validation & taxonomy refinement** | **Tooling complete, tested and gated. `--burden` and `--propose` run today and produce real Phase 12 inputs. `--refine` reports BLOCKED, because it consumes gold that does not exist** |
 | 13 | Not started |
 
 **Phases 11 and 12 are now blocked on the same missing person.** That is the single most
@@ -49,7 +49,7 @@ code shortens it.
 
 - **Sandbox caveat:** the agent sandbox runs Python 3.10; the project pins 3.11. Tests were run
   with an **uncommitted** `sitecustomize.py` shim backfilling `datetime.UTC`. **That file is
-  still in the working tree and must be deleted before committing** — the sandbox could not
+  still in the working tree and must be deleted before committing** - the sandbox could not
   remove it (`Operation not permitted`). `git status` will show it as untracked.
 - A stale `.git/index.lock` has appeared again; `Remove-Item -LiteralPath ".git\index.lock"`
   before the first git command.
@@ -64,7 +64,7 @@ code shortens it.
 
 ---
 
-## PART B — Current Session Summary
+## PART B - Current Session Summary
 
 ### B1. What this session was asked to do
 
@@ -88,7 +88,7 @@ not a feeling"*, and nothing in the project estimated it. So the phase decompose
 
 | Half | Needs | Status |
 |---|---|---|
-| agreement analysis (`--refine`) | `data/gold/`, i.e. a second annotator | **BLOCKED — exits 1** |
+| agreement analysis (`--refine`) | `data/gold/`, i.e. a second annotator | **BLOCKED - exits 1** |
 | burden analysis (`--burden`) | the taxonomy | **runs today** |
 | change costing (`--propose`) | a candidate taxonomy + silver | **runs today** |
 
@@ -97,9 +97,9 @@ for a reason that applies to the other half and not to this one.
 
 ### B3. What was built
 
-**`src/taxonomy/`** — previously an empty package, now the Phase 12 home.
+**`src/taxonomy/`** - previously an empty package, now the Phase 12 home.
 
-**`burden.py` — the arithmetic half of OPEN-026.** Counts the decisions
+**`burden.py` - the arithmetic half of OPEN-026.** Counts the decisions
 `potato_project.py` actually puts in front of an annotator, derived from the *same*
 `taxonomy.yaml` that generates the Potato schemes so the estimate cannot drift from the
 instrument. Under the current 10 constructs:
@@ -124,10 +124,10 @@ Three design choices carry weight here:
 
 The fatigue threshold is not a comfort metric. `OPEN-026` names the failure exactly: a rushed
 second half produces a worse dataset than a careful smaller one, **and the damage is invisible
-in the kappa** — two tired annotators drift toward the same defaults and *agree more*. Burden
+in the kappa** - two tired annotators drift toward the same defaults and *agree more*. Burden
 is the only guard against a kappa that looks good because both people gave up.
 
-**`refinement.py` — disagreement → repair.** A kappa of 0.31 is compatible with at least four
+**`refinement.py` - disagreement → repair.** A kappa of 0.31 is compatible with at least four
 different fixes and they are not interchangeable, so the module **decomposes before it
 recommends**: presence disagreements vs intensity-only vs span-only, plus cross-construct
 confusion pairs. Verdicts are `KEEP` / `REVISE_RUBRIC` / `REVISE_INTENSITY_ANCHORS` /
@@ -140,34 +140,34 @@ Two guards are the point of the module:
   would read that undefined number as unreliability.
 - **A rare construct with a low kappa returns `KEEP`, not `DROP`.** The obvious Phase 12 move
   is to drop whatever scores badly. That optimises the headline kappa and damages the paper,
-  because the worst-scoring constructs are the rare, clinically loaded ones — `burnout_signal`
-  above all — which are exactly what a reviewer cares about. The kappa paradox is reported, not
+  because the worst-scoring constructs are the rare, clinically loaded ones - `burnout_signal`
+  above all - which are exactly what a reviewer cares about. The kappa paradox is reported, not
   acted on.
 
 `confusion_pairs()` finds the merge signal that **no single construct's kappa can show**:
 `perceived_stress` and `cognitive_anxiety` can each score moderately while the same items swap
 between them.
 
-**`versioning.py` — the changelog and what a change costs.** Diffs two taxonomies and
+**`versioning.py` - the changelog and what a change costs.** Diffs two taxonomies and
 classifies every difference by whether it invalidates silver. The load-bearing entry:
 
 > **An added construct invalidates the entire corpus.** The instinct is that adding is safe. It
-> is not — a v2 label is *silent* about a new construct, and treating silence as "not present"
+> is not - a v2 label is *silent* about a new construct, and treating silence as "not present"
 > fabricates a negative on every utterance, worst precisely where the class is rare.
 
 Verified against real silver: a definition edit to `cognitive_anxiety` invalidates 1,036 of
 6,200 labels (16.7%) across **873 distinct texts**; adding one construct invalidates 100% across
 6,444 distinct texts. The distinct-text count is reported beside the record count because Phase
-9 measured 87.4% duplication and quoting records alone would overstate the bill several-fold —
+9 measured 87.4% duplication and quoting records alone would overstate the bill several-fold -
 which could talk the owner out of a change that is actually cheap.
 
 `Changelog` refuses a version that does not advance, and refuses a change with no stated
 reason: the gate is *"agreement improves **or is justified**"*, and an unjustified change
 satisfies neither half. Reworded examples are flagged `COSMETIC` and surfaced for owner
-confirmation rather than auto-approved — whether a rewording changed the *question* is a
+confirmation rather than auto-approved - whether a rewording changed the *question* is a
 judgement about meaning, and no diff can make it.
 
-**`scripts/run_taxonomy_refinement.py`** — the Phase 12 gate: `--burden`, `--refine`,
+**`scripts/run_taxonomy_refinement.py`** - the Phase 12 gate: `--burden`, `--refine`,
 `--propose`, `--status`. Offline, free, deterministic.
 
 **Nothing in Phase 12 writes `config/taxonomy.yaml`.** Every output is a recommendation to the
@@ -177,7 +177,7 @@ the paper makes.
 
 ### B4. Verification
 
-`tests/test_taxonomy.py` — **30 tests, all passing.** The ones that matter assert refusals:
+`tests/test_taxonomy.py` - **30 tests, all passing.** The ones that matter assert refusals:
 
 - the default timing model declares itself unmeasured, and the report says so in its own text
 - a measurement with no source is refused
@@ -189,13 +189,13 @@ the paper makes.
 - a version bump with no reason is refused
 - **`--refine` exits 1 with `BLOCKED` and `OPEN-025` when no gold exists**
 - **`config/taxonomy.yaml` is byte-identical after `--status` and `--burden`**
-- gold labels still refuse a machine author — Phase 12 reads gold and must not become a way to
+- gold labels still refuse a machine author - Phase 12 reads gold and must not become a way to
   write it
 
 **What was deliberately not done:** no annotator was invented, nothing was written to
 `data/gold/`, and `--refine` was not exercised end-to-end against fabricated gold. The
 refinement path's *arithmetic* is exercised in tests against synthetic `ConstructAgreement`
-objects, which is a different claim from "it has been run on real annotations" — and this
+objects, which is a different claim from "it has been run on real annotations" - and this
 project has now twice found that a carefully-written, never-executed path was broken
 (OPEN-024, OPEN-027). **Treat `--refine` as unexecuted until it runs on real gold.**
 
@@ -206,12 +206,12 @@ project has now twice found that a carefully-written, never-executed path was br
 | `scripts/run_ingestion.py --verify-only` | **Phase 7: PASSED** |
 | `scripts/run_preprocessing.py` | **Phase 8: PASSED** |
 | `scripts/run_eda.py` | **Phase 9: PASSED** |
-| `scripts/run_labeling.py` | **Phase 10: PASSED** — 9,302 labels |
+| `scripts/run_labeling.py` | **Phase 10: PASSED** - 9,302 labels |
 | `scripts/run_annotation.py --status` | unchanged; both batches NOT computable |
 | `scripts/run_taxonomy_refinement.py --status` | v2, 10 constructs; burden computed, agreement blocked |
-| `scripts/run_taxonomy_refinement.py --burden` | **0** — writes `reports/annotation_burden.{md,json}` |
+| `scripts/run_taxonomy_refinement.py --burden` | **0** - writes `reports/annotation_burden.{md,json}` |
 | `scripts/run_taxonomy_refinement.py --propose` | **0** with a reason, **2** without |
-| `scripts/run_taxonomy_refinement.py --refine` | **1 — BLOCKED**, correct |
+| `scripts/run_taxonomy_refinement.py --refine` | **1 - BLOCKED**, correct |
 | `ruff check` / `ruff format --check` | clean, 82 files |
 | `pytest` | **415/416**; the one failure is `test_python_version_is_311` under sandbox 3.10, i.e. the test working. **Expect 416/416 on the 3.11 machine.** |
 
@@ -223,13 +223,13 @@ potato_output 13 · preprocessing 42 · profile 63 · smoke 17 · synonym_audit 
 
 | File | Change |
 |---|---|
-| `src/taxonomy/burden.py` | **new** — annotation burden, marginal cost, fatigue threshold |
-| `src/taxonomy/refinement.py` | **new** — disagreement decomposition, confusion pairs, verdicts |
-| `src/taxonomy/versioning.py` | **new** — taxonomy diff, changelog, silver re-label scope |
-| `src/taxonomy/__init__.py` | was empty — now the package surface |
-| `scripts/run_taxonomy_refinement.py` | **new** — the Phase 12 gate |
-| `tests/test_taxonomy.py` | **new** — 30 tests |
-| `reports/annotation_burden.{md,json}` | **new** — generated |
+| `src/taxonomy/burden.py` | **new** - annotation burden, marginal cost, fatigue threshold |
+| `src/taxonomy/refinement.py` | **new** - disagreement decomposition, confusion pairs, verdicts |
+| `src/taxonomy/versioning.py` | **new** - taxonomy diff, changelog, silver re-label scope |
+| `src/taxonomy/__init__.py` | was empty - now the package surface |
+| `scripts/run_taxonomy_refinement.py` | **new** - the Phase 12 gate |
+| `tests/test_taxonomy.py` | **new** - 30 tests |
+| `reports/annotation_burden.{md,json}` | **new** - generated |
 | `docs/open_issues.md` | OPEN-026 half-closed, with what closes the other half |
 | `PROJECT_PLAN.md` | status board brought current through Phase 12 |
 
@@ -317,7 +317,7 @@ git push
 
 ---
 
-## PART C — What Phase 12 needs next
+## PART C - What Phase 12 needs next
 
 ### 1. Recruit the second annotator (OPEN-025). Still the phase. Still one conversation.
 
@@ -327,7 +327,7 @@ entry commented out.
 
 **One SRMIST coach or sport-psychology practitioner closes three items:** OPEN-011 (broker
 pre-competition athlete text under an A3 consent basis), OPEN-025 (second annotator), OPEN-004
-(Phase 17 expert rater). A test asserts the roster has exactly one annotator — **if it starts
+(Phase 17 expert rater). A test asserts the roster has exactly one annotator - **if it starts
 failing, someone has been recruited; update this handover, do not "fix" the test.**
 
 ### 2. Time the `gold_dev` pass and close OPEN-026 properly.
@@ -373,7 +373,7 @@ escalation rates, then re-project. **Do not raise `monthly_cap_usd`.**
 - `data/gold/` is human-owned. `pytest` must never be able to spend money. Offline and
   deterministic from a fresh clone. Never commit secrets.
 
-**Do not start Phase 13** until the dataset is frozen — a baseline trained on a taxonomy that
+**Do not start Phase 13** until the dataset is frozen - a baseline trained on a taxonomy that
 is still moving has to be retrained, and the number it produced in the meantime will be quoted
 by someone.
 
@@ -391,16 +391,16 @@ by someone.
 | **OPEN-023** | A full live labelling pass projects at 87% of the monthly cap. Owner decision. | now |
 | **OPEN-026** | **Half closed.** Arithmetic done (12.1 h/annotator); the stopwatch is not. | Phase 12 freeze |
 | OPEN-008 | Key exists; **no live call has ever been made.** Assume broken until executed. | Phase 10 live pilot |
-| OPEN-007 | CrewAI backend written but never executed. **Assume broken until executed.** | — |
+| OPEN-007 | CrewAI backend written but never executed. **Assume broken until executed.** | - |
 | OPEN-022 | Template era not recorded. | Phase 18 |
 | OPEN-021 | The lexicon baseline is not independent of the corpus. A paper obligation. | Phase 18 |
 | OPEN-019 | `generation_spec` replicated per utterance. | monitored |
-| OPEN-009 | Model/price drift. Unverified — the sandbox has no route to openrouter.ai. | any large batch |
+| OPEN-009 | Model/price drift. Unverified - the sandbox has no route to openrouter.ai. | any large batch |
 | OPEN-012 | Vocabulary bounded by the template bank; 860 types. | Phase 14 (monitored) |
 | OPEN-005 | Ethics exemption not in writing. | Submission |
 | OPEN-006 | Withdrawal contact is a personal address. | Public release |
-| OPEN-002 | Broken pixeltable plugin hook; cosmetic. | — |
-| OPEN-024, OPEN-027, OPEN-003 | closed | — |
+| OPEN-002 | Broken pixeltable plugin hook; cosmetic. | - |
+| OPEN-024, OPEN-027, OPEN-003 | closed | - |
 
 **The paper consequence, stated plainly.** Phase 12 can now show a reviewer that the construct
 set was frozen against a *measured* burden and a *measured* agreement, with every candidate

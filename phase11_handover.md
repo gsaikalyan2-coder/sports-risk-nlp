@@ -1,11 +1,11 @@
-# Handover — Phase 11: Human Gold Annotation
+# Handover - Phase 11: Human Gold Annotation
 
 Self-contained. A new AI session can start from this file plus the repo; no chat history
 needed.
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes.
 Construct-grounded NLP that detects validated sports-psychology constructs in an athlete's
@@ -36,10 +36,10 @@ of truth for open items.
 | Phase | Status |
 |---|---|
 | 1–8 | Complete (see `phase10_handover.md` Part A for commits) |
-| 9 — EDA & quality profiling | Complete |
-| 9b — Corpus hardening | Complete |
-| **10 — Weak / LLM labelling** | **Complete offline. The live path has never been run.** |
-| **11 — Human gold annotation** | **NEXT** |
+| 9 - EDA & quality profiling | Complete |
+| 9b - Corpus hardening | Complete |
+| **10 - Weak / LLM labelling** | **Complete offline. The live path has never been run.** |
+| **11 - Human gold annotation** | **NEXT** |
 
 **Carried-forward caveats:**
 
@@ -47,26 +47,26 @@ of truth for open items.
   `datetime.UTC` (3.11+) is used in `src/agents/ledger.py`, `src/ingestion/allowlist.py`
   and now `src/labeling/{schema,runner}.py`. Tests were run in the sandbox with an
   uncommitted `sitecustomize` shim backfilling that alias. **Re-run `pytest` on the 3.11
-  machine to confirm natively — expect 325/325.**
+  machine to confirm natively - expect 325/325.**
 - **OPEN-002** (broken pixeltable plugin hook) fired on every file write again. Cosmetic.
-- **`.git/index.lock`** appeared again — Phase 6, 7, 8, 9 and now 10. Environment quirk.
+- **`.git/index.lock`** appeared again - Phase 6, 7, 8, 9 and now 10. Environment quirk.
 - **Phase 3:** the BibTeX key `Toth2025` is historical. László Tóth was the handling editor,
   not an author. Correct authors: Nogueira, Morais, Mansell & Gomes.
 
 ---
 
-## PART B — Current Session Summary (Phase 10)
+## PART B - Current Session Summary (Phase 10)
 
 ### B1. What Phase 10 was asked to do
 
-*Objective — produce silver labels cheaply. Tasks — the Labeling Agent labels utterances
+*Objective - produce silver labels cheaply. Tasks - the Labeling Agent labels utterances
 against the taxonomy with rationale and confidence, using cheap-tier models, prompt caching
-and batching; escalate low-confidence to mid tier. Deliverable — `data/processed/silver/`
-plus per-shard cost logs. Gate — full corpus silver-labelled under budget, confidence
+and batching; escalate low-confidence to mid tier. Deliverable - `data/processed/silver/`
+plus per-shard cost logs. Gate - full corpus silver-labelled under budget, confidence
 recorded per label, every call carrying a routing decision and a `logs/cost_ledger.csv`
 entry, plus the Annotation-QA review queue.*
 
-All delivered **offline**. The one thing not delivered is a live run — see B7.
+All delivered **offline**. The one thing not delivered is a live run - see B7.
 
 ### B2. What was built
 
@@ -107,7 +107,7 @@ Recomputed on the actual corpus:
 |---|---|---|
 | utterance text alone | 6,444 | 30.7% |
 | (utterance, parent record) | 9,185 | 1.3% |
-| **(utterance, parent record, days-to-competition) — used** | **9,260** | **0.5%** |
+| **(utterance, parent record, days-to-competition) - used** | **9,260** | **0.5%** |
 
 636 utterance texts appear in more than one distinct parent record, and they are the
 frequent ones. Nearly all of the 31% was exactly the strings whose context differs. The key
@@ -118,15 +118,15 @@ option measurable as an ablation.
 **2. `config/model_routing.yaml`'s cost estimate is low by an order of magnitude.**
 It says "about $1.12 for a full labeling pass", assuming "~400 input tokens (rubric is
 cached)". The assembled rubric is **3,946 estimated tokens**. Measured projection for the
-full corpus: **$17.46 against a $20 enforced cap** — $4.99 cheap-tier plus $12.47 of
+full corpus: **$17.46 against a $20 enforced cap** - $4.99 cheap-tier plus $12.47 of
 assumed escalation, with prompt caching given zero credit. Raised as **OPEN-023**.
 **This is an owner decision and is the first thing Part C asks for.**
 
 **3. The cost ledger was O(n²) and had never been run at scale.** `record()` called
 `_ensure_header()` (mkdir + exists + stat) and `spend_this_month()` (a full CSV re-read) on
 every append. cProfile: `_ensure_header` was **11.2 of 11.9 seconds** on a 600-prompt run.
-The first full run did not finish. Fixed — month total cached and maintained incrementally
-under the append lock, header checked once per instance — and a test asserts the cached
+The first full run did not finish. Fixed - month total cached and maintained incrementally
+under the append lock, header checked once per instance - and a test asserts the cached
 total equals a fresh read. Logged as **OPEN-024 (resolved)**.
 
 **4. The Phase 9b era comparison cannot be reproduced for the labeller.** The sharpest
@@ -143,9 +143,9 @@ coarser proxy. Raised as **OPEN-022**.
    `OfflineLLM` and override that method with the two-argument signature, and they were
    right: `_synthesise(kind, rng)` is the established contract for "make an answer of this
    shape out of thin air", and a shape that needs the prompt is a different job. **The
-   fix went into `llm.py`, not the tests** — the new "silver" shape is dispatched to a
+   fix went into `llm.py`, not the tests** - the new "silver" shape is dispatched to a
    separate `_synthesise_silver(user, rng)` and the old signature is untouched.
-2. **My own test fixtures were wrong twice** — `Provenance` field names and
+2. **My own test fixtures were wrong twice** - `Provenance` field names and
    `IngestionRefused.reason_code`. Both fixed in the tests, because there the tests were
    the thing that was wrong.
 3. **ruff caught a late-binding closure** (B023) in `ancestry.py`. The behaviour happened
@@ -157,13 +157,13 @@ coarser proxy. Raised as **OPEN-022**.
 
 | Gate | Result |
 |---|---|
-| `scripts/run_ingestion.py --verify-only` | **Phase 7: PASSED** — 4,000 records |
-| `scripts/run_preprocessing.py` | **Phase 8: PASSED** — 9,302 utterances, 0 dropped, fixture 34/34 exact, leak 0% |
-| `scripts/run_benchmark_audit.py` | **PASSED** — probe drop +0.520, lexicon +0.108 |
-| `scripts/run_eda.py` | **Phase 9: PASSED** — gold_eval 400, 0/10 below floor |
-| `scripts/run_labeling.py` | **Phase 10: PASSED** — see below |
+| `scripts/run_ingestion.py --verify-only` | **Phase 7: PASSED** - 4,000 records |
+| `scripts/run_preprocessing.py` | **Phase 8: PASSED** - 9,302 utterances, 0 dropped, fixture 34/34 exact, leak 0% |
+| `scripts/run_benchmark_audit.py` | **PASSED** - probe drop +0.520, lexicon +0.108 |
+| `scripts/run_eda.py` | **Phase 9: PASSED** - gold_eval 400, 0/10 below floor |
+| `scripts/run_labeling.py` | **Phase 10: PASSED** - see below |
 | `ruff check` / `ruff format --check` | clean, 65 files |
-| `pytest` | **324/325** — the one failure is `test_python_version_is_311` under the sandbox's 3.10, i.e. the test working correctly |
+| `pytest` | **324/325** - the one failure is `test_python_version_is_311` under the sandbox's 3.10, i.e. the test working correctly |
 | Determinism | two consecutive runs → identical `review_queue.jsonl`; `silver.jsonl` identical once `run_id` and `labeled_on` are stripped (both are per-run by design) |
 
 **Phase 10 gate, offline, generator v1.4 corpus:**
@@ -175,7 +175,7 @@ coarser proxy. Raised as **OPEN-022**.
 | Calls made | 12,893 (9,260 cheap + 3,633 mid escalations) |
 | Failures (unparseable after escalation) | **0** |
 | Abstention rate | 0.333 |
-| **Actual cost** | **$0.000000** — offline; nothing was spent |
+| **Actual cost** | **$0.000000** - offline; nothing was spent |
 | Projected live cost | $17.46 (upper bound, no cache credit) |
 | Review queue | 4,944 rows over 4,427 distinct utterances |
 
@@ -183,7 +183,7 @@ coarser proxy. Raised as **OPEN-022**.
 not findings.** Do not quote them.
 
 Review queue by reason: `ESCALATED_AND_UNCERTAIN` 3,652 · `BURNOUT_ASSERTED` 1,087 ·
-`SPAN_IS_WHOLE_UTTERANCE` 205. Every burnout assertion is queued, not a sample of them —
+`SPAN_IS_WHOLE_UTTERANCE` 205. Every burnout assertion is queued, not a sample of them -
 it is the most clinically loaded construct in the taxonomy.
 
 ### B6. API key handling
@@ -197,7 +197,7 @@ report, log, or message produced this session.
 
 **Not one live OpenRouter call has been made.** Two blockers, both environmental:
 
-1. **The agent sandbox has no route to `openrouter.ai`** — `scripts/refresh_pricing.py
+1. **The agent sandbox has no route to `openrouter.ai`** - `scripts/refresh_pricing.py
    --check` returns `Tunnel connection failed: 403 Forbidden`. So the Step 1 catalogue
    check could not be performed here, and OPEN-009 remains unverified for this run.
 2. Consequently `--live` was never attempted. `scripts/run_labeling.py` refuses `--live`
@@ -212,14 +212,14 @@ that same mistake with a different module name.
 | File | Change |
 |---|---|
 | `src/labeling/{__init__,schema,prompt,parser,dedup,runner,store,qa,ancestry}.py` | **new** |
-| `scripts/run_labeling.py` | **new** — the Phase 10 gate |
-| `tests/test_labeling.py` | **new** — 72 tests |
-| `docs/labeling.md` | **new** — prompt design, routing, schema, honest limitations |
+| `scripts/run_labeling.py` | **new** - the Phase 10 gate |
+| `tests/test_labeling.py` | **new** - 72 tests |
+| `docs/labeling.md` | **new** - prompt design, routing, schema, honest limitations |
 | `src/agents/llm.py` | `_synthesise_silver` added; `_synthesise` signature preserved |
 | `src/agents/ledger.py` | O(n²) fix: cached month total, header checked once |
 | `docs/open_issues.md` | OPEN-008 partially resolved; OPEN-022/023/024 raised |
 | `.gitignore` | silver JSONL and review queue ignored; manifest + provenance kept |
-| `data/processed/silver/synth_precomp_v1/` | **new** — 9,302 labels, manifest, provenance |
+| `data/processed/silver/synth_precomp_v1/` | **new** - 9,302 labels, manifest, provenance |
 | `reports/labeling_run.json` | **new** |
 
 ### B9. Commit commands
@@ -310,7 +310,7 @@ git push
 
 ---
 
-## PART C — Phase 11 Brief
+## PART C - Phase 11 Brief
 
 **Objective:** human gold annotation. Saikalyan plus **at least one peer** independently
 annotate `data/processed/gold_candidates/gold_eval.jsonl` (400 items) against
@@ -330,7 +330,7 @@ cap. Options, in order of preference:
       and measures the three unknowns inside the projection: the cache-read rate, the real
       escalation rate, the real output length. Re-project afterwards.
    b. If the re-projection is comfortable, run the full pass.
-   c. If it is not, shorten the rubric or reduce the escalation fraction — **do not raise
+   c. If it is not, shorten the rubric or reduce the escalation fraction - **do not raise
       `monthly_cap_usd`.**
 
 **2. Calibrate on `gold_dev` first.** 100 items drawn from *training-side* templates, so
@@ -338,7 +338,7 @@ arguing over the rubric on them costs zero evaluation power. Both annotators lab
 `gold_dev`, compare, and amend `docs/annotation_guidelines.md` where it did not decide the
 case. Only then start `gold_eval`.
 
-**3. Recruit the peer annotator — and make it the same conversation as OPEN-004.**
+**3. Recruit the peer annotator - and make it the same conversation as OPEN-004.**
 
 ### The rules that make the kappa meaningful
 
@@ -355,15 +355,15 @@ case. Only then start `gold_eval`.
   Agreement is between two humans.
 - **Adjudication happens after both passes**, with the owner, against the document. If
   adjudication reveals a rule the document does not cover, amend the document and re-run
-  the affected batch — do not settle it verbally.
+  the affected batch - do not settle it verbally.
 
 ### What Phase 10 hands you
 
-- `data/processed/silver/synth_precomp_v1/silver.jsonl` — 9,302 silver labels (gitignored;
+- `data/processed/silver/synth_precomp_v1/silver.jsonl` - 9,302 silver labels (gitignored;
   regenerate with `python scripts/run_labeling.py`).
-- `logs/review_queue.jsonl` — 4,427 utterances the Annotation-QA pass flagged. **Not an
+- `logs/review_queue.jsonl` - 4,427 utterances the Annotation-QA pass flagged. **Not an
   annotation queue.** It is evidence about the labeller.
-- `docs/labeling.md` — including sec.9, the honest limitations, which the paper needs.
+- `docs/labeling.md` - including sec.9, the honest limitations, which the paper needs.
 
 ### Constraints, all inherited and non-negotiable
 
@@ -390,14 +390,14 @@ case. Only then start `gold_eval`.
 | **OPEN-008** | **Partially resolved.** The key exists; no live call has ever been made. | **Phase 10's live pilot** |
 | **OPEN-022** | **New.** Template era is not recorded, so the sharpest shared-ancestry probe cannot be run. | Phase 18 |
 | **OPEN-021** | The lexicon baseline is not independent of the corpus. A paper obligation; the same check now exists for silver in `ancestry.py`. | Phase 18 |
-| OPEN-024 | ~~Ledger was O(n²)~~ — **CLOSED at Phase 10**, same session it was found. | closed |
+| OPEN-024 | ~~Ledger was O(n²)~~ - **CLOSED at Phase 10**, same session it was found. | closed |
 | OPEN-019 | `generation_spec` replicated per utterance (×~2.3). | monitored |
-| OPEN-009 | Model/price drift. **Unverified this session** — the sandbox has no route to openrouter.ai. | any large batch |
-| OPEN-007 | CrewAI backend written but never executed. Phase 10 used the direct routing layer, so this is unchanged. | — |
+| OPEN-009 | Model/price drift. **Unverified this session** - the sandbox has no route to openrouter.ai. | any large batch |
+| OPEN-007 | CrewAI backend written but never executed. Phase 10 used the direct routing layer, so this is unchanged. | - |
 | OPEN-012 | Vocabulary bounded by the template bank; 860 types. | Phase 14 (monitored) |
 | OPEN-005 | Ethics exemption not in writing. | Submission |
 | OPEN-006 | Withdrawal contact is a personal address. | Public release |
-| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. | — |
+| OPEN-002 | Broken pixeltable plugin hook; cosmetic, fires on every file write. | - |
 
 **OPEN-011 and OPEN-004 are still the same conversation, and it is now blocking.** One
 SRMIST coach or sport-psychology practitioner could both broker pre-competition text under
@@ -408,7 +408,7 @@ figure over text no athlete ever said.
 
 ---
 
-## PART D — Phase 11 tooling, built 2026-08-10 (update to Part C)
+## PART D - Phase 11 tooling, built 2026-08-10 (update to Part C)
 
 Part C above was written before any Phase 11 code existed. Two of the three
 "do these first" items are now done. **The third is unchanged and is the blocker.**
@@ -417,7 +417,7 @@ Part C above was written before any Phase 11 code existed. Two of the three
 
 | Path | What |
 |---|---|
-| `src/annotation/context.py` | attaches the parent record to every item — **the defect fix** |
+| `src/annotation/context.py` | attaches the parent record to every item - **the defect fix** |
 | `src/annotation/potato_project.py` | emits a Potato project from `config/taxonomy.yaml` |
 | `src/annotation/schema.py` | `GoldLabel` / `GoldConstruct`; no machine author exists |
 | `src/annotation/store.py` | the only write path into `data/gold/`, four locks |
@@ -442,7 +442,7 @@ alone, so offsets stay aligned with `InterimRecord` and `SilverLabel`.
 
 ### Tool decision
 
-**Potato 2.7.1 adopted** (generated, not vendored — `pip install potato-annotation==2.7.1`).
+**Potato 2.7.1 adopted** (generated, not vendored - `pip install potato-annotation==2.7.1`).
 **`sciknoworg/ALD-E-ImageMiner` rejected:** it is an image/figure annotation dataset project
 for atomic-layer-deposition papers, not a text annotation tool. Its pilot→full task phasing
 and `onboarding/` convention were borrowed; no code was.
@@ -450,13 +450,13 @@ and `onboarding/` convention were borrowed; no code was.
 ### Verification
 
 - Both projects pass **Potato's own** `python -m potato.validate_cli <config> --strict`:
-  *"OK — no issues found."* That caught a real defect — an `html_layout` key carried over
-  from an older Potato API — which was deleted rather than justified.
+  *"OK - no issues found."* That caught a real defect - an `html_layout` key carried over
+  from an older Potato API - which was deleted rather than justified.
 - `pytest` **372/373** (the failure is the 3.11 check under the sandbox's 3.10).
 - Phase 7, 8, 9, 10 and benchmark gates all re-run: **PASSED**.
 - `ruff check` / `format --check`: clean, 74 files.
 - A test asserts the roster has exactly one annotator. **If it starts failing, someone has
-  been recruited — update this handover, do not "fix" the test.**
+  been recruited - update this handover, do not "fix" the test.**
 
 ### What remains, in order
 
@@ -472,7 +472,7 @@ and `onboarding/` convention were borrowed; no code was.
 
 `CLAUDE.md` sec.4 says agents never write `data/gold/`. `src/annotation/store.py` writes
 there, on the reading that the rule protects **the origin of the content** (a person's
-judgement) rather than forbidding all file writes — under the literal reading gold could never
+judgement) rather than forbidding all file writes - under the literal reading gold could never
 come into existence. Four locks enforce the purpose, and they are listed in
 `docs/annotation_tooling.md` §6. **If the owner disagrees with that interpretation, this is
 the module to change.**

@@ -14,7 +14,7 @@ included `torch>=2.2`. That looks harmless. It is not.
 
 On Linux, the default PyPI wheel for `torch` is the **CUDA** build. Installing it
 pulls roughly 2.5 GB of torch itself plus a set of `nvidia-*` CUDA runtime
-libraries — cuDNN, cuBLAS, NCCL and friends — that together push the image past
+libraries - cuDNN, cuBLAS, NCCL and friends - that together push the image past
 **6 GB**. A container with no GPU never loads a single one of them. The build
 would have taken 30–60 minutes on a laptop and could plausibly have failed on
 disk space or a network timeout.
@@ -31,7 +31,7 @@ The fix is to layer:
 
 `Dockerfile.train` installs torch with
 `--extra-index-url https://download.pytorch.org/whl/cpu`, which is what your
-Windows venv already does correctly — it has `torch==2.13.0+cpu`.
+Windows venv already does correctly - it has `torch==2.13.0+cpu`.
 
 The `train` service sits behind a Compose **profile**, so a plain
 `docker compose build` does not touch the heavy stack. You will not pay the
@@ -57,7 +57,7 @@ Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 Then **wait**. Docker Desktop takes 30–90 seconds to bring up its Linux VM. The
 whale icon in the system tray stops animating and the tooltip reads
-"Docker Desktop is running". Do not run the next command until it does — a
+"Docker Desktop is running". Do not run the next command until it does - a
 half-started daemon produces the same "cannot find the file specified" error and
 sends you chasing a problem you do not have.
 
@@ -67,7 +67,7 @@ sends you chasing a problem you do not have.
 docker info --format '{{.ServerVersion}}'
 ```
 
-Expected: a version string such as `27.3.1`. This is the real test — `docker
+Expected: a version string such as `27.3.1`. This is the real test - `docker
 --version` only proves the *CLI* exists and will happily succeed with the daemon
 dead, which is exactly why Phase 2 check 2 passed while checks 7 and 8 failed.
 
@@ -93,7 +93,7 @@ cd C:\Users\x\sports-risk-nlp
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 3.1 Check 7 — container build
+### 3.1 Check 7 - container build
 
 ```powershell
 docker compose build app
@@ -101,10 +101,10 @@ docker compose build app
 
 First build takes 5–12 minutes, mostly `pip install`. Rebuilds after a code
 change take seconds, because the `COPY requirements-base.txt` step sits *above*
-the `COPY . .` step and Docker caches layers in order — editing `src/` no longer
+the `COPY . .` step and Docker caches layers in order - editing `src/` no longer
 invalidates the dependency layer.
 
-### 3.2 Check 8 — container hello-world
+### 3.2 Check 8 - container hello-world
 
 ```powershell
 docker compose run --rm app python scripts/hello.py
@@ -150,7 +150,7 @@ docker compose run --rm agents python scripts/run_crew.py --live
 # Dashboard at http://localhost:8501
 docker compose up dashboard
 
-# Heavy training image — build the base FIRST, it is the parent layer
+# Heavy training image - build the base FIRST, it is the parent layer
 docker compose build app
 docker compose --profile train build train
 docker compose --profile train run --rm train python scripts/hello.py
@@ -166,7 +166,7 @@ docker system prune -f
 
 **`.env` is optional, deliberately.** Both services declare
 `env_file: [{path: .env, required: false}]`. Without `required: false`, Compose
-aborts before creating the container if `.env` is missing — and `.env` is
+aborts before creating the container if `.env` is missing - and `.env` is
 gitignored, so a fresh clone has none. This is a common way for a repo to be
 "reproducible" everywhere except on a reviewer's machine.
 
@@ -181,7 +181,7 @@ will try to pull it from a registry and fail with a confusing "not found".
 
 **The bind mount shadows `COPY . .`.** In development, `volumes: - .:/app`
 mounts your working tree over `/app`, so the copied code is hidden and your live
-edits take effect without rebuilding. The `COPY` still matters — it is what makes
+edits take effect without rebuilding. The `COPY` still matters - it is what makes
 the image standalone for the Phase 24 reproducible artifact, where there is no
 bind mount.
 

@@ -1,10 +1,10 @@
-# Consent form — donating a pre-competition reflection
+# Consent form - donating a pre-competition reflection
 
 **Study:** Pre-Competition Psychological Risk Profiling of Athletes
 **Researcher:** Saikalyan, undergraduate student, SRM Institute of Science and Technology (SRMIST)
-**Contact:** `sk8069@srmist.edu.in` (SRMIST) — subject line `[SPORTS-RISK-NLP]`
+**Contact:** `sk8069@srmist.edu.in` (SRMIST) - subject line `[SPORTS-RISK-NLP]`
 **Supervisor:** Dr. Shankar Ram, SRMIST
-**Form version:** 1.0 (2026-08-12) — allow-list category **A3**, `docs/ethics.md` §3.1, §4, §7
+**Form version:** 1.0 (2026-08-12) - allow-list category **A3**, `docs/ethics.md` §3.1, §4, §7
 
 > **Read this before you write anything.** If any part is unclear, email and ask. Do not donate
 > text you would be uncomfortable seeing analysed by a computer program and described, in
@@ -15,7 +15,7 @@
 ## 1. What the study is
 
 I am building a research system that reads text an athlete writes *before* a competition and
-detects psychological constructs in the language — things like anxiety, confidence, motivation,
+detects psychological constructs in the language - things like anxiety, confidence, motivation,
 and how a person frames the upcoming event. The system combines those into an interpretable
 "risk" index intended for research and for supporting conversations, not for making decisions
 about anyone.
@@ -24,7 +24,7 @@ It is an undergraduate research project aimed at an IEEE conference paper.
 
 ## 2. What I am asking you to do
 
-Write **one short reflection (roughly 80–250 words)** about an upcoming competition — a race,
+Write **one short reflection (roughly 80–250 words)** about an upcoming competition - a race,
 meet, match, or event you have coming up, or one you remember clearly.
 
 Useful prompts, though you can ignore them and write freely:
@@ -37,9 +37,9 @@ Along with it, tell me:
 
 - roughly **how many days** until the event (or how many days it was, if you're recalling one)
 - your **sport**
-- your **competition level** — one of: club, regional, national, international, elite
+- your **competition level** - one of: club, regional, national, international, elite
 
-**Time:** 10–15 minutes. **Payment:** none — this is unfunded student research.
+**Time:** 10–15 minutes. **Payment:** none - this is unfunded student research.
 
 ## 3. What happens to your words
 
@@ -47,7 +47,7 @@ Along with it, tell me:
    URLs, locations, club and school names, and event names that would pin you down are replaced
    with placeholders. This runs automatically and is checked against a test set.
 2. It is stored in a private research repository, **not published as raw text**.
-3. It may be **labelled** — by me, and by one other person — for the psychological constructs
+3. It may be **labelled** - by me, and by one other person - for the psychological constructs
    above.
 4. It may be used to **train and evaluate** machine-learning models within this project.
 5. Findings are reported **in aggregate**. Statistics, model scores, and charts.
@@ -58,11 +58,11 @@ Along with it, tell me:
   a demo. A distinctive sentence is searchable and could identify you, so any example shown
   publicly will be synthetic or rewritten past the point of recognition.
 - **No score about you as an individual will ever be published or shown to anyone.**
-- **Nobody who knows you gets your text or any result about you** — not a coach, not a teammate,
+- **Nobody who knows you gets your text or any result about you** - not a coach, not a teammate,
   not a club, not your institution.
 - **No diagnosis.** This system does not and cannot assess your mental health. It detects patterns
   in language. A high score means "this text uses language associated with pre-competition
-  pressure" — nothing more. It is not a clinical instrument and has never been clinically
+  pressure" - nothing more. It is not a clinical instrument and has never been clinically
   validated.
 - **Your text will not be sold, shared with any company, or redistributed.**
 
@@ -98,12 +98,12 @@ You can stop at any point.
 
 Contact for all of the above:
 
-> **`sk8069@srmist.edu.in`** (SRMIST institutional address) — subject line `[SPORTS-RISK-NLP]`
+> **`sk8069@srmist.edu.in`** (SRMIST institutional address) - subject line `[SPORTS-RISK-NLP]`
 > Supervisor / secondary contact: **Dr. Shankar Ram**, SRMIST
 > I aim to acknowledge within **7 days**. Withdrawals are actioned before the next release.
 
 *(Interim contact. This project intends to replace it with an institutional SRMIST address and a
-named supervisor before anything is published, so the route outlives one personal inbox —
+named supervisor before anything is published, so the route outlives one personal inbox -
 `docs/ethics.md` §7.1, OPEN-006.)*
 
 ## 8. Ethics review
@@ -151,7 +151,7 @@ Date:  ____________________
 Keep signed forms **outside the repository**. The consent record contains a real name and is
 exactly the kind of file `.gitignore` will not save you from if it is committed once. Store the
 donation text in `data/raw/<source_id>/` under an `A3_consented_donation` descriptor, and keep the
-name↔`record_id` mapping in a separate file that is never committed — it is needed only to action
+name↔`record_id` mapping in a separate file that is never committed - it is needed only to action
 a withdrawal.
 
 Every `requires` field in `config/data_sources_allowlist.yaml` under `A3_consented_donation` must

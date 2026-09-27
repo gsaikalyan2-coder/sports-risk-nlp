@@ -3,7 +3,7 @@
 Artefacts used by the test suite. **Not corpus.** Nothing here is ingested, none
 of it appears in `data/`, and none of it may be used for training or evaluation.
 
-## `deid_cases.jsonl` — the de-identification recall fixture (OPEN-013)
+## `deid_cases.jsonl` - the de-identification recall fixture (OPEN-013)
 
 ### Why it exists
 
@@ -43,7 +43,7 @@ Categories match the removal table in `docs/ethics.md` §5.1: `person_name`,
 
 No real athlete, coach, team, or event is named. Names were constructed to be
 implausible as real public figures while remaining realistic in form. If any
-string here matches a real person by coincidence, that is unintended — report it
+string here matches a real person by coincidence, that is unintended - report it
 via the contact route in `docs/ethics.md` §7.1 and it will be replaced.
 
 ### The negatives matter as much as the positives
@@ -51,8 +51,8 @@ via the contact route in `docs/ethics.md` §7.1 and it will be replaced.
 A de-identifier that replaces everything scores perfect recall and destroys the
 corpus. `docs/ethics.md` §5.2 requires typed placeholders precisely because
 blanking "destroys the linguistic structure the model needs". The `negative`
-cases — ordinary words that look name-like, sport nouns, weekdays, capitalised
-sentence openers — catch over-redaction, and Phase 8 must report **precision as
+cases - ordinary words that look name-like, sport nouns, weekdays, capitalised
+sentence openers - catch over-redaction, and Phase 8 must report **precision as
 well as recall**.
 
 ### How Phase 8 should use it
@@ -66,6 +66,6 @@ well as recall**.
 5. Re-measure against real text when OPEN-011 is resolved, and report both.
 
 Do not tune the de-identifier until it overfits this file. It is a smoke test
-with teeth, not a benchmark — roughly 40 cases cannot certify a PII pipeline, and
+with teeth, not a benchmark - roughly 40 cases cannot certify a PII pipeline, and
 `docs/ethics.md` §5.3 already names residual re-identification risk as a stated
 limitation.

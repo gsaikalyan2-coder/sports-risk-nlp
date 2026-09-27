@@ -49,15 +49,7 @@ from src.dashboard import (  # noqa: E402
 
 st.set_page_config(page_title="Match-day profile", layout="wide")
 
-mode = st.sidebar.radio(
-    "Appearance",
-    ("light", "dark"),
-    index=("light", "dark").index(st.session_state.get("mode", theme.DEFAULT_MODE)),
-    format_func=str.capitalize,
-    horizontal=True,
-    key="appearance_choice_matchday",
-)
-st.session_state["mode"] = mode
+mode = theme.mode_control(st)
 # The dashboard (Cohere) language, not the Claude one. `tests/test_dashboard_pages.py`
 # holds that the Claude language belongs to Page 2 alone, and the rule exists so
 # the two design specifications stay separable; a second page borrowing it is how
@@ -70,7 +62,6 @@ def _lexicon():
     return LexiconBackend()
 
 
-st.markdown(f'<div class="announcement">{plain.ANNOUNCEMENT}</div>', unsafe_allow_html=True)
 st.markdown('<p class="mono-label">Match-day profile</p>', unsafe_allow_html=True)
 st.markdown(f"# {plain.SCENARIO_TITLE}")
 st.markdown(theme.lede(plain.SCENARIO_LEDE), unsafe_allow_html=True)

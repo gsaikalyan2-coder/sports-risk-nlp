@@ -5,8 +5,8 @@
 
 ## Summary of the gap (one paragraph)
 
-Validated sport-psychology constructs — competitive anxiety, self-confidence, stress appraisal,
-coping, motivation orientation, resilience, and burnout — are well studied through psychometric
+Validated sport-psychology constructs - competitive anxiety, self-confidence, stress appraisal,
+coping, motivation orientation, resilience, and burnout - are well studied through psychometric
 surveys, and explainable ML is emerging in sports, but **no line of work bridges validated
 constructs to athlete *text* with span-level, construct-specific labels, and almost none validates
 its explanations with coaches or sport psychologists.** Text-based studies stop at sentiment or
@@ -36,7 +36,7 @@ These are the variables the risk index should center, each with repeated links t
 
 ## 2. Limitations of existing work (what we beat)
 
-- **Cross-sectional, self-report designs** — good for associations, weak for causal/dynamic inference;
+- **Cross-sectional, self-report designs** - good for associations, weak for causal/dynamic inference;
   authors explicitly recommend longitudinal/experimental tracking and behavioral/coach/physiological
   data [Li2025, Daumiller2021].
 - **Small, narrow, or unbalanced samples** by age, level, geography, or sport
@@ -60,13 +60,13 @@ emerging and argues current models miss temporal/multimodal structure [Feng2025,
 
 ## 5. Our positioning (three-part contribution)
 
-1. **Construct-grounded athlete-text corpus** — span→construct labels mapping text to CSAI-2-style
+1. **Construct-grounded athlete-text corpus** - span→construct labels mapping text to CSAI-2-style
    anxiety/confidence, stress/pressure, coping, motivation orientation, attentional disruption,
    resilience, appraisal orientation, and ABQ-style burnout. Bridges the survey↔text gap.
-2. **Two-level interpretability with a measured faithfulness margin** — span→construct evidence + construct→risk
+2. **Two-level interpretability with a measured faithfulness margin** - span→construct evidence + construct→risk
    weighting, with a small validation study asking coaches/sport-psychology practitioners whether the
    explanations are sensible. Directly fills the Interpretability-Validation gap.
-3. **Time-aware, fusion-ready design** — pre-competition sampling records timing and light context so
+3. **Time-aware, fusion-ready design** - pre-competition sampling records timing and light context so
    the corpus supports temporal/multimodal extensions; full temporal + multimodal modeling is Future Work.
 
 Ethics is treated as a first-class concern because risk labels can stigmatize athletes and change
@@ -89,7 +89,7 @@ coaching behavior [Jiacheng2025]; the system is research/decision-support, not d
 | Madigan2020 | Avoidance coping → rising burnout over 6 months | Psychol. Sport Exerc. 48:101666 (2020) | [10.1016/j.psychsport.2020.101666](https://doi.org/10.1016/j.psychsport.2020.101666) |
 | Daumiller2021 | Mastery-approach goals → lower burnout / psychosomatic stress | Int. J. Sport Exerc. Psychol. 20(2):416–435 (2021) | [10.1080/1612197X.2021.1877326](https://doi.org/10.1080/1612197X.2021.1877326) |
 | Toth2025 | Pre-competition emotion: interpretation & challenge/threat appraisal ⚠ | Front. Sports Act. Living 7:1636826 (2025) | [10.3389/fspor.2025.1636826](https://doi.org/10.3389/fspor.2025.1636826) |
-| Park2023 | Psychological skills training — bibliometric analysis | Healthcare 11(2):259 (2023) | [10.3390/healthcare11020259](https://doi.org/10.3390/healthcare11020259) |
+| Park2023 | Psychological skills training - bibliometric analysis | Healthcare 11(2):259 (2023) | [10.3390/healthcare11020259](https://doi.org/10.3390/healthcare11020259) |
 | Kranzinger2025 | Scoping review: XAI in sport rarely practitioner-validated | Discov. Artif. Intell. 6(1):5 (2025, online) | [10.1007/s44163-025-00709-8](https://doi.org/10.1007/s44163-025-00709-8) |
 | Jiacheng2025 | SHAP-based interpretable ML injury risk; ethics/stigma | Sci. Rep. 15:40252 (2025) | [10.1038/s41598-025-24144-y](https://doi.org/10.1038/s41598-025-24144-y) |
 | Raju2026 | ML framework for athletic injury prediction; sample/validation limits | BMC Sports Sci. Med. Rehabil. 18:107 (2026) | [10.1186/s13102-025-01502-x](https://doi.org/10.1186/s13102-025-01502-x) |
@@ -108,11 +108,11 @@ Anchors for the modelling and evaluation sections, which the Phase 3 sweep did n
 
 | Key | Note | Primary source | DOI / canonical record |
 |---|---|---|---|
-| Devlin2019 | BERT — transformer fine-tuning for text classification | NAACL-HLT 2019, 4171–4186 | [10.18653/v1/N19-1423](https://doi.org/10.18653/v1/N19-1423) |
-| He2021 | DeBERTa — candidate backbone (CLAUDE.md §6) | ICLR 2021 | [arXiv:2006.03654](https://arxiv.org/abs/2006.03654) — no publisher DOI |
-| Guo2017 | Calibration of neural nets; temperature scaling for the risk index | ICML 2017, PMLR 70:1321–1330 | [PMLR v70/guo17a](https://proceedings.mlr.press/v70/guo17a.html) — no publisher DOI |
-| Lundberg2017 | SHAP — span/feature attribution for the explainability layer | NeurIPS 30 (2017) | [NeurIPS 2017 proceedings](https://papers.nips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html) — no publisher DOI |
-| Cohen1960 | Cohen's kappa — inter-annotator agreement for the gold set | Educ. Psychol. Meas. 20(1):37–46 | [10.1177/001316446002000104](https://doi.org/10.1177/001316446002000104) |
+| Devlin2019 | BERT - transformer fine-tuning for text classification | NAACL-HLT 2019, 4171–4186 | [10.18653/v1/N19-1423](https://doi.org/10.18653/v1/N19-1423) |
+| He2021 | DeBERTa - candidate backbone (CLAUDE.md §6) | ICLR 2021 | [arXiv:2006.03654](https://arxiv.org/abs/2006.03654) - no publisher DOI |
+| Guo2017 | Calibration of neural nets; temperature scaling for the risk index | ICML 2017, PMLR 70:1321–1330 | [PMLR v70/guo17a](https://proceedings.mlr.press/v70/guo17a.html) - no publisher DOI |
+| Lundberg2017 | SHAP - span/feature attribution for the explainability layer | NeurIPS 30 (2017) | [NeurIPS 2017 proceedings](https://papers.nips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html) - no publisher DOI |
+| Cohen1960 | Cohen's kappa - inter-annotator agreement for the gold set | Educ. Psychol. Meas. 20(1):37–46 | [10.1177/001316446002000104](https://doi.org/10.1177/001316446002000104) |
 
 > ICLR / ICML / NeurIPS papers carry no publisher DOI. Their arXiv / PMLR / NeurIPS
 > proceedings entries **are** the primary records, so these are resolved, not unresolved.
@@ -123,5 +123,5 @@ Anchors for the modelling and evaluation sections, which the Phase 3 sweep did n
 
 - Multi-label text classification methodology beyond a backbone citation.
 - A weak-supervision / LLM-labelling anchor (e.g. Snorkel-style programmatic labelling).
-- A sports-psych instrument citation trail for CSAI-2 and the ABQ — needed in Phase 4 so
+- A sports-psych instrument citation trail for CSAI-2 and the ABQ - needed in Phase 4 so
   every construct in `config/taxonomy.yaml` has a real instrument anchor.

@@ -1,12 +1,12 @@
-# Handover — Phase 13: Baselines
+# Handover - Phase 13: Baselines
 
 **Date:** 2026-08-11 · **Week 4 of 8** · **Gate: PASSED** (every number PROVISIONAL)
-**Previous:** `phase12_handover.md` · **Next:** Phase 14 — Transformer fine-tuning
+**Previous:** `phase12_handover.md` · **Next:** Phase 14 - Transformer fine-tuning
 **Do not start Phase 14 until the owner confirms receipt of this file.**
 
 ---
 
-## PART A — Project Summary
+## PART A - Project Summary
 
 **Pre-Competition Psychological Risk Profiling of Athletes.** Construct-grounded NLP that
 detects validated sports-psychology constructs in an athlete's *pre-competition* text and
@@ -31,15 +31,15 @@ design.
 | Phase | State |
 |---|---|
 | 1–9b | Complete and gated. 4,000 synthetic records → 9,302 utterances, de-ID leak rate 0% |
-| 10 Weak labelling | Complete **offline only**. 9,302 silver labels — **and Phase 13 found they contain no signal (OPEN-028)** |
-| 11 Gold verification | Tooling complete. Gate UNMEASURABLE — kappa needs a second human (OPEN-025) |
+| 10 Weak labelling | Complete **offline only**. 9,302 silver labels - **and Phase 13 found they contain no signal (OPEN-028)** |
+| 11 Gold verification | Tooling complete. Gate UNMEASURABLE - kappa needs a second human (OPEN-025) |
 | 12 Taxonomy refinement | Tooling complete, tested, gated. `--refine` reports BLOCKED |
-| **13 Baselines** | **Complete. Gate PASSED. All figures PROVISIONAL — planted-label corpus-property measurements, not accuracy** |
-| 14 Transformer | Not started. **Blocked as written** — see Part C |
+| **13 Baselines** | **Complete. Gate PASSED. All figures PROVISIONAL - planted-label corpus-property measurements, not accuracy** |
+| 14 Transformer | Not started. **Blocked as written** - see Part C |
 
 ---
 
-## PART B — Current Session Summary
+## PART B - Current Session Summary
 
 ### B1. The finding that reshaped the phase
 
@@ -53,7 +53,7 @@ Measured before writing any modelling code:
 
 | Property | Value |
 |---|---|
-| Labels per non-abstained utterance | exactly 1, always — the data is not multi-label |
+| Labels per non-abstained utterance | exactly 1, always - the data is not multi-label |
 | Constructs attested | **6 of 10** (the four categorical ones are absent by design) |
 | Abstention rate | 33.3% = the stub's hardcoded `rng.random() < 0.33` |
 | Silver construct ∈ parent's planted set | 20.2% vs 16.7% chance |
@@ -61,7 +61,7 @@ Measured before writing any modelling code:
 
 Consequences: a multi-label baseline cannot be trained on it; macro-F1 over 10 constructs is
 capped at 0.6 before modelling; on a template-disjoint split a classifier scores ≈0 and that is
-the *correct* answer. **`PROVISIONAL — silver-evaluated` would have understated the problem**,
+the *correct* answer. **`PROVISIONAL - silver-evaluated` would have understated the problem**,
 because that stamp implies the labels carry some signal.
 
 Raised as **OPEN-028** and put to the owner before implementing.
@@ -69,7 +69,7 @@ Raised as **OPEN-028** and put to the owner before implementing.
 ### B2. Owner decisions taken this session
 
 1. **Build the harness, gate on `generation_spec.planted_constructs`** under the
-   `scripts/run_benchmark_audit.py` precedent — explicitly a corpus-property measurement, never
+   `scripts/run_benchmark_audit.py` precedent - explicitly a corpus-property measurement, never
    a results-table number. Recommended and chosen over running the live pilot first or refusing
    to produce any number.
 2. **Template-disjoint remains the headline**, random the contrast; the gap is a paper result.
@@ -102,19 +102,19 @@ Files modified: `PROJECT_PLAN.md` (status board, live risks, Phase 13 outcome),
 ### B5. Design decisions worth carrying forward
 
 - **`load_gold` refuses while `data/gold/` is empty** rather than falling back to silver, and
-  the refusal message names the fallback it is declining — otherwise a future reader "fixes"
+  the refusal message names the fallback it is declining - otherwise a future reader "fixes"
   the error by adding exactly that fallback. Two tests assert this.
 - **`load_silver` requires `acknowledge_no_signal=True`.** Still callable, because
   demonstrating the collapse is better evidence than asserting it.
 - **One-vs-rest is written out rather than imported.** `OneVsRestClassifier` raises on a
   single-class column, and silver has four all-negative columns. `_ConstantZero` keeps the
-  macro-F1 denominator at 10 instead of silently averaging over the 6 attested constructs —
+  macro-F1 denominator at 10 instead of silently averaging over the 6 attested constructs -
   dropping them is a real way papers overstate results.
 - **Labels are looked up by `record_id`, never zipped positionally** against a shuffled split.
 - **`solver="liblinear"`** so the score does not move with BLAS thread count.
 - **Dedup drops texts whose copies disagree** rather than majority-voting them.
 
-### B6. Gate results — the actual output
+### B6. Gate results - the actual output
 
 ```
 Phase 13 baselines  seed=42  sklearn=1.7.2
@@ -141,16 +141,16 @@ Phase 13 gate: PASSED
 
 1. **The bar for Phase 14 is the lexicon at 0.462, not the learned models.** Both classical
    models score *below* the lexicon on the honest split. The 0.462 independently reproduces the
-   OPEN-021 floor of 0.461 measured by a different code path — a genuine cross-check.
+   OPEN-021 floor of 0.461 measured by a different code path - a genuine cross-check.
 2. **A linear model over TF-IDF memorises this corpus perfectly.** LinearSVC: 1.000 macro-F1
    random, 0.181 template-disjoint. The **+0.819** gap is the strongest OPEN-012 evidence the
    project has and belongs in the paper as a *result*. `run_benchmark_audit.py`'s note that
    1-NN's drop is "a LOWER BOUND on the inflation fine-tuning would show" is now confirmed:
    +0.523 for the probe, +0.819 for a linear model.
 3. **The silver ablation collapses as predicted.** `--silver`: every system ~0.10, lexicon
-   **0.040 — below stratified-random**.
+   **0.040 - below stratified-random**.
 
-### B7. Verification — everything that was run
+### B7. Verification - everything that was run
 
 | Check | Result |
 |---|---|
@@ -185,29 +185,29 @@ and one `run_id`; `utterances.jsonl` and `silver.jsonl` are byte-identical. Dete
 
 ---
 
-## PART C — What Phase 14 needs next
+## PART C - What Phase 14 needs next
 
 ### C1. Phase 14 is blocked as written
 
 `PROJECT_PLAN.md` specifies: *"Fine-tune DeBERTa/RoBERTa multi-label classifier on
 gold+silver."* Today that reads **"train on nothing + noise"**:
 
-- `data/gold/` is **empty** (OPEN-025 — no second annotator).
+- `data/gold/` is **empty** (OPEN-025 - no second annotator).
 - `data/processed/silver/` is **PRNG output** (OPEN-028).
 
 A transformer trained on this would produce a number, and the number would be meaningless. The
-gate — *"Transformer > best baseline on macro-F1"* — cannot be honestly evaluated.
+gate - *"Transformer > best baseline on macro-F1"* - cannot be honestly evaluated.
 
 ### C2. The three ways forward, for the owner to choose
 
 1. **Unblock the data (correct, needs a person and a pilot).** Run the live labelling pilot
    (OPEN-008 steps 1–3, ~$1–12 per OPEN-023) *and* recruit the second annotator (OPEN-025).
    Both must happen; the pilot alone gives real silver but still no evaluation set.
-2. **Run Phase 14 as a corpus-property measurement**, exactly as Phase 13 did — fine-tune
+2. **Run Phase 14 as a corpus-property measurement**, exactly as Phase 13 did - fine-tune
    against planted labels, report against the same template-disjoint split, and check whether a
    transformer beats **0.462**. Defensible, produces a real methods result, and every number
    carries the same provisional stamp. Cheapest path to a Week-4 deliverable.
-3. **Reorder — do Phase 15/16 (risk fusion, explainability) scaffolding first** and hold
+3. **Reorder - do Phase 15/16 (risk fusion, explainability) scaffolding first** and hold
    Phase 14 until data exists. Keeps the critical path moving but leaves the paper's central
    model unbuilt closest to the freeze.
 
@@ -217,12 +217,12 @@ shorter by waiting.
 
 ### C3. What Phase 14 can reuse verbatim
 
-- `src/models/dataset.py` — same loaders. `--gold` swaps the input path and nothing else.
-- `src/evaluation/metrics.py::paired_bootstrap_p_value` — **the Phase 14 gate needs it.**
+- `src/models/dataset.py` - same loaders. `--gold` swaps the input path and nothing else.
+- `src/evaluation/metrics.py::paired_bootstrap_p_value` - **the Phase 14 gate needs it.**
   "Transformer > best baseline" is not met by 0.48 vs 0.462 unless the gap survives resampling.
-- `scripts/run_baselines.py` — the gate-script shape, the provisional stamping, the refusal
+- `scripts/run_baselines.py` - the gate-script shape, the provisional stamping, the refusal
   behaviour. Copy the framing, not just the structure.
-- `reports/baselines.json` — the numbers to beat, machine-readable.
+- `reports/baselines.json` - the numbers to beat, machine-readable.
 
 ### C4. Watch items specific to Phase 14
 
@@ -249,14 +249,14 @@ shorter by waiting.
 | OPEN-021 | Lexicon not independent of the corpus. **Reconfirmed at 0.462 this phase.** | Phase 18 |
 | OPEN-012 | Template leakage. **Now quantified at +0.819 for a linear model.** | Phase 14 |
 | OPEN-026 | Annotation burden half-measured. | Phase 12 freeze |
-| OPEN-007, OPEN-022, OPEN-019, OPEN-009, OPEN-005, OPEN-006 | unchanged | — |
-| OPEN-002 | Broken pixeltable hook; cosmetic, fired on every write this session. | — |
+| OPEN-007, OPEN-022, OPEN-019, OPEN-009, OPEN-005, OPEN-006 | unchanged | - |
+| OPEN-002 | Broken pixeltable hook; cosmetic, fired on every write this session. | - |
 
 **Stated plainly.** Phase 13 delivered a working, tested, reproducible baseline harness and
 three findings worth publishing. It also established that **two of the project's three data
 assets are not what they appear to be**: gold does not exist, and silver is noise. The tooling
 has not been the bottleneck for three phases. One SRMIST coach or sport-psychology
-practitioner closes OPEN-025, OPEN-011 and OPEN-004 — and one $1–12 pilot closes OPEN-008 and
+practitioner closes OPEN-025, OPEN-011 and OPEN-004 - and one $1–12 pilot closes OPEN-008 and
 OPEN-028.
 
 ---

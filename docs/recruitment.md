@@ -1,4 +1,4 @@
-# A3 recruitment — asking people to donate a pre-competition reflection
+# A3 recruitment - asking people to donate a pre-competition reflection
 
 Companion to `docs/consent_form.md`. Category **A3**, `docs/ethics.md` §3.1.
 
@@ -7,9 +7,9 @@ Companion to `docs/consent_form.md`. Category **A3**, `docs/ethics.md` §3.1.
 OPEN-011 is the project's highest live risk: contribution #1 needs real pre-competition athlete
 text and there is none. Two routes were tried and closed:
 
-- **A1 public dataset** — Phase 7 surveyed four candidates, all post-match, all rejected on
+- **A1 public dataset** - Phase 7 surveyed four candidates, all post-match, all rejected on
   licensing or access. No corpus of pre-competition athlete text exists publicly.
-- **A5 topic-scoped forum collection** — attempted 2026-08-12, `HTTP 403 Blocked` on every
+- **A5 topic-scoped forum collection** - attempted 2026-08-12, `HTTP 403 Blocked` on every
   request. Reddit refuses unauthenticated programmatic reads and the block was treated as an
   answer (`docs/ethics.md` §3.5.5).
 
@@ -19,7 +19,7 @@ ethically cleanest from the start; it lost earlier only on recruitment lead time
 ## What "enough" looks like
 
 **You need far less than you think.** The purpose of A3 text is a *gold evaluation set*, not
-training volume — `synth_precomp_v1` already supplies 4,000 synthetic records for training.
+training volume - `synth_precomp_v1` already supplies 4,000 synthetic records for training.
 
 | donations | what it buys |
 |---|---|
@@ -34,7 +34,7 @@ you start in September.
 
 In rough order of yield per unit of effort:
 
-1. **SRMIST sports teams and the gym.** Anyone who competes — athletics, swimming, cricket,
+1. **SRMIST sports teams and the gym.** Anyone who competes - athletics, swimming, cricket,
    football, badminton, chess, esports. A team WhatsApp group is one message to thirty people.
 2. **Your own year group.** Many students compete at club level in something.
 3. **A coach or PE staff member.** Highest value by far, because the same person may also solve
@@ -43,8 +43,8 @@ In rough order of yield per unit of effort:
 4. **Amateur running/cycling clubs near campus.** Community clubs are often willing to help a
    student project.
 
-**Do not post the ask on Reddit.** Not because it would be scraping — soliciting donations is not
-collection — but because an unsolicited research request from a new account in those communities
+**Do not post the ask on Reddit.** Not because it would be scraping - soliciting donations is not
+collection - but because an unsolicited research request from a new account in those communities
 is usually removed by moderators, and it burns the venue.
 
 ## The message
@@ -53,17 +53,17 @@ Short, honest, no hype. Longer asks get read less.
 
 > **Subject: 10 minutes to help an undergrad research project?**
 >
-> Hi — I'm Saikalyan, a sophomore at SRMIST. I'm doing a research project on the language
+> Hi - I'm Saikalyan, a sophomore at SRMIST. I'm doing a research project on the language
 > athletes use *before* a competition, aiming for a conference paper.
 >
 > I need people who compete in something to write **one short reflection (~150 words)** about an
-> upcoming event — what's on your mind, how prep feels, what you're looking forward to or not.
+> upcoming event - what's on your mind, how prep feels, what you're looking forward to or not.
 > Takes about 10 minutes.
 >
 > A few things up front:
 > - Your words are **never published word-for-word** and **no result about you personally** is
 >   ever shown or shared. Everything is de-identified first and reported in aggregate.
-> - Nobody who knows you sees it — not a coach, not your team.
+> - Nobody who knows you sees it - not a coach, not your team.
 > - It is **not** any kind of mental-health assessment. It's a language study.
 > - You can withdraw any time, no reason needed.
 > - You need to be 18+.
@@ -71,7 +71,7 @@ Short, honest, no hype. Longer asks get read less.
 > Full details and the consent form are here: [link/attach `docs/consent_form.md`]
 >
 > If you're up for it, reply to this or email `sk8069@srmist.edu.in` (SRMIST) with subject
-> `[SPORTS-RISK-NLP]`. And if it's not for you, no worries at all — a share with anyone who
+> `[SPORTS-RISK-NLP]`. And if it's not for you, no worries at all - a share with anyone who
 > competes would help just as much.
 >
 > Thanks,
@@ -103,7 +103,7 @@ That single sentence is the highest-leverage line in this document. It opens **O
 ```bash
 python scripts/run_donation.py --add donations_inbox.jsonl --source-id a3_donations_v1
 python scripts/run_donation.py --verify-only --source-id a3_donations_v1
-python scripts/run_preprocessing.py        # de-identify — required before any model use
+python scripts/run_preprocessing.py        # de-identify - required before any model use
 ```
 
 The name↔`record_id` mapping lives outside the repo and is needed only to action a withdrawal.

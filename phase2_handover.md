@@ -1,4 +1,4 @@
-# Phase 2 Handover Instructions — Dev Environment & Tooling
+# Phase 2 Handover Instructions - Dev Environment & Tooling
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes
 **Handover to:** a new Claude Cowork chat executing **Phase 2**
@@ -57,7 +57,7 @@ Google Colab, Supabase, and Stitch are **not** used in Phase 2.
 | 11 | Pin versions in `requirements.txt` to the resolved versions; commit | Reproducible pins | New commit; `docker compose build` still passes |
 
 **If GPU/torch install is heavy or fails locally:** document the CPU-only fallback and note that
-model training (Phase 14) will run on **Google Colab** instead — do not block Phase 2 on local GPU.
+model training (Phase 14) will run on **Google Colab** instead - do not block Phase 2 on local GPU.
 
 ---
 
@@ -80,10 +80,10 @@ model training (Phase 14) will run on **Google Colab** instead — do not block 
 ## 5. Roles & Responsibilities of the Receiving Claude Chat
 
 - **Execute** the Phase 2 steps above; produce runnable, verified increments.
-- **Teach while doing** — explain each command's purpose (owner is a sophomore).
+- **Teach while doing** - explain each command's purpose (owner is a sophomore).
 - **Report** each step's result and stop at the first failure with a diagnosis, not a guess.
 - **Update** `.claude.md` / this doc if any tool decision changes (with owner confirmation).
-- **Do not** start Phase 3+ work (no data ingestion, no modeling) — Phase 2 is environment only.
+- **Do not** start Phase 3+ work (no data ingestion, no modeling) - Phase 2 is environment only.
 
 ---
 
@@ -104,7 +104,7 @@ model training (Phase 14) will run on **Google Colab** instead — do not block 
 
 1. **Try to self-diagnose** (read the error, check versions/paths) and report the finding.
 2. **Environment quirks are expected, not blockers:** the `validate_antipatterns.py` hook error and
-   git "unable to unlink … Operation not permitted" warnings are **harmless** — files/commits still
+   git "unable to unlink … Operation not permitted" warnings are **harmless** - files/commits still
    succeed. Do not treat them as failures.
 3. **Missing prerequisite** (no Python 3.11 / Docker not installed): pause and ask the owner to install;
    provide the exact download step. Do not work around it silently.
@@ -119,14 +119,14 @@ model training (Phase 14) will run on **Google Colab** instead — do not block 
 ## 8. Guardrails, Constraints & Best Practices
 
 - **Never commit secrets.** Keys live only in `.env` (gitignored); use `.env.example` for placeholders.
-- **Ask before locking any new tool/library/model** — confirmed decisions only (`.claude.md` §8).
+- **Ask before locking any new tool/library/model** - confirmed decisions only (`.claude.md` §8).
 - **Reproducibility first:** pin versions, keep the fixed seed (`config/settings.yaml`, seed 42),
   Dockerize. No "works on my machine."
 - **Small, verifiable steps** with a check after each; end with a verification step.
-- **Do not touch `data/gold/`** in any phase — human-owned.
+- **Do not touch `data/gold/`** in any phase - human-owned.
 - **Stay in scope:** Phase 2 = environment only; no pipeline logic, no data, no models.
 - **Be concise and direct** in chat; put depth in files/docs (owner preference).
-- **Keep the ethics framing intact** — research/decision-support, de-identification, non-diagnosis.
+- **Keep the ethics framing intact** - research/decision-support, de-identification, non-diagnosis.
 - **Back up:** once a GitHub remote is authorized, push after Phase 2 so work is off-machine.
 
 ---
@@ -136,4 +136,4 @@ model training (Phase 14) will run on **Google Colab** instead — do not block 
 - [CONFIRM Python 3.11 installed on owner's machine]
 - [CONFIRM Docker Desktop installed and running]
 - [VERIFY contents of the pre-existing `.env` file and rotate the key if needed]
-- [CHOOSE the secret-scan pre-commit hook — e.g. `detect-secrets` or `gitleaks`]
+- [CHOOSE the secret-scan pre-commit hook - e.g. `detect-secrets` or `gitleaks`]

@@ -1,11 +1,11 @@
-# Artifact — Pre-Competition Psychological Risk Profiling of Athletes
+# Artifact - Pre-Competition Psychological Risk Profiling of Athletes
 
 Research artifact accompanying the paper. Construct-grounded NLP that detects
 validated sports-psychology constructs in pre-competition athlete text and fuses
 them into an interpretable risk index with two-level explanations
 (span→construct, construct→risk).
 
-> **PROVISIONAL — planted-label corpus-property measurement, NOT accuracy.**
+> **PROVISIONAL - planted-label corpus-property measurement, NOT accuracy.**
 > `data/gold/` is empty (OPEN-025); no real athlete text exists (OPEN-011).
 > Every figure in this artifact measures agreement with generator-planted labels
 > on **synthetic** text. Nothing here is a measurement of a person.
@@ -15,7 +15,7 @@ them into an interpretable risk index with two-level explanations
 ## What this artifact contains
 
 * A **synthetic** construct-grounded corpus (`synth_precomp_v1`, 4,000 records →
-  9,302 utterances), regenerated deterministically from source at seed 42 — the
+  9,302 utterances), regenerated deterministically from source at seed 42 - the
   corpus text is not shipped, the generator is.
 * A ten-construct multi-label taxonomy grounded in the CSAI-2 / SDT / ABQ
   traditions (`config/taxonomy.yaml`, `docs/annotation_guidelines.md`).
@@ -68,7 +68,7 @@ python scripts/run_reproduction.py --verify --root . --tiers A,B
 ```
 
 **Clone into a new directory.** The checker inspects the tree first and exits 2
-rather than measuring if it finds generated artefacts already present — a
+rather than measuring if it finds generated artefacts already present - a
 reproduction verified where it could not have failed is not evidence. This also
 means `docker compose run app` will not do: every service bind-mounts the host
 working tree.
@@ -87,7 +87,7 @@ The `--extra-index-url` is required, not advisory: `torch==2.13.0+cpu` is a PEP
 ### What reproduces, and how exactly
 
 `reports/predictions/` is committed, so the cheap path re-derives the
-transformer's **scores** without torch, weights or corpus — and does not
+transformer's **scores** without torch, weights or corpus - and does not
 re-derive the transformer. Full per-artefact strengths, the ±0.010 retrain
 tolerance and how it was fixed before any run, and the complete list of what
 cannot be reproduced by anyone: **[`docs/reproducibility.md`](docs/reproducibility.md)**.
@@ -101,7 +101,7 @@ every headline number returned at full float precision.
 
 Template-disjoint split, planted labels, synthetic text. Each figure is
 agreement with the generator's own planted labels, never a measurement of
-correctness — see the stamp above.
+correctness - see the stamp above.
 
 | result | figure |
 |---|---|
@@ -118,7 +118,7 @@ nothing (+0.033, p = 0.107); the risk index cannot be calibrated because no
 observed outcome exists; and **four of the ten constructs are inert** in the
 fusion layer under the conservative default polarity policy, so the risk
 decomposition is not ten-construct without qualification. 104 of 120 driver rows
-(86.7%) have no supporting span — published rather than hidden.
+(86.7%) have no supporting span - published rather than hidden.
 
 The lexicon floor is not independent of the corpus (OPEN-021); that caveat
 travels with the 0.462 wherever it is quoted.
@@ -148,7 +148,7 @@ provenance stamp enforced in code rather than trusted to the report author.
 
 See `LICENSE`. The contact route is below and in `docs/consent_form.md`.
 
-## Contact — withdrawal, correction, incident reports
+## Contact - withdrawal, correction, incident reports
 
 **`sk8069@srmist.edu.in`** (SRMIST institutional address)
 Supervisor / secondary contact: **Dr. Shankar Ram**, SRMIST
@@ -158,5 +158,5 @@ Subject-line prefix: `[SPORTS-RISK-NLP]` · Acknowledgement target: **7 days**
 surface. It is the mechanism behind §7's withdrawal and correction rights: if it
 is not reachable from the document a reader actually has, those rights are
 decorative. Note that the released corpus is 100% synthetic (OPEN-011), so no
-real person's text is presently subject to withdrawal — the route exists so that
+real person's text is presently subject to withdrawal - the route exists so that
 it already works on the day that stops being true.

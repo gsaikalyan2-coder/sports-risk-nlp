@@ -457,6 +457,51 @@ def test_the_explanation_page_is_reachable_only_by_opening_a_tile():
     assert "pages/1_Signal_detail.py" in entry
 
 
+def test_the_surfaces_streamlit_portals_out_of_the_page_follow_the_mode():
+    """Three surfaces Streamlit renders OUTSIDE the widget that owns them.
+
+    The open select list, the running indicator and the tooltip are attached to
+    `<body>`, not inside the widget's own testid, so every rule written against
+    that testid stops at the closed control. Each was painted from the static
+    theme config in `.streamlit/config.toml`, which is one file and cannot follow
+    a runtime mode. Measured in the running app: in dark mode the select opened a
+    white sheet of near-black options over a dark page, and "Running" / "Stop"
+    rendered at 1.15:1.
+
+    Asserted on the stylesheet rather than on a rendered page because no test in
+    this suite drives a browser -- which is exactly how the defect survived: a
+    screenshot of a closed select passes either way.
+    """
+    from src.dashboard import theme
+
+    portalled = (
+        '[data-testid="stSelectboxVirtualDropdown"]',
+        '[data-testid="stStatusWidget"]',
+        '[data-baseweb="tooltip"]',
+    )
+    for css in (
+        theme.app_css("light"),
+        theme.app_css("dark"),
+        theme.claude_css("light"),
+        theme.claude_css("dark"),
+    ):
+        for selector in portalled:
+            assert selector in css, f"{selector} is left to the static theme config"
+
+
+def test_no_panel_paints_text_in_a_border_token():
+    """`hairline` is a border colour and was painting the coverage panel's glyphs.
+
+    Measured in the running app at 1.41:1 on the light canvas and 1.44:1 on the
+    dark one -- the weakest state was not faint, it was invisible, in both modes.
+    The three states are still told apart, by glyph and by the row's own text
+    class, which is the separation this project uses everywhere else.
+    """
+    from src.dashboard.coverage_panel import STATE_TOKENS
+
+    assert "hairline" not in STATE_TOKENS.values()
+
+
 def test_the_widget_grid_is_evenly_spaced():
     """Tiles are equal-height and equally gapped, in both languages.
 
@@ -487,7 +532,7 @@ def test_page_two_follows_the_dashboard_appearance_in_its_own_language():
     from src.dashboard import theme
 
     source = (SHELL_DIR / "pages" / "2_Score_my_own_text.py").read_text(encoding="utf-8")
-    assert 'st.session_state.get("mode"' in source, "Page 2 ignores the reader's choice"
+    assert "theme.mode_control(st)" in source, "Page 2 ignores the reader's choice"
     assert "theme.claude_css(mode)" in source
     assert "claude-dark" in source
 
@@ -505,29 +550,50 @@ def test_page_two_follows_the_dashboard_appearance_in_its_own_language():
         assert token not in dark, "Page 2 borrowed the dashboard's dark tokens"
 
 
-def test_the_mode_is_carried_in_a_key_that_survives_navigation():
-    """Streamlit drops widget state for widgets the current page does not render.
+def test_every_page_offers_the_appearance_control_through_the_one_helper():
+    """Owner instruction, 2026-09-27: light and dark on every page, not on three.
 
-    So the choice cannot live in the radio's own key: the reader picks dark on
-    the dashboard, opens Page 2, and Streamlit has already discarded it. Every
-    page must read the plain `mode` key, and the pages that offer the control
-    must write it.
+    Eight of eleven pages used to read `mode` out of session state and render no
+    control, so a reader who opened the taxonomy deck or the brain atlas first had
+    no way to change appearance from where they were standing. Every page now
+    calls `theme.mode_control(st)`, and the rule is written against that call
+    rather than against a radio, because eleven inlined radios is how one page
+    ends up seeding its index from a key a different page writes.
     """
     for path in _shell_files():
         source = path.read_text(encoding="utf-8")
         if "app_css(" not in source and "claude_css(" not in source:
             continue
-        assert "st.session_state" in source and '"mode"' in source, (
-            f"{path.name} does not read the persisted appearance key"
+        assert "theme.mode_control(st)" in source, (
+            f"{path.name} paints a mode but offers no way to change it"
         )
-        if "st.sidebar.radio" in source:
-            assert 'st.session_state["mode"] =' in source, (
-                f"{path.name} offers the control but never persists the choice"
-            )
+        assert "st.sidebar.radio" not in source, (
+            f"{path.name} inlines its own appearance radio instead of the shared control"
+        )
+
+
+def test_the_mode_is_carried_in_a_key_that_survives_navigation():
+    """Streamlit drops widget state for widgets the current page does not render.
+
+    So the choice cannot live in the radio's own key: the reader picks dark on
+    the dashboard, opens Page 2, and Streamlit has already discarded it. Asserted
+    on the helper every page routes through -- it must seed its index from the
+    plain key and write the choice back into it, and those two keys must differ,
+    because Streamlit refuses an assignment to a key a widget owns.
+    """
+    import inspect
+
+    from src.dashboard import theme
+
+    assert theme.APPEARANCE_WIDGET_KEY != theme.MODE_KEY
+    body = inspect.getsource(theme.mode_control)
+    assert "st.session_state.get(MODE_KEY, DEFAULT_MODE)" in body
+    assert "st.session_state[MODE_KEY] = choice" in body
+    assert "key=APPEARANCE_WIDGET_KEY" in body
 
 
 # ---------------------------------------------------------------------------
-# (f) Phase 26 — the cognitive pages, and the two halves of their feature flag
+# (f) Phase 26 - the cognitive pages, and the two halves of their feature flag
 #
 # `_shell_files()` already rglobs `dashboard/`, so every rule above walks the new
 # pages with no change -- which was the point of writing it that way in Phase 20

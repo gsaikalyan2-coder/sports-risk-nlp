@@ -500,7 +500,7 @@ def test_the_panel_without_frames_is_unchanged(view):
 
 
 # ---------------------------------------------------------------------------
-# (g) V3 — the cognitive-load panel
+# (g) V3 - the cognitive-load panel
 # ---------------------------------------------------------------------------
 
 
@@ -597,7 +597,7 @@ def test_the_load_panel_reaches_no_network(load_doc):
 
 
 # ---------------------------------------------------------------------------
-# (h) V5 — the neurofeedback panel
+# (h) V5 - the neurofeedback panel
 # ---------------------------------------------------------------------------
 
 
@@ -782,7 +782,7 @@ def test_the_narrated_heart_rate_trace_rises_when_the_heart_speeds_up(narrated):
 
 
 # ---------------------------------------------------------------------------
-# (i) the narrated clip — the most over-readable surface in the project
+# (i) the narrated clip - the most over-readable surface in the project
 # ---------------------------------------------------------------------------
 
 

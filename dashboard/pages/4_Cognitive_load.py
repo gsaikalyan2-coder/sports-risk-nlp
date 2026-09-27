@@ -80,7 +80,7 @@ from src.dashboard.neurovis import (  # noqa: E402
 from src.dashboard.view import build_view, known_examples  # noqa: E402
 from src.dashboard.widgets import load_widget  # noqa: E402
 
-mode = st.session_state.get("mode", theme.DEFAULT_MODE)
+mode = theme.mode_control(st)
 st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 
 WINDOWS = 12

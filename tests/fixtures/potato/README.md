@@ -1,4 +1,4 @@
-# Recorded Potato 2.7.1 output — test fixtures
+# Recorded Potato 2.7.1 output - test fixtures
 
 **These are not gold labels and must never be treated as any.** They are a
 *rehearsal*: five `gold_dev` items annotated by a script so that
@@ -17,7 +17,7 @@ in the shape `potato.export.tabular_exporter.JSONLExporter` writes.
 Nothing here was typed by hand. That is the whole point: OPEN-027 existed
 because the parser had only ever been tested against fixtures written by the
 same person who wrote the parser, which cannot detect a wrong assumption about
-the tool. A recorded artifact from the real library can, and did — see
+the tool. A recorded artifact from the real library can, and did - see
 `docs/annotation_tooling.md` §8.
 
 ## Why record the artifact instead of depending on Potato in the test suite
@@ -27,7 +27,7 @@ it a test dependency to generate three files on every run would slow the suite
 and give CI a network-shaped failure mode, for no extra signal: the bytes are
 what the parser has to survive, and the bytes are here. `POTATO_VERSION` in
 `src/annotation/potato_project.py` pins the version these were recorded from.
-**If that pin is raised, regenerate these fixtures** — the schema changed once
+**If that pin is raised, regenerate these fixtures** - the schema changed once
 already between the version the parser was written against and 2.7.1.
 
 ## Contents

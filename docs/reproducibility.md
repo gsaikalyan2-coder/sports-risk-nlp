@@ -5,9 +5,9 @@
 Phase 22 deliverable. The machine-readable form of everything below is
 `src/reproducibility/manifest.py::PLAN`; the checker is
 `python scripts/run_reproduction.py`. If this document and the plan ever
-disagree, the plan is right — it is the one a test can iterate over.
+disagree, the plan is right - it is the one a test can iterate over.
 
-> **PROVISIONAL — planted-label corpus-property measurement, NOT accuracy.**
+> **PROVISIONAL - planted-label corpus-property measurement, NOT accuracy.**
 > `data/gold/` is empty (OPEN-025); no real athlete text exists (OPEN-011).
 > Reproducing a number here proves the pipeline is deterministic. It proves
 > nothing about athletes.
@@ -28,7 +28,7 @@ python scripts/run_evaluation.py --seed 42 --resamples 1000
 ```
 
 Minutes, no GPU, no API key, no torch. That reproduces **every headline number
-in the paper** — and the next section is the part a reviewer should read before
+in the paper** - and the next section is the part a reviewer should read before
 believing that sentence.
 
 To have the checker do it and grade the result:
@@ -48,12 +48,12 @@ Exit 0 gate passed · 1 gate failed · 2 the run was refused (see §5).
 | **A** | regenerate the corpus, preprocess, refit the classical and lexicon baselines | minutes | base lock | **byte-identical** |
 | **B** | rescore every system from the committed prediction caches; rebuild `reports/results.json` | seconds | base lock | **byte-identical** |
 | **C** | retrain the transformer and regenerate its prediction cache | ~10 CPU-hours | ML lock | **within ±0.010 absolute macro-F1** |
-| **D** | anything gold-derived — κ, human agreement | — | a second annotator | **not reproducible by anyone** |
+| **D** | anything gold-derived - κ, human agreement | - | a second annotator | **not reproducible by anyone** |
 
 **Tier B is the one to understand.** `reports/predictions/` is *committed*. A
 fresh clone therefore reproduces the transformer's macro-F1, its bootstrap
 interval, the +0.126 delta over the lexicon floor and the +0.234 memorisation
-gap — with no torch, no `models/` and no corpus — because the transformer's
+gap - with no torch, no `models/` and no corpus - because the transformer's
 predictions arrived with the clone. That is a genuinely useful property: it
 means the scoring, the bootstrap and the ablations are all independently
 checkable in seconds. It is *not* evidence that the checkpoint retrains to the
@@ -66,7 +66,7 @@ green tick cannot be read as the expensive one.
 
 Applying one word to every artefact would understate what this repository can
 promise and overstate it in the same table. Phase 13 asserts the classical
-baselines at **full float precision, not `approx`** — calling those "within
+baselines at **full float precision, not `approx`** - calling those "within
 tolerance" would be a weaker claim than the code already makes. A distilroberta
 fine-tune on a different CPU, BLAS build and torch build will not land on the
 same float, and demanding that it does would produce a gate failing for reasons
@@ -94,7 +94,7 @@ the SHA-256 of the plan that made it, and any verification carrying a different
 hash fails the gate. A tolerance widened after the delta is known is fitted to
 that run, not a gate on it, and here that is refused mechanically rather than
 promised in prose. The claim row is `reproduction_tolerance` in
-`src/evaluation/ablations.py::CLAIMS`, added — per Phase 19's corollary — before
+`src/evaluation/ablations.py::CLAIMS`, added - per Phase 19's corollary - before
 the sentence was written anywhere.
 
 The number itself is bounded on both sides:
@@ -143,14 +143,14 @@ that quietly skips things claims more than it delivers.
 `data/` and `models/` are gitignored, so a genuine clone has neither. A step
 that silently reads one of them passes for the author and fails for the first
 reviewer. So `scripts/run_reproduction.py` inspects the tree first and **exits 2
-rather than measuring** if it finds generated artefacts present — a warning is
+rather than measuring** if it finds generated artefacts present - a warning is
 something a tired person scrolls past; a refusal is not.
 
 Note what a genuine clone *does* carry, because it is not nothing:
 `data/raw/*/provenance.json`, `data/interim/*/{provenance,preprocessing}.json`,
 `data/processed/gold_candidates/sampling_plan.json`, and all of
 `reports/predictions/`. Treating a populated `data/interim/` directory as
-contamination — which the first version of this check did — rejects every honest
+contamination - which the first version of this check did - rejects every honest
 clone. The generated artefacts are `records.jsonl` and `utterances.jsonl`; the
 manifests beside them ship on purpose.
 
@@ -165,8 +165,8 @@ without the mount.
 
 Before Phase 22 neither image installed a lock. `Dockerfile` installed
 `requirements-base.txt` (12 floors) and `Dockerfile.train` installed
-`requirements-ml.txt` (7 floors), while the only auditable file — the 180-pin
-`requirements.lock.txt` — was the one nothing used. `torch>=2.2` resolves to a
+`requirements-ml.txt` (7 floors), while the only auditable file - the 180-pin
+`requirements.lock.txt` - was the one nothing used. `torch>=2.2` resolves to a
 different answer every build, so the artifact's reproducibility statement
 described the owner's Windows venv rather than either container (SEC-07).
 
@@ -179,8 +179,8 @@ Now:
 
 Both are partitioned from `requirements.lock.txt` by a **computed** dependency
 closure (`pip install --dry-run --report` with the lock as a constraint file),
-not by hand. The base lock resolves with **zero unpinned extras** — verified
-2026-08-24 — which is the property that makes "pinned" true rather than
+not by hand. The base lock resolves with **zero unpinned extras** - verified
+2026-08-24 - which is the property that makes "pinned" true rather than
 aspirational.
 
 ```bash
@@ -196,7 +196,7 @@ being a two-command path where the second command lives in someone's memory.
 installs a local-version lock without the flag (`MissingExtraIndex`).
 
 Measured while building the locks, and worth keeping: resolving the ML layer
-*without* the extra index — i.e. taking torch from PyPI — additionally pulls 19
+*without* the extra index - i.e. taking torch from PyPI - additionally pulls 19
 `nvidia-*` / `cuda-*` / `triton` packages, several GB of CUDA runtime a CPU-only
 container never loads. That is what the flag buys.
 
@@ -206,7 +206,7 @@ container never loads. That is what the flag buys.
 and that has consequences a reader should know about:
 
 * **`uvloop` was missing.** A Linux-only transitive dependency of `uvicorn`, so
-  a Windows freeze cannot see it — and installing the lock in a Linux container
+  a Windows freeze cannot see it - and installing the lock in a Linux container
   pulled it *unpinned*. Now pinned in the base lock with a platform marker.
 * **`sentencepiece` was missing entirely.** `requirements-ml.txt` requires it
   (microsoft/deberta-v3-base ships a SentencePiece vocabulary; omitting it
@@ -221,7 +221,7 @@ and that has consequences a reader should know about:
 
 Verifying in a real clone on Linux turned up something no test had:
 `records.jsonl` matched the owner's tree byte-for-byte, and `utterances.jsonl`
-did not — identical content, exactly 9,302 bytes apart, one CR per line.
+did not - identical content, exactly 9,302 bytes apart, one CR per line.
 
 The two stores' code was **identical**; both used `open("w", encoding="utf-8")`,
 which translates `\n` to `\r\n` on Windows. The difference was that the corpus
@@ -231,8 +231,8 @@ came from which environment.** The numbers were unaffected. The byte-identity
 claim was not.
 
 `src/evaluation/sampling.py` already used `newline="\n"`; the other writers did
-not. They do now — `src/ingestion/store.py`, `src/preprocessing/store.py`,
-`src/labeling/store.py`, and the manifest writers alongside them — and
+not. They do now - `src/ingestion/store.py`, `src/preprocessing/store.py`,
+`src/labeling/store.py`, and the manifest writers alongside them - and
 `tests/test_reproducibility.py` asserts it at source level, because a functional
 check passes on Linux whether or not the fix is present and so would assert
 nothing about the platform where the defect lives.
@@ -246,15 +246,15 @@ will not match `FILE_DIGESTS`. The content is unchanged.
 
 Learned by running it and reading the output, not by writing tests:
 
-1. **A verification in a contaminated tree** — refused, exit 2.
-2. **A verification whose plan hash has moved since declaration** — the
+1. **A verification in a contaminated tree** - refused, exit 2.
+2. **A verification whose plan hash has moved since declaration** - the
    tolerance was edited after the fact.
-3. **A declared artefact with no verdict** — silence about an artefact is how a
+3. **A declared artefact with no verdict** - silence about an artefact is how a
    path claims more than it delivers, so silence is a failure condition.
 4. **A pass that reproduced nothing.** With no tiers selected, every artefact is
    honestly marked skipped, every other check is satisfied, and the gate went
    green having done nothing. Phase 18's corollary in a new costume.
-5. **An artefact skipped inside an attempted tier** — a tier is exercised or not
+5. **An artefact skipped inside an attempted tier** - a tier is exercised or not
    selected.
 6. **A step that exited non-zero**, even one producing no artefacts. On the
    first real run the `env` step failed and the gate passed on the strength of
@@ -269,8 +269,8 @@ verification step is not optional.
 
 ## 9. Related
 
-* `docs/model_card.md` §9 — the same path from the model's side.
-* `docs/security.md` — SEC-07 and SEC-11, the pinning findings.
-* `docs/findings.md` — what the numbers mean.
-* `docs/docker.md` — the two images.
-* `ARTIFACT.md` — the anonymized release README.
+* `docs/model_card.md` §9 - the same path from the model's side.
+* `docs/security.md` - SEC-07 and SEC-11, the pinning findings.
+* `docs/findings.md` - what the numbers mean.
+* `docs/docker.md` - the two images.
+* `ARTIFACT.md` - the anonymized release README.

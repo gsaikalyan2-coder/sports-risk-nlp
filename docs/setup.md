@@ -5,7 +5,7 @@ Target: Python **3.11**. Everything below assumes the repo root
 `C:\Users\x\sports-risk-nlp` and PowerShell.
 
 > **Why two environments?** The local `.venv` is for fast day-to-day work in VS Code.
-> The Docker image is the *reproducibility contract* — it is what a reviewer or a future
+> The Docker image is the *reproducibility contract* - it is what a reviewer or a future
 > you rebuilds to get identical results. Both must run the same hello-world.
 
 ---
@@ -39,7 +39,7 @@ python -m pip install --upgrade pip
 If PowerShell blocks the activate script:
 `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` then retry.
 
-`.venv/` is already in `.gitignore` — never commit it.
+`.venv/` is already in `.gitignore` - never commit it.
 
 ---
 
@@ -60,7 +60,7 @@ pip install -r requirements.txt
 ```
 
 If a dependency conflict appears (most likely `crewai` vs `openai`), record the exact
-error before changing versions — do not silently loosen a pin.
+error before changing versions - do not silently loosen a pin.
 
 ---
 
@@ -94,7 +94,7 @@ Services in `docker-compose.yml`:
 | `app` | pipeline / scripts | `docker compose run --rm app <cmd>` |
 | `dashboard` | Streamlit UI (Phase 21) | `docker compose up dashboard` → http://localhost:8501 |
 
-`.dockerignore` keeps `.git/`, `.venv/`, `.env`, `data/`, and `models/` out of the image —
+`.dockerignore` keeps `.git/`, `.venv/`, `.env`, `data/`, and `models/` out of the image -
 that keeps builds fast and guarantees no secret or raw athlete text is baked into a layer.
 
 ---
@@ -112,14 +112,14 @@ pre-commit run --all-files      # first run downloads the hook environments
 
 Configured in `.pre-commit-config.yaml`:
 
-- **ruff** + **ruff-format** — lint and format Python (config in `pyproject.toml`).
-- **detect-secrets** — scans the diff for high-entropy strings and known key formats,
+- **ruff** + **ruff-format** - lint and format Python (config in `pyproject.toml`).
+- **detect-secrets** - scans the diff for high-entropy strings and known key formats,
   compared against the reviewed allow-list in `.secrets.baseline`.
-- basic hygiene — trailing whitespace, end-of-file newline, YAML validity,
+- basic hygiene - trailing whitespace, end-of-file newline, YAML validity,
   merge-conflict markers, private keys, and a 5 MB file-size ceiling
   (datasets and model weights must never enter git history).
 
-**Prove the secret hook works** (do this once — it is a Phase 2 gate):
+**Prove the secret hook works** (do this once - it is a Phase 2 gate):
 
 ```powershell
 "OPENROUTER_API_KEY=sk-or-v1-0123456789abcdef0123456789abcdef" | Out-File fake_secret.py  # pragma: allowlist secret
@@ -145,7 +145,7 @@ git ls-files | Select-String "\.env$"     # MUST return nothing
 ```
 
 - Real keys live only in `.env` (gitignored). `.env.example` holds placeholders only.
-- If a key was ever pasted into a tracked file or a chat, **rotate it** — deleting the line
+- If a key was ever pasted into a tracked file or a chat, **rotate it** - deleting the line
   does not remove it from git history.
 - Never print an API key into a log, a notebook output, or `logs/cost_ledger.csv`.
 
@@ -185,7 +185,7 @@ The Ruff extension reads `pyproject.toml`, so editor formatting matches the pre-
 
 ---
 
-## 9. Known environment quirks (harmless — do not treat as failures)
+## 9. Known environment quirks (harmless - do not treat as failures)
 
 - A `validate_antipatterns.py` plugin hook with an unresolved `${CLAUDE_PLUGIN_ROOT}` prints a
   red error after file writes. Files still save. Fix in Settings → Capabilities.

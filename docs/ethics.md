@@ -1,7 +1,7 @@
 # Ethics & Data Governance Policy
 
 **Project:** Pre-Competition Psychological Risk Profiling of Athletes
-**Version:** 1.1 — Phase 5, 2026-08-08 (header corrected at Phase 7; the 1.1 changelog entry was present but the header still read 1.0)
+**Version:** 1.1 - Phase 5, 2026-08-08 (header corrected at Phase 7; the 1.1 changelog entry was present but the header still read 1.0)
 **Status:** Binding on all phases and all agents. No data may be collected, processed, labelled, or released except under this policy.
 **Companion file:** `config/data_sources_allowlist.yaml` (machine-readable allow-list; enforced by `src/ingestion/` from Phase 7)
 
@@ -36,8 +36,8 @@ document constrains the corpus rather than describing it after the fact.
 > output should be used as one.
 
 The system is not a clinical instrument. It has not been clinically validated, it was not
-developed with a clinical population, and the constructs it detects — although drawn from
-validated instruments — are being detected in **text**, not elicited through the instruments
+developed with a clinical population, and the constructs it detects - although drawn from
+validated instruments - are being detected in **text**, not elicited through the instruments
 themselves. The gap between "scores high on the CSAI-2" and "writes like someone who would" is
 real and unquantified, and the paper must say so.
 
@@ -60,7 +60,7 @@ The system must never be used to:
 5. Rank, league-table, or compare identified individuals by risk score.
 6. Substitute for a conversation with a qualified professional.
 
-These prohibitions are carried in the model card, the released README, and the dashboard UI —
+These prohibitions are carried in the model card, the released README, and the dashboard UI -
 not only here. A prohibition nobody reads is not a control.
 
 ### 2.4 Non-goal: this is not a duty-of-care mechanism
@@ -83,7 +83,7 @@ default for an unlisted source is **deny**.
 | # | Category | Conditions |
 |---|---|---|
 | **A1** | **Existing public research datasets** with an explicit licence permitting research use | Licence recorded in `provenance.json`; attribution preserved; redistribution only if the licence allows |
-| **A2** | **Synthetic text** generated for this project | Marked `synthetic: true` in every record; never presented as real athlete speech; generation prompts version-controlled. The match-day scenario dropdowns (Phase 30, `src/ingestion/scenarios.py::SCENARIO_BIAS`) bias which constructs a scenario plants, each citing the same `config/taxonomy.yaml` instrument anchor its construct already carries — a reviewer can audit which constructs each scenario is designed to express directly from that table. |
+| **A2** | **Synthetic text** generated for this project | Marked `synthetic: true` in every record; never presented as real athlete speech; generation prompts version-controlled. The match-day scenario dropdowns (Phase 30, `src/ingestion/scenarios.py::SCENARIO_BIAS`) bias which constructs a scenario plants, each citing the same `config/taxonomy.yaml` instrument anchor its construct already carries - a reviewer can audit which constructs each scenario is designed to express directly from that table. |
 | **A3** | **Explicitly consented text** donated for this research | Written informed consent naming this project and its purpose; withdrawal right honoured (§7) |
 | **A4** | **Officially published press-conference and post/pre-match interview transcripts** | Public, professional-capacity speech, published by the org or outlet; de-identified per §5; subject to §3.3 |
 
@@ -95,9 +95,9 @@ revisited at Phase 7.
 
 | Category | Why |
 |---|---|
-| Scraping personal social-media accounts — **account-centred** collection: user timelines, profile harvesting, or following named individuals across posts | Public ≠ consented. Personal posts are not professional-capacity speech and users do not anticipate psychological profiling. **Narrowed 2026-08-11 — see §3.5.** Topic-scoped collection from public pseudonymous forums is now permitted as category A5 under binding conditions. Account-centred collection remains prohibited without exception. |
+| Scraping personal social-media accounts - **account-centred** collection: user timelines, profile harvesting, or following named individuals across posts | Public ≠ consented. Personal posts are not professional-capacity speech and users do not anticipate psychological profiling. **Narrowed 2026-08-11 - see §3.5.** Topic-scoped collection from public pseudonymous forums is now permitted as category A5 under binding conditions. Account-centred collection remains prohibited without exception. |
 | Any text from an identifiable **minor** (under 18) | Youth athletes are a vulnerable population; profiling them requires ethics-board review and guardian consent that this project does not have. |
-| Private communications — DMs, team chats, medical notes, counselling records, journals not donated under A3 | No consent, and the last two are special-category health data. |
+| Private communications - DMs, team chats, medical notes, counselling records, journals not donated under A3 | No consent, and the last two are special-category health data. |
 | Any source whose licence forbids research use, or whose terms of service forbid the collection method | Legal exposure and reviewer challenge. |
 | Text obtained by scraping behind authentication or a paywall | Circumvents access control. |
 | Text about an athlete's **health, injury, or treatment** as its subject matter | Special-category data; outside the pre-competition psychological-language scope. |
@@ -111,7 +111,7 @@ assumed.
 A professional athlete speaking at an official press conference is a public figure making
 public, professional-capacity statements. Analysing that speech is standard practice in sports
 media research. **But** the fact that speech is lawfully public does not make every downstream
-use of it appropriate — and inferring psychological state is a substantially more intrusive use
+use of it appropriate - and inferring psychological state is a substantially more intrusive use
 than the speaker anticipated when answering a question about tactics.
 
 Conditions on A4, all mandatory:
@@ -120,13 +120,13 @@ Conditions on A4, all mandatory:
    names.
 2. **No individual-level published output.** Aggregate and worked examples only. Any example
    appearing in the paper, the dashboard, or a figure must be **synthetic or paraphrased beyond
-   re-identification** — never a quotable real utterance tied to a real person.
+   re-identification** - never a quotable real utterance tied to a real person.
 3. **No named-athlete claim, ever**, including in informal discussion of results.
 4. If a passage would embarrass or harm its speaker if attributed, it is excluded regardless of
    its research value.
 
 If a reviewer, an ethics board, or the owner judges A4 too permissive, the project falls back to
-**A1 + A2 + A3 only**. That reduces ecological validity and would be reported as a limitation —
+**A1 + A2 + A3 only**. That reduces ecological validity and would be reported as a limitation -
 it does not break the project.
 
 **Owner decision, 2026-08-08: A4 is CONFIRMED and permitted**, under all four mandatory conditions
@@ -136,7 +136,7 @@ requirements on Phase 7 ingestion and on every published artefact, not advisory 
 - Phase 7 (`src/ingestion/`) must de-identify A4 text despite the speaker being publicly known.
 - Phase 9 (dashboard) and the paper must use **synthetic or heavily paraphrased** examples only.
   A real, quotable press-conference utterance must never appear in any output, even
-  de-identified — a distinctive quote is itself an identifier, findable by search.
+  de-identified - a distinctive quote is itself an identifier, findable by search.
 - The exclusion test in condition 4 ("would this embarrass or harm the speaker if attributed")
   is applied at annotation time, not at publication time, and an excluded passage is dropped
   from the corpus rather than merely withheld from the paper.
@@ -145,7 +145,7 @@ Because A4 is the permission most likely to be questioned at review, §3.3 as a 
 to be cited in the paper. Do not weaken conditions 1–4 without revisiting this decision with the
 owner and amending this section.
 
-### 3.4 Institutional review — DETERMINED EXEMPT (documentary record pending)
+### 3.4 Institutional review - DETERMINED EXEMPT (documentary record pending)
 
 **Determination:** the owner reports, following consultation at SRMIST, that this project is
 **exempt** from institutional ethics review as secondary analysis of public, licensed, consented,
@@ -155,7 +155,7 @@ or synthetic text, with no primary human-subjects data collection and no clinica
 **Effect:** the block on A3 and A4 collection is **lifted**. Phase 7 ingestion may proceed across
 all permitted categories.
 
-**Still outstanding — one item, and it is not optional.** This determination is currently recorded
+**Still outstanding - one item, and it is not optional.** This determination is currently recorded
 on the owner's verbal report. The paper needs the *documentary* form: an email, a letter, or a
 committee reference number from whoever made the determination, naming the determining body and
 the date.
@@ -168,12 +168,12 @@ costs one email. Reconstructing it in the first week of September, against a sub
 costs considerably more.
 
 **When obtained:** save it to `docs/ethics_review_exemption.*` (do not commit it if it contains
-personal contact details — record the reference number here instead) and cite it in the paper's
+personal contact details - record the reference number here instead) and cite it in the paper's
 Ethics section. Tracked as **OPEN-005** in `docs/open_issues.md`.
 
 ---
 
-### 3.5 Category A5 — public pseudonymous forum text *(owner amendment, 2026-08-11)*
+### 3.5 Category A5 - public pseudonymous forum text *(owner amendment, 2026-08-11)*
 
 **This section amends a previously non-negotiable prohibition. It is written to be read by a
 reviewer, including the parts that argue against the decision.**
@@ -181,18 +181,18 @@ reviewer, including the parts that argue against the decision.**
 #### What changed and why
 
 Until 2026-08-11 the prohibition on "scraping personal social-media accounts" was absolute. Phase 7
-(2026-08-09) had established that **no public corpus of pre-competition athlete text exists** — all
+(2026-08-09) had established that **no public corpus of pre-competition athlete text exists** - all
 four surveyed candidates were post-match, which is the wrong side of the event for an anticipatory
 taxonomy (`appraisal_orientation`, anticipatory `cognitive_anxiety`). That left the project with a
 synthetic corpus and no real text, and contribution #1 depends on real text (**OPEN-011**).
 
-Public pseudonymous forum communities for amateur endurance athletes — r/running, r/triathlon,
-r/swimming, r/climbing and similar — contain genuinely **anticipatory** pre-competition writing
+Public pseudonymous forum communities for amateur endurance athletes - r/running, r/triathlon,
+r/swimming, r/climbing and similar - contain genuinely **anticipatory** pre-competition writing
 that exists nowhere else in accessible form. The owner has decided to permit topic-scoped
 collection from these communities, as **category A5**, under the binding conditions in §3.5.3.
 
-**The prohibition is narrowed, not repealed.** Account-centred collection — user timelines, profile
-harvesting, following a named individual across posts, or assembling any per-author history —
+**The prohibition is narrowed, not repealed.** Account-centred collection - user timelines, profile
+harvesting, following a named individual across posts, or assembling any per-author history -
 remains prohibited without exception. A5 permits collecting *posts matched by topic*, never
 *people matched by identity*. That distinction is the whole substance of this amendment: it is the
 difference between studying a discourse and profiling a person.
@@ -232,18 +232,18 @@ Three further objections that the conditions mitigate but do not remove:
   which is a validity problem as well as an ethical one. It belongs in §6 and in the paper's
   limitations.
 
-**If a reviewer finds this amendment unpersuasive, the fallback is A3** — recruiting the same
+**If a reviewer finds this amendment unpersuasive, the fallback is A3** - recruiting the same
 communities for *consented donation* rather than collecting from them. A3 is already permitted and
 was unblocked on 2026-08-08. It remains available and is the ethically cleaner route; it was not
 chosen because recruitment lead time is incompatible with the project's remaining schedule. That
 reasoning is a resourcing constraint, not an ethical argument, and it is recorded here as such.
 
-#### 3.5.3 Binding conditions — all mandatory, none advisory
+#### 3.5.3 Binding conditions - all mandatory, none advisory
 
 | # | Condition |
 |---|---|
 | C1 | **Topic-scoped only.** Collection is by subreddit and pre-competition query. Never by author, never a user timeline, never a per-author history. |
-| C2 | **Public and unauthenticated only.** Either **(a)** the official API via a registered application with declared research use, **or** **(b)** public read-only JSON endpoints with a descriptive User-Agent, single-threaded and rate-limited to ≤10 requests/minute. Rate limits respected either way. No login-walled, private, quarantined, or paywalled content (P5 stands). **Route (b) was added 2026-08-12 and carries a caveat — see §3.5.5.** |
+| C2 | **Public and unauthenticated only.** Either **(a)** the official API via a registered application with declared research use, **or** **(b)** public read-only JSON endpoints with a descriptive User-Agent, single-threaded and rate-limited to ≤10 requests/minute. Rate limits respected either way. No login-walled, private, quarantined, or paywalled content (P5 stands). **Route (b) was added 2026-08-12 and carries a caveat - see §3.5.5.** |
 | C3 | **Adults only.** Any post indicating a minor author, or drawn from a youth/school-age community, is excluded (P2 stands, unweakened). |
 | C4 | **No health content.** Posts whose subject is injury, illness, treatment, medication, or a mental-health diagnosis are excluded at ingestion (P6 stands). Pre-competition nerves are in scope; a disclosed anxiety disorder is not. |
 | C5 | **De-identification before use.** §5 pipeline runs before any text reaches a model. Usernames, handles, URLs, club and school names, locations, and race names that pin an individual are replaced. `deidentified` stays false until it has run. |
@@ -251,7 +251,7 @@ reasoning is a resourcing constraint, not an ethical argument, and it is recorde
 | C7 | **No individual-level output.** No per-author or per-post risk score is published, exported, or shown. Aggregate only. |
 | C8 | **No contact.** Authors are never messaged, replied to, or approached about their inclusion. |
 | C9 | **Deletion is honoured.** Posts deleted or removed upstream are dropped from the corpus at the next refresh and are not retained in derived artefacts where separable. |
-| C10 | **No redistribution of source text.** Derived artefacts only — labels, statistics, models. The raw collection is not published. Post IDs may be released for reproducibility only if C6 and C9 remain satisfiable. |
+| C10 | **No redistribution of source text.** Derived artefacts only - labels, statistics, models. The raw collection is not published. Post IDs may be released for reproducibility only if C6 and C9 remain satisfiable. |
 | C11 | **Data minimisation.** Post body and coarse metadata only (subreddit, days-to-competition where stated, sport, level). No author metadata, karma, history, or cross-posting graph. |
 
 Violation of any condition is an ingestion refusal, logged to `logs/ingestion_refusals.log`. The
@@ -268,11 +268,11 @@ be added to the checking path**.
 - **Institutional review.** §3.4's exemption was determined for *secondary analysis of public,
   licensed, consented, and synthetic text*. A5 is public secondary analysis and is within the
   scope of that determination as written. **This should nonetheless be confirmed rather than
-  assumed** — the exemption predates this amendment and the determining body did not see it.
+  assumed** - the exemption predates this amendment and the determining body did not see it.
   Tracked as **OPEN-030**; resolve before submission, alongside OPEN-005.
 
 ---
-#### 3.5.5 C2 route (b) — unauthenticated public endpoints *(2026-08-12)*
+#### 3.5.5 C2 route (b) - unauthenticated public endpoints *(2026-08-12)*
 
 **Why it was added.** The owner was unable to register a Reddit application. C2 as originally
 drafted required one, which would have made A5 unusable in practice.
@@ -289,8 +289,8 @@ than a formality. Consequences that follow:
 1. **Route (a) is preferred wherever available.** Registering a script application is free and
    takes minutes. Route (b) exists because a specific person was blocked, not because it is
    equivalent.
-2. **The paper must describe the collection method accurately** — "public read-only endpoints,
-   unauthenticated, rate-limited to under 10 requests per minute" — and must not describe it as
+2. **The paper must describe the collection method accurately** - "public read-only endpoints,
+   unauthenticated, rate-limited to under 10 requests per minute" - and must not describe it as
    "via the Reddit API" if route (b) was used. Those are different claims.
 3. **Volume stays low.** Route (b) is for assembling a small gold set (order 10²), not a training
    corpus. If the project ever needs volume, that is the point at which registering stops being
@@ -303,7 +303,7 @@ route (a), or state route (b) explicitly in the paper's ethics section. Do not l
 
 ##### Outcome, 2026-08-12: route (b) was attempted and is closed
 
-Route (b) was exercised the day it was added. **Every request returned `HTTP 403 Blocked`** —
+Route (b) was exercised the day it was added. **Every request returned `HTTP 403 Blocked`** -
 eight of eight communities, zero posts fetched, zero records written. Reddit refuses
 unauthenticated programmatic reads.
 
@@ -333,8 +333,8 @@ time (§3.5.2), and that remains a resourcing constraint rather than an ethical 
   permission, and the allow-list category (A1–A4).
 - **No provenance, no ingestion.** Phase 7's gate enforces this.
 - Licences are recorded verbatim, not summarised.
-- Where redistribution is not permitted, the release ships **derived artefacts only** —
-  labels, span offsets, and retrieval instructions — never the source text. See §9.
+- Where redistribution is not permitted, the release ships **derived artefacts only** -
+  labels, span offsets, and retrieval instructions - never the source text. See §9.
 - Consent under A3 is written, names this project specifically, states that text will be
   labelled for psychological constructs, and explains the withdrawal right.
 
@@ -359,7 +359,7 @@ review. No exceptions, no "it's already public" carve-out. This is the specifica
 
 | Category | Action |
 |---|---|
-| Person names — athletes, coaches, family, opponents, officials | Replace with typed placeholders: `[ATHLETE]`, `[COACH]`, `[TEAMMATE]`, `[OPPONENT]`, `[PERSON]` |
+| Person names - athletes, coaches, family, opponents, officials | Replace with typed placeholders: `[ATHLETE]`, `[COACH]`, `[TEAMMATE]`, `[OPPONENT]`, `[PERSON]` |
 | Social handles, usernames, emails, phone numbers, URLs | `[HANDLE]`, `[CONTACT]`, `[URL]` |
 | Team, club, school, and sponsor names | `[TEAM]`, `[ORG]` |
 | Specific venues, cities, countries | `[LOCATION]` |
@@ -376,7 +376,7 @@ review. No exceptions, no "it's already public" carve-out. This is the specifica
   created or stored. If one would be needed for a later analysis, that analysis is out of scope.
 - **Quasi-identifier combinations count.** Sport plus event plus finishing position can re-identify
   as surely as a name. Where the combination is distinctive, generalise the field.
-- **Manual audit on a stratified sample** every phase that touches data — automated NER misses
+- **Manual audit on a stratified sample** every phase that touches data - automated NER misses
   nicknames, in-group references, and unusual spellings. Failures are logged.
 - **Annotators flag, not fix.** A record with surviving identifiers is escalated per
   `docs/annotation_guidelines.md` §7, never quietly labelled.
@@ -417,11 +417,11 @@ Named honestly, because the paper is stronger for naming them than for being cau
 - **Incident (suspected re-identification or leak):** stop processing, quarantine the affected
   records, notify the owner, record it in `docs/security.md`, and do not publish the affected
   subset. A near-miss is logged the same as a hit.
-### 7.1 Contact route — NOMINATED
+### 7.1 Contact route - NOMINATED
 
 **Primary contact for withdrawal, correction, and incident reports:**
 
-> **Saikalyan — `sk8069@srmist.edu.in`** (SRMIST institutional address)
+> **Saikalyan - `sk8069@srmist.edu.in`** (SRMIST institutional address)
 > Secondary / supervisor: **Dr. Shankar Ram**, SRMIST
 > Subject line prefix: `[SPORTS-RISK-NLP]`
 > Acknowledgement target: **7 days**. Withdrawal actioned before the next data release.
@@ -430,7 +430,7 @@ This address **must** appear verbatim in the released `README.md`, in `docs/mode
 the A3 consent form, or none of the mechanisms in §7 is reachable in practice and the withdrawal
 right is decorative.
 
-**Standing requirement — replace before any public release.** A personal webmail address is
+**Standing requirement - replace before any public release.** A personal webmail address is
 acceptable for a project that has not yet released anything; it is **not** acceptable on a
 published IEEE artefact, for two reasons that both bite at review time:
 
@@ -446,7 +446,7 @@ Therefore, **before the corpus, code, or paper is released**, this section must 
 - a **named supervisor or lab contact** as secondary, so the route survives the owner's
   graduation.
 
-Neither is recorded here yet, and neither has been invented — inventing a plausible-looking
+Neither is recorded here yet, and neither has been invented - inventing a plausible-looking
 institutional address would produce a route that silently fails, which is worse than an honest
 interim one. Tracked as **OPEN-006** in `docs/open_issues.md`; it is a release blocker, not a
 Phase 7 blocker, so it does not hold up ingestion.
@@ -491,24 +491,24 @@ Before any public release of code, data, or model:
 
 | Phase | Obligation |
 |---|---|
-| 7 — Ingestion | Validate every source against `config/data_sources_allowlist.yaml`; write complete `provenance.json`; refuse unlisted sources |
-| 8 — Preprocessing | Run de-identification per §5; manual audit of a stratified sample; log failures |
-| 10 — Silver labelling | Labelling agent operates only on de-identified text; no raw text in prompts or logs |
-| 11 — Gold annotation | Annotators briefed on §2 and `annotation_guidelines.md` §0; escalation route live |
-| 15 — Risk fusion | Score presented only with per-construct contributions; never as a bare number |
-| 17 — Expert validation | Experts see de-identified or synthetic examples only; brief them on prohibited uses |
-| 21 — Dashboard & security | Prohibited-use notice in UI; PII audit; secret and dependency scan |
-| 24/25 — Release & paper | §9 checklist complete; §8 limitations included |
+| 7 - Ingestion | Validate every source against `config/data_sources_allowlist.yaml`; write complete `provenance.json`; refuse unlisted sources |
+| 8 - Preprocessing | Run de-identification per §5; manual audit of a stratified sample; log failures |
+| 10 - Silver labelling | Labelling agent operates only on de-identified text; no raw text in prompts or logs |
+| 11 - Gold annotation | Annotators briefed on §2 and `annotation_guidelines.md` §0; escalation route live |
+| 15 - Risk fusion | Score presented only with per-construct contributions; never as a bare number |
+| 17 - Expert validation | Experts see de-identified or synthetic examples only; brief them on prohibited uses |
+| 21 - Dashboard & security | Prohibited-use notice in UI; PII audit; secret and dependency scan |
+| 24/25 - Release & paper | §9 checklist complete; §8 limitations included |
 
 ---
 
-## 11. Owner decisions — all three resolved 2026-08-08
+## 11. Owner decisions - all three resolved 2026-08-08
 
 | # | Item | Decision | Residual action |
 |---|---|---|---|
-| 1 | Institutional review (§3.4) | **EXEMPT** — secondary analysis of public/licensed/consented/synthetic text; no primary human-subjects collection. A3 and A4 collection **unblocked**. | Obtain the determination **in writing** (reference number or email) and cite it in the paper. **OPEN-005** — before submission. |
+| 1 | Institutional review (§3.4) | **EXEMPT** - secondary analysis of public/licensed/consented/synthetic text; no primary human-subjects collection. A3 and A4 collection **unblocked**. | Obtain the determination **in writing** (reference number or email) and cite it in the paper. **OPEN-005** - before submission. |
 | 2 | Category A4, press-conference text (§3.3) | **CONFIRMED permitted** under all four mandatory conditions. Conservative A1+A2+A3 fallback **not** taken. | None. Conditions 1–4 are now binding on Phases 7, 9, and the paper. |
-| 3 | Contact route (§7.1) | **INSTITUTIONAL** — `sk8069@srmist.edu.in`, supervisor Dr. Shankar Ram, prefix `[SPORTS-RISK-NLP]`, 7-day acknowledgement. | **OPEN-006 closed at Phase 22 (2026-08-24)** — personal address replaced by the SRMIST route plus a named supervisor, propagated to the consent form, `README.md`, `docs/model_card.md` and `ARTIFACT.md`. Supervisor's own address still to be added if the institution requires a second reachable mailbox. |
+| 3 | Contact route (§7.1) | **INSTITUTIONAL** - `sk8069@srmist.edu.in`, supervisor Dr. Shankar Ram, prefix `[SPORTS-RISK-NLP]`, 7-day acknowledgement. | **OPEN-006 closed at Phase 22 (2026-08-24)** - personal address replaced by the SRMIST route plus a named supervisor, propagated to the consent form, `README.md`, `docs/model_card.md` and `ARTIFACT.md`. Supervisor's own address still to be added if the institution requires a second reachable mailbox. |
 
 **Nothing in this section now blocks Phase 7 ingestion.** The two residual items are a
 pre-submission item and a pre-release item respectively, both tracked in
@@ -525,7 +525,7 @@ pre-submission item and a pre-release item respectively, both tracked in
 
 ---
 
-## 13. Phase 27 — uploaded photographs and video (added 2026-09-15)
+## 13. Phase 27 - uploaded photographs and video (added 2026-09-15)
 
 **Status: this section is the blocking gate named in `.claude.md` §11.2 and
 `CLAUDE.md` §11.2, discharged for media. It was written before the media path
@@ -641,8 +641,8 @@ athlete self-report. Two ethical points:
   flagged, on the owner's decision of 2026-09-15. The flag renders above the
   score and outside any expander, so it survives a screenshot.
 
-Its measured behaviour — 0.85 recall on a held-out split, 1 of 20 authored
-negatives passing — is reported in `docs/model_card.md` §11 and in
+Its measured behaviour - 0.85 recall on a held-out split, 1 of 20 authored
+negatives passing - is reported in `docs/model_card.md` §11 and in
 `tests/test_relevance.py`. The negative set was authored by the project, so the
 false-positive figure is a sanity check and not an estimate of behaviour on real
 uploads. That limitation is stated wherever the figure appears.
@@ -659,7 +659,7 @@ uploads. That limitation is stated wherever the figure appears.
 | Relevance gate reports a number | 0.85 held-out recall; `tests/test_relevance.py`. |
 | Model card updated | `docs/model_card.md` §11. |
 
-## 14. Phase 28 — facial cues, read under consent, inside the index (added 2026-09-16)
+## 14. Phase 28 - facial cues, read under consent, inside the index (added 2026-09-16)
 
 **Status: this section discharges the blocker §13.5 named, for facial cues only.
 It was written before `src/media/facecues.py` was allowed into the repository,
@@ -714,7 +714,7 @@ It lives in `src/dashboard/copy.py::FACE_CUES_LIMITATION`, is rendered by
 `dashboard/pages/2_Score_my_own_text.py` whenever `MediaResult.face_measured` is
 true, and `tests/test_facecues.py` asserts its presence.
 
-### 14.4 Retention of biometric data — required by §13.5
+### 14.4 Retention of biometric data - required by §13.5
 
 Unchanged from §13.3 and restated because a face now enters the code path: the
 uploaded bytes are decoded into a local array, reduced to two floats, and
@@ -760,7 +760,7 @@ this section.
 | Model card updated | `docs/model_card.md` §12. |
 | Third-party / public-figure prohibition | Unchanged, §3.3 and §13.5 bullet 1. |
 
-## 15. Phase 29 — match-day profile: blocked pending owner sign-off (added 2026-09-19)
+## 15. Phase 29 - match-day profile: blocked pending owner sign-off (added 2026-09-19)
 
 **Status: this section is the blocking gate `src/media/pressroom.py` names in its
 own docstring. It was written after the code was found, on review, to conflict
@@ -785,8 +785,8 @@ default. None of that is in question.
 
 The feature's entire purpose is to answer "what is this specific athlete's
 score" from a link the reader chose because it names someone. That is §2.3.3's
-prohibited act — "generate claims about a named athlete's psychological state,
-publicly or privately" — performed by design, not by accident. §13.4 already
+prohibited act - "generate claims about a named athlete's psychological state,
+publicly or privately" - performed by design, not by accident. §13.4 already
 considered and rejected the argument that public availability changes this:
 
 > "Media of a public figure from a press conference is not exempt. Public
@@ -802,8 +802,8 @@ Those are different acts of de-identification and only the first is what
 
 ### 15.3 The gate
 
-`fetch_transcript` refuses with `TranscriptUnavailable` — before contacting
-YouTube — unless the environment variable `SRN_MATCHDAY_REAL_ATHLETES` is set.
+`fetch_transcript` refuses with `TranscriptUnavailable` - before contacting
+YouTube - unless the environment variable `SRN_MATCHDAY_REAL_ATHLETES` is set.
 No code path in this repository sets it. It is not exposed in the Streamlit UI,
 not set in `packages.txt`, `requirements-base.txt`, the `Dockerfile`, or the
 Streamlit Community Cloud deploy repo's configuration, and `.env.example`
@@ -814,8 +814,8 @@ by default and that no network route is attempted while it is closed.
 
 Unblocking `SRN_MATCHDAY_REAL_ATHLETES` in any environment this project
 controls requires, first, a dated owner decision reversing (not narrowing
-around) §2.3.3 and §13.4 — written here, with the reviewer-facing consequence
-named — and then, before any code changes: a real consent or notice route for
+around) §2.3.3 and §13.4 - written here, with the reviewer-facing consequence
+named - and then, before any code changes: a real consent or notice route for
 the person named in the link (not an attestation by whoever pasted the URL), a
 retention and takedown route under §7 naming that person, and the §14.3
 facial-cue limitation restated for a photograph the uploader may not have taken.
@@ -830,3 +830,54 @@ Absent all four, this section's answer stays "no" and the flag stays unset.
 | No UI path sets the flag | Confirmed by reading `dashboard/pages/6_Match_day_profile.py`; no `os.environ` write in the page. |
 | Public-figure prohibition | Unchanged, §2.3.3, §13.4, §14.2. Not discharged by this section. |
 | Model card updated | Not required while the feature is blocked; revisit at unblock time. |
+
+## 16. Phase 35 - the photo and video path is withdrawn from the interface (2026-09-27)
+
+Owner instruction, 2026-09-27: remove the photo / video uploader and the facial-cue
+consent tick from "Score my own text", completely. Done in
+`dashboard/pages/2_Score_my_own_text.py`, which now reads typed words and nothing else.
+
+### 16.1 What this changes about the sections above
+
+Sections 13 and 14 describe a reachable feature. As of this date they describe
+machinery no page calls. Both stay in this document unedited, because they are the
+compliance record of what was built and under what argument, and deleting the record
+of a capability is not the same as removing the capability.
+
+The concrete position now:
+
+| Section | Was | Is |
+|---|---|---|
+| §13 media ingestion, admission gates, nothing-retained rule | reachable from page 2 | unreferenced by any page |
+| §14 facial cues under uploader consent, weighted into the index | reachable from page 2 | unreferenced by any page |
+| §14.3 mandatory limitation beside every face-derived number | rendered on page 2 | no face-derived number is produced |
+| §15 match-day real-athlete path | blocked by an unset flag | unchanged, still blocked |
+
+### 16.2 Why the code was not deleted with the interface
+
+`src/media/` and `src/dashboard/mediaio.py` are still in the tree and still tested by
+`tests/test_media.py`, `tests/test_facecues.py`, `tests/test_relevance.py` and
+`tests/test_text_admission.py`. Their guarantees have not been weakened: the consent
+precondition in `FaceCueReader.__init__` still raises, `GatedRealReader` still refuses,
+and the Phase 27 rule that an unreadable input produces no number rather than a zero is
+still what `NullExtractor` enforces and what `gibberish.admit` enforces on the paste box
+this page does use.
+
+What has changed is the only thing an ethics reader should care about: there is no route
+through the running application by which a photograph of a face reaches a psychological
+score. That is now true by absence of a call site, which is a stronger property than the
+consent checkbox it replaces.
+
+If a future phase restores the uploader, it restores §14 with it, including the consent
+attestation, the §14.3 limitation above the score, and the requirement that the text-only
+score is shown beside the combined one.
+
+### 16.3 Compliance checkpoint (extends §15.5)
+
+| Requirement | State |
+|---|---|
+| No page constructs a face reader | `grep -rn "read_upload\|FaceCueReader" dashboard/` returns nothing. |
+| No page offers an upload control | `grep -rn "file_uploader" dashboard/` returns nothing. |
+| No page offers a consent tick | `grep -rn "st.checkbox" dashboard/` returns nothing. |
+| Refuse-rather-than-default rule still enforced on the surviving input | `gibberish.admit` runs before `build_view`; `tests/test_text_admission.py`. |
+| Media honesty machinery intact for any future restoration | `tests/test_media.py`, `tests/test_facecues.py` unchanged and green. |

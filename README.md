@@ -30,7 +30,7 @@ pip install -r requirements-ml.lock.txt --extra-index-url https://download.pytor
 
 ## Reproducing the results
 
-Minutes, no GPU, no API key. **Clone into a new directory** — the checker refuses
+Minutes, no GPU, no API key. **Clone into a new directory** - the checker refuses
 to grade a run performed in a tree that already holds the generated artefacts.
 
 ```powershell
@@ -73,7 +73,7 @@ docker compose run --rm app python scripts/hello.py
 ## Cost control
 
 Agent work routes through three OpenRouter cost tiers with a hard $20/month cap and an
-append-only ledger at `logs/cost_ledger.csv`. **Offline is the default** — the smoke
+append-only ledger at `logs/cost_ledger.csv`. **Offline is the default** - the smoke
 crew runs deterministically with no API key and no spend, so tests and a reviewer
 reproducing the artifact never cost anything. See **[`docs/agents.md`](docs/agents.md)**
 and `config/model_routing.yaml`.
@@ -83,7 +83,7 @@ and `config/model_routing.yaml`.
 Uses public/licensed/synthetic, de-identified text. No mental-health claims about real
 named individuals. See `docs/ethics.md`.
 
-## Contact — withdrawal, correction, incident reports
+## Contact - withdrawal, correction, incident reports
 
 **`sk8069@srmist.edu.in`** (SRMIST institutional address)
 Supervisor / secondary contact: **Dr. Shankar Ram**, SRMIST
@@ -93,5 +93,5 @@ Subject-line prefix: `[SPORTS-RISK-NLP]` · Acknowledgement target: **7 days**
 surface. It is the mechanism behind §7's withdrawal and correction rights: if it
 is not reachable from the document a reader actually has, those rights are
 decorative. Note that the released corpus is 100% synthetic (OPEN-011), so no
-real person's text is presently subject to withdrawal — the route exists so that
+real person's text is presently subject to withdrawal - the route exists so that
 it already works on the day that stops being true.
