@@ -1024,6 +1024,80 @@ DECK_GUIDELINES_NOTE = (
     "replacement for it."
 )
 
+# -- Phase 36: the squad view -------------------------------------------------
+
+SQUAD_TITLE = "Who to speak to first"
+
+SQUAD_PLAIN = (
+    "The rest of this app looks at one athlete at a time. A coach has a group. This page "
+    "generates a squad of made-up athletes, scores each one the ordinary way, and puts "
+    "them in order -- because an order is the one thing this number can honestly give you."
+)
+
+SQUAD_HOW_TO_READ: tuple[tuple[str, str], ...] = (
+    (
+        "The order, not the gap",
+        "Row 1 ranked above row 2. How much higher is not meaningful: the number has "
+        "never been calibrated against anything, so read the ladder as a queue, not as a "
+        "set of distances.",
+    ),
+    (
+        "A hatched bar inside the order",
+        "Signals were found in that athlete, but every one of them was the kind whose "
+        "direction is left open, so together they moved the number by nothing. The "
+        "midpoint there is a real reading, not a missing one.",
+    ),
+    (
+        "The rows below the dashed line",
+        "The word list found nothing in what these athletes wrote. They get no number and "
+        "no place in the queue. This is the most important row type on the page: someone "
+        "nothing was found in is not someone who is fine, they are someone this tool "
+        "cannot say anything about.",
+    ),
+    (
+        "The spread",
+        "Top of the queue minus bottom. A small spread means the ranking is barely "
+        "separating anyone, which is worth knowing before acting on the order.",
+    ),
+)
+
+SQUAD_NO_TEAM_SCORE = (
+    "There is deliberately no single squad number here. Averaging a group of readings that "
+    "were never calibrated produces something that looks more solid than any of the "
+    "readings that went into it, and that is exactly the number most likely to end up "
+    "beside a team's name in a slide. The middle row is reported instead, and it is one "
+    "athlete's own reading picked out of the list -- not an average of anybody."
+)
+
+SQUAD_SILENT_NOTE = (
+    "Athletes with no reading are listed, counted, and kept out of the order. They are "
+    "never placed last: last is a position, and a position would be a claim about them."
+)
+
+SQUAD_WHAT_IT_IS_NOT = (
+    "Not a team assessment, not a screening list, and not a ranking of real people. Every "
+    "athlete on this page is generated from a template, and the ordering is between "
+    "made-up records. Nothing here is evidence about anybody."
+)
+
+SQUAD_FLOOR_NOTE = (
+    "Every number on this page comes from the word-list baseline, the weakest method in "
+    "the project, which reads high more often than it reads low. It is used here because "
+    "it is the only one that can score text it has never seen."
+)
+
+SQUAD_PROMPT = "How many athletes in the squad"
+
+SQUAD_SEED_NOTE = (
+    "The same sport, size and seed always generate the same squad, so a screenshot can be "
+    "reproduced exactly."
+)
+
+SQUAD_PREVALENCE_NOTE = (
+    "How many of the squad each signal was found in. A count of how often something was "
+    "detected, nothing more -- these are not added up, averaged or weighted into anything."
+)
+
 
 def _screen() -> None:
     """Screen every string this module publishes, at import.

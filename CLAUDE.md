@@ -1155,3 +1155,115 @@ three cases - the polarity really is unresolved whatever the policy - but `view.
 inertness from the *weight*, not from that flag, so under the two exploratory policies
 nothing renders as inert and all ten constructs move the index. That is the behaviour
 `POLICY_NOTES` already describes, and it is now measured rather than trusted.
+
+## 19. Phase 36 - the squad view, and the temporal feature that was measured and refused (2026-09-28)
+
+> **Status: squad view built, tested and rendering. Temporal trajectory NOT built,
+> for a measured reason recorded in §19.3.** Written the same day, which §16.3 says
+> is the only version of the §8 rule 10 habit that counts.
+
+### 19.1 Owner decision (locked 2026-09-28)
+
+Asked for the three parked expansions from §10 to be implemented. Presented with
+four options and the reasons two of them were refusals rather than work items,
+the owner chose **"Build team + temporal"**. Team shipped. Temporal did not, and
+the reason is a measurement rather than an opinion (§19.3).
+
+| Expansion | Outcome |
+|---|---|
+| **Team aggregation** | **Built.** `src/dashboard/squad.py`, `charts.squad_strip`, `dashboard/pages/8_Squad_view.py`, `tests/test_squad.py` |
+| **Temporal trajectory** | **Refused on measurement.** Timing is metadata; all three timings produce byte-identical text (§19.3) |
+| **Outcome linkage** | **Refused on honesty.** Correlating the scorer against outcomes this project would itself generate is circular; it needs real outcome data, which is an acquisition problem |
+| **Multimodal fusion** | **Not reopened.** Phase 35 was an owner decision to remove the face channel from the page; reversing it needs its own dated decision |
+
+### 19.2 What the squad view is, and the two things it refuses
+
+A squad is an **ordering** problem: a coach's real question is who to speak to
+first. Ordering is the one thing this index legitimately supports - every caption
+in the project already says "ranking only, not calibrated" - so the page ranks.
+
+**There is no team score.** Not a mean, not a squad index, not a gauge. Averaging
+uncalibrated readings produces a number that looks more solid than any of its
+inputs, and it is the number most likely to be screenshotted beside a team name.
+The headline is the distribution: who is where, how far apart, how many could not
+be read.
+
+**The median is an order statistic, not an average.** `Squad.median` returns one
+member's own `ScoreSurface`, selected. On an even count it takes the lower of the
+two middles rather than averaging them, so Phase 34's "no new arithmetic" rule
+stays *literally* true instead of acquiring its first exception here. This is the
+design choice worth keeping: the reported figure is always a real reading of a
+real record.
+
+**§12.3 again, by a fourth door.** An unreadable member would squash to exactly
+0.50 and land mid-table looking like an average athlete. `SquadMember` refuses to
+hold a number it did not earn (`detected` and `surface` must agree at
+construction, as `SentenceBand` and `CloudLane` already require), and unreadable
+members render **below a dashed rule, outside the ranking** - never last, because
+last is a position and a position is a claim. A member genuinely at 0.50 because
+every detected construct was inert is a *different* fact and carries a different
+mark: hatched bar, real position, the words "counted as zero".
+
+### 19.3 Why temporal was not built: timing is metadata
+
+Measured before writing any of it, across all nine life contexts at
+sport=athletics, seed=7:
+
+| | week_before | morning_of | immediately_before | spread |
+|---|---|---|---|---|
+| every context | unchanged | unchanged | unchanged | **0.0000** |
+
+`generate_scenario_record` uses `scenario.timing` for exactly two things: the
+record id and `time_to_competition_days`. The generated **text is byte-identical**
+across all three timings. A trajectory drawn over them is three identical bars
+with a caption claiming a shape - the §12.3 failure exactly, and the one this
+project has now caught four times.
+
+`build_squad` therefore pins `timing="morning_of"` and says why in its docstring,
+rather than offering a dropdown that changes nothing while implying otherwise.
+
+**What an honest temporal feature would need**, and none of it exists yet: a
+timing-conditioned bias table (`TIMING_BIAS`, the shape `SCENARIO_BIAS` already
+has) so that different timings plant different constructs, grounded in a citable
+temporal claim - the CSAI-2 tradition's own finding that somatic anxiety rises
+close to the event while cognitive anxiety stays flat is the obvious anchor. That
+is a psychological claim encoded into the generator, which under §8 rule 2 is an
+owner decision and not a coding one. It would live in `scenarios.py`, not
+`synthetic.py`, so it would not touch the corpus hashes §18.3 prices at ~10
+CPU-hours. **Unasked and unbuilt; recorded here so the next session does not
+re-derive it.**
+
+### 19.4 What is deliberately not built
+
+* Any squad-wide score, gauge or average. §19.2.
+* A squad assembled from *real* athletes. Every member is generated text; the
+  page says so twice, above the fold.
+* Any cross-squad comparison or league table. Two uncalibrated orderings compared
+  against each other is a claim about neither.
+* A measured precision for the ordering. It cannot exist until `data/gold/` is
+  annotated (OPEN-025), and the first pass did not produce it (§19.5).
+
+### 19.5 The gold_dev pass of 2026-09-27, and why it produced nothing
+
+A1 completed a full three-hour sitting over the 100 `gold_dev` items - the burden
+estimate was 3.03 h and the file was written 3 h 02 m after the server started, so
+the time was genuinely spent. The ingest refused **96 of 100** items with a single
+error, `INTENSITY_WITHOUT_SPAN`, and because the writer is all-or-nothing,
+`data/gold/` is still empty.
+
+| | |
+|---|---|
+| Items with all ten intensity fields | 4 |
+| Items with exactly one field | 93 |
+| Items with any span marked | **1** |
+
+The parser was ruled out first: it correctly read the one item that does carry
+spans (`synth_precomp_v1-000008#u0`, three `somatic_anxiety` spans at 0-82, 10-41,
+14-42), so this is not a recurrence of OPEN-027. The radio pass was done and the
+span pass was not.
+
+**The tooling behaved correctly and the refusal was right** - "refusing beats
+repairing: a coerced gold label is a corrupted ruler", and span-level evidence is
+contribution #2. The lesson for the redo is a workflow one, not a code one: the
+span drag is the step that carries the contribution, and it is the step the
+interface makes easiest to skip. OPEN-025 stands.

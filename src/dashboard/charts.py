@@ -1072,3 +1072,123 @@ def corpus_cloud_chart(cloud, *, width: int = CHART_WIDTH) -> str:
     )
     out.append("</svg>")
     return "".join(out)
+
+
+def squad_strip(squad, *, width: int = CHART_WIDTH) -> str:
+    """A squad as a ranked ladder, with the unreadable members below the rule.
+
+    One row per athlete, ordered by the index, because ordering is what this
+    number supports. There is no aggregate bar and no team gauge: the figure's
+    claim is "this is the order", not "this is the squad's level", and a single
+    squad-wide bar would be read as the latter within a second of being pasted
+    into a slide.
+
+    Members the detector could not read are drawn **below a horizontal rule**,
+    hatched, with the words "nothing detected" and no bar at all. They are not
+    ranked last -- last is a position, and a position is a claim. They are outside
+    the ranking, which is the honest place for them: an athlete nothing was found
+    in is not a low-risk athlete, they are one this tool cannot speak about, and
+    in a triage view that is the most decision-relevant row on the page.
+
+    A member sitting exactly on the midpoint *inside* the ranking is a different
+    fact and carries a different mark: everything detected in them was
+    directionally unresolved, so the pushes genuinely summed to zero. Hatched bar,
+    real position, the words "counted as zero". Two facts, two markings, neither
+    of them a bare 0.50 bar -- the rule `sentence_ribbon` already applies one level
+    down.
+    """
+    ranked = list(squad.ordered)
+    silent = list(squad.silent)
+    row_h = 24
+    top = 74
+    left = 196
+    plot_w = width - left - 76
+    rule_gap = 16 if silent else 0
+    height = top + (len(ranked) + len(silent)) * row_h + rule_gap + 52
+    hatch = "squad-inert-hatch"
+
+    out: list[str] = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" '
+        f'aria-label="A squad of {len(squad.members)} synthetic athletes ranked by risk '
+        f'index, with {squad.n_silent} unreadable members listed outside the ranking">',
+        _defs(hatch),
+        f'<rect width="{width}" height="{height}" fill="{COLOUR_SURFACE}"/>',
+        f'<text x="8" y="18" {FONT} font-size="12" fill="{COLOUR_INK}" font-weight="600">'
+        f"Who to speak to first - {escape(squad.sport)}</text>",
+        f'<text x="8" y="34" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "one row per athlete, ordered by the index; ranking only, not calibrated, and "
+        "there is deliberately no squad-wide score</text>",
+        f'<text x="8" y="48" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"{len(ranked)} readable, {squad.n_silent} the word list found nothing in - those "
+        "are listed below the rule, without a number</text>",
+        f'<text x="8" y="62" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        f"top-to-bottom spread {squad.spread:.2f}</text>",
+    ]
+
+    for index, member in enumerate(ranked):
+        y = top + index * row_h
+        mid = y + row_h / 2
+        bar_w = plot_w * max(0.0, min(1.0, member.surface.value))
+        fill = f"url(#{hatch})" if not member.moved else COLOUR_SEQUENTIAL
+        out.append(
+            f'<text x="8" y="{mid + 3:.1f}" {FONT} font-size="10" fill="{COLOUR_INK}">'
+            f"{index + 1}. {escape(_clip(member.plain_context, 30))}</text>"
+        )
+        out.append(
+            f'<rect x="{left}" y="{y + 5:.1f}" width="{bar_w:.1f}" height="{row_h - 10}" '
+            f'fill="{fill}" stroke="{COLOUR_MUTED}" stroke-width="0.6"/>'
+        )
+        out.append(
+            f'<text x="{left + plot_w + 6}" y="{mid + 4:.1f}" {FONT_SVG_MONO} font-size="10" '
+            f'fill="{COLOUR_INK}">{member.surface.display}</text>'
+        )
+        if not member.moved:
+            # Third channel, beside the hatch and the muted fill: the word itself.
+            out.append(
+                f'<text x="{left + 6}" y="{mid + 3:.1f}" {FONT} font-size="9" '
+                f'fill="{COLOUR_MUTED}">counted as zero</text>'
+            )
+
+    if silent:
+        rule_y = top + len(ranked) * row_h + rule_gap / 2
+        out.append(
+            f'<line x1="8" y1="{rule_y:.1f}" x2="{width - 8}" y2="{rule_y:.1f}" '
+            f'stroke="{COLOUR_RULE}" stroke-width="1" stroke-dasharray="4 3"/>'
+        )
+        for index, member in enumerate(silent):
+            y = top + (len(ranked) + index) * row_h + rule_gap
+            mid = y + row_h / 2
+            out.append(
+                f'<text x="8" y="{mid + 3:.1f}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+                f"- {escape(_clip(member.plain_context, 30))}</text>"
+            )
+            out.append(
+                f'<rect x="{left}" y="{y + 5:.1f}" width="{plot_w:.1f}" '
+                f'height="{row_h - 10}" fill="url(#{hatch})" fill-opacity="0.5" '
+                f'stroke="{COLOUR_GRID}" stroke-width="0.6" stroke-dasharray="3 3"/>'
+            )
+            out.append(
+                f'<text x="{left + 6}" y="{mid + 3:.1f}" {FONT} font-size="9" '
+                f'fill="{COLOUR_MUTED}">nothing detected - no number</text>'
+            )
+
+    axis_y = top + (len(ranked) + len(silent)) * row_h + rule_gap + 4
+    out.append(
+        f'<line x1="{left}" y1="{axis_y}" x2="{left + plot_w}" y2="{axis_y}" '
+        f'stroke="{COLOUR_RULE}" stroke-width="1.5"/>'
+    )
+    out.append(
+        f'<text x="{left}" y="{axis_y + 14}" {FONT} font-size="10" fill="{COLOUR_MUTED}">0</text>'
+    )
+    out.append(
+        f'<text x="{left + plot_w}" y="{axis_y + 14}" {FONT} font-size="10" '
+        f'fill="{COLOUR_MUTED}" text-anchor="end">1</text>'
+    )
+    out.append(
+        f'<text x="8" y="{height - 10}" {FONT} font-size="10" fill="{COLOUR_MUTED}">'
+        "the order is the claim, not the gap between any two rows; nothing here is an "
+        "average of the squad</text>"
+    )
+    out.append("</svg>")
+    return "".join(out)
