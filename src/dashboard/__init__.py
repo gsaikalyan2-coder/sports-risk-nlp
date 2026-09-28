@@ -59,6 +59,7 @@ from .charts import (
     risk_meter,
     risk_waterfall,
     sentence_ribbon,
+    squad_strip,
 )
 from .corpus_cloud import (
     CloudLane,
@@ -96,6 +97,7 @@ from .mediaio import (
 )
 from .motion import evidence_height, motion_panel, panel_height, spans_panel
 from .ribbon import Ribbon, RibbonRefused, SentenceBand, build_ribbon
+from .squad import MAX_SQUAD, MIN_SQUAD, Squad, SquadMember, SquadRefused, build_squad
 from .taxonomy_cards import TaxonomyCard, TaxonomyCardError, load_cards
 from .view import (
     DEFAULT_POLICY_LABEL,
@@ -114,6 +116,14 @@ from .view import (
 from .widgets import Widget, coverage_widget, widget_for, widgets_for
 
 __all__ = [
+    # Phase 36: the squad view -- a group as an ordering problem.
+    "build_squad",
+    "Squad",
+    "SquadMember",
+    "SquadRefused",
+    "MIN_SQUAD",
+    "MAX_SQUAD",
+    "squad_strip",
     # Phase 34: the sentence ribbon, the corpus constellation, the taxonomy deck.
     "build_ribbon",
     "Ribbon",
