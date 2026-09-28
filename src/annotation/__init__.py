@@ -1,10 +1,9 @@
 """Human gold annotation (Phase 11).
 
 Turns `data/processed/gold_candidates/` into a runnable Potato project, reads
-the annotators' output back as typed `GoldLabel`s, and reports per-construct
-inter-annotator agreement.
+the annotators' output back as typed `GoldLabel`s.
 
-    from src.annotation import load_batch, write_project, compute_agreement
+    from src.annotation import load_batch, write_project
 
 Submodules, in workflow order:
 
@@ -13,28 +12,20 @@ Submodules, in workflow order:
     ingest          read Potato output back; refuses malformed annotations
     schema          GoldLabel / GoldConstruct; only a human can author one
     store           the only write path into data/gold/
-    agreement       Cohen's kappa, weighted kappa, span F1, adjudication worklist
 
 The annotation UI is **Potato** (`davidjurgens/potato`), installed separately
 and not vendored. `docs/annotation_tooling.md` explains the integration and
 pins the version.
+
+NOTE (2026-09-28): this project no longer computes inter-annotator agreement.
+`agreement.py` (Cohen's kappa, weighted kappa, span F1, the adjudication
+worklist) was deleted by owner decision -- see `CLAUDE.md` sec.20-21 and
+`config/annotators.yaml`'s header. A backup of the deleted module is under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/agreement.py`.
 """
 
 from __future__ import annotations
 
-from .agreement import (
-    AgreementReport,
-    AgreementUnmeasurable,
-    ConstructAgreement,
-    align,
-    band,
-    cohens_kappa,
-    compute_agreement,
-    construct_agreement,
-    disagreements,
-    quadratic_weighted_kappa,
-    span_overlap_f1,
-)
 from .context import (
     AnnotationItem,
     ContextError,
@@ -71,11 +62,8 @@ from .store import GoldStore, GoldWriteRefused
 
 __all__ = [
     "POTATO_VERSION",
-    "AgreementReport",
-    "AgreementUnmeasurable",
     "AnnotationItem",
     "Annotator",
-    "ConstructAgreement",
     "ContextError",
     "GoldConstruct",
     "GoldLabel",
@@ -86,15 +74,9 @@ __all__ = [
     "IngestReport",
     "PotatoOutputError",
     "PotatoPass",
-    "align",
-    "band",
     "build_config",
     "build_items",
-    "cohens_kappa",
-    "compute_agreement",
-    "construct_agreement",
     "context_coverage",
-    "disagreements",
     "discover_passes",
     "ingest_passes",
     "ingest_potato",
@@ -103,11 +85,9 @@ __all__ = [
     "normalise_record",
     "parent_texts",
     "parse_annotation",
-    "quadratic_weighted_kappa",
     "read_pass",
     "resolve_span_surface",
     "sibling_counts",
     "span_labels",
-    "span_overlap_f1",
     "write_project",
 ]

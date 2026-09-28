@@ -4,8 +4,14 @@
 `data/gold/`
 **Tool:** [Potato](https://github.com/davidjurgens/potato) - "the portable annotation tool",
 pinned at **2.7.1**
-**Status:** built and verified 2026-08-10. **No annotation has been performed yet, and the
-second annotator does not exist.**
+**Status:** built and verified 2026-08-10. **Updated 2026-09-28: `gold_dev` is annotated by A1
+alone (96/100 valid spans). A2 agreed on 2026-08-12 but never annotated anything, and the owner
+decided to close OPEN-025 by dropping the inter-annotator-agreement claim rather than wait
+further. As a direct consequence, `src/annotation/agreement.py` was deleted (backup under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/`), and `--agreement` no longer exists
+on `scripts/run_annotation.py`. Sections 7 and 10.2 below describe that deleted system and are
+kept for the historical record of what it computed and why, not as current behaviour.** See
+`CLAUDE.md` sec.20-21 for the full reasoning.
 
 ---
 
@@ -125,7 +131,11 @@ purpose:
 annotations under their own roster id. No schema stops research fraud. The locks stop the
 realistic failure - a future session deciding silver labels are "good enough" to seed gold.
 
-## 7. Agreement: four numbers, never one
+## 7. Agreement: four numbers, never one (REMOVED 2026-09-28, kept for the record)
+
+**This section describes `src/annotation/agreement.py`, which no longer exists.** Kept as-is
+below because it explains a real design, in case a future annotator makes IAA measurable again
+and this needs rebuilding from the backup. See the file header above and `CLAUDE.md` sec.20-21.
 
 | Statistic | Question |
 |---|---|
@@ -168,12 +178,13 @@ cd annotation/gold_dev && potato start config.yaml
 # 3. ingest each pass (each person runs this with their OWN id)
 python scripts/run_annotation.py --ingest --batch gold_dev --annotator A1
 
-# 4. compare, argue, amend docs/annotation_guidelines.md, re-annotate if the rubric moved
-python scripts/run_annotation.py --agreement --batch gold_dev
-
-# 5. only now: the evaluation set
+# 4. only now: the evaluation set
 python scripts/run_annotation.py --build --batch gold_eval
 ```
+
+**(2026-09-28) There used to be a step 4 here** - `--agreement --batch gold_dev`, comparing two
+passes before opening `gold_eval`. It was single-annotator by decision and removed along with
+`src/annotation/agreement.py`; see the file header above.
 
 **The order is load-bearing.** `gold_dev` is drawn from *training-side* templates precisely so
 that burning it on rubric arguments costs zero evaluation power. An item read during an
@@ -218,8 +229,11 @@ remaining unexecuted paths and should be assumed broken until executed.
 ## 10. Honest limitations
 
 1. **No annotation exists.** The tooling is verified; the gold set is empty.
-2. **There is no second annotator.** Kappa is undefined with one person, so contribution #1
-   does not exist yet. This is the Phase 11 blocker and no code can close it.
+2. **There is no second annotator, by decision.** A2 agreed (2026-08-12) but never annotated;
+   the owner chose to proceed on A1's single pass and drop the IAA claim rather than keep
+   waiting (2026-09-28). Contribution #1 as originally framed ("with inter-annotator agreement
+   reported") does not exist, and is named as a limitation in the paper rather than omitted.
+   `src/annotation/agreement.py` was deleted as a result; see `CLAUDE.md` sec.20-21.
 3. **Burden is unmeasured.** Ten intensity questions plus a span pass, per item, per
    annotator, over 400 items. `CLAUDE.md` sec.3 schedules exactly this check before the
    taxonomy freezes at Phase 12 - **time the `gold_dev` pass** and use the number. The

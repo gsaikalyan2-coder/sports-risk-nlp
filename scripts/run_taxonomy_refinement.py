@@ -4,22 +4,22 @@
     python scripts/run_taxonomy_refinement.py --burden                  # OPEN-026
     python scripts/run_taxonomy_refinement.py --burden --measured-minutes-per-item 1.9 \
         --measured-source "gold_dev pass, A1, 2026-08-14, stopwatch"
-    python scripts/run_taxonomy_refinement.py --refine --batch gold_dev  # needs gold
     python scripts/run_taxonomy_refinement.py --propose config/taxonomy_v3.yaml
     python scripts/run_taxonomy_refinement.py --status
 
 Offline, free and deterministic, like every other gate in this project.
 
-**The phase has two halves and they are blocked differently.**
-`config/taxonomy.yaml` freezes the construct set at Phase 12 *"after checking
-annotation burden and inter-annotator agreement."*
+**NOTE (2026-09-28): `--refine` no longer exists.** `config/taxonomy.yaml`
+freezes the construct set at Phase 12 *"after checking annotation burden and
+inter-annotator agreement."* By owner decision this project does not report
+inter-annotator agreement (see `CLAUDE.md` sec.20-21 and
+`config/annotators.yaml`'s header), so the disagreement-driven half of this
+gate -- `src/taxonomy/refinement.py` and `src/annotation/agreement.py`, which
+supplied its only input -- was deleted rather than left permanently blocked.
+Backups are under `annotation/gold_dev/_backup_2026-09-28/removed_20260928/`.
+Taxonomy freezing at Phase 12 now rests on burden alone plus owner rubric
+review, not on a measured kappa.
 
-- **Agreement** needs `data/gold/`, which needs a second annotator (OPEN-025).
-  `--refine` therefore reports BLOCKED and exits non-zero until that person
-  exists. That refusal is the Phase 11 blocker still being visible, and routing
-  around it -- by analysing silver, or by treating one pass as two -- would
-  produce a taxonomy decision made on no evidence and record it as if it had
-  been made on some.
 - **Burden** needs nothing but the taxonomy, so `--burden` runs today and closes
   the arithmetic half of OPEN-026. It cannot close the *measurement* half; the
   report says so in its own text until someone passes
@@ -49,20 +49,12 @@ if str(REPO_ROOT) not in sys.path:
 import yaml  # noqa: E402
 
 from src.agents.config import ConfigError, load_taxonomy  # noqa: E402
-from src.annotation import (  # noqa: E402
-    AgreementUnmeasurable,
-    GoldStore,
-    align,
-    compute_agreement,
-    disagreements,
-    load_annotators,
-)
+from src.annotation import GoldStore, load_annotators  # noqa: E402
 from src.labeling.store import SilverStore  # noqa: E402
 from src.taxonomy import (  # noqa: E402
     Changelog,
     TaxonomyVersionError,
     TimingModel,
-    analyse,
     diff_taxonomy,
     estimate_burden,
     relabel_scope,
@@ -118,7 +110,10 @@ def cmd_burden(args, taxonomy) -> int:
         roster = load_annotators()
     except Exception:  # noqa: BLE001 -- roster problems are Phase 11's gate, not this one
         roster = {}
-    n_annotators = max(2, len(roster))  # the plan mandates 100% double annotation
+    # Single-annotator by decision (2026-09-28) -- this used to be
+    # max(2, len(roster)) because the plan mandated 100% double annotation.
+    # It no longer does; burden is costed for the roster as it actually is.
+    n_annotators = max(1, len(roster))
 
     reports = {}
     for batch in BATCH_FILES:
@@ -159,81 +154,6 @@ def cmd_burden(args, taxonomy) -> int:
         print("    --measured-minutes-per-item <n> --measured-source '<who, when, how>'")
         print("  100 items with a stopwatch produces the number BEFORE the 400-item")
         print("  commitment is made, which is the whole point of doing it at gold_dev.")
-    return 0
-
-
-def cmd_refine(args, taxonomy) -> int:
-    _rule(f"Label validation and taxonomy refinement -- {args.batch}")
-    constructs = list(taxonomy["constructs"])
-    store = GoldStore()
-    passes = store.read_batch(args.batch)
-    print(f"  gold passes on disk: {sorted(passes) or 'none'}")
-
-    try:
-        agreement = compute_agreement(
-            passes, constructs, batch=args.batch, bootstrap=args.bootstrap
-        )
-    except AgreementUnmeasurable as exc:
-        print()
-        print("  BLOCKED")
-        print(f"  {exc}")
-        print()
-        print("  Phase 12 refines the taxonomy using the disagreement Phase 11 measures.")
-        print("  With no measured disagreement there is nothing to refine, and inventing")
-        print("  a substitute would be worse than waiting: analysing silver would ask")
-        print("  whether the LLM agrees with itself, and analysing one human pass would")
-        print("  ask whether a person agrees with themselves. Neither is a reason to")
-        print("  change a construct definition, and both would be recorded as if it were.")
-        print()
-        print("  Blocked on OPEN-025 (second annotator). Meanwhile --burden and")
-        print("  --propose both run and both produce real Phase 12 inputs.")
-        print()
-        print("Phase 12 gate: BLOCKED (not a code failure -- the gold set does not exist)")
-        return 1
-
-    rows = disagreements(
-        align(passes[agreement.annotator_a], passes[agreement.annotator_b]), constructs
-    )
-
-    burden = None
-    try:
-        burden = estimate_burden(
-            batch=args.batch,
-            n_items=_batch_size(args.batch),
-            constructs=constructs,
-            n_annotators=2,
-        )
-    except FileNotFoundError:
-        pass
-
-    report = analyse(agreement, rows, burden=burden, min_confusion=args.min_confusion)
-    print()
-    print(report.to_markdown())
-
-    REPORTS.mkdir(exist_ok=True)
-    md_path = REPORTS / f"refinement_{args.batch}.md"
-    md_path.write_text(report.to_markdown() + "\n", encoding="utf-8")
-    json_path = REPORTS / f"refinement_{args.batch}.json"
-    json_path.write_text(
-        json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-    print()
-    print(f"  wrote {md_path.relative_to(REPO_ROOT)}")
-    print(f"  wrote {json_path.relative_to(REPO_ROOT)}")
-
-    pending = report.needs_owner_decision
-    if pending:
-        print()
-        print(f"  OWNER DECISION REQUIRED: {pending}")
-        print("  The gate does not pass until each is decided and written into the")
-        print("  changelog with its reason. 'Post-refinement agreement improves OR IS")
-        print("  JUSTIFIED' -- an undocumented drop satisfies neither half.")
-        print()
-        print("Phase 12 gate: NOT YET (analysis complete, decisions outstanding)")
-        return 1
-
-    print()
-    print("Phase 12 gate: PASSED -- no construct requires an owner decision")
     return 0
 
 
@@ -299,7 +219,8 @@ def cmd_status(args, taxonomy) -> int:
     print(f"  locked at phase {taxonomy.get('locked_at_phase')} ({taxonomy.get('locked_on')})")
 
     print()
-    print("  Freeze criterion has two halves:")
+    print("  Freeze criterion: burden + owner rubric review (IAA dropped 2026-09-28,")
+    print("  see CLAUDE.md sec.20-21).")
     burden_report = REPORTS / "annotation_burden.json"
     if burden_report.exists():
         data = json.loads(burden_report.read_text(encoding="utf-8"))
@@ -311,8 +232,7 @@ def cmd_status(args, taxonomy) -> int:
     store = GoldStore()
     for batch in BATCH_FILES:
         ids = store.annotator_ids(batch)
-        state = "computable" if len(ids) >= 2 else f"BLOCKED (passes: {ids or 'none'})"
-        print(f"    agreement : {batch:<10} {state}")
+        print(f"    gold      : {batch:<10} passes ingested: {ids or 'none'}")
 
     print()
     print("  Nothing in Phase 12 writes config/taxonomy.yaml.")
@@ -323,13 +243,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Phase 12 taxonomy refinement gate")
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--burden", action="store_true", help="annotation burden (OPEN-026)")
-    action.add_argument("--refine", action="store_true", help="analyse gold disagreement")
     action.add_argument("--propose", metavar="PATH", help="diff a candidate taxonomy")
     action.add_argument("--status", action="store_true", help="where everything stands")
 
     parser.add_argument("--batch", default="gold_dev", choices=tuple(BATCH_FILES))
-    parser.add_argument("--bootstrap", type=int, default=1000)
-    parser.add_argument("--min-confusion", type=int, default=2)
     parser.add_argument("--measured-minutes-per-item", type=float, default=None)
     parser.add_argument("--measured-source", default="", help="who timed it, when, how")
     parser.add_argument("--reason", default="", help="why the taxonomy is changing")
@@ -344,8 +261,6 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.burden:
         return cmd_burden(args, taxonomy)
-    if args.refine:
-        return cmd_refine(args, taxonomy)
     if args.propose:
         return cmd_propose(args, taxonomy)
     return cmd_status(args, taxonomy)

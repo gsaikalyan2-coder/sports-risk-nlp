@@ -3,7 +3,7 @@
     "phase": 12,
     "batch": "gold_dev",
     "n_items": 100,
-    "n_annotators": 2,
+    "n_annotators": 1,
     "n_constructs": 10,
     "timing_model": {
       "read_context_s": 22.0,
@@ -17,7 +17,7 @@
     "estimate_is_measured": false,
     "seconds_per_item": 109.0,
     "hours_per_annotator": 3.03,
-    "total_person_hours": 6.06,
+    "total_person_hours": 3.03,
     "fatigue_threshold_hours": 2.0,
     "exceeds_fatigue_threshold": true,
     "recommended_sittings": 2,
@@ -25,61 +25,61 @@
       {
         "construct": "cognitive_anxiety",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "somatic_anxiety",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "self_confidence",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "motivation_orientation",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "perceived_stress",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "attentional_focus",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "burnout_signal",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "coping_style",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "resilience",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "appraisal_orientation",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 0.333,
+        "marginal_hours_over_batch": 0.167,
         "share_of_total_burden": 0.055
       }
     ]
@@ -88,7 +88,7 @@
     "phase": 12,
     "batch": "gold_eval",
     "n_items": 400,
-    "n_annotators": 2,
+    "n_annotators": 1,
     "n_constructs": 10,
     "timing_model": {
       "read_context_s": 22.0,
@@ -102,7 +102,7 @@
     "estimate_is_measured": false,
     "seconds_per_item": 109.0,
     "hours_per_annotator": 12.11,
-    "total_person_hours": 24.22,
+    "total_person_hours": 12.11,
     "fatigue_threshold_hours": 2.0,
     "exceeds_fatigue_threshold": true,
     "recommended_sittings": 7,
@@ -110,61 +110,61 @@
       {
         "construct": "cognitive_anxiety",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "somatic_anxiety",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "self_confidence",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "motivation_orientation",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "perceived_stress",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "attentional_focus",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "burnout_signal",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "coping_style",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "resilience",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       },
       {
         "construct": "appraisal_orientation",
         "marginal_seconds_per_item": 6.0,
-        "marginal_hours_over_batch": 1.333,
+        "marginal_hours_over_batch": 0.667,
         "share_of_total_burden": 0.055
       }
     ]

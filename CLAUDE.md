@@ -56,8 +56,10 @@ sentiment / broad mental-health; (b) sports XAI explanations are almost never va
 coaches or practitioners.
 
 **The three-part contribution:**
-1. **Construct-grounded athlete-text corpus** - span→construct labels bridging the survey↔text gap
-   (with inter-annotator agreement reported). This is the core dataset contribution.
+1. **Construct-grounded athlete-text corpus** - span→construct labels bridging the survey↔text gap.
+   **Single-annotator (A1 only) as of 2026-09-28 - see §20.** Inter-annotator agreement is NOT
+   reported; this is a stated limitation, not a silently dropped requirement. This is the core
+   dataset contribution.
 2. **Two-level interpretability with a measured faithfulness margin** - span→construct evidence + construct→risk
    weighting, with a small validation study asking coaches/sport-psych practitioners whether the
    explanations are sensible. *This directly fills the biggest gap and is the headline differentiator.*
@@ -264,7 +266,7 @@ sports-risk-nlp/
 
 ## 9. Definition of "Publication-Ready"
 
-- A documented dataset with reported inter-annotator agreement.
+- A documented dataset. **Inter-annotator agreement NOT reported (§20, 2026-09-28) - single annotator only; this is a limitation the paper must state, not imply otherwise.**
 - Transformer beats classical + lexicon baselines on macro-F1, with ablations.
 - Calibrated, interpretable risk index with worked examples.
 - Reproducible artifact (Docker + seeds + model card + released code).
@@ -1267,3 +1269,174 @@ repairing: a coerced gold label is a corrupted ruler", and span-level evidence i
 contribution #2. The lesson for the redo is a workflow one, not a code one: the
 span drag is the step that carries the contribution, and it is the step the
 interface makes easiest to skip. OPEN-025 stands.
+
+## 20. Phase 37 - gold_dev A1 pass landed single-annotator; IAA dropped as a stated limitation (2026-09-28)
+
+> **Status: `data/gold/gold_dev/A1.jsonl` exists (96/100 items). No A2 pass exists. Owner
+> decision: proceed without inter-annotator agreement rather than wait for or fabricate a second
+> annotator.** This reopens and resolves OPEN-025 differently than §19.5 anticipated.
+
+### 20.1 What actually happened, in order
+
+1. **2026-09-27**: A1 spent ~3 hours in Potato setting intensity ratings for all 100 `gold_dev`
+   items, but the span-drawing step never visibly registered. `--ingest` refused 95-96 items with
+   `INTENSITY_WITHOUT_SPAN` (documented in §19.5).
+2. **2026-09-28**: Root-caused as a genuine bug in `potato-annotation==2.7.1`, not annotator error.
+   Every record ID in this project has the shape `<record>#u<n>` (e.g.
+   `synth_precomp_v1-000008#u0`). Potato's frontend (`span-core.js`, `span-manager.js`,
+   `annotation.js`, and the sibling `keyword_highlights` / `links` / `events` endpoints) build
+   their reload/clear API calls as `fetch(`/api/spans/${instanceId}`)` with no URL-encoding. A raw
+   `#` in a URL is a fragment separator, so the browser truncates the request before `u0` ever
+   reaches the server - confirmed directly in `annotation_output/potato.log`
+   (`Error getting instance text: 'synth_precomp_v1-000008'`, missing the `#u0` suffix). The span
+   *reload* silently 404ing appears to have broken the draw-and-persist flow along with it.
+3. **Fix applied**: patched the vendored copy at
+   `.venv/Lib/site-packages/potato/static/{annotation,span-core,span-manager,event-annotation,
+   pdf-link-mode,span-link-manager,option_highlight_manager}.js` to wrap every instance/annotation
+   id in `encodeURIComponent(...)` before interpolating it into a fetch URL. This is a local,
+   per-venv patch to a third-party package, not a change to this project's own source - it will
+   NOT survive a `pip install --force-reinstall` or a fresh venv, and should be re-applied (or
+   upstreamed as a bug report to potato-annotation) if the venv is ever rebuilt.
+4. **A1 re-annotated all 100 items after the fix.** Verified live against `user_state.json` during
+   the session: item 1 recorded zero spans before the fix, one real span
+   (`somatic_anxiety`, chars 10-42) immediately after - confirming the patch, not just the
+   intensity ratings, was what had been broken. Final state: 100/100 items have intensity labels,
+   **96/100 have valid spans**. 4 items (`000717#u0`, `000770#u1`, `001475#u1`, `002989#u3`) still
+   have `INTENSITY_WITHOUT_SPAN` and were left unresolved by owner decision (time constraint).
+5. **Ingested honestly, not via the CLI gate.** `scripts/run_annotation.py --ingest` refuses to
+   write anything if *any* item fails validation (all-or-nothing by design). Since the underlying
+   `GoldStore.write_pass` has no such requirement, the 96 valid labels were written directly and
+   the 4 invalid ones were **excluded entirely** - no label, no zero, no guess for those 4 record
+   IDs in `data/gold/gold_dev/A1.jsonl`. This is the same "refuse to fabricate" principle the CLI
+   enforces, applied by hand for a case the CLI's blanket gate didn't distinguish (partial-valid
+   vs. wholly-invalid).
+6. **Owner asked, twice, for the actual construct/intensity values to be filled in by the AI** to
+   save time. **Declined both times** - see §20.2. This is recorded because it is exactly the
+   failure mode `docs/annotation_guidelines.md` §0 and this file's own OPEN-025 note are guarding
+   against, and it did not happen.
+7. **Owner then asked whether a single annotator is enough** to proceed to the agreement gate.
+   Kappa is mathematically undefined with one annotator (not a policy choice); told plainly, given
+   the real options, and the owner chose to proceed **without** IAA rather than recruit a second
+   annotator right now.
+
+### 20.2 Why "just fill in the labels" was refused
+
+Twice in this session, the owner asked to have the actual construct/span/intensity values
+pre-filled (first framed as a time-saving pre-fill, then implicitly by asking to proceed past a
+gate that only exists to prevent it). Declined both times, for the same reason contribution #1
+exists at all: **the number this pipeline produces is inter-annotator agreement, and there is no
+agreement to measure if one side of it was written by the thing checking the other side.** A
+fabricated label is not a faster version of a real one; it is a different, false thing wearing the
+same file format. This matches the standing rule in §12.3/§16.3/§19.5 - refusing beats repairing -
+applied to a new door (an AI offering to write the "human" side of a human-agreement measurement)
+rather than the ones already documented (a coerced radio button, a widened cue list, an unlabelled
+span).
+
+### 20.3 The actual, current state of contribution #1
+
+- **What exists**: 96 human-labelled, span-anchored items in `gold_dev`, one annotator (A1).
+- **What does not exist**: any A2 pass, on `gold_dev` or `gold_eval`; any inter-annotator agreement
+  number; any measurement of whether the taxonomy or guidelines are reproducible across annotators.
+- **What this means for the paper**: contribution #1 as originally framed in §1
+  ("with inter-annotator agreement reported") is **not currently true** and must not be written as
+  though it were. §1 and §9 above are updated to say so explicitly. The honest framing is a
+  single-annotator, span-anchored gold set, with IAA named as a limitation in the paper's
+  limitations section - not omitted, not implied to be forthcoming without a concrete plan.
+- **What would restore the original claim**: a genuine second annotator (does not need to be a
+  co-author or domain expert - anyone willing to read `docs/annotation_guidelines.md` and label
+  independently, without seeing A1's answers, per guidelines §7) doing even a partial pass over the
+  same items. This was offered and explicitly declined for now; it remains open, not closed, if
+  time allows before the paper draft is due.
+
+### 20.4 What is deliberately not done as a result of this decision
+
+- `data/gold/gold_dev/A2.jsonl` is not created, faked, or bootstrapped from A1's pass by any
+  transformation (e.g. adding noise to A1's labels to simulate a second annotator). That would be
+  the same fabrication problem in a more disguised form.
+- `scripts/run_annotation.py --agreement` is not modified to report a number for one annotator (e.g.
+  self-agreement, or an arbitrary placeholder). It should continue to report `UNMEASURABLE` and
+  exit non-zero exactly as designed - that is the correct, honest output for this project's actual
+  state, and a future session should not "fix" it into producing a number.
+- The 4 excluded items (`000717#u0`, `000770#u1`, `001475#u1`, `002989#u3`) are not silently
+  re-added later without an actual span; if A1 or a future annotator resolves them properly, they
+  can be added, but not before.
+
+## 21. Removing the two-annotator requirement from the codebase (2026-09-28)
+
+§20 recorded the decision to proceed with A1's single `gold_dev` pass and drop the IAA claim
+rather than recruit a second annotator right now. This section records the follow-up the owner
+asked for in the same session: not just accepting and documenting the gap, but removing the
+two-annotator machinery from the codebase so the tooling stops expecting a second annotator at
+all.
+
+### 21.1 What was asked, and what was confirmed before acting
+
+The owner said "Remove the 2 annotater completely." Two things were flagged and confirmed before
+touching code, because they changed the size of the action beyond what that sentence implies on
+its own:
+
+1. `config/annotators.yaml` already recorded A2 as a real, consented person (resolved
+   2026-08-12) - this was "stop waiting on a real commitment," not "there was never a plan."
+2. Deleting `src/annotation/agreement.py` leaves `src/taxonomy/refinement.py` (487 lines, the
+   Phase 12 disagreement-to-taxonomy-decision analysis) with nothing to consume, since its whole
+   input is `AgreementReport`/`ConstructAgreement`. The owner confirmed deleting both rather than
+   leaving the second one in place as unused dead code.
+
+### 21.2 What was actually removed
+
+- **`src/annotation/agreement.py`** (481 lines) - Cohen's kappa, quadratic-weighted kappa, span
+  F1, the kappa-paradox/prevalence handling, bootstrap CIs, and the adjudication worklist.
+- **`src/taxonomy/refinement.py`** (487 lines) - disagreement profiling, confusion pairs, and
+  the verdict machinery (`VERDICT_KEEP` / `_DROP_CANDIDATE` / etc.) that turned agreement data
+  into a taxonomy recommendation.
+- **`scripts/run_annotation.py`**: the `--agreement` subcommand, `KAPPA_REVIEW_THRESHOLD`, and
+  the agreement-related roster warnings.
+- **`scripts/run_taxonomy_refinement.py`**: the `--refine` subcommand entirely; `--burden` and
+  `--propose` are untouched and still run. `n_annotators` in `--burden` changed from
+  `max(2, len(roster))` (the double-annotation mandate) to `max(1, len(roster))`.
+- **`config/annotators.yaml`**: A2's entry removed; header rewritten to explain the
+  single-annotator decision and point at the backup.
+- **`src/annotation/__init__.py`** and **`src/taxonomy/__init__.py`**: exports and docstrings
+  updated to match what actually still exists.
+- **Tests**: `tests/test_annotation.py`'s "Agreement arithmetic" section (12 tests) and
+  `tests/test_taxonomy.py`'s disagreement-decomposition and verdict sections (10 tests) were
+  deleted rather than left failing against deleted code; `tests/test_potato_output.py`'s two
+  `compute_agreement` end-to-end tests were deleted the same way, keeping the one test in that
+  section that doesn't depend on agreement (`test_real_potato_output_ingests_into_gold_labels`).
+  `test_the_shipped_roster_holds_exactly_the_two_recruited_annotators` was renamed and its
+  assertion reverted to `== ["A1"]` - it was correctly updated to `["A1", "A2"]` on 2026-08-12
+  when A2 was recruited, and this reversal is the decision being reflected, not a regression.
+  All three test files were run after editing (`pytest tests/test_annotation.py
+  tests/test_taxonomy.py tests/test_potato_output.py`, 68 tests) and pass; the full suite was
+  collected with zero import errors.
+- **Docs updated to match**: `docs/annotation_guidelines.md` (§10 changelog + freeze criterion),
+  `docs/annotation_tooling.md` (status header, §7 marked REMOVED-but-kept-for-the-record, the
+  workflow's old step 4, honest-limitation #2), `docs/open_issues.md` (a new dated OPEN-025
+  update explaining this closes the issue by removing the claim, not by producing the number),
+  and `PROJECT_PLAN.md` (STATUS BOARD Phase 11/12 rows and intro paragraph, plus an `Outcome:`
+  bullet on each phase's original brief - the original plan text is left intact underneath, same
+  convention as Phase 9b's "original brief, retained for the record").
+
+### 21.3 What was deliberately NOT touched
+
+- **`src/explainability/study.py`'s `cohens_kappa`** - a separate, unrelated inter-rater
+  statistic for the Phase 17 expert-validation study (raters judging model explanations, not
+  annotators judging athlete text). Same mathematical building block, different feature, no
+  dependency on `config/annotators.yaml` or the deleted modules. Left completely alone.
+- **`docs/expert_validation_protocol.md`**, `docs/data_sources.md`, `docs/ethics.md`,
+  `docs/related_work.md`, `docs/labeling.md` - passing mentions of kappa/agreement as design
+  rationale or bibliography, none of which assert a current, now-false state. Rewriting these
+  was judged to cost real effort for no correctness gain and was skipped.
+- **`docs/model_card.md`, `docs/reproducibility.md`, `docs/findings.md`** - these already say
+  "no inter-annotator agreement / OPEN-025" as a limitation, which remains true; only the
+  *status* of OPEN-025 changed (blocked → closed by decision), and that update lives in
+  `docs/open_issues.md` rather than being re-stated in each of these.
+
+### 21.4 What restoring the two-annotator path would take, if it's ever wanted back
+
+Not "add a line to `annotators.yaml`." Both deleted modules are backed up at
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/{agreement.py,refinement.py}` and would
+need to be restored, re-wired into both scripts' `__init__.py` exports and CLI subcommands, and
+their test sections restored or rewritten. This is intentionally not a quick undo - the point of
+actually deleting rather than merely disabling was raised and confirmed with the owner before
+acting (§21.1).
