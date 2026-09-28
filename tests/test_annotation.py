@@ -5,10 +5,15 @@ Three things are defended here, in order of how badly they break the paper:
 1. **`data/gold/` stays human-owned.** Not by convention -- by a schema with no
    machine author, a roster of real people, and a store that refuses anything
    else.
-2. **Agreement is refused when it cannot exist.** A single-annotator batch must
-   raise, not return a number. A placeholder kappa would walk into a results
-   table and nobody downstream could tell.
-3. **The annotator sees the whole record.** The defect this phase opened with.
+2. **The annotator sees the whole record.** The defect this phase opened with.
+
+NOTE (2026-09-28): this file used to also test the agreement arithmetic
+(Cohen's kappa, weighted kappa, span F1, the adjudication worklist). That
+suite was deleted along with `src/annotation/agreement.py` -- see
+`config/annotators.yaml`'s header and `CLAUDE.md` sec.20-21 for why this
+project no longer reports inter-annotator agreement. A backup of the deleted
+module (and its tests, if needed later) is under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/`.
 
 Everything is offline and free; nothing here touches a network or a model.
 """
@@ -21,7 +26,6 @@ import pytest
 
 from src.agents.config import load_taxonomy
 from src.annotation import (
-    AgreementUnmeasurable,
     AnnotationItem,
     Annotator,
     ContextError,
@@ -30,19 +34,12 @@ from src.annotation import (
     GoldSchemaError,
     GoldStore,
     GoldWriteRefused,
-    align,
     build_config,
     build_items,
-    cohens_kappa,
-    compute_agreement,
-    construct_agreement,
     context_coverage,
-    disagreements,
     ingest_potato,
     parse_annotation,
-    quadratic_weighted_kappa,
     span_labels,
-    span_overlap_f1,
     write_project,
 )
 from src.annotation.potato_project import REQUIRED_CONFIG_KEYS
@@ -318,25 +315,21 @@ def roster() -> dict[str, Annotator]:
     }
 
 
-def test_the_shipped_roster_holds_exactly_the_two_recruited_annotators():
-    """**OPEN-025 resolved 2026-08-12.** A2 was recruited -- a teammate of the
-    owner with sports-domain familiarity -- so `config/annotators.yaml` now
-    lists two people and inter-annotator agreement is computable for the first
-    time in this project.
+def test_the_shipped_roster_holds_exactly_the_one_annotator():
+    """**Single-annotator by decision, 2026-09-28.** A2 had been recruited
+    (OPEN-025 resolved 2026-08-12) but never annotated anything, and the owner
+    decided to proceed on A1's single pass rather than wait -- see
+    `config/annotators.yaml`'s header and `CLAUDE.md` sec.20-21. This test
+    previously asserted `== ["A1", "A2"]`; it is back to `== ["A1"]`, and that
+    is not a regression, it is the roster reflecting the decision.
 
-    The previous version of this test asserted `== ["A1"]` and carried the note
-    "if this starts failing, someone has been recruited -- update the handover,
-    do not 'fix' the test". That is what happened, and this is the update.
-
-    The assertion stays *exact* rather than relaxing to `>= 2`. The roster is a
+    The assertion stays *exact* rather than relaxing to `>= 1`. The roster is a
     lock, not a list: `src/annotation/store.py` refuses any gold label whose
     `annotator_id` is not here, and a test that tolerates extra entries would
-    let a third annotator appear -- by typo or by a well-meaning future session
-    inventing one to make a pipeline run -- without anything failing. A kappa
-    computed over three annotators where two were intended is a number nobody
-    would question and nobody could reproduce.
+    let a second annotator appear -- by typo or by a well-meaning future
+    session inventing one to make a pipeline run -- without anything failing.
     """
-    assert sorted(load_annotators()) == ["A1", "A2"]
+    assert sorted(load_annotators()) == ["A1"]
 
 
 def test_exactly_one_roster_entry_is_the_owner():
@@ -503,138 +496,3 @@ def test_ingest_skips_items_not_yet_annotated(taxonomy, tmp_path):
         valid_constructs=taxonomy["constructs"],
     )
     assert report.ok and report.skipped_unannotated == 1
-
-
-# ---------------------------------------------------------------------------
-# Agreement arithmetic
-# ---------------------------------------------------------------------------
-
-
-def test_kappa_is_one_for_perfect_agreement_on_two_categories():
-    pairs = [("a", "a")] * 5 + [("b", "b")] * 5
-    assert cohens_kappa(pairs) == pytest.approx(1.0)
-
-
-def test_kappa_is_zero_for_chance_agreement():
-    # Both annotators say 'a' half the time, independently, agreeing half the
-    # time: observed 0.5, expected 0.5.
-    pairs = [("a", "a"), ("a", "b"), ("b", "a"), ("b", "b")]
-    assert cohens_kappa(pairs) == pytest.approx(0.0)
-
-
-def test_kappa_is_one_when_both_always_said_the_same_single_category():
-    """The degenerate case. The standard formula divides by zero here; a nan
-    would propagate into a macro-average and delete the construct from the
-    table. They agreed completely, so the answer is 1.0."""
-    assert cohens_kappa([("none", "none")] * 10) == pytest.approx(1.0)
-
-
-def test_weighted_kappa_treats_2_vs_3_as_milder_than_0_vs_3():
-    """The point of weighting an ordinal scale, in one comparison.
-
-    The first version of this test compared two perfectly symmetric fixtures and
-    asserted `0.0 > 0.0`. Both were legitimately zero -- identical marginals,
-    observed disagreement equal to expected -- so the test was wrong, not the
-    arithmetic. The property actually worth pinning is the *relationship to the
-    unweighted statistic*: adjacent disagreements should score better than
-    unweighted kappa says, and distant ones worse.
-    """
-    adjacent = [(0, 0)] * 10 + [(1, 1)] * 5 + [(2, 3)] * 3 + [(3, 2)] * 2
-    distant = [(0, 0)] * 10 + [(1, 1)] * 5 + [(0, 3)] * 3 + [(3, 0)] * 2
-
-    # Same number of disagreements in both, at different distances.
-    assert quadratic_weighted_kappa(adjacent) > quadratic_weighted_kappa(distant)
-
-    # Adjacent disagreement is nearly agreement, so weighting rewards it...
-    assert quadratic_weighted_kappa(adjacent) > cohens_kappa(adjacent)
-    # ...while 0-vs-3 is a disagreement about whether the construct is there at
-    # all, and unweighted kappa flatters it.
-    assert quadratic_weighted_kappa(distant) < cohens_kappa(distant)
-
-
-def test_span_f1_rewards_overlap_not_exact_match():
-    """Two careful annotators routinely include or exclude a leading 'I keep'.
-    Scoring that as total disagreement would say nothing useful."""
-    assert span_overlap_f1(["I keep thinking"], ["keep thinking"]) > 0.7
-    assert span_overlap_f1(["I keep thinking"], ["I keep thinking"]) == pytest.approx(1.0)
-    assert span_overlap_f1(["I keep thinking"], ["the final"]) == 0.0
-
-
-def test_span_f1_is_one_when_neither_marked_anything():
-    assert span_overlap_f1([], []) == pytest.approx(1.0)
-
-
-def test_agreement_refuses_a_single_annotator_batch():
-    """The most important test in this file. One person labelling 400 items is a
-    labelled set, not a gold standard, and a placeholder number here would walk
-    straight into a results table."""
-    with pytest.raises(AgreementUnmeasurable, match="two independent passes"):
-        compute_agreement({"A1": [gold("A1")]}, ["cognitive_anxiety"], batch="gold_dev")
-
-
-def test_agreement_refuses_three_annotators():
-    passes = {aid: [gold(aid)] for aid in ("A1", "A2", "A3")}
-    with pytest.raises(AgreementUnmeasurable, match="Fleiss"):
-        compute_agreement(passes, ["cognitive_anxiety"], batch="gold_dev")
-
-
-def test_agreement_over_a_real_pair(taxonomy):
-    constructs = list(taxonomy["constructs"])
-    pass_a, pass_b = [], []
-    for i in range(30):
-        rid = f"s-p{i}#u0"
-        marked = i % 3 == 0
-        pass_a.append(gold("A1", record_id=rid, constructs=(anxiety(),) if marked else ()))
-        pass_b.append(gold("A2", record_id=rid, constructs=(anxiety(),) if marked else ()))
-    report = compute_agreement(
-        {"A1": pass_a, "A2": pass_b}, constructs, batch="gold_dev", bootstrap=50
-    )
-    row = next(c for c in report.constructs if c.construct == "cognitive_anxiety")
-    assert row.kappa == pytest.approx(1.0)
-    assert row.kappa_ci is not None
-    assert "burnout_signal" in [c.construct for c in report.constructs if c.is_degenerate]
-
-
-def test_a_construct_neither_annotator_marked_is_undefined_not_zero():
-    row = construct_agreement([(gold("A1"), gold("A2"))] * 5, "burnout_signal", bootstrap=0)
-    assert row.is_degenerate
-    assert "UNDEFINED" in row.interpretation()
-
-
-def test_a_rare_construct_says_so_rather_than_reporting_a_bare_kappa():
-    pairs = []
-    for i in range(100):
-        marked = i < 3
-        pairs.append(
-            (
-                gold("A1", constructs=(anxiety(),) if marked else ()),
-                gold("A2", constructs=(anxiety(),) if i < 2 else ()),
-            )
-        )
-    row = construct_agreement(pairs, "cognitive_anxiety", bootstrap=0)
-    assert row.is_rare
-    assert "kappa paradox" in row.interpretation()
-
-
-def test_escalated_items_are_excluded_from_the_pair():
-    """Guidelines sec.7: an escalated item is not labelled. Including it would
-    compare a judgement against a refusal to judge."""
-    a = [gold("A1", record_id="r1", escalate=True, escalate_reason="off-topic")]
-    b = [gold("A2", record_id="r1", constructs=(anxiety(),))]
-    assert align(a, b) == []
-
-
-def test_disagreements_put_presence_conflicts_before_intensity_quibbles():
-    pairs = [
-        (
-            gold("A1", record_id="r1", constructs=(anxiety(2),)),
-            gold("A2", record_id="r1", constructs=(anxiety(3),)),
-        ),
-        (
-            gold("A1", record_id="r2", constructs=(anxiety(2),)),
-            gold("A2", record_id="r2", constructs=()),
-        ),
-    ]
-    work = disagreements(pairs, ["cognitive_anxiety"])
-    assert work[0]["record_id"] == "r2"
-    assert work[0]["presence_disagreement"] is True

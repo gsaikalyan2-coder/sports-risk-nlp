@@ -1982,6 +1982,37 @@ Two honest options, and the choice must be made before the paper is written:
 What is not available is describing student raters as practitioner validation. The claim must
 match the raters.
 
+## OPEN-025 update 2026-09-28 - CLOSED BY DECISION. IAA dropped, not deferred.
+
+**Status: CLOSED 2026-09-28 - not by recruiting, by deciding not to.**
+
+A2 agreed on 2026-08-12 (above) but never annotated anything, and under time pressure the owner
+decided to stop waiting. A1 annotated `gold_dev` alone: 100/100 items intensity-labelled, 96/100
+with valid spans (4 items - `000717#u0`, `000770#u1`, `001475#u1`, `002989#u3` - excluded
+honestly rather than faked or zeroed). The owner was offered, and twice declined, having the
+missing label values filled in by the AI to save time, and was told plainly that kappa is
+mathematically undefined with one annotator before choosing to proceed without it. Full account
+in `CLAUDE.md` sec.20.
+
+**As a direct, structural consequence** (not a separate decision): `src/annotation/agreement.py`
+and `src/taxonomy/refinement.py` - which took `AgreementReport`/`ConstructAgreement` as its only
+input - were deleted rather than left permanently blocked. Backup under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/`. `scripts/run_annotation.py
+--agreement` and `scripts/run_taxonomy_refinement.py --refine` no longer exist. `--burden` and
+`--propose` are unaffected. Tests updated to match: `tests/test_annotation.py`'s agreement suite
+and `tests/test_taxonomy.py`'s verdict/disagreement suite were removed rather than left failing
+against deleted code; the roster test that had been updated to `== ["A1", "A2"]` on 2026-08-12 is
+back to `== ["A1"]`, and that is the decision reflected, not a regression.
+
+**What this means for the paper, stated once, plainly:** contribution #1 as originally framed
+("a construct-grounded corpus with reported inter-annotator agreement") does not exist and will
+not by the time the paper is written, unless a real second annotator does a pass before the
+draft is due. The honest framing is a single-annotator, span-anchored gold set (96/100 on
+`gold_dev`; `gold_eval`, 400 items, still unannotated), with the absence of IAA named as a
+limitation - not omitted, not implied to be forthcoming. This does not resolve OPEN-025 the way
+the 2026-08-12 update anticipated; it closes it a different way, by removing the claim rather
+than producing the number.
+
 ---
 
 ## OPEN-034 - a presence-only claim gate certified a claim its evidence contradicted

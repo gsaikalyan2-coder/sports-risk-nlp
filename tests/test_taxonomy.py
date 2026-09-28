@@ -1,68 +1,39 @@
-"""Phase 12 -- burden, refinement verdicts, and taxonomy versioning.
+"""Phase 12 -- burden and taxonomy versioning.
 
 The tests that matter here are the ones asserting a *refusal*: that an
-unmeasured burden estimate says so, that a rare construct is not recommended for
-dropping, that an added construct invalidates the whole corpus, and that the
-gate reports BLOCKED rather than producing a taxonomy decision from no gold.
+unmeasured burden estimate says so, and that an added construct invalidates
+the whole corpus.
 
 Every one of those is a case where the convenient behaviour is the wrong one.
+
+NOTE (2026-09-28): this file used to also test the disagreement-decomposition
+and verdict machinery in `src/taxonomy/refinement.py` (profile_disagreements,
+confusion_pairs, verdict_for, analyse) against `src/annotation/agreement.py`'s
+`AgreementReport`/`ConstructAgreement`. Both modules were deleted by owner
+decision -- this project no longer reports inter-annotator agreement, so
+there is nothing left for that analysis to consume. See
+`config/annotators.yaml`'s header and `CLAUDE.md` sec.20-21. A backup of both
+deleted modules is under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/`.
 """
 
 from __future__ import annotations
 
 import pytest
 
-from src.annotation.agreement import AgreementReport, ConstructAgreement
 from src.annotation.schema import GoldConstruct, GoldLabel
 from src.taxonomy import (
-    VERDICT_DROP_CANDIDATE,
-    VERDICT_KEEP,
-    VERDICT_MERGE_CANDIDATE,
-    VERDICT_REVISE_INTENSITY_ANCHORS,
-    VERDICT_REVISE_SPAN_RULE,
-    VERDICT_UNDER_SAMPLED,
     Changelog,
     TaxonomyVersionError,
     TimingModel,
-    analyse,
-    confusion_pairs,
     diff_taxonomy,
     estimate_burden,
-    profile_disagreements,
     relabel_scope,
-    verdict_for,
 )
 from src.taxonomy.burden import DEFAULT_TIMING, FATIGUE_HOURS_PER_ANNOTATOR
 from src.taxonomy.versioning import CHANGE_ADDED, CHANGE_COSMETIC, CHANGE_REMOVED
 
 CONSTRUCTS = ["cognitive_anxiety", "somatic_anxiety", "burnout_signal"]
-
-
-def _agreement(
-    construct: str,
-    *,
-    kappa: float,
-    prevalence: float = 0.30,
-    span_f1: float = 0.80,
-    weighted: float | None = None,
-    degenerate: bool = False,
-    percent: float = 0.85,
-) -> ConstructAgreement:
-    present = 0 if degenerate else 10
-    return ConstructAgreement(
-        construct=construct,
-        n_items=100,
-        percent_agreement=percent,
-        kappa=kappa,
-        weighted_kappa=kappa if weighted is None else weighted,
-        prevalence_a=prevalence,
-        prevalence_b=prevalence,
-        both_present=present,
-        only_a=0 if degenerate else 3,
-        only_b=0 if degenerate else 3,
-        neither=100 - present,
-        span_f1=span_f1,
-    )
 
 
 # --- burden ---------------------------------------------------------------
@@ -121,133 +92,6 @@ def test_fatigue_threshold_splits_a_long_batch():
     assert report.sittings >= 2
     assert report.hours_per_annotator / report.sittings <= FATIGUE_HOURS_PER_ANNOTATOR + 1e-9
     assert "tired annotators" in report.to_markdown()
-
-
-# --- disagreement decomposition -------------------------------------------
-
-
-def _row(construct, *, ia, ib, va="present", vb="present", presence=False, rid="r1"):
-    return {
-        "record_id": rid,
-        "text": "t",
-        "construct": construct,
-        "A1_value": va,
-        "A1_intensity": ia,
-        "A1_spans": [],
-        "A2_value": vb,
-        "A2_intensity": ib,
-        "A2_spans": [],
-        "presence_disagreement": presence,
-        "distance": abs(ia - ib),
-        "either_uncertain": False,
-    }
-
-
-def test_profile_separates_presence_from_intensity_from_span():
-    rows = [
-        _row("cognitive_anxiety", ia=2, ib=0, va="present", vb="none", presence=True),
-        _row("cognitive_anxiety", ia=2, ib=3),
-        _row("cognitive_anxiety", ia=2, ib=2),  # same everywhere but on the worklist: spans
-    ]
-    profiles = profile_disagreements(rows, CONSTRUCTS, annotators=["A1", "A2"])
-    prof = profiles["cognitive_anxiety"]
-    assert (prof.presence, prof.intensity_only, prof.span_only) == (1, 1, 1)
-    assert profiles["burnout_signal"].n_disagreements == 0
-
-
-def test_profile_requires_exactly_two_annotators():
-    with pytest.raises(ValueError, match="exactly two annotator"):
-        profile_disagreements([], CONSTRUCTS, annotators=["A1"])
-
-
-def test_confusion_pairs_find_constructs_that_trade_places():
-    """Invisible in either construct's own kappa; visible only across them."""
-    rows = []
-    for i in range(3):
-        rid = f"r{i}"
-        rows.append(
-            _row("cognitive_anxiety", ia=2, ib=0, va="present", vb="none", presence=True, rid=rid)
-        )
-        rows.append(
-            _row("somatic_anxiety", ia=0, ib=2, va="none", vb="present", presence=True, rid=rid)
-        )
-    pairs = confusion_pairs(rows, annotators=["A1", "A2"], min_count=2)
-    assert pairs[0]["constructs"] == ["cognitive_anxiety", "somatic_anxiety"]
-    assert pairs[0]["co_swapped_items"] == 3
-
-
-# --- verdicts -------------------------------------------------------------
-
-
-def test_degenerate_construct_is_under_sampled_not_dropped():
-    """A sampling gap must never be recorded as a taxonomy problem."""
-    v = verdict_for(_agreement("burnout_signal", kappa=0.0, degenerate=True), None)
-    assert v.verdict == VERDICT_UNDER_SAMPLED
-    assert "Do NOT drop it on this evidence" in v.rationale
-
-
-def test_rare_construct_with_low_kappa_is_kept():
-    """The kappa paradox. Dropping here optimises the number and weakens the paper."""
-    v = verdict_for(_agreement("burnout_signal", kappa=0.21, prevalence=0.03, percent=0.96), None)
-    assert v.verdict == VERDICT_KEEP
-    assert "kappa paradox" in v.rationale
-
-
-def test_common_construct_with_low_kappa_is_a_drop_candidate():
-    v = verdict_for(_agreement("perceived_stress", kappa=0.22, prevalence=0.40), None)
-    assert v.verdict == VERDICT_DROP_CANDIDATE
-    assert "not rare" in v.rationale
-
-
-def test_intensity_dominated_disagreement_targets_the_anchors():
-    rows = [_row("cognitive_anxiety", ia=2, ib=3) for _ in range(9)]
-    rows.append(_row("cognitive_anxiety", ia=2, ib=0, va="present", vb="none", presence=True))
-    profiles = profile_disagreements(rows, CONSTRUCTS, annotators=["A1", "A2"])
-    v = verdict_for(
-        _agreement("cognitive_anxiety", kappa=0.55, weighted=0.80),
-        profiles["cognitive_anxiety"],
-    )
-    assert v.verdict == VERDICT_REVISE_INTENSITY_ANCHORS
-
-
-def test_good_presence_agreement_with_weak_spans_targets_the_span_rule():
-    rows = [_row("cognitive_anxiety", ia=2, ib=2) for _ in range(5)]
-    profiles = profile_disagreements(rows, CONSTRUCTS, annotators=["A1", "A2"])
-    v = verdict_for(
-        _agreement("cognitive_anxiety", kappa=0.72, span_f1=0.20), profiles["cognitive_anxiety"]
-    )
-    assert v.verdict == VERDICT_REVISE_SPAN_RULE
-    assert "contribution #2" in v.rationale.lower()
-
-
-def test_merge_candidate_wins_over_a_healthy_kappa():
-    v = verdict_for(
-        _agreement("cognitive_anxiety", kappa=0.75), None, merge_partners=["perceived_stress"]
-    )
-    assert v.verdict == VERDICT_MERGE_CANDIDATE
-
-
-def test_analyse_end_to_end_flags_owner_decisions():
-    report = AgreementReport(
-        batch="gold_dev",
-        annotator_a="A1",
-        annotator_b="A2",
-        n_paired=100,
-        n_escalated=0,
-        n_unpaired=0,
-        constructs=[
-            _agreement("cognitive_anxiety", kappa=0.81),
-            _agreement("somatic_anxiety", kappa=0.25, prevalence=0.45),
-            _agreement("burnout_signal", kappa=0.0, degenerate=True),
-        ],
-    )
-    burden = estimate_burden(batch="gold_dev", n_items=100, constructs=CONSTRUCTS)
-    out = analyse(report, [], burden=burden)
-    assert out.by_verdict(VERDICT_DROP_CANDIDATE) == ["somatic_anxiety"]
-    assert out.by_verdict(VERDICT_UNDER_SAMPLED) == ["burnout_signal"]
-    assert out.needs_owner_decision == ["somatic_anxiety"]
-    assert all(v.marginal_hours is not None for v in out.verdicts)
-    assert "Owner decision required" in out.to_markdown()
 
 
 # --- versioning -----------------------------------------------------------
@@ -372,17 +216,6 @@ def test_no_change_is_a_legitimate_phase_12_outcome():
 
 
 # --- the gate -------------------------------------------------------------
-
-
-def test_gate_blocks_refinement_without_gold(tmp_path, monkeypatch, capsys):
-    """No gold, no taxonomy decision. The convenient alternatives are both wrong."""
-    from scripts import run_taxonomy_refinement as gate
-
-    monkeypatch.setattr(gate.GoldStore, "read_batch", lambda self, batch: {})
-    assert gate.main(["--refine", "--batch", "gold_dev"]) == 1
-    out = capsys.readouterr().out
-    assert "BLOCKED" in out
-    assert "OPEN-025" in out
 
 
 def test_gate_burden_runs_today(capsys):

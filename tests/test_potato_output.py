@@ -14,7 +14,14 @@ The tests are grouped by the property they defend:
 1. **Discovery** -- the passes are where Potato actually puts them.
 2. **Span recovery** -- offset-only spans become evidence, or are refused.
 3. **Equivalence** -- the raw state file and the export agree.
-4. **End to end** -- two real passes become a kappa with a bootstrap interval.
+4. **End to end** -- real output becomes gold labels.
+
+NOTE (2026-09-28): section 4 used to also carry two tests that took real
+output through `compute_agreement` to a kappa with a bootstrap interval. That
+function (`src/annotation/agreement.py`) was deleted by owner decision --
+this project no longer reports inter-annotator agreement. See
+`config/annotators.yaml`'s header and `CLAUDE.md` sec.20-21. A backup is under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/agreement.py`.
 """
 
 from __future__ import annotations
@@ -26,11 +33,8 @@ import pytest
 
 from src.agents.config import load_taxonomy
 from src.annotation import (
-    Annotator,
-    GoldStore,
     PotatoOutputError,
     PotatoPass,
-    compute_agreement,
     discover_passes,
     ingest_passes,
     read_pass,
@@ -54,16 +58,6 @@ def item_texts() -> dict[str, str]:
         if line.strip()
     ]
     return {row["id"]: row["text"] for row in rows}
-
-
-def roster() -> dict[str, Annotator]:
-    # A2 is deliberately absent from the shipped config/annotators.yaml because
-    # no such person has been recruited. Here they are a fixture, so the
-    # agreement arithmetic can be exercised without inventing a real annotator.
-    return {
-        "A1": Annotator("A1", "owner", True),
-        "A2": Annotator("A2", "peer", False),
-    }
 
 
 # ---------------------------------------------------------------------------
@@ -185,7 +179,7 @@ def test_raw_state_and_export_produce_identical_payloads(item_texts):
 
 
 # ---------------------------------------------------------------------------
-# 4. End to end: real output -> gold labels -> kappa
+# 4. End to end: real output -> gold labels
 # ---------------------------------------------------------------------------
 
 
@@ -208,60 +202,3 @@ def test_real_potato_output_ingests_into_gold_labels(taxonomy, item_texts):
     # A categorical pole recorded as a span label decodes to the construct value.
     motivated = by_id["synth_precomp_v1-000011#u1"]
     assert motivated.value_for("motivation_orientation") == "approach"
-
-
-def test_two_real_passes_yield_a_kappa_with_an_interval(taxonomy, item_texts, tmp_path):
-    """The whole Phase 11 arc on real output: two passes in, agreement out.
-
-    Deliberately written against a tmp_path store and a fixture roster. Nothing
-    here may write into the repository's `data/gold/`, which belongs to whoever
-    actually did the annotating.
-    """
-    store = GoldStore(root=tmp_path, roster=roster())
-    for annotator in ("A1", "A2"):
-        report = ingest_passes(
-            [PotatoPass(annotator, OUTPUT_DIR / annotator / "user_state.json", "user_state")],
-            item_texts=item_texts,
-            annotator_id=annotator,
-            batch="gold_dev",
-            valid_constructs=taxonomy["constructs"],
-        )
-        assert report.ok, [str(e) for e in report.errors]
-        store.write_pass(report.labels, annotator=roster()[annotator], batch="gold_dev")
-
-    passes = store.read_batch("gold_dev")
-    assert sorted(passes) == ["A1", "A2"]
-
-    agreement = compute_agreement(
-        passes, list(taxonomy["constructs"]), batch="gold_dev", bootstrap=50
-    )
-    assert agreement.n_paired > 0
-
-    # The two rehearsal passes were built to differ on intensity while agreeing
-    # on presence, so perceived_stress must show up as a graded disagreement
-    # rather than a presence one.
-    stress = next(c for c in agreement.constructs if c.construct == "perceived_stress")
-    assert stress.only_a == 0 and stress.only_b == 0
-    assert stress.weighted_kappa <= stress.kappa
-
-    assert "inter-annotator agreement" in agreement.to_markdown().lower()
-
-
-def test_the_bootstrap_interval_is_suppressed_on_a_tiny_batch(taxonomy, item_texts, tmp_path):
-    """Five items cannot support a percentile bootstrap, and a CI printed from
-    five items would be quoted as though it meant something."""
-    store = GoldStore(root=tmp_path, roster=roster())
-    for annotator in ("A1", "A2"):
-        report = ingest_passes(
-            [PotatoPass(annotator, OUTPUT_DIR / annotator / "user_state.json", "user_state")],
-            item_texts=item_texts,
-            annotator_id=annotator,
-            batch="gold_dev",
-            valid_constructs=taxonomy["constructs"],
-        )
-        store.write_pass(report.labels, annotator=roster()[annotator], batch="gold_dev")
-
-    agreement = compute_agreement(
-        store.read_batch("gold_dev"), list(taxonomy["constructs"]), batch="gold_dev", bootstrap=50
-    )
-    assert all(c.kappa_ci is None for c in agreement.constructs)

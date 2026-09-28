@@ -324,6 +324,9 @@ All bracketed keys resolve to entries in `paper/refs.bib`.
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-08-08 | Initial complete rubric. Phase 4. Taxonomy v2 locked; all 11 instrument anchors resolved to primary records with DOIs (except `Martens1990`, a pre-DOI book chapter, paired with `Cox2003` which has one). |
+| 1.1 | 2026-09-28 | `gold_dev` annotated by A1 alone (96/100 valid spans); owner decided to drop the inter-annotator-agreement check rather than wait on A2. See `CLAUDE.md` sec.20-21. |
 
-Construct set is **frozen at Phase 12** after the inter-annotator agreement check. Any
-construct with poor agreement is a candidate to drop.
+Construct set is **frozen at Phase 12** after burden and owner rubric review. It was originally
+"burden and the inter-annotator agreement check", but this project does not report IAA (decided
+2026-09-28; see `CLAUDE.md` sec.20-21) - a construct with poor rubric clarity is still a
+candidate to drop, that judgement is just the owner's rather than a measured kappa's.

@@ -91,9 +91,12 @@ baseline-vs-transformer, ±silver and ±risk-fusion. Only the first was runnable
 ## STATUS BOARD (superseded - end of Phase 9)
 
 **Week 3 of 8.** Phases 1–10 complete and gated (10 offline only). Phases 11 and 12 have their
-tooling built, tested and gated; **both gates are blocked on the same missing person**
-(OPEN-025, the second annotator). Every phase from here that consumes gold inherits that
-block, so recruiting is now the critical path and no amount of code shortens it.
+tooling built and tested. **OPEN-025 update, 2026-09-28: closed by decision, not by recruiting.**
+A2 had agreed (2026-08-12) but never annotated anything; the owner decided to proceed on A1's
+single `gold_dev` pass (96/100 items) and drop the inter-annotator-agreement claim rather than
+wait further. `src/annotation/agreement.py` and `src/taxonomy/refinement.py` were deleted as a
+direct consequence (backup under `annotation/gold_dev/_backup_2026-09-28/removed_20260928/`),
+and `scripts/run_taxonomy_refinement.py --refine` no longer exists. See `CLAUDE.md` sec.20-21.
 
 | Phase | Status | Evidence |
 |---|---|---|
@@ -108,8 +111,8 @@ block, so recruiting is now the critical path and no amount of code shortens it.
 | 9 EDA & quality profiling | ✅ | `reports/eda.md` · gold plan, 400 items, 0/10 below floor |
 | **9b Corpus hardening** | ✅ | **15 templates/construct**, vocab 625→**860**, duplication 87.4%→**37.6%** |
 | 10 Weak labelling | ✅ **offline only** | **9,302** silver labels verified; no live OpenRouter call has ever been made (OPEN-008/OPEN-023) |
-| 11 Gold verification | **tooling ✅, gate UNMEASURABLE** | Potato ingest verified against real Potato 2.7.1 output (OPEN-027 closed, and it was broken). Kappa needs a second human - **OPEN-025** |
-| **12 Label validation & taxonomy refinement** | **tooling ✅, gate BLOCKED** | `src/taxonomy/` + `scripts/run_taxonomy_refinement.py`. `--burden` and `--propose` run today; `--refine` is blocked on gold, i.e. on OPEN-025 |
+| 11 Gold verification | **gate CLOSED by decision, no IAA** | Potato ingest verified against real Potato 2.7.1 output (OPEN-027 closed, and it was broken). A1 single-annotated `gold_dev` (96/100). Kappa dropped by owner decision, not measured - **OPEN-025 closed 2026-09-28** |
+| **12 Label validation & taxonomy refinement** | **tooling ✅ (burden/propose only), refine REMOVED** | `src/taxonomy/` + `scripts/run_taxonomy_refinement.py`. `--burden` and `--propose` run today; `--refine` was deleted 2026-09-28 along with the agreement machinery it depended on (OPEN-025) |
 | **13 Baselines** | ✅ **gate PASSED, numbers PROVISIONAL** | `src/models/` + `scripts/run_baselines.py` · `reports/baselines.{md,json}`. Six systems scored with bootstrap CIs. **Honest floor is the lexicon at 0.462 macro-F1** on the template-disjoint split; TF-IDF+LogReg 0.222, LinearSVC 0.181. All figures are planted-label *corpus-property* measurements, **not accuracy** - `data/gold/` is empty (OPEN-025). **OPEN-028 raised:** silver labels are PRNG output |
 
 **Live risks, in order.** These supersede the generic risk list at the foot of this file.
@@ -333,6 +336,15 @@ Sec = Security/Ethics · Pap = Paper.
   a routing decision and a `logs/cost_ledger.csv` entry.
 
 ### Phase 11 - Gold standard human verification
+- **Outcome (2026-09-28):** Ran with **one** annotator (A1), not the two planned below. A2 had
+  agreed (2026-08-12) but never sat down to annotate, and time didn't allow further waiting.
+  `gold_dev`: 100/100 items intensity-labelled, **96/100 with valid spans** (4 excluded honestly,
+  not faked or zeroed - see `CLAUDE.md` sec.20). Kappa is undefined with one annotator, so the
+  owner decided to drop the inter-annotator-agreement claim rather than leave it perpetually
+  pending: `src/annotation/agreement.py` and `src/taxonomy/refinement.py` were deleted
+  (backup under `annotation/gold_dev/_backup_2026-09-28/removed_20260928/`), and this phase's
+  gate is now "single-annotator, span-anchored gold; no IAA reported" - a named limitation in
+  the paper, not an omission. `gold_eval` (400 items) remains unannotated.
 - **Objective:** A trustworthy evaluation set.
 - **The sample is already drawn.** `data/processed/gold_candidates/` holds `gold_eval.jsonl`
   (400 items) and `gold_dev.jsonl` (100), with `sampling_plan.json` recording the template
@@ -354,6 +366,11 @@ Sec = Security/Ethics · Pap = Paper.
 - **`data/gold/` is human-owned.** No agent writes there; the store guards refuse the root.
 
 ### Phase 12 - Label validation & taxonomy refinement
+- **Outcome (2026-09-28):** The disagreement-driven half of this phase (`--refine`, and
+  `src/taxonomy/refinement.py` underneath it) was deleted along with Phase 11's agreement
+  machinery - there is no measured disagreement left to analyse. The construct set freezes on
+  burden + owner rubric review instead of burden + measured kappa. `--burden` and `--propose`
+  are unaffected and still run. See `CLAUDE.md` sec.20-21.
 - **Objective:** Fix schema problems the data exposed.
 - **Tasks:** Analyze disagreement patterns; refine `taxonomy.yaml`/guidelines; re-label affected silver.
 - **Parallel agents:** Psy, Lab.

@@ -2,62 +2,42 @@
 #
 # WHY THIS FILE EXISTS
 #
-# Inter-annotator agreement is a property of a PAIR of people over the same
-# items. That only holds if "annotator A" means the same person on every item
-# and in every batch. A free-text annotator field lets one typo create a third
-# annotator with nine items and a meaningless kappa, and nothing would fail.
-#
 # `src/annotation/store.py` refuses to write a gold label whose `annotator_id`
 # is not listed here. Adding yourself is a deliberate act.
 #
 # PSEUDONYMOUS BY DESIGN
 #
 # Ids are role-based pseudonyms, not names or email addresses. `docs/ethics.md`
-# governs the athletes in the corpus, but the annotators are human subjects of
-# the agreement study too, and the paper reports per-annotator statistics. A
-# published kappa table that names two students is a disclosure nobody agreed
-# to. Keep the mapping from id to person out of the repository.
+# governs the athletes in the corpus; keep the mapping from id to person out of
+# the repository.
 #
 # CLAUDE.md sec.4: no agent writes data/gold/. There is no entry here for a
 # model, and `GoldLabel` has no author kind that would permit one.
+#
+# -----------------------------------------------------------------------------
+# SINGLE-ANNOTATOR BY DECISION (2026-09-28)
+#
+# This project does not report inter-annotator agreement. A2 had been recruited
+# (a teammate of the owner, sports-domain familiarity) but never annotated
+# anything, and time no longer allows waiting on that. The owner decided to
+# proceed on A1's single pass over `gold_dev` (96/100 items, span-anchored) and
+# to drop the IAA claim entirely rather than leave it perpetually pending.
+#
+# As a direct consequence, `src/annotation/agreement.py` and
+# `src/taxonomy/refinement.py` (the disagreement-driven taxonomy analysis) were
+# deleted -- backed up under
+# `annotation/gold_dev/_backup_2026-09-28/removed_20260928/` -- and
+# `scripts/run_taxonomy_refinement.py --refine` no longer exists. See
+# `CLAUDE.md` sec.20-21 for the full reasoning, what was declined along the
+# way, and what this means for the paper's claims.
+#
+# Adding a real A2 back here later is still possible; it would require
+# restoring the two deleted modules from backup, not just adding a line.
+# -----------------------------------------------------------------------------
 
 version: 1
 
 annotators:
   - annotator_id: A1
-    role: project owner; primary annotator
+    role: project owner; sole annotator
     is_owner: true
-
-  # -------------------------------------------------------------------------
-  # A2 IS NOT YET A REAL PERSON. THIS IS THE PHASE 11 BLOCKER.
-  #
-  # Kappa with one annotator is undefined, so contribution #1 -- "a
-  # construct-grounded corpus with reported inter-annotator agreement" -- does
-  # not exist until this entry names someone who has actually agreed to do it.
-  #
-  # 400 items, double annotated, is the commitment. Estimate the burden from
-  # the gold_dev calibration pass before asking, so the ask is honest.
-  #
-  # The highest-value candidate is an SRMIST coach or sport-psychology
-  # practitioner, because the same person could also broker pre-competition
-  # athlete text under an A3 consent basis (OPEN-011) and serve as the Phase 17
-  # expert rater (OPEN-004). Those three open items have one solution between
-  # them and it has been deferred across five phases.
-  #
-  # RESOLVED 2026-08-12. A2 is a real person who has agreed: a teammate of the
-  # owner with sports-domain familiarity. Kept pseudonymous per the header --
-  # the paper reports per-annotator statistics and a published kappa table that
-  # names two students is a disclosure nobody agreed to.
-  #
-  # Before A2 annotates anything:
-  #   1. They read docs/annotation_guidelines.md and onboarding/README.md.
-  #   2. Calibration pass on data/processed/gold_candidates/gold_dev.jsonl
-  #      (100 items, ~3.03 h estimated, split across TWO sittings --
-  #      reports/annotation_burden.md warns that a rushed second half raises
-  #      kappa while lowering data quality, because tired annotators drift
-  #      toward shared defaults).
-  #   3. Adjudicate disagreements against the rubric, not against each other.
-  # -------------------------------------------------------------------------
-  - annotator_id: A2
-    role: peer annotator; sports-domain familiarity
-    is_owner: false

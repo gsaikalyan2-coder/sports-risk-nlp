@@ -1,25 +1,27 @@
 #!/usr/bin/env python
-"""The Phase 11 gate: build the annotation project, ingest passes, report agreement.
+"""The Phase 11 gate: build the annotation project, ingest passes.
 
     python scripts/run_annotation.py --build --batch gold_dev     # make the Potato project
     python scripts/run_annotation.py --build --batch gold_eval
     python scripts/run_annotation.py --ingest --batch gold_dev --annotator A1
-    python scripts/run_annotation.py --agreement --batch gold_dev
     python scripts/run_annotation.py --status                     # where is everything
 
 Offline, free and deterministic, like every other gate in this project. No
 network, no API key, no model.
 
-**The order is load-bearing.** `gold_dev` first: both annotators label it, you
-compare, you argue about the rubric, you amend `docs/annotation_guidelines.md`,
-and only then does anyone open `gold_eval`. `gold_dev` is drawn from
-training-side templates precisely so that burning it on rubric arguments costs
-zero evaluation power. An item read during an argument about the rubric is no
-longer an independent measurement.
+**The order is load-bearing.** `gold_dev` first: the annotator labels it, you
+amend `docs/annotation_guidelines.md` if the rubric needs it, and only then
+does anyone open `gold_eval`. `gold_dev` is drawn from training-side templates
+precisely so that burning it on rubric arguments costs zero evaluation power.
+An item read during an argument about the rubric is no longer an independent
+measurement.
 
-**This gate can fail for a reason no code can fix.** Agreement needs two people.
-With one pass on disk, `--agreement` reports UNMEASURABLE and exits non-zero.
-That is not a bug to route around; it is the Phase 11 blocker being visible.
+**NOTE (2026-09-28):** this gate used to also compute inter-annotator
+agreement via `--agreement`. By owner decision this project no longer reports
+IAA -- `src/annotation/agreement.py` was deleted (backup under
+`annotation/gold_dev/_backup_2026-09-28/removed_20260928/`), and `--agreement`
+no longer exists here. See `CLAUDE.md` sec.20-21 and `config/annotators.yaml`'s
+header for the full reasoning.
 
 Exit codes: 0 gate passed, 1 gate failed, 2 configuration or policy error.
 """
@@ -27,7 +29,6 @@ Exit codes: 0 gate passed, 1 gate failed, 2 configuration or policy error.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -38,15 +39,11 @@ if str(REPO_ROOT) not in sys.path:
 from src.agents.config import ConfigError, load_taxonomy  # noqa: E402
 from src.annotation import (  # noqa: E402
     POTATO_VERSION,
-    AgreementUnmeasurable,
     ContextError,
     GoldSchemaError,
     GoldStore,
     GoldWriteRefused,
-    align,
-    compute_agreement,
     context_coverage,
-    disagreements,
     discover_passes,
     ingest_passes,
     load_annotators,
@@ -56,13 +53,6 @@ from src.annotation import (  # noqa: E402
 
 DEFAULT_PROJECT_ROOT = REPO_ROOT / "annotation"
 REPORTS = REPO_ROOT / "reports"
-
-#: The Phase 12 decision threshold. `config/taxonomy.yaml` says any construct
-#: with poor agreement is a candidate to drop; 0.40 is the conventional
-#: moderate/fair boundary and is a REPORTING threshold, not a pass/fail one.
-#: A gate that failed on it would block Phase 11 on a number the phase exists
-#: to discover.
-KAPPA_REVIEW_THRESHOLD = 0.40
 
 
 def _rule(title: str) -> None:
@@ -113,12 +103,10 @@ def cmd_build(args, taxonomy) -> int:
 
     print()
     print(f"  Annotators on the roster: {sorted(roster)}")
-    if len(roster) < 2:
-        print()
-        print("  WARNING: only one annotator is on the roster.")
-        print("  Kappa is undefined with one annotator, so contribution #1 -- 'a corpus")
-        print("  with reported inter-annotator agreement' -- cannot exist yet. Add the")
-        print("  second person to config/annotators.yaml once they have agreed.")
+    print(
+        "  Single-annotator by decision (2026-09-28) -- this project does not "
+        "report inter-annotator agreement. See CLAUDE.md sec.20-21."
+    )
     print()
     print(f"  Next:  pip install potato-annotation=={POTATO_VERSION}")
     print(
@@ -211,76 +199,12 @@ def cmd_ingest(args, taxonomy) -> int:
     return 0
 
 
-def cmd_agreement(args, taxonomy) -> int:
-    _rule(f"Inter-annotator agreement -- {args.batch}")
-    store = GoldStore()
-    passes = store.read_batch(args.batch)
-    print(f"  passes on disk: {sorted(passes)}")
-
-    constructs = list(taxonomy["constructs"])
-    try:
-        report = compute_agreement(passes, constructs, batch=args.batch, bootstrap=args.bootstrap)
-    except AgreementUnmeasurable as exc:
-        print()
-        print("  UNMEASURABLE")
-        print(f"  {exc}")
-        print()
-        print("Phase 11 gate: FAILED (not a code failure -- the second annotator is missing)")
-        return 1
-
-    print()
-    print(report.to_markdown())
-
-    REPORTS.mkdir(exist_ok=True)
-    md_path = REPORTS / f"agreement_{args.batch}.md"
-    md_path.write_text(report.to_markdown() + "\n", encoding="utf-8")
-    json_path = REPORTS / f"agreement_{args.batch}.json"
-    json_path.write_text(
-        json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-
-    pairs = align(passes[report.annotator_a], passes[report.annotator_b])
-    work = disagreements(pairs, constructs)
-    queue_path = REPO_ROOT / "logs" / f"adjudication_{args.batch}.jsonl"
-    queue_path.parent.mkdir(exist_ok=True)
-    with queue_path.open("w", encoding="utf-8") as fh:
-        for row in work:
-            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-
-    print()
-    print(f"  wrote {md_path.relative_to(REPO_ROOT)}")
-    print(f"  wrote {json_path.relative_to(REPO_ROOT)}")
-    print(f"  adjudication worklist: {queue_path.relative_to(REPO_ROOT)} ({len(work)} rows)")
-
-    weak = report.below(KAPPA_REVIEW_THRESHOLD)
-    if weak:
-        print()
-        print(f"  Constructs below kappa {KAPPA_REVIEW_THRESHOLD}: {weak}")
-        print("  REPORTED, NOT FAILED. config/taxonomy.yaml freezes the construct set at")
-        print("  Phase 12 after exactly this check; a gate that failed here would block")
-        print("  the phase on the number the phase exists to produce. Read each one's")
-        print("  interpretation column first -- a low kappa on a rare construct is the")
-        print("  kappa paradox, not necessarily poor annotation.")
-
-    degenerate = [c.construct for c in report.constructs if c.is_degenerate]
-    if degenerate:
-        print()
-        print(f"  Never marked by either annotator: {degenerate}")
-        print("  Kappa is undefined for these, and Phase 12 needs to know whether that is")
-        print("  a sampling gap or a construct this corpus does not realise.")
-
-    print()
-    print("Phase 11 gate:", "PASSED" if report.n_paired > 0 else "FAILED")
-    return 0 if report.n_paired > 0 else 1
-
-
 def cmd_status(args, taxonomy) -> int:
     _rule("Phase 11 status")
     try:
         roster = load_annotators()
         print(f"  roster: {sorted(roster)}")
-        if len(roster) < 2:
-            print("    BLOCKER: kappa needs two annotators; one is on the roster")
+        print("    single-annotator by decision (2026-09-28); no IAA is reported")
     except GoldSchemaError as exc:
         print(f"  roster: ERROR {exc}")
 
@@ -292,10 +216,6 @@ def cmd_status(args, taxonomy) -> int:
         print(f"  {batch}")
         print(f"    potato project : {'built' if project.exists() else 'NOT BUILT'}")
         print(f"    passes ingested: {ids or 'none'}")
-        if len(ids) >= 2:
-            print("    agreement      : computable")
-        else:
-            print("    agreement      : NOT computable")
     return 0
 
 
@@ -304,7 +224,6 @@ def main(argv: list[str] | None = None) -> int:
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--build", action="store_true", help="generate the Potato project")
     action.add_argument("--ingest", action="store_true", help="read a completed pass")
-    action.add_argument("--agreement", action="store_true", help="compute and report kappa")
     action.add_argument("--status", action="store_true", help="where everything stands")
 
     parser.add_argument("--batch", default="gold_dev", choices=("gold_dev", "gold_eval"))
@@ -317,7 +236,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-root", type=Path, default=None)
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--overwrite", action="store_true", help="replace an existing pass")
-    parser.add_argument("--bootstrap", type=int, default=1000)
     parser.add_argument("--max-errors", type=int, default=25)
     args = parser.parse_args(argv)
 
@@ -337,8 +255,6 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_build(args, taxonomy)
     if args.ingest:
         return cmd_ingest(args, taxonomy)
-    if args.agreement:
-        return cmd_agreement(args, taxonomy)
     return cmd_status(args, taxonomy)
 
 
