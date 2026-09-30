@@ -1,0 +1,67 @@
+{
+  "source_id": "synth_precomp_v2",
+  "source_name": "Synthetic pre-competition athlete panels with a planted temporal drift (template grammar v1.4, panel extension v1)",
+  "allowlist_category": "A2_synthetic",
+  "url_or_citation": "Generated for this project by src/ingestion/temporal.py (construct-template-grammar@1.4+panel, seed=22). Not derived from any external corpus. Additive to synth_precomp_v1, which is frozen and unmodified.",
+  "collection_date": "2026-09-30",
+  "licence_or_consent_basis": "Project-generated synthetic text. No third-party licence applies and no human subject is involved: no real person's words are reproduced, paraphrased, or used as a generation input. Released under the repository licence alongside the code that produces it.",
+  "permitted_uses": "Research use, training, evaluation, redistribution, and publication of verbatim examples. Because no real athlete is involved, this is the only category in the corpus from which examples may be quoted verbatim in the paper or dashboard (docs/ethics.md sec.3.3 condition 2).",
+  "redistribution_permitted": true,
+  "synthetic": true,
+  "subject_is_adult": true,
+  "language": "en",
+  "deidentified": false,
+  "notes": "PANEL CORPUS WITH A PLANTED DRIFT. Each athlete_id carries a series of records at different time_to_competition_days. The within-athlete temporal structure was PLANTED by src/ingestion/temporal.py under an owner decision of 2026-09-29: somatic anxiety rises approaching the event while cognitive anxiety and self-confidence stay flat, per CSAI-2 multidimensional anxiety theory [Martens1990; Cox2003]. Any trajectory recovered from this corpus is a sanity check on this project's own instrumentation, NOT evidence about athletes and NOT support for the psychological claim itself. athlete_id and timepoint_index live in record.extra. Template selection is UNBIASED with respect to src.evaluation.baselines.CONSTRUCT_CUES: no realisation is chosen because the lexicon can detect it, so this corpus does not inflate the lexicon baseline (OPEN-021). synth_precomp_v1 is untouched by this corpus.",
+  "time_to_competition": null,
+  "sport": null,
+  "competition_level": null,
+  "region": null,
+  "source_type": "synthetic",
+  "record_count": 1302,
+  "generator": {
+    "name": "construct-template-grammar+panel",
+    "version": "1.4+t1",
+    "kind": "template-grammar",
+    "seed": 22,
+    "generated_on": "2026-09-30",
+    "prompts_location": "src/ingestion/temporal.py (version-controlled TIMING_BIAS ladder over the src/ingestion/synthetic.py template bank, which is imported unchanged)",
+    "notes": "Deterministic seeded template grammar, no language model and no network call. Adds a WITHIN-ATHLETE temporal drift on top of the v1 generator: somatic anxiety rises approaching the competition (CSAI-2 multidimensional anxiety theory [Martens1990; Cox2003]) while cognitive anxiety and self-confidence are planted at a day-independent band and serve as designed-flat negative controls. The drift is a generator design choice taken by the owner on 2026-09-29, NOT a measurement; see this module's docstring and reports/temporal.md.",
+    "extra": {
+      "drifting_constructs": [
+        "somatic_anxiety"
+      ],
+      "flat_by_design": [
+        "cognitive_anxiety",
+        "self_confidence"
+      ],
+      "drift_anchor": "CSAI-2 multidimensional anxiety theory [Martens1990; Cox2003]",
+      "panel": {
+        "n_athletes": 300,
+        "day_ladder": [
+          30,
+          21,
+          14,
+          10,
+          7,
+          5,
+          3,
+          2,
+          1,
+          0
+        ],
+        "long_series_share": 0.7,
+        "long_series_points": [
+          4,
+          6
+        ],
+        "short_series_points": [
+          2,
+          3
+        ],
+        "min_timepoints_for_slope": 4
+      },
+      "v1_relationship": "additive; synth_precomp_v1 is frozen and byte-unmodified by this corpus"
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,274 @@
+================================================================================
+HANDOVER -- PHASE 22 (L3 TEMPORAL TRAJECTORY)
+
+NOTE ON THE FILENAME: this repository already contains handover_phase_22.txt,
+written 2026-08-24 for a DIFFERENT Phase 22 (reproducibility packaging ->
+Phase 23 IEEE draft assembly). The phase number has been reused. That file is
+untouched; this one is deliberately named handover_phase_22_l3_temporal.txt,
+following the handover_phase_22b_dashboard.txt precedent already in the repo.
+
+Pre-Competition Psychological Risk Profiling of Athletes
+Written 2026-09-30. Self-contained: a fresh session needs nothing but this file
+and the repository.
+================================================================================
+
+PART A -- PROJECT SUMMARY AND CURRENT STATUS
+--------------------------------------------------------------------------------
+Goal: construct-grounded, multi-dimensional psychological risk profiling of
+pre-competition athlete text. Ten sports-psychology constructs detected in text
+and fused into an interpretable, UNCALIBRATED risk index. Research and
+decision-support only; never clinical, never about a named real person.
+
+Phase just completed: PHASE 22 -- L3 temporal trajectory features.
+
+Status: BUILT, TESTED, FULL SUITE GREEN. The phase was gated on a blocker that
+was resolved by owner decision on 2026-09-29 (route B: build a separate
+additive temporal corpus). The blocker is documented in full below because the
+measurement behind it must not be re-derived.
+
+Standing project state, unchanged by this phase:
+  * data/gold/ holds 96 single-annotator items (A1 only). No inter-annotator
+    agreement exists and none is claimed (see .claude.md sec.20/21).
+  * No number anywhere in this repository is an accuracy. Every figure is
+    agreement with generator-planted labels on synthetic text.
+  * The risk index is a ranking only, never calibrated.
+  * synth_precomp_v1 is FROZEN: 4,000 records, SHA-256 pinned in
+    src/reproducibility/manifest.py (corpus_records fa09f5ad...,
+    utterances 87a796ca...). This phase did not touch it.
+
+--------------------------------------------------------------------------------
+PART B -- WHAT HAPPENED IN THIS SESSION
+--------------------------------------------------------------------------------
+
+B1. THE BLOCKER, MEASURED AND RESOLVED
+--------------------------------------
+The phase was gated on: does a synth_precomp_v1 record carry an athlete_id and
+a day-offset within the pre-competition window?
+
+MEASURED ANSWER (all 4,000 records, plus interim and silver layers):
+  * day-offset: YES. time_to_competition_days in {0,1,2,3,5,7,10,14,21,30},
+    counts 535/814/534/531/237/281/276/279/263/250.
+  * athlete_id: NO. It exists nowhere. synthetic.py::_draw_stratum draws sport,
+    competition_level, region, source_type, time_to_competition_days and
+    training_load_hint INDEPENDENTLY per record. RawRecord has no subject
+    field. extra == {} in all 4,000 records. No athlete_id / subject_id /
+    speaker_id / participant_id anywhere in data/ or src/.
+
+So every v1 record is an i.i.d. draw. v1 contains no panels, and no grouping of
+it can produce a within-athlete series.
+
+A SECOND blocker was already on record and applies with equal force. Phase 36
+(.claude.md sec.19.3) measured that generate_scenario_record uses `timing` for
+exactly two things -- the record id and time_to_competition_days -- so the text
+is byte-identical across all three timings, spread 0.0000. Identity alone would
+therefore have produced a slope fitted over noise, and the shuffled-time
+control would have found nothing: a tautology, not a finding.
+
+RESOLUTION (owner decision, 2026-09-29): build synth_precomp_v2 as a SEPARATE
+ADDITIVE panel corpus with both an identity axis and a planted drift. v1 frozen
+and untouched. Retrofitting identity onto v1 was proposed and REFUSED: assigning
+i.i.d. draws to invented athletes manufactures panel structure that was never
+generated, and a slope fitted across records whose sport, level and region all
+change between "timepoints" is .claude.md sec.12.3 by a new door.
+
+B2. THE DRIFT CLAIM (OWNER DECISION, 2026-09-29)
+------------------------------------------------
+Encoded into the generator, and therefore an owner decision under .claude.md
+sec.8 rule 2, not a coding one:
+
+    Approaching a competition, SOMATIC anxiety rises -- sharply in the final
+    24-48h. COGNITIVE anxiety stays comparatively flat across the
+    pre-competition window. SELF-CONFIDENCE stays flat.
+
+Grounding: multidimensional anxiety theory's time-to-event prediction
+[Martens1990], CSAI-2 tradition [Cox2003]. Both keys resolve in paper/refs.bib
+and both are already the instrument_anchor config/taxonomy.yaml gives
+cognitive_anxiety and somatic_anxiety generally, so the table is grounded in the
+same instruments those constructs already cite -- the convention Phase 30
+(sec.15.3) established for SCENARIO_BIAS.
+
+BINDING FRAMING FOR THE PAPER: every trajectory number is a SANITY CHECK that
+the analysis recovers a drift this project planted on purpose. It is not
+evidence about athletes, not a clinical finding, and not support for the
+psychological claim itself. Recovering a planted label is circular as evidence,
+exactly as docs/data_sources.md already says of generation_spec.
+
+B3. FILES CREATED (all new; no tracked file modified)
+-----------------------------------------------------
+  src/ingestion/temporal.py      TIMING_BIAS drift ladder, FLAT_BY_DESIGN
+                                 negative controls, PanelSpec, AthletePanel,
+                                 generate_panel_record, build_panel_corpus,
+                                 panel_descriptor, panel_generator_stamp
+  src/evaluation/trajectory.py   AthleteSeries, TrajectoryFeatures, features_for,
+                                 shuffled_control, cluster_shapes, ChannelResult,
+                                 TrajectoryReport, analyse, Holm correction
+  scripts/run_temporal.py        build + score + analyse + write the report
+  tests/test_temporal.py         43 tests
+  data/raw/synth_precomp_v2/     1,302 records, 300 athletes, + provenance.json
+  reports/temporal.md            the artifact
+
+Verified by `git status --porcelain`: this phase is ENTIRELY new files. Zero
+diff to src/ingestion/synthetic.py and src/ingestion/scenarios.py. The v1
+corpus, interim and silver artefacts are byte-unmodified, and all 52
+tests/test_reproducibility.py tests pass, which is what actually proves it.
+
+B4. RESULTS
+-----------
+Corpus: 300 athletes, 1,302 records, 1,255 readable (47 unreadable, 3.6%,
+excluded rather than entered as 0.5). Slope suppression: 33.1% (99/299
+athletes below the 4-timepoint floor; one athlete had no readable timepoint at
+all). 2,000 permutations per channel.
+
+  channel                 design expectation              uncorrected p   outcome
+  risk_index              drift INHERITED, not planted    0.0005          survives
+  somatic_anxiety         drift planted                   0.0005          survives
+  coping_style            no drift planted                0.0250          does NOT survive Holm
+  resilience              no drift planted                0.1484          no signal
+  self_confidence         FLAT BY DESIGN                  0.1759          no signal
+  attentional_focus       no drift planted                0.3803          no signal
+  motivation_orientation  no drift planted                0.6387          no signal
+  appraisal_orientation   no drift planted                0.8796          no signal
+  perceived_stress        no drift planted                0.8986          no signal
+  burnout_signal          no drift planted                0.8991          no signal
+  cognitive_anxiety       FLAT BY DESIGN                  0.9525          no signal
+
+All eleven channels behaved as the generator's design predicts.
+
+Time axis: t = -time_to_competition_days, so t increases towards the event and a
+POSITIVE slope means "rises as the competition approaches". Stated on every
+surface that prints a slope, because fitting against the raw countdown gives a
+negative coefficient for a rising quantity and that is the classic sign error
+here.
+
+B5. KEY DECISIONS
+-----------------
+1. athlete_id and timepoint_index live in record.extra, NOT as new RawRecord
+   fields. Adding a field changes to_dict()'s key set for every record in the
+   project including the hash-pinned v1 artefacts. extra is the schema's
+   documented slot, so the panel corpus costs no reproducibility hash.
+2. New module rather than editing scenarios.py or synthetic.py, so Phase 30's
+   determinism tests and every seeded v1 artefact stay valid. Also avoids the
+   ~10 CPU-hour corpus regeneration sec.18.3 prices.
+3. Drift split across BOTH plant-probability and intensity, so no single
+   timepoint is a giveaway and "rises sharply" means more athletes reporting it
+   AND reporting it more strongly.
+4. cognitive_anxiety and self_confidence declared in FLAT_BY_DESIGN as explicit
+   negative controls, so the prediction is auditable in code rather than
+   asserted in prose after the fact.
+5. risk_index kept in its own category (inherits_drift) rather than listed
+   beside the planted channel. It moves because somatic_anxiety carries +1.0 in
+   LinearRiskScorer, so it is arithmetically downstream of the same planted
+   effect -- a derived result is not an independent confirmation.
+6. Ragged panel lengths (70% get 4-6 timepoints, 30% get 2-3), and PanelSpec
+   REFUSES bands that do not straddle MIN_TIMEPOINTS_FOR_SLOPE, so the
+   suppression rate is a measured number rather than 0% or 100%.
+7. Clustering runs over the z-scored (slope, volatility, last_day_delta) vector,
+   not raw series: the panels are ragged by design, so two athletes sit on
+   different day sets and cannot be compared point-by-point without
+   interpolating readings nobody took.
+8. Unreadable timepoints are EXCLUDED from every series -- not imputed, not
+   carried forward, not entered as 0.5. AthleteSeries refuses a value it did not
+   earn, the same construction-time rule SquadMember, SentenceBand and CloudLane
+   already enforce.
+
+B6. THREE DEFECTS FOUND AND FIXED DURING THE BUILD
+---------------------------------------------------
+Recorded because each was silent and each would have shipped.
+
+(a) CUE-BIASED TEMPLATE SELECTION REACHING A CORPUS. The first draft imported
+    scenarios._realise_graded_at to plant the drift. That function biases
+    template choice towards realisations containing
+    src.evaluation.baselines.CONSTRUCT_CUES phrases -- legitimate for the
+    Match-day demo, fatal for a corpus, because text chosen BECAUSE the lexicon
+    detects it inflates the lexicon's own score. That is OPEN-021 made strictly
+    worse by construction. Caught by
+    tests/test_scenarios.py::test_no_corpus_writing_module_imports_scenarios,
+    which exists for exactly this and whose docstring says the failure is
+    silent. FIXED: temporal.py now imports nothing from scenarios.py and uses
+    synthetic._realise plus a local _realise_graded_unbiased, both flat
+    randrange over the bank with no cue list consulted. The corpus was
+    REBUILT. Honest cost, paid rather than engineered away: detection fell, so
+    unreadable records and suppressed slopes both rose. A test in
+    tests/test_temporal.py now asserts the containment from this module's side
+    too, so the reason travels with the code that broke it.
+
+(b) NO MULTIPLICITY CORRECTION. Eleven channels were being tested
+    simultaneously against a fixed 0.05. Across eleven channels that produces a
+    false positive roughly half the time, and it duly did: coping_style reached
+    an uncorrected p = 0.025 with no drift planted in it. Checked for a
+    mechanism before correcting -- coping_style's mean probability is flat
+    across the window (0.13-0.27, no trend) and its cue list shares ZERO terms
+    with somatic_anxiety's -- so chance is the explanation. FIXED: Holm
+    step-down across the channel family (FAMILY_ALPHA = 0.05). coping_style does
+    not survive it. The correction was the right test whatever came out; it is
+    not a response to the result, and reports/temporal.md says so and names the
+    false positive rather than hiding it.
+
+(c) IRREPRODUCIBLE PERMUTATION NULL. The control seeded numpy from
+    hash((seed, channel)). Python randomises string hashing per process unless
+    PYTHONHASHSEED is set, so the null differed between runs while looking
+    seeded. FIXED: zlib.crc32 of the channel name. Verified identical across
+    three fresh processes, and a test asserts run-to-run reproducibility.
+
+Also: the scalar control was 11 channels x 2,000 permutations x ~300 series of
+OLS fits and took minutes. Vectorised (with t centred, the slope reduces to
+dot(t_c, y)/sum(t_c^2), so a whole permutation block is one matrix product).
+Whole pipeline now runs in ~37s.
+
+B7. TEST STATUS
+---------------
+FULL SUITE GREEN: 1,322 tests, 0 failures, a handful of skips.
+
+IMPORTANT ENVIRONMENT NOTE for the next session. The suite was run with a
+CPython 3.11.16 environment created for the purpose. An earlier run under the
+sandbox's default Python 3.10 produced ~40 spurious failures, ALL of them
+`AttributeError: module 'datetime' has no attribute 'UTC'` -- datetime.UTC is
+3.11+, pyproject declares requires-python = ">=3.11", and six modules use it
+(src/agents/ledger.py, src/annotation/schema.py, src/ingestion/allowlist.py,
+src/labeling/runner.py, src/labeling/schema.py, src/taxonomy/versioning.py).
+Those failures are the interpreter, not the code. Do not "fix" them.
+
+Two files are slow enough to time out a constrained runner:
+tests/test_profile.py (~45s of session-scoped corpus-profiling fixture setup)
+and tests/test_reproducibility.py (hashes the corpus). Both pass.
+
+--------------------------------------------------------------------------------
+PART C -- BLOCKERS AND OPEN ITEMS
+--------------------------------------------------------------------------------
+No blockers. The phase is complete.
+
+Open, and deliberately NOT done in this session:
+
+1. .claude.md has NO section for Phase 22. Rule 10 says this file is the single
+   source of truth and is updated when a decision is confirmed; sec.16.3 says a
+   rule obeyed only when convenient is not a rule. WRITE THE SECTION. It must
+   carry: the measured blocker (B1), the owner drift decision and its citation
+   (B2), the three defects (B6), and the fact that sec.19.3's refusal of a
+   temporal feature was correct at the time and was resolved by adding a corpus
+   rather than by reversing the measurement.
+2. docs/reproducibility.md does not pin synth_precomp_v2. Decide whether it
+   should. Pinning it makes the panel corpus a frozen artefact like v1; leaving
+   it unpinned keeps it regenerable. Owner decision, not a coding one.
+3. No dashboard surface shows any of this. Deliberate: nothing was asked for,
+   and a trajectory drawn on a coach-facing page is the single most
+   over-readable object this project could ship. If it is ever built it needs
+   the sec.12.3 treatment and the planted-drift framing above the fold.
+4. No detector precision for these readings. They are the LexiconBackend floor
+   with its known upward bias (OPEN-021), and data/gold/ carries no temporal
+   annotation, so nothing here can be checked against a human label. OPEN-025
+   unchanged.
+5. The paper's numbers stay text-only and v1-only. No figure in this phase
+   belongs in a results table. If the temporal work is written up at all it is
+   a methods/instrumentation note, framed per B2.
+
+--------------------------------------------------------------------------------
+PART D -- HOW TO REPRODUCE
+--------------------------------------------------------------------------------
+  python scripts/run_temporal.py                 # build + analyse (~37s)
+  python scripts/run_temporal.py --analyse-only  # re-analyse, no write
+  python scripts/run_temporal.py --build-only
+  python -m pytest tests/test_temporal.py -q     # 43 tests
+
+Offline, deterministic, no API key, no language model. Exit code 1 if any
+channel stops behaving as the generator's design predicts, which is the gate.
+================================================================================
