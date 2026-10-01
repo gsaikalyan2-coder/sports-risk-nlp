@@ -77,7 +77,7 @@ st.markdown(theme.app_css(mode), unsafe_allow_html=True)
 if not theme.cognitive_layer_enabled():
     st.sidebar.caption(
         f"Cognitive layer off: set {theme.COGNITIVE_FLAG}=1 to show the brain atlas, "
-        "cognitive load and neurofeedback pages. Everything behind it runs on "
+        "and cognitive load pages. Everything behind it runs on "
         "generated signals; nobody is recorded in either state."
     )
 

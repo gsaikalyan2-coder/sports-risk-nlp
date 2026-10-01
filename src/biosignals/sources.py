@@ -5,7 +5,7 @@ Why this module is the first thing in the package
 The cognitive layer's whole risk is that a *simulated* signal is visually
 indistinguishable from a *measured* one. A tachogram drawn from `random` looks
 exactly like a tachogram drawn from a chest strap, and a ring that grows when a
-number crosses a threshold looks exactly like neurofeedback whether or not
+number crosses a threshold looks exactly like a training signal whether or not
 anybody is wearing anything. So provenance cannot be something a renderer
 remembers to print. It has to be something a window cannot exist without.
 
@@ -38,7 +38,7 @@ The moment a real physiological signal from any person -- including the
 repository owner's own -- reaches this code, `docs/ethics.md` and
 `docs/model_card.md` must be updated FIRST, with a consent route, a retention
 rule, and a statement that physiological data is a different privacy class from
-synthetic text. V5 (closed-loop neurofeedback) is additionally an INTERVENTION
+synthetic text. A closed feedback loop would additionally be an INTERVENTION
 rather than an observation: a closed feedback loop changes the behaviour of the
 person inside it, so it needs ethics approval and a clinician in the loop before
 it runs against anyone. `MuseSource`, `OpenBCISource` and `PolarH10Source` are
@@ -331,107 +331,6 @@ def require_simulated(source: object) -> SimulatedSource:
             "rather than an observation."
         )
     return source
-
-
-class SimulatedEEGSource(SimulatedSource):
-    """A synthetic EEG-shaped series with a slowly wandering alpha/theta balance.
-
-    What this is and is not
-    -----------------------
-    It is a sum of two sinusoids and noise. It is not a model of cortical
-    activity, it is not fitted to any recording, and its numbers mean nothing
-    outside this simulator. It exists so the V5 ring has something to respond to
-    that behaves the way a real ratio behaves -- drifting on a timescale of tens
-    of seconds, crossing a threshold and coming back -- rather than a random walk
-    that never settles or a sine that is obviously a sine.
-
-    The construction, stated so a reviewer can check it rather than trust it:
-
-        sample(t) = alpha_amp(index) * cos(2*pi*ALPHA_HZ*t + phase_a)
-                  + THETA_AMP       * cos(2*pi*THETA_HZ*t + phase_t)
-                  + gauss(0, NOISE_SD)
-
-        alpha_amp(index) = ALPHA_BASE + ALPHA_SWING * sin(2*pi*index/DRIFT_PERIOD)
-
-    `alpha_amp` is the only thing that moves between windows, so the alpha/theta
-    ratio rises and falls on a `DRIFT_PERIOD`-window cycle. Phases are drawn per
-    window so consecutive windows are not phase-continuous -- which is honest:
-    this is a bag of independent windows, not a continuous recording, and
-    pretending otherwise would be the first step towards treating it as one.
-    """
-
-    #: Band centres. Inside the conventional theta (4-8 Hz) and alpha (8-13 Hz)
-    #: ranges used by `features.THETA_BAND` / `features.ALPHA_BAND`, and placed
-    #: on exact DFT bin centres for the default window so the hand-computed test
-    #: fixtures in `tests/test_biosignals.py` are exact rather than approximate.
-    ALPHA_HZ = 10.0
-    THETA_HZ = 6.0
-
-    ALPHA_BASE = 1.0
-    ALPHA_SWING = 0.55
-    THETA_AMP = 1.0
-    NOISE_SD = 0.12
-    DRIFT_PERIOD = 24  # windows per full rise-and-fall cycle
-
-    def __init__(
-        self,
-        *,
-        seed: int = 20260913,
-        sample_rate_hz: float = 128.0,
-        samples: int = 256,
-        name: str = "simulated-eeg",
-        stamp: str = SIMULATED_STAMP,
-    ) -> None:
-        super().__init__(name=name, seed=seed, stamp=stamp)
-        if samples < 2:
-            raise ValueError("a window needs at least two samples.")
-        if sample_rate_hz <= 0:
-            raise ValueError("sample_rate_hz must be positive.")
-        self.sample_rate_hz = float(sample_rate_hz)
-        self.samples = int(samples)
-
-    def alpha_amplitude(self, index: int) -> float:
-        """The alpha amplitude for one window. Public so a test can predict it."""
-        return self.ALPHA_BASE + self.ALPHA_SWING * math.sin(
-            2.0 * math.pi * (index % self.DRIFT_PERIOD) / self.DRIFT_PERIOD
-        )
-
-    def window(self, index: int) -> BiosignalWindow:
-        from src.biosignals.features import (
-            ALPHA_BAND,
-            THETA_BAND,
-            alpha_theta_ratio,
-            band_power,
-        )
-
-        rng = self.rng(index)
-        phase_a = rng.uniform(0.0, 2.0 * math.pi)
-        phase_t = rng.uniform(0.0, 2.0 * math.pi)
-        alpha_amp = self.alpha_amplitude(index)
-        dt = 1.0 / self.sample_rate_hz
-
-        series = tuple(
-            alpha_amp * math.cos(2.0 * math.pi * self.ALPHA_HZ * (n * dt) + phase_a)
-            + self.THETA_AMP * math.cos(2.0 * math.pi * self.THETA_HZ * (n * dt) + phase_t)
-            + rng.gauss(0.0, self.NOISE_SD)
-            for n in range(self.samples)
-        )
-
-        alpha = band_power(series, self.sample_rate_hz, *ALPHA_BAND)
-        theta = band_power(series, self.sample_rate_hz, *THETA_BAND)
-        return BiosignalWindow(
-            source=self.name,
-            stamp=self.stamp,
-            index=index,
-            t0_s=index * self.samples / self.sample_rate_hz,
-            sample_rate_hz=self.sample_rate_hz,
-            channels={"eeg": series},
-            features={
-                "alpha_power": alpha,
-                "theta_power": theta,
-                "alpha_theta_ratio": alpha_theta_ratio(alpha, theta),
-            },
-        )
 
 
 class SimulatedCardioOculoSource(SimulatedSource):

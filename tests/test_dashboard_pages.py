@@ -614,7 +614,7 @@ def test_the_mode_is_carried_in_a_key_that_survives_navigation():
 # seven times.
 # ---------------------------------------------------------------------------
 
-COGNITIVE_PAGES = ("3_Brain_atlas.py", "4_Cognitive_load.py", "5_Neurofeedback_demo.py")
+COGNITIVE_PAGES = ("3_Brain_atlas.py", "4_Cognitive_load.py")
 
 
 def _cognitive_shell_files() -> list[Path]:
@@ -797,7 +797,7 @@ def test_no_cognitive_page_prints_a_heading_its_panel_already_carries():
     """
     for path in _cognitive_shell_files():
         source = path.read_text(encoding="utf-8")
-        for constant in ("ATLAS_TITLE", "LOAD_TITLE", "NF_TITLE", "theme.lede("):
+        for constant in ("ATLAS_TITLE", "LOAD_TITLE", "theme.lede("):
             assert constant not in source, (
                 f"{path.name} renders {constant}, which its panel already renders"
             )

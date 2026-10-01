@@ -29,20 +29,6 @@ import cmath
 import math
 from collections.abc import Sequence
 
-#: Conventional EEG band edges, in Hz, lower inclusive and upper exclusive.
-#: These are textbook boundaries, not a finding of this project.
-DELTA_BAND = (0.5, 4.0)
-THETA_BAND = (4.0, 8.0)
-ALPHA_BAND = (8.0, 13.0)
-BETA_BAND = (13.0, 30.0)
-
-BANDS: dict[str, tuple[float, float]] = {
-    "delta": DELTA_BAND,
-    "theta": THETA_BAND,
-    "alpha": ALPHA_BAND,
-    "beta": BETA_BAND,
-}
-
 
 def _centered(samples: Sequence[float]) -> tuple[float, ...]:
     """Remove the mean. A DC offset otherwise lands in the lowest bins as power."""
@@ -94,48 +80,6 @@ def band_power(
             acc += value * cmath.exp(step * index)
         total += (2.0 / (n * n)) * (acc.real * acc.real + acc.imag * acc.imag)
     return total
-
-
-def relative_band_power(
-    samples: Sequence[float],
-    sample_rate_hz: float,
-    low_hz: float,
-    high_hz: float,
-    *,
-    reference: tuple[float, float] = (DELTA_BAND[0], BETA_BAND[1]),
-) -> float:
-    """Band power as a fraction of power in `reference`. Unitless, in [0, 1].
-
-    Useful because absolute band power depends on electrode impedance, gain and
-    a dozen other things a simulator does not have, so an absolute number is not
-    comparable across sources even in principle.
-    """
-    whole = band_power(samples, sample_rate_hz, *reference)
-    if whole <= 0.0:
-        raise ValueError("reference band carries no power; a ratio would be meaningless.")
-    return band_power(samples, sample_rate_hz, low_hz, high_hz) / whole
-
-
-def alpha_theta_ratio(alpha_power: float, theta_power: float) -> float:
-    """Alpha power divided by theta power.
-
-    Raises on zero or negative theta rather than flooring it with an epsilon.
-    An epsilon here would be an invented constant that silently sets the ceiling
-    of the V5 ring -- a number nothing in this project supports, doing real work
-    in a picture. A window with literally no theta power cannot come from any
-    source in this package (there is always noise in the band), so the raise is
-    a genuine "this input is not what you think it is" rather than a case the
-    caller has to handle.
-    """
-    if alpha_power < 0.0:
-        raise ValueError("alpha power cannot be negative.")
-    if theta_power <= 0.0:
-        raise ValueError(
-            "theta power is zero, so the alpha/theta ratio is undefined. Flooring it "
-            "with an epsilon would invent the ceiling of the neurofeedback ring; see "
-            "this function's docstring."
-        )
-    return alpha_power / theta_power
 
 
 # ---------------------------------------------------------------------------

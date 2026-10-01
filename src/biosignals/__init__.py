@@ -20,22 +20,14 @@ dashboard behaves exactly as it did in Phase 24.
 """
 
 from src.biosignals.features import (
-    ALPHA_BAND,
-    BANDS,
-    BETA_BAND,
-    DELTA_BAND,
     HF_BAND,
     LOAD_WEIGHTS,
-    THETA_BAND,
-    alpha_theta_ratio,
     band_power,
     blink_rate,
     hf_hrv,
     load_index,
     pupil_effort,
-    relative_band_power,
 )
-from src.biosignals.session import NeurofeedbackSession, SessionState
 from src.biosignals.sources import (
     SIMULATED_STAMP,
     SIMULATED_TOKEN,
@@ -44,36 +36,25 @@ from src.biosignals.sources import (
     EthicsGateError,
     NarratedSession,
     SimulatedCardioOculoSource,
-    SimulatedEEGSource,
     SimulatedSource,
     require_simulated,
 )
 
 __all__ = [
-    "ALPHA_BAND",
-    "BANDS",
-    "BETA_BAND",
-    "DELTA_BAND",
     "SIMULATED_STAMP",
     "HF_BAND",
     "LOAD_WEIGHTS",
     "SIMULATED_TOKEN",
-    "THETA_BAND",
     "BiosignalSource",
     "BiosignalWindow",
     "EthicsGateError",
     "NarratedSession",
-    "NeurofeedbackSession",
-    "SessionState",
     "SimulatedCardioOculoSource",
-    "SimulatedEEGSource",
     "SimulatedSource",
-    "alpha_theta_ratio",
     "band_power",
     "blink_rate",
     "hf_hrv",
     "load_index",
     "pupil_effort",
-    "relative_band_power",
     "require_simulated",
 ]

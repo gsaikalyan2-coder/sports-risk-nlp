@@ -624,39 +624,6 @@ LOAD_WHAT_IT_IS_NOT = (
 )
 
 # ---------------------------------------------------------------------------
-# Phase 26 / V5, closed-loop neurofeedback, demo mode
-# ---------------------------------------------------------------------------
-
-NF_TITLE = "Neurofeedback loop (demo)"
-
-#: Rendered before the first control on the page, in red. Not negotiable: a
-#: closed feedback loop changes the behaviour of the person inside it, which
-#: makes it an intervention rather than an observation.
-NF_DEMO_ONLY = (
-    "DEMO MODE: the loop is closing against a generated signal and nobody is being "
-    "trained. No headset is attached and no person is in this loop."
-)
-
-NF_ETHICS_GATE = (
-    "Before this runs against any person it needs ethics approval and a clinician in the "
-    "loop, and the ethics and model-card documents updated first. The page refuses to "
-    "render for anything but a generated source."
-)
-
-NF_PLAIN = (
-    "The ring grows while the generated signal holds above its target and shrinks when it "
-    "drifts. That is the whole mechanism a real attention-training session uses."
-)
-
-NF_HOW_TO_READ = (
-    "Dashed circle is the target. Solid ring is the current value. The counters below are "
-    "session arithmetic over the ticks so far, nothing more."
-)
-
-NF_TILE_LABEL = "Time in target"
-NF_TILE_CAPTION = "of the last demo session"
-
-# ---------------------------------------------------------------------------
 # Phase 26 / V3, narrated, a spoken clip with the simulated body under it
 # ---------------------------------------------------------------------------
 

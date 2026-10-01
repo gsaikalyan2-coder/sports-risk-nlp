@@ -30,8 +30,6 @@ from src.dashboard.copy import (
     DIRECTION_PLAIN,
     LOAD_TILE_CAPTION,
     LOAD_TILE_LABEL,
-    NF_TILE_CAPTION,
-    NF_TILE_LABEL,
 )
 from src.dashboard.view import (
     POLICY_SHORT,
@@ -242,27 +240,4 @@ def load_widget(window) -> Widget:
         inert=False,
         detected=True,
         stamp=window.stamp,
-    )
-
-
-def neurofeedback_widget(session, ratios, *, stamp: str) -> Widget:
-    """The Phase 26 / V5 summary tile: time in target for the last demo session.
-
-    The arithmetic comes from `NeurofeedbackSession.run`, which is pure and
-    tested without a browser -- the tile reads a state, it does not count. The
-    caption carries the demo wording, because a "time in target" figure lifted
-    out of this page and into a slide would otherwise read as a training result
-    for a person who does not exist.
-    """
-    state = session.run(ratios)
-    return Widget(
-        construct="neurofeedback",
-        title=NF_TILE_LABEL,
-        value=f"{state.in_target_s:.0f}s",
-        value_caption=NF_TILE_CAPTION + ", generated signal, no person",
-        secondary=f"{state.longest_hold_s:.0f}s longest hold",
-        secondary_caption=f"over {state.elapsed_s:.0f}s of generated signal",
-        inert=False,
-        detected=True,
-        stamp=stamp,
     )
