@@ -1,0 +1,14 @@
+# Streamlit Community Cloud dependency set (dashboard only).
+#
+# Cloud reads the requirements file sitting next to the main file
+# (dashboard/app.py) before the repo-root requirements.txt, so this file keeps
+# the deployed app off the full dev stack (torch, crewai, transformers, shap).
+# The dashboard never trains or loads a model; every number comes from
+# src.dashboard and committed fixtures. Versions are the set the previous
+# deployment ran on.
+streamlit==1.63.0
+PyYAML==6.0.3
+numpy==2.4.4
+pandas==3.0.2
+scipy==1.17.1
+scikit-learn==1.8.0
