@@ -27,10 +27,7 @@ from src.biosignals import (
     LOAD_WEIGHTS,
     BiosignalWindow,
     EthicsGateError,
-    NeurofeedbackSession,
-    SessionState,
     SimulatedCardioOculoSource,
-    SimulatedEEGSource,
     SimulatedSource,
     require_simulated,
 )
@@ -39,10 +36,7 @@ __all__ = [
     "LOAD_WEIGHTS",
     "BiosignalWindow",
     "EthicsGateError",
-    "NeurofeedbackSession",
-    "SessionState",
     "SimulatedCardioOculoSource",
-    "SimulatedEEGSource",
     "SimulatedSource",
     "require_simulated",
 ]

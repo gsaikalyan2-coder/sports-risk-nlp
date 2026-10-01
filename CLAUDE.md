@@ -318,7 +318,7 @@ SHAP, W&B, Streamlit, LaTeX). Flag if you want to change any.
 
 | Question | Decision |
 |---|---|
-| What V1 / V3 / V5 are | **V1** = construct→brain network atlas · **V3** = cognitive load from HRV + webcam oculometrics · **V5** = closed-loop neurofeedback session |
+| What V1 / V3 / V5 are | **V1** = construct→brain network atlas · **V3** = cognitive load from HRV + webcam oculometrics · **V5** = closed-loop neurofeedback session (**removed 2026-10-01, see §11.6**) |
 | Data source | **Simulated only, behind a hardware-ready seam.** No headset, no strap, no participant. |
 | V5 scope | **Demo mode only, no human subject.** The loop closes against a simulated signal. |
 | Documents updated | This file, `PROJECT_PLAN.md` (new Phase 26), `handover_phase_26_cognitive_layer.txt` |
@@ -370,7 +370,8 @@ The layer copies the architecture the dashboard already proved, rather than inve
   Nothing about the layer's honesty rests on the default: the stamps, the ethics gate in
   `src/biosignals/sources.py` and the activation screen never consult it.
 - **Widget placement.** Navigation order becomes **Dashboard → Score my own text → Brain atlas →
-  Cognitive load → Neurofeedback (demo)**. Each feature is a page *and* exposes a compact summary
+  Cognitive load**. (Neurofeedback was the fifth page and was removed on 2026-10-01; see §11.6.)
+  Each feature is a page *and* exposes a compact summary
   tile built through the existing `src/dashboard/widgets.py::Widget` contract, so the same three
   features can appear as tiles appended after the existing grid on the dashboard.
 
@@ -522,61 +523,37 @@ fastest route to a *real* athlete because nobody objects to a chest strap.
 
 ---
 
-## 11.6 V5 - Closed-Loop Neurofeedback (demo mode)
+## 11.6 V5 - REMOVED (2026-10-01)
 
-### Feature overview
-An attention-training visual driven by a live alpha/theta ratio: a ring that expands while the
-athlete holds the target state and contracts when attention drifts, with time-in-target and
-longest-hold reported for the session. **In this phase the loop closes against a simulated signal and
-no human is being trained** - it is a demonstration of the mechanism, not an intervention.
+**The closed-loop neurofeedback demo was removed from the codebase entirely on owner
+instruction, 2026-10-01.** This section records the removal rather than describing the
+feature, following the sec.21 precedent: a feature that is deleted is deleted, and the
+reason it existed stays on the record so a future session does not rebuild it by accident.
 
-### Widget specification
-- **Page:** `dashboard/pages/5_Neurofeedback_demo.py` - fifth in nav. The filename carries `_demo`
-  deliberately; the nav label must read "Neurofeedback (demo)".
-- **Component:** `neurovis.neurofeedback_panel(session, *, mode)`.
-- **State:** a `NeurofeedbackSession` dataclass (elapsed, time-in-target, longest hold, target
-  threshold) held in `st.session_state["nf_session"]`; Start / Stop / Reset buttons.
-- **UI behaviour:** ring radius ∝ alpha/theta ratio; ring colour switches at the target threshold;
-  a dashed reference circle marks the target; a trace below shows the ratio against the threshold
-  line. Session stats update once per tick. A red banner states the demo-mode limitation at all times.
-- **Summary tile:** "Time in target" for the last demo session.
+What V5 was: an attention-training ring driven by a simulated alpha/theta ratio, with
+time-in-target and longest-hold counters. The loop closed against a generated signal and
+no human was ever in it.
 
-### Files affected
-| File | Change |
-|---|---|
-| `src/biosignals/session.py` | **new** - `NeurofeedbackSession` state machine; pure, no Streamlit |
-| `src/biosignals/sources.py` | **modified** - `SimulatedEEGSource` gains the band-power path V5 needs |
-| `src/dashboard/neurovis.py` | **modified** - `neurofeedback_panel()` |
-| `dashboard/pages/5_Neurofeedback_demo.py` | **new** - page shell |
-| `src/dashboard/copy.py` | **modified** - `NF_PLAIN`, `NF_DEMO_ONLY`, `NF_ETHICS_GATE` |
-| `tests/test_biosignals.py` | **modified** - session state machine tests |
-| `docs/ethics.md` | **NOT modified now - blocking gate before any human use** (§11.2) |
+Deleted outright: `dashboard/pages/5_Neurofeedback_demo.py`, `src/biosignals/session.py`
+(`NeurofeedbackSession`, `SessionState`), `SimulatedEEGSource`, `features.alpha_theta_ratio`,
+the EEG band constants, `features.relative_band_power`, `neurovis.{ring_radius,
+neurofeedback_height, neurofeedback_panel}`, `widgets.neurofeedback_widget`, every `NF_*`
+copy string, and their tests.
 
-### Implementation steps
-1. Implement `NeurofeedbackSession` as a pure state machine: `tick(ratio) -> SessionState`. All
-   session arithmetic lives here so it is testable without a browser.
-2. Add the band-power path to `SimulatedEEGSource` (alpha and theta from the same simulated series).
-3. Build `neurofeedback_panel()`; the animation is CSS/JS inside the iframe, with the final state
-   painted by a classic script first so a blocked CDN costs the motion and nothing else - the defect
-   already found and fixed once in `motion.py`.
-4. Build the page shell with the demo-mode banner rendered **before** any control, not after.
-5. Add the ethics guard: the page refuses to render if the configured source is not a
-   `SimulatedSource`.
+**Kept deliberately, because they were never V5-only:** the `# BLOCKED UNTIL ETHICS SIGN-OFF`
+guard and `require_simulated` in `src/biosignals/sources.py`, which still protect V3;
+`band_power` and `hf_hrv`, which V3's load index needs; and the `SIMULATED` stamp contract.
+The ethics gate test survives, retargeted, in `tests/test_neurovis.py`.
 
-### Dependencies & integration points
-- **Consumes:** `src/biosignals/sources.py` and `features.py` - **V5 cannot be built before V3's
-  source layer exists.** This is the only hard cross-feature dependency in the layer.
-- **Consumes:** `theme`, `copy`, the `motion.py` two-script pattern.
-- **Blocks on:** ethics approval and a clinician before any non-simulated use.
+**The ethics position is unchanged by this removal.** The gate in
+`src/biosignals/sources.py` still refuses any non-simulated source, and the sec.11.2 rule
+still stands: the moment any real physiological signal from any person enters this code,
+`docs/ethics.md` and `docs/model_card.md` must be updated first. Removing V5 removes the
+one feature that would additionally have been an intervention; it does not relax anything.
 
-### Testing & validation
-- The session state machine: time-in-target and longest-hold are correct on a hand-written ratio
-  sequence; a reset clears both.
-- The panel renders its demo-mode banner, and the banner text appears **before** the first control in
-  the page source (same ordering rule as the provenance stamp).
-- The page raises if handed a non-simulated source - assert the guard, not just its absence.
-- The panel renders fully with the animation module removed (classic-script fallback).
-- No band or threshold language leaks into the summary tile.
+Restoring it would not be a revert of one commit: the session state machine, the EEG
+source, the ratio feature, the panel, the widget and six test blocks would all need
+rebuilding, and the intervention argument in sec.11.2 would need re-making.
 
 ---
 
@@ -586,11 +563,12 @@ no human is being trained** - it is a demonstration of the mechanism, not an int
 shared: src/biosignals/{sources,features}.py + src/dashboard/neurovis.py
    │
    ├── V1  Brain atlas          (independent - can ship alone, needs no source)
-   ├── V3  Cognitive load       (needs sources + features)
-   │      └── V5  Neurofeedback (needs V3's source + feature layer)
+   └── V3  Cognitive load       (needs sources + features)
+
+   (V5 Neurofeedback depended on V3's source and feature layer. Removed 2026-10-01, §11.6.)
 ```
 
-Recommended order: **shared → V1 → V3 → V5.** V1 first because it is independent, demos well, and
+Recommended order: **shared → V1 → V3.** V1 first because it is independent, demos well, and
 exercises `neurovis.py` before the biosignal layer is on the critical path.
 
 ### Definition of done for the layer

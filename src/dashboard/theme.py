@@ -216,7 +216,7 @@ def mode_control(st) -> str:
 
 
 #: The three Phase 26 pages, by the fragment Streamlit puts in their nav href.
-COGNITIVE_PAGES: tuple[str, ...] = ("Brain_atlas", "Cognitive_load", "Neurofeedback_demo")
+COGNITIVE_PAGES: tuple[str, ...] = ("Brain_atlas", "Cognitive_load")
 
 COGNITIVE_FLAG = "SRN_COGNITIVE_LAYER"
 

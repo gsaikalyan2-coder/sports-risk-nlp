@@ -542,7 +542,8 @@ Sec = Security/Ethics · Pap = Paper.
 ### Phase 26 - Cognitive layer (V1 / V3 / V5) *(stretch; gated on "starts only after Phase 23 ships" - **gate breached 2026-09-13**, see the phase-order debt note in the status board)*
 - **Objective:** Add a cognitive/physiological presentation layer over the existing text pipeline -
   a construct→brain-network atlas (V1), a cognitive-load panel from HRV + webcam oculometrics (V3),
-  and a closed-loop neurofeedback demo (V5) - **without moving a single number in the paper**.
+  and a closed-loop neurofeedback demo (V5, removed 2026-10-01; see CLAUDE.md §11.6) -
+  **without moving a single number in the paper**.
 - **Scope decision (owner, 2026-09-13):** simulated signals only, behind a hardware-ready seam.
   No headset, no strap, no participant. V5 ships in **demo mode**: the loop closes against a
   simulated signal and trains nobody.

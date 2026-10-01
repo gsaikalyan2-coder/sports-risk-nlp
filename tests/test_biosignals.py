@@ -29,24 +29,17 @@ Four properties, and the reason each one is a test rather than a convention:
 
 from __future__ import annotations
 
-import dataclasses
 import math
 
 import pytest
 
 from src.biosignals.features import (
-    ALPHA_BAND,
-    BETA_BAND,
-    DELTA_BAND,
     LOAD_WEIGHTS,
-    THETA_BAND,
-    alpha_theta_ratio,
     band_power,
     blink_rate,
     hf_hrv,
     load_index,
     pupil_effort,
-    relative_band_power,
 )
 from src.biosignals.sources import (
     SIMULATED_STAMP,
@@ -54,7 +47,6 @@ from src.biosignals.sources import (
     BiosignalWindow,
     EthicsGateError,
     SimulatedCardioOculoSource,
-    SimulatedEEGSource,
     SimulatedSource,
     require_simulated,
 )
@@ -151,7 +143,7 @@ def test_duration_is_derived_from_the_channels_and_not_stored():
 
 
 def test_the_gate_lets_a_real_simulated_source_through():
-    source = SimulatedEEGSource(seed=1)
+    source = SimulatedCardioOculoSource(seed=1)
     assert require_simulated(source) is source
 
 
@@ -201,12 +193,12 @@ def test_the_gate_names_the_documents_that_must_be_updated_first():
 
 def test_a_simulated_source_cannot_be_built_without_a_stamp():
     with pytest.raises(ValueError, match="SIMULATED"):
-        SimulatedEEGSource(stamp="live capture")
+        SimulatedCardioOculoSource(stamp="live capture")
 
 
 def test_simulated_is_a_property_with_no_setter():
     """So a subclass cannot quietly assign its way out of being simulated."""
-    source = SimulatedEEGSource(seed=1)
+    source = SimulatedCardioOculoSource(seed=1)
     with pytest.raises(AttributeError):
         source.simulated = False  # type: ignore[misc]
     assert isinstance(SimulatedSource.simulated, property)
@@ -216,6 +208,15 @@ def test_simulated_is_a_property_with_no_setter():
 def test_the_abstract_base_cannot_be_instantiated_directly():
     with pytest.raises(TypeError):
         SimulatedSource(name="x", seed=1)  # type: ignore[abstract]
+
+
+#: Test-local frequency windows for `band_power`. Declared here rather than
+#: imported, because the EEG band constants left the module with the V5 feature
+#: and these are fixtures for a DSP function, not production values.
+LOW_BAND = (0.5, 4.0)
+MID_BAND = (4.0, 8.0)
+TEST_BAND = (8.0, 13.0)
+HIGH_BAND = (13.0, 30.0)
 
 
 # ---------------------------------------------------------------------------
@@ -231,20 +232,20 @@ def test_band_power_of_a_pure_cosine_is_half_its_amplitude_squared():
     """
     for amplitude, expected in ((1.0, 0.5), (2.0, 2.0), (0.5, 0.125)):
         series = cosine(10.0, amplitude)
-        assert band_power(series, FS, *ALPHA_BAND) == pytest.approx(expected, rel=1e-9)
+        assert band_power(series, FS, *TEST_BAND) == pytest.approx(expected, rel=1e-9)
 
 
 def test_band_power_is_zero_outside_the_band_that_holds_the_signal():
     series = cosine(10.0, 2.0)
-    assert band_power(series, FS, *THETA_BAND) == pytest.approx(0.0, abs=1e-9)
-    assert band_power(series, FS, *DELTA_BAND) == pytest.approx(0.0, abs=1e-9)
-    assert band_power(series, FS, *BETA_BAND) == pytest.approx(0.0, abs=1e-9)
+    assert band_power(series, FS, *MID_BAND) == pytest.approx(0.0, abs=1e-9)
+    assert band_power(series, FS, *LOW_BAND) == pytest.approx(0.0, abs=1e-9)
+    assert band_power(series, FS, *HIGH_BAND) == pytest.approx(0.0, abs=1e-9)
 
 
 def test_band_power_of_a_constant_series_is_zero_in_every_band():
     """The mean is removed first, so a DC offset is not power in the lowest bins."""
     flat = tuple(3.7 for _ in range(N))
-    for band in (DELTA_BAND, THETA_BAND, ALPHA_BAND, BETA_BAND):
+    for band in (LOW_BAND, MID_BAND, TEST_BAND, HIGH_BAND):
         assert band_power(flat, FS, *band) == pytest.approx(0.0, abs=1e-12)
 
 
@@ -254,14 +255,14 @@ def test_band_power_adds_over_two_tones_in_different_bands():
     alpha = cosine(10.0, 2.0)
     theta = cosine(6.0, 1.0)
     mixed = tuple(a + t for a, t in zip(alpha, theta, strict=True))
-    assert band_power(mixed, FS, *ALPHA_BAND) == pytest.approx(2.0, rel=1e-9)
-    assert band_power(mixed, FS, *THETA_BAND) == pytest.approx(0.5, rel=1e-9)
+    assert band_power(mixed, FS, *TEST_BAND) == pytest.approx(2.0, rel=1e-9)
+    assert band_power(mixed, FS, *MID_BAND) == pytest.approx(0.5, rel=1e-9)
 
 
 def test_band_power_is_monotone_in_amplitude():
     previous = -1.0
     for amplitude in (0.25, 0.5, 1.0, 2.0, 4.0):
-        power = band_power(cosine(10.0, amplitude), FS, *ALPHA_BAND)
+        power = band_power(cosine(10.0, amplitude), FS, *TEST_BAND)
         assert power > previous
         previous = power
 
@@ -269,41 +270,20 @@ def test_band_power_is_monotone_in_amplitude():
 def test_band_power_does_not_depend_on_phase():
     """A power spectrum discards phase; a version that did not would make the
     simulator's per-window random phase show up as a wandering feature value."""
-    reference = band_power(cosine(10.0, 1.0, phase=0.0), FS, *ALPHA_BAND)
+    reference = band_power(cosine(10.0, 1.0, phase=0.0), FS, *TEST_BAND)
     for phase in (0.3, 1.1, 2.7, 5.9):
-        assert band_power(cosine(10.0, 1.0, phase=phase), FS, *ALPHA_BAND) == pytest.approx(
+        assert band_power(cosine(10.0, 1.0, phase=phase), FS, *TEST_BAND) == pytest.approx(
             reference, rel=1e-9
         )
 
 
 def test_band_power_refuses_inputs_it_cannot_answer_for():
     with pytest.raises(ValueError, match="positive"):
-        band_power(cosine(10.0), 0.0, *ALPHA_BAND)
+        band_power(cosine(10.0), 0.0, *TEST_BAND)
     with pytest.raises(ValueError, match="low < high"):
         band_power(cosine(10.0), FS, 13.0, 8.0)
     with pytest.raises(ValueError, match="two samples"):
-        band_power((1.0,), FS, *ALPHA_BAND)
-
-
-def test_relative_band_power_of_a_single_tone_is_one():
-    series = cosine(10.0, 2.0)
-    assert relative_band_power(series, FS, *ALPHA_BAND) == pytest.approx(1.0, rel=1e-9)
-    assert relative_band_power(series, FS, *THETA_BAND) == pytest.approx(0.0, abs=1e-9)
-
-
-def test_relative_band_power_of_two_equal_tones_splits_in_half():
-    mixed = tuple(a + t for a, t in zip(cosine(10.0, 1.0), cosine(6.0, 1.0), strict=True))
-    assert relative_band_power(mixed, FS, *ALPHA_BAND) == pytest.approx(0.5, rel=1e-9)
-    assert relative_band_power(mixed, FS, *THETA_BAND) == pytest.approx(0.5, rel=1e-9)
-
-
-def test_the_alpha_theta_ratio_is_a_division_and_refuses_to_invent_a_ceiling():
-    assert alpha_theta_ratio(2.0, 0.5) == pytest.approx(4.0)
-    assert alpha_theta_ratio(0.5, 2.0) == pytest.approx(0.25)
-    with pytest.raises(ValueError, match="undefined"):
-        alpha_theta_ratio(1.0, 0.0)
-    with pytest.raises(ValueError, match="negative"):
-        alpha_theta_ratio(-1.0, 1.0)
+        band_power((1.0,), FS, *TEST_BAND)
 
 
 # ---------------------------------------------------------------------------
@@ -311,64 +291,29 @@ def test_the_alpha_theta_ratio_is_a_division_and_refuses_to_invent_a_ceiling():
 # ---------------------------------------------------------------------------
 
 
-def test_the_same_seed_and_index_give_an_identical_window():
-    a = SimulatedEEGSource(seed=42).window(3)
-    b = SimulatedEEGSource(seed=42).window(3)
-    assert a.channels["eeg"] == b.channels["eeg"]
-    assert a.features == b.features
-
-
 def test_a_window_does_not_depend_on_what_was_asked_for_before_it():
     """The property a paper figure depends on, and the one an RNG held on the
     instance would silently break: the simulator is a function of (seed, index),
     not a stream with a position in it."""
-    fresh = SimulatedEEGSource(seed=42).window(3)
-    source = SimulatedEEGSource(seed=42)
+    fresh = SimulatedCardioOculoSource(seed=42).window(3)
+    source = SimulatedCardioOculoSource(seed=42)
     for index in (0, 1, 2, 7, 11):
         source.window(index)
-    assert source.window(3).channels["eeg"] == fresh.channels["eeg"]
-
-
-def test_different_seeds_give_different_windows():
-    a = SimulatedEEGSource(seed=1).window(0)
-    b = SimulatedEEGSource(seed=2).window(0)
-    assert a.channels["eeg"] != b.channels["eeg"]
-
-
-def test_every_window_the_source_emits_carries_the_stamp():
-    source = SimulatedEEGSource(seed=5)
-    for window in source.stream(6):
-        assert "SIMULATED" in window.stamp.upper()
-        assert window.source == "simulated-eeg"
+    assert source.window(3).channels["rr_ms"] == fresh.channels["rr_ms"]
 
 
 def test_the_stream_is_consecutive_and_pure():
-    source = SimulatedEEGSource(seed=5)
+    source = SimulatedCardioOculoSource(seed=5)
     first = source.stream(4)
     assert [w.index for w in first] == [0, 1, 2, 3]
-    assert [w.channels["eeg"] for w in source.stream(4)] == [w.channels["eeg"] for w in first]
+    assert [w.channels["rr_ms"] for w in source.stream(4)] == [w.channels["rr_ms"] for w in first]
 
 
-def test_the_alpha_theta_ratio_rises_and_falls_over_the_drift_cycle():
-    """The behaviour V5's ring exists to show. Asserted on the amplitude schedule
-    (a closed form) and then on the realised feature, so a change to the noise
-    level cannot quietly flatten the thing the panel is animating."""
-    source = SimulatedEEGSource(seed=9)
-    quarter = source.DRIFT_PERIOD // 4
-    assert source.alpha_amplitude(quarter) > source.alpha_amplitude(0)
-    assert source.alpha_amplitude(3 * quarter) < source.alpha_amplitude(0)
-
-    ratios = [source.window(i).features["alpha_theta_ratio"] for i in range(source.DRIFT_PERIOD)]
-    assert max(ratios) > min(ratios) * 1.5, "the drift is too small for a ring to show it"
-    assert ratios.index(max(ratios)) != 0, "the peak should not sit at the start of the cycle"
-
-
-def test_the_windows_features_are_the_ones_the_panels_will_read():
-    window = SimulatedEEGSource(seed=3).window(0)
-    assert set(window.features) == {"alpha_power", "theta_power", "alpha_theta_ratio"}
-    assert window.features["alpha_theta_ratio"] == pytest.approx(
-        window.features["alpha_power"] / window.features["theta_power"], rel=1e-12
-    )
+def test_every_window_the_source_emits_carries_the_stamp():
+    source = SimulatedCardioOculoSource(seed=5)
+    for window in source.stream(6):
+        assert "SIMULATED" in window.stamp.upper()
+        assert window.source == "simulated-cardio-oculo"
 
 
 # ---------------------------------------------------------------------------
@@ -379,7 +324,7 @@ def test_the_windows_features_are_the_ones_the_panels_will_read():
 def test_a_windows_context_mapping_cannot_collide_with_a_construct_name():
     """Every key is prefixed, so a biosignal feature can never be mistaken for a
     construct probability if the two mappings are ever merged by a future page."""
-    window = SimulatedEEGSource(seed=3).window(0)
+    window = SimulatedCardioOculoSource(seed=3).window(0)
     context = window.context()
     assert context
     assert all(key.startswith("biosignal_") for key in context)
@@ -406,7 +351,7 @@ def test_the_risk_index_is_bit_identical_with_and_without_the_context_mapping():
         "self_confidence": 0.22,
         "burnout_signal": 0.17,
     }
-    window = SimulatedEEGSource(seed=3).window(0)
+    window = SimulatedCardioOculoSource(seed=3).window(0)
 
     without = scorer.score(probabilities)
     with_context = scorer.score(probabilities, context=window.context())
@@ -521,75 +466,3 @@ def test_the_cardio_window_context_is_still_ignored_by_the_scorer():
     with_context = scorer.score(probabilities, context=window.context())
     assert with_context.index == without.index
     assert with_context.context_used == ()
-
-
-# ---------------------------------------------------------------------------
-# (g) V5 - the session state machine, checked on paper
-# ---------------------------------------------------------------------------
-
-
-def test_the_session_counters_match_arithmetic_done_by_hand():
-    from src.biosignals.session import NeurofeedbackSession
-
-    session = NeurofeedbackSession(target=1.0, tick_s=1.0)
-    #        below, below, ON,  ON,  below, ON,  ON,  ON,  below
-    ratios = [0.4, 0.9, 1.2, 1.5, 0.8, 1.1, 1.4, 1.0, 0.2]
-    state = session.run(ratios)
-    assert state.ticks == 9
-    assert state.elapsed_s == pytest.approx(9.0)
-    assert state.in_target_s == pytest.approx(5.0)  # two + three
-    assert state.longest_hold_s == pytest.approx(3.0)
-    assert state.current_hold_s == pytest.approx(0.0)
-    assert state.in_target_fraction == pytest.approx(5.0 / 9.0)
-
-
-def test_the_target_boundary_is_inclusive():
-    """A ratio sitting exactly on the target is the value a participant would be
-    trying hardest to hold; a strict comparison refuses to credit it."""
-    from src.biosignals.session import NeurofeedbackSession
-
-    session = NeurofeedbackSession(target=1.0)
-    assert session.run([1.0]).in_target_s == pytest.approx(1.0)
-    assert session.run([0.999]).in_target_s == pytest.approx(0.0)
-
-
-def test_a_reset_clears_both_counters():
-    from src.biosignals.session import NeurofeedbackSession
-
-    session = NeurofeedbackSession(target=1.0)
-    assert session.run([2.0, 2.0, 2.0]).longest_hold_s == pytest.approx(3.0)
-    fresh = session.reset()
-    assert fresh.in_target_s == 0.0 and fresh.longest_hold_s == 0.0 and fresh.ticks == 0
-    assert fresh.in_target_fraction == 0.0
-
-
-def test_the_session_state_is_frozen_so_history_stays_answerable():
-    from src.biosignals.session import NeurofeedbackSession
-
-    session = NeurofeedbackSession(target=1.0)
-    states = session.trace([2.0, 0.5, 2.0])
-    assert [s.in_target_s for s in states] == [1.0, 1.0, 2.0]
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        states[0].in_target_s = 99.0  # type: ignore[misc]
-
-
-def test_a_session_refuses_a_target_that_every_ratio_meets():
-    from src.biosignals.session import NeurofeedbackSession
-
-    with pytest.raises(ValueError, match="target"):
-        NeurofeedbackSession(target=0.0)
-    with pytest.raises(ValueError, match="target"):
-        NeurofeedbackSession(target=-1.0)
-    with pytest.raises(ValueError, match="tick_s"):
-        NeurofeedbackSession(target=1.0, tick_s=0.0)
-
-
-def test_the_tick_length_scales_the_counters_and_nothing_else():
-    from src.biosignals.session import NeurofeedbackSession
-
-    ratios = [2.0, 2.0, 0.1]
-    one = NeurofeedbackSession(target=1.0, tick_s=1.0).run(ratios)
-    half = NeurofeedbackSession(target=1.0, tick_s=0.5).run(ratios)
-    assert half.in_target_s == pytest.approx(one.in_target_s / 2)
-    assert half.ticks == one.ticks
-    assert half.in_target_fraction == pytest.approx(one.in_target_fraction)

@@ -597,47 +597,8 @@ def test_the_load_panel_reaches_no_network(load_doc):
 
 
 # ---------------------------------------------------------------------------
-# (h) V5 - the neurofeedback panel
+# (h) cross-cutting checks over the surviving panels
 # ---------------------------------------------------------------------------
-
-
-@pytest.fixture(scope="module")
-def nf():
-    from src.biosignals import NeurofeedbackSession, SimulatedEEGSource
-
-    source = SimulatedEEGSource(seed=20260913)
-    ratios = [w.features["alpha_theta_ratio"] for w in source.stream(48)]
-    session = NeurofeedbackSession(target=sorted(ratios)[len(ratios) // 2], tick_s=1.0)
-    return session, ratios, source.stamp
-
-
-@pytest.fixture(scope="module", params=MODES)
-def nf_doc(request, nf):
-    session, ratios, stamp = nf
-    return neurovis.neurofeedback_panel(session, ratios, mode=request.param, stamp=stamp)
-
-
-def test_the_demo_banner_precedes_the_first_control_in_the_source(nf_doc):
-    """The ordering rule, asserted rather than the mere presence of the string.
-
-    A banner after the Start button is in the DOM and under the fold, which is
-    the same failure the provenance stamp inside a collapsed expander has.
-    """
-    assert plain.NF_DEMO_ONLY in nf_doc
-    assert nf_doc.index(plain.NF_DEMO_ONLY) < nf_doc.index("<button")
-    assert nf_doc.index(plain.NF_DEMO_ONLY) < nf_doc.upper().index("SIMULATED")
-
-
-def test_the_panel_states_the_ethics_gate(nf_doc):
-    assert plain.NF_ETHICS_GATE in nf_doc
-    assert "clinician" in nf_doc
-
-
-def test_the_panel_refuses_anything_that_is_not_a_session(nf):
-    _session, ratios, stamp = nf
-    for impostor in (None, object(), {"target": 1.0}):
-        with pytest.raises(TypeError):
-            neurovis.neurofeedback_panel(impostor, ratios, mode="light", stamp=stamp)
 
 
 def test_the_page_refuses_a_source_that_is_not_simulated():
@@ -657,59 +618,6 @@ def test_the_page_refuses_a_source_that_is_not_simulated():
         require_simulated(Impostor())
 
 
-def test_the_ring_radius_inverts_to_the_ratio(nf):
-    """The ring introduces no number: radius is affine in ratio/(2*target),
-    clamped, and the target always lands at exactly half the span."""
-    session, ratios, _stamp = nf
-    target_r = neurovis.ring_radius(session.target, session.target)
-    midpoint = (neurovis.RING_MIN_R + neurovis.RING_MAX_R) / 2
-    assert target_r == pytest.approx(midpoint)
-    assert neurovis.ring_radius(0.0, session.target) == pytest.approx(neurovis.RING_MIN_R)
-    assert neurovis.ring_radius(99.0, session.target) == pytest.approx(neurovis.RING_MAX_R)
-    previous = -1.0
-    for ratio in sorted(ratios):
-        r = neurovis.ring_radius(ratio, session.target)
-        assert r >= previous
-        previous = r
-
-
-def test_the_panel_counters_come_from_the_state_machine(nf, nf_doc):
-    session, ratios, _stamp = nf
-    end = session.run(ratios)
-    first = session.trace(ratios)[0]
-    assert f"{first.in_target_s:.0f}s" in nf_doc
-    assert end.longest_hold_s > 0, "the fixture never holds target; this proves nothing"
-
-
-def test_the_panel_renders_fully_with_the_animation_removed(nf, nf_doc):
-    """Classic-script-first. The server paints the ring, the trace, the target
-    line and every counter, so a script that never runs costs the Start button
-    and nothing else -- the defect motion.py records having shipped once."""
-    session, ratios, _stamp = nf
-    without = re.sub(r"<script>.*?</script>", "", nf_doc, flags=re.S)
-    assert "<script" not in without
-    assert plain.NF_DEMO_ONLY in without
-    assert 'id="ring"' in without
-    assert 'id="tr"' in without
-    assert "stroke-dasharray" in without, "the target reference circle is gone"
-    first = session.trace(ratios)[0]
-    assert f"{first.in_target_s:.0f}s" in without
-
-
-def test_the_neurofeedback_tile_uses_no_band_language(nf):
-    from src.dashboard.widgets import neurofeedback_widget
-
-    session, ratios, stamp = nf
-    tile = neurofeedback_widget(session, ratios, stamp=stamp)
-    text = " ".join(
-        (tile.title, tile.value, tile.value_caption, tile.secondary, tile.secondary_caption)
-    )
-    for banned in ("low", "moderate", "high", "elevated", "severe", "normal", "improv"):
-        assert not re.search(rf"\b{banned}", text, re.I)
-    assert "no person" in text.lower()
-    assert tile.stamp.strip()
-
-
 def test_the_load_tile_uses_no_band_language(windows):
     from src.dashboard.widgets import load_widget
 
@@ -720,9 +628,8 @@ def test_the_load_tile_uses_no_band_language(windows):
     assert plain.LOAD_NOT_CALIBRATED in tile.value_caption
 
 
-def test_both_new_panels_pass_the_activation_screen(load_doc, nf_doc):
+def test_the_load_panel_passes_the_activation_screen(load_doc):
     neurovis.assert_no_activation_vocabulary(load_doc)
-    neurovis.assert_no_activation_vocabulary(nf_doc)
 
 
 def test_the_atlas_timeline_does_not_repeat_the_current_example(view):
