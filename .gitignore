@@ -127,3 +127,8 @@ donations_inbox*.jsonl
 consent_forms/
 
 Claude outputs/
+
+# Real annotator labels (A1 gold_dev backups) - never publish
+annotation/gold_dev/_backup_*/project.sqlite
+annotation/gold_dev/_backup_*/user_state.json
+annotation/gold_dev/_backup_*/*.sqlite
